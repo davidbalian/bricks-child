@@ -1,0 +1,194 @@
+{
+  "Chevrolet": {
+    "Astro Cargo": [],
+    "Astro Passenger": [],
+    "Avalanche": [],
+    "Aveo": [
+      "Aveo",
+      "Aveo LT",
+      "Aveo LS"
+    ],
+    "Beretta": [],
+    "Blazer": [
+      "Blazer"
+    ],
+    "Bolt EUV": [],
+    "Bolt EV": [
+      "Bolt EV"
+    ],
+    "C10 Pickup": [],
+    "C1500 Pickup": [
+      "C1500 Pickup 2WD"
+    ],
+    "C20 Pickup": [],
+    "C2500 Pickup": [],
+    "Camaro": [
+      "Camaro",
+      "ZL1",
+      "SS",
+      "LT",
+      "RS"
+    ],
+    "Caprice": [],
+    "Captiva": [],
+    "Cavalier": [],
+    "Celebrity": [],
+    "Chevette": [],
+    "Citation II": [],
+    "City Express Cargo Van": [],
+    "Classic": [],
+    "Coachbuilder Wagon": [],
+    "Cobalt": [],
+    "Colorado": [
+      "Colorado 2WD",
+      "Colorado",
+      "Colorado Crew Cab 2WD",
+      "Colorado Crew Cab",
+      "Colorado Mud Terrain Tires",
+      "Colorado ZR2",
+      "Colorado Extended Cab 2WD",
+      "Colorado Extended Cab"
+    ],
+    "Corsica": [],
+    "Corvette": [
+      "Corvette",
+      "Corvette Z06",
+      "Corvette Z06 Carbon Aero",
+      "Corvette ZR1",
+      "Grand Sport",
+      "Stingray",
+      "ZR1"
+    ],
+    "Cruze": [
+      "Cruze",
+      "Cruze Premier",
+      "Cruze LT"
+    ],
+    "El Camino Pickup": [],
+    "Epica": [],
+    "Equinox": [
+      "Equinox",
+      "Equinox Premier"
+    ],
+    "Express Cargo": [
+      "Express 2500 2WD Cargo",
+      "Express 3500 2WD Cargo"
+    ],
+    "Express Passenger": [],
+    "G10/20 Van": [
+      "G10/20 2WD"
+    ],
+    "G30 Van": [
+      "G30 2WD"
+    ],
+    "HHR": [],
+    "Impala": [],
+    "Impala/Caprice": [
+      "Caprice/Impala",
+      "Impala/Caprice"
+    ],
+    "K10 Pickup": [
+      "K10 Pickup"
+    ],
+    "K1500 Pickup": [
+      "K1500 Pickup",
+      "Silverado K1500 Pickup"
+    ],
+    "K20 Pickup": [],
+    "K2500 Pickup": [],
+    "Lumina": [],
+    "Lumina Minivan": [],
+    "Lumina/APV Minivan": [],
+    "Lumina/Monte Carlo": [
+      "Lumina/Monte Carlo"
+    ],
+    "Malibu": [],
+    "Metro": [],
+    "Monte Carlo": [],
+    "Nova": [],
+    "Optra": [
+      "Lacetti"
+    ],
+    "Pickup 2500": [
+      "Pickup 2500 2WD",
+      "Pickup 2500",
+      "Silverado 2500HD",
+      "Colorado 2500"
+    ],
+    "Postal Cab Chassis": [],
+    "Prizm": [],
+    "R10 Pickup": [],
+    "R20 (C20) Pickup": [],
+    "S10 Cab Chassis": [],
+    "S10 Pickup": [],
+    "S10 Utility Body": [],
+    "SS": [],
+    "SSR Pickup": [],
+    "Silverado": [
+      "Silverado 1500 2WD",
+      "Silverado 1500",
+      "Silverado 2500 HD 2WD",
+      "Silverado 2WD",
+      "Silverado",
+      "Silverado Mud Terrain Tires",
+      "Silverado 1500 LTZ",
+      "Silverado 2500 LTZ"
+    ],
+    "Sonic": [
+      "Sonic"
+    ],
+    "Spark": [
+      "Spark",
+      "LS",
+      "LT"
+    ],
+    "Spectrum": [],
+    "Sport Van": [],
+    "Sprint": [],
+    "Suburban": [
+      "Suburban 1500 2WD",
+      "Suburban 1500",
+      "Suburban 2WD",
+      "Suburban",
+      "Suburban C1500 2WD",
+      "Suburban K1500",
+      "Suburban V1500",
+      "LT Suburban 2WD",
+      "LT Suburban",
+      "LS Suburban 2WD",
+      "LS Suburban"
+    ],
+    "T10 (S10) Pickup": [],
+    "Tahoe": [
+      "Tahoe 1500 2WD",
+      "Tahoe 1500",
+      "Tahoe 2WD",
+      "Tahoe",
+      "Tahoe K1500",
+      "Tahoe Z71"
+    ],
+    "Tracker": [],
+    "TrailBlazer": [],
+    "Trailblazer": [],
+    "Traverse": [
+      "Traverse"
+    ],
+    "Trax": [
+      "Trax",
+      "LT",
+      "Premier"
+    ],
+    "Uplander": [],
+    "V10 (K10) Pickup": [],
+    "V20 Pickup": [],
+    "Van 15/25 Conversion": [],
+    "Van 1500": [],
+    "Van 1500/2500": [],
+    "Venture": [],
+    "Volt": [
+      "Volt",
+      "Chevrolet Volt Premier",
+      "Chevrolet Volt LT"
+    ]
+  }
+}

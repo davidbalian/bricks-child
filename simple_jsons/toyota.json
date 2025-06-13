@@ -1,0 +1,219 @@
+{
+  "Toyota": {
+    "4Runner": [
+      "4Runner 2WD",
+      "4Runner",
+      "4Runner TRD Off-Road",
+      "4Runner Limited",
+      "4Runner TRD Pro"
+    ],
+    "86": [
+      "86",
+      "GT86",
+      "TRD Special Edition"
+    ],
+    "Avalon": [
+      "Avalon",
+      "Avalon Hybrid",
+      "Avalon Hybrid XLE",
+      "Avalon XLE",
+      "Avalon Limited"
+    ],
+    "C-HR": [
+      "C-HR",
+      "1. C-HR Hybrid 2. C-HR GR Sport 3. C-HR Limited Edition"
+    ],
+    "Cab Chassis": [
+      "Cab/Chassis",
+      "Cab/Chassis 2WD",
+      "Hilux Cab Chassis",
+      "Hilux Cab/Chassis"
+    ],
+    "Camry": [
+      "Camry",
+      "Camry Hybrid",
+      "Camry Hybrid LE",
+      "Camry Hybrid SE/XLE/XSE",
+      "Camry Hybrid XLE",
+      "Camry Hybrid XLE/SE",
+      "Camry LE/SE",
+      "Camry Solara",
+      "Camry XLE/XSE",
+      "Camry XSE",
+      "Camry Design",
+      "Camry VVT-iE"
+    ],
+    "Celica": [
+      "Celica",
+      "Celica Supra",
+      "Celica GT",
+      "Celica GT-Four"
+    ],
+    "Corolla": [
+      "Corolla",
+      "Corolla APEX",
+      "Corolla XSE",
+      "Corolla Hybrid",
+      "Corolla LE Eco",
+      "Corolla Sport",
+      "Corolla XLE",
+      "Corolla iM",
+      "Corolla XLi",
+      "Corolla GLi",
+      "Corolla GL"
+    ],
+    "Corolla Cross": [
+      "Corolla Cross",
+      "Corolla Cross Hybrid"
+    ],
+    "Cressida": [
+      "GLX",
+      "GLS"
+    ],
+    "Crown": [],
+    "Echo": [
+      "1. Toyota Yaris 2. Toyota Auris 3. Toyota Corolla"
+    ],
+    "FJ Cruiser": [
+      "FJ Cruiser"
+    ],
+    "GR 86": [
+      "GR 86"
+    ],
+    "GR Supra": [
+      "GR Supra",
+      "1. GR Supra 2.0 2. GR Supra A91 Edition 3. GR Supra Premium Edition"
+    ],
+    "Grand Highlander": [],
+    "Highlander": [
+      "Highlander",
+      "Highlander 2WD",
+      "Highlander LE",
+      "Highlander Hybrid",
+      "Highlander Hybrid 2WD",
+      "Highlander Hybrid LE Plus",
+      "Highlander Hybrid LTD/PLAT",
+      "Highlander LE/XLE/SE/LTD",
+      "Highlander Limited",
+      "Highlander Platinum",
+      "Highlander Limited Hybrid"
+    ],
+    "Land Cruiser": [
+      "Land Cruiser",
+      "Land Cruiser Utility",
+      "Land Cruiser Commercial"
+    ],
+    "MR2": [
+      "MR2",
+      "MR2 Spyder",
+      "MR2 Turbo"
+    ],
+    "Matrix": [],
+    "Mirai": [
+      "Mirai"
+    ],
+    "Paseo": [],
+    "Previa": [
+      "Previa",
+      "Estima",
+      "Tarago",
+      "Estima Lucida"
+    ],
+    "Prius": [
+      "Prius",
+      "Prius Eco",
+      "Prius Plug-in Hybrid",
+      "Prius XLE/LTD",
+      "Prius c",
+      "Prius+"
+    ],
+    "Prius Prime": [
+      "Prius Prime",
+      "Prius Prime SE",
+      "Prius Prime Plus",
+      "Prius Prime Premium",
+      "Prius Prime Limited"
+    ],
+    "Prius c": [
+      "Prius c",
+      "1. Prius c Hybrid 2. Prius c Aqua 3. Prius c S"
+    ],
+    "Prius v": [
+      "Prius v",
+      "1. Prius v+ 2. Prius v Hybrid 3. Prius v Active 4. Prius v Excel"
+    ],
+    "RAV4": [
+      "RAV4",
+      "RAV4 2WD",
+      "RAV4 LE",
+      "RAV4 TRD OFFROAD",
+      "RAV4 Hybrid",
+      "RAV4 LE/XLE",
+      "RAV4 Limited",
+      "RAV4 Adventure",
+      "RAV4 XSE Hybrid"
+    ],
+    "RAV4 Prime": [
+      "RAV4 Prime",
+      "RAV4 Prime Hybrid"
+    ],
+    "Sequoia": [
+      "Sequoia",
+      "Some other popular variants of the Toyota Sequoia commonly available in the Cypriot and British markets that are missing from the list are: Limited",
+      "Platinum"
+    ],
+    "Sienna": [
+      "Sienna LE",
+      "Sienna XLE",
+      "Sienna Limited"
+    ],
+    "Starlet": [
+      "Starlet"
+    ],
+    "Supra": [
+      "Supra",
+      "GR Supra",
+      "Supra 2.0 Turbo",
+      "Supra 3.0 Premium"
+    ],
+    "Tacoma": [
+      "Tacoma 2WD",
+      "Tacoma",
+      "Tacoma Double Cab",
+      "Tacoma Double Cab Off-Road",
+      "Tacoma MT",
+      "Tacoma TRD PRO",
+      "Tacoma SR5/Sport/Off-Road/Limited",
+      "Tacoma Access Cab",
+      "Tacoma Double Cab TRD Sport"
+    ],
+    "Tercel": [],
+    "Truck/T100": [
+      "Hilux 2WD"
+    ],
+    "Tundra": [
+      "Tundra 2WD",
+      "Tundra",
+      "Tundra Limited",
+      "Tundra Platinum",
+      "Tundra TRD Pro"
+    ],
+    "Van": [
+      "Some other popular variants of the Toyota that are commonly available in the Cypriot market and/or the British market and are missing from this list are: Panel",
+      "Minibus"
+    ],
+    "Venza": [
+      "Venza",
+      "Venza Hybrid",
+      "Venza XLE"
+    ],
+    "Yaris": [
+      "Yaris",
+      "Yaris iA",
+      "Yaris Hybrid",
+      "Yaris GRMN",
+      "Yaris Cross"
+    ],
+    "bZ4X": []
+  }
+}

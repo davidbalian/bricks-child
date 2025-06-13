@@ -1,0 +1,578 @@
+:root {
+  --dark-blue: #0b72c1;
+  --light-blue: #0d86e3;
+  --light-bg: #f9f9f9;
+  --white: #ffffff;
+  --borders: #ccc;
+  --text-color: #242424;
+  --light-text-color: #595959;
+  --success-green: #21c05b;
+  --error-red: #ff0000;
+  --border: 1px solid var(--borders);
+
+  --border-radius-small: 4px;
+  --border-radius-medium: 8px;
+  --border-radius-large: 16px;
+
+  --opacity: 0.8;
+
+  --transition-time: 0.2s;
+
+  font-size: 16px;
+
+  --small-font-size: 0.875rem;
+  --regular-font-size: 1rem;
+
+  --max-width: 1300px;
+}
+
+/*
+ Theme Name:   Bricks Child Theme
+ Theme URI:    https://bricksbuilder.io/
+ Description:  Use this child theme to extend Bricks.
+ Author:       Bricks
+ Author URI:   https://bricksbuilder.io/
+ Template:     bricks
+ Version:      1.0
+ Text Domain:  bricks
+*/
+
+/* =Theme customization starts here
+-------------------------------------------------------------- */
+
+/* header */
+.menu-item {
+  line-height: inherit !important;
+  margin: 0 !important;
+}
+
+.menu-link {
+  height: fit-content !important;
+}
+
+/* gradient button */
+.gradient-button a {
+  padding: 0.5rem 1rem !important;
+  background: linear-gradient(
+    to right,
+    var(--dark-blue),
+    var(--light-blue)
+  ) !important;
+  color: var(--white) !important;
+  border-radius: var(--border-radius-small) !important;
+  transition: opacity var(--transition-time) !important;
+  border: none !important;
+}
+
+.gradient-button a:hover:not(.disabled) {
+  opacity: var(--opacity) !important;
+}
+
+.gradient-button a.disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+#block-10 p {
+  margin: 0;
+}
+
+/* header */
+.ast-mobile-header-wrap .ast-primary-header-bar,
+.ast-primary-header-bar .site-primary-header-wrap {
+  height: 4rem;
+  text-align: center;
+}
+
+#ast-hf-menu-1 .menu-link {
+  padding: 0;
+}
+
+#ast-hf-menu-1 {
+  gap: 2rem;
+}
+
+/* other */
+.ast-plain-container.ast-no-sidebar #primary {
+  margin: 0 !important;
+  gap: 0.5rem; /* Add gap */
+}
+
+/* top-bar */
+.ast-above-header.ast-above-header-bar,
+.ast-header-break-point #masthead.site-header .ast-above-header-bar {
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: var(--small-font-size);
+}
+
+/* Override Parent Theme Transition for Site Title/Description Links */
+.site-description a,
+.site-description:focus a,
+.site-description:hover a,
+.site-title a,
+.site-title:focus a,
+.site-title:hover a {
+  transition: color 0.2s linear;
+}
+
+/* Override Parent Theme Transition for Main Menu Links */
+.main-header-menu .menu-link,
+.main-header-menu > a {
+  transition: color 0.2s linear;
+}
+
+/* Override Parent Theme Transition for Form Inputs/Selects/Textareas */
+input[type="email"],
+input[type="number"],
+input[type="password"],
+input[type="reset"],
+input[type="search"],
+input[type="tel"],
+input[type="text"],
+input[type="url"],
+select,
+textarea {
+  transition: border-color 0.2s linear, box-shadow 0.2s linear; /* Only transition border and shadow */
+  /* Add other properties like background-color if needed */
+}
+
+/* == Start: Global Form Element Styles ==*/
+label {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+select,
+input[type="text"],
+input[type="number"],
+input[type="url"], /* Added url */
+input[type="email"], /* Added email */
+input[type="password"], /* Added password */
+input[type="search"], /* Added search */
+input[type="tel"], /* Added tel */
+textarea,
+.checkbox-dropdown-button /* Add dropdown button */ {
+  width: 100%;
+  padding: 8px 8px;
+  border: var(--border);
+  border-radius: var(--border-radius-small);
+  background-color: var(--white);
+  color: var(--text-color);
+  font-size: var(--small-font-size);
+  font-weight: 400; /* Set font-weight for inputs */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin-bottom: 0.5rem; /* Consistent bottom margin */
+}
+
+/* Specific background for SELECT only */
+select,
+.checkbox-dropdown-button /* Add dropdown button */ {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 1em;
+  padding-right: 2.5em; /* Make space for arrow */
+}
+
+/* Specific overrides/additions for checkbox dropdown button */
+.checkbox-dropdown-button {
+  text-align: left;
+  cursor: pointer;
+  position: relative; /* Ensure positioning context if needed */
+}
+
+/* Focus Styles */
+select:focus,
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="url"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+textarea:focus,
+.checkbox-dropdown-button:focus /* Add dropdown button */ {
+  outline: none;
+  border-color: var(--dark-blue);
+  box-shadow: 0 0 0 2px rgba(11, 114, 193, 0.1);
+}
+
+/* Disabled Styles */
+select:disabled,
+input:disabled,
+textarea:disabled,
+.checkbox-dropdown-button:disabled /* Add dropdown button */ {
+  /* Broadened to input:disabled */
+  background-color: #f5f5f5; /* Consider a variable? */
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+/* == End: Global Form Element Styles == */
+
+/* Listing Form Styles */
+.listing-success-message {
+  background-color: rgba(33, 192, 91, 0.1);
+  border: 1px solid var(--success-green);
+  border-radius: var(--border-radius-medium);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.listing-success-message h2 {
+  color: var(--success-green);
+  margin-top: 0;
+}
+
+.listing-success-message .button {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  margin-top: 1rem;
+  background: linear-gradient(to right, var(--dark-blue), var(--light-blue));
+  color: var(--white);
+  border-radius: var(--border-radius-small);
+  text-decoration: none;
+  transition: opacity var(--transition-time);
+}
+
+.listing-success-message .button:hover {
+  opacity: var(--opacity);
+}
+
+/* Error message styling */
+.listing-error-message {
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid var(--error-red);
+  border-radius: var(--border-radius-medium);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.listing-error-message h2 {
+  color: var(--error-red);
+  margin-top: 0;
+}
+
+.listing-error-message p {
+  margin-bottom: 0.5rem;
+}
+
+.form-error-message {
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid var(--error-red);
+  border-radius: var(--border-radius-small);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-color);
+}
+
+.form-error-message ul {
+  margin: 0.5rem 0 0 1.5rem;
+  padding: 0;
+}
+
+input.error,
+select.error,
+textarea.error {
+  border-color: var(--error-red) !important;
+}
+
+/* == Start: Multi-Select Filter Styles == */
+.multi-select-filter {
+  position: relative; /* Needed for absolute positioning of the popup */
+  margin-bottom: 0.5rem; /* Consistent with other form elements */
+}
+
+.multi-select-display {
+  width: 100%;
+  padding: 8px 8px;
+  border: var(--border);
+  border-radius: var(--border-radius-small);
+  background-color: var(--white);
+  color: var(--text-color);
+  font-size: var(--small-font-size);
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 1em;
+  padding-right: 2.5em; /* Make space for arrow */
+  cursor: pointer;
+  display: flex; /* Use flexbox to align text and arrow */
+  justify-content: space-between; /* Push arrow to the right */
+  align-items: center;
+  height: 38px; /* Match typical input height, adjust as needed */
+  box-sizing: border-box;
+}
+
+.multi-select-display span:first-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Show ellipsis if text is too long */
+  flex-grow: 1; /* Allow text to take available space */
+}
+
+.multi-select-display .dropdown-arrow {
+  /* Styling for arrow can be added if different from background SVG */
+  /* For now, relying on background-image */
+  flex-shrink: 0; /* Prevent arrow from shrinking */
+}
+
+/* Focus style for the display element */
+.multi-select-filter.active .multi-select-display,
+.multi-select-display:focus {
+  /* Assuming focus can be set via JS if needed */
+  outline: none;
+  border-color: var(--dark-blue);
+  box-shadow: 0 0 0 2px rgba(11, 114, 193, 0.1);
+}
+
+.multi-select-popup {
+  display: none; /* Hidden by default */
+  position: absolute;
+  top: 100%; /* Position below the display element */
+  left: 0;
+  width: 100%;
+  background-color: var(--white);
+  border: var(--border);
+  border-top: none; /* Avoid double border */
+  border-radius: 0 0 var(--border-radius-small) var(--border-radius-small);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100; /* Ensure it appears above other elements */
+  max-height: 200px; /* Limit height and allow scrolling */
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* Show popup when active */
+.multi-select-filter.active .multi-select-popup {
+  display: block;
+}
+
+.multi-select-popup ul {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0; /* Add some padding */
+}
+
+.multi-select-popup li {
+  margin: 0;
+  padding: 0;
+}
+
+.multi-select-popup label {
+  display: flex; /* Align checkbox and text */
+  align-items: center;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: normal; /* Override default label weight */
+  margin-bottom: 0; /* Override default label margin */
+  white-space: nowrap; /* Prevent wrapping */
+  font-size: var(--small-font-size);
+  transition: background-color var(--transition-time);
+}
+
+.multi-select-popup label:hover {
+  background-color: #f0f0f0; /* Subtle hover effect */
+}
+
+.multi-select-popup input[type="checkbox"] {
+  margin-right: 0.75rem; /* Space between checkbox and text */
+  width: auto; /* Override global form width */
+  height: auto;
+  margin-bottom: 0; /* Override global form margin */
+  cursor: pointer;
+  /* Optional: Style checkbox appearance */
+}
+
+.multi-select-popup .option-count {
+  color: var(--light-text-color);
+  font-size: 0.9em;
+}
+
+.multi-select-popup .disabled-option label {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* account display and saved */
+.header-widget-area[data-section="sidebar-widgets-header-widget-1"] {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+#block-8 {
+  margin: 0;
+}
+
+/* Car Listings Filter Styles */
+.loading-filter {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading-filter::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: filter-loading 0.8s linear infinite;
+}
+
+@keyframes filter-loading {
+    to {
+        transform: translateY(-50%) rotate(360deg);
+    }
+}
+
+/* Disabled filter options */
+select option:disabled {
+    color: #999;
+    font-style: italic;
+}
+
+/* Loading spinner for listings grid */
+.loading-spinner {
+    text-align: center;
+    padding: 40px;
+    font-size: 16px;
+    color: #666;
+}
+
+.loading-spinner::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 40px;
+    margin: 20px auto;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top-color: #007bff;
+    border-radius: 50%;
+    animation: spinner 1s linear infinite;
+}
+
+@keyframes spinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Global Font Awesome 6 fixes */
+.fas, .fa-solid {
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+    font-weight: 900 !important;
+    font-style: normal !important; /* Prevent italic inheritance */
+}
+
+.far, .fa-regular {
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+    font-weight: 400 !important;
+    font-style: normal !important; /* Prevent italic inheritance */
+}
+
+.fab, .fa-brands {
+    font-family: "Font Awesome 6 Brands", "Font Awesome 5 Brands", "FontAwesome" !important;
+    font-weight: 400 !important;
+    font-style: normal !important; /* Prevent italic inheritance */
+}
+
+.fa {
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+    font-weight: 900 !important;
+    font-style: normal !important; /* Prevent italic inheritance */
+}
+
+/* Ensure pseudo-elements work properly */
+.fas::before, .fa-solid::before, .fa::before {
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+    font-weight: 900 !important;
+    font-style: normal !important; /* Prevent italic inheritance */
+}
+
+.far::before, .fa-regular::before {
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+    font-weight: 400 !important;
+    font-style: normal !important; /* Prevent italic inheritance */
+}
+
+.fab::before, .fa-brands::before {
+    font-family: "Font Awesome 6 Brands", "Font Awesome 5 Brands", "FontAwesome" !important;
+    font-weight: 400 !important;
+    font-style: normal !important; /* Prevent italic inheritance */
+}
+
+/* Specific heart icon fixes */
+.fa-heart.fas, .fas.fa-heart {
+    font-weight: 900 !important; /* Solid heart - filled */
+    color: #ff0000 !important; /* Red color for filled hearts */
+}
+
+.fa-heart.far, .far.fa-heart {
+    font-weight: 400 !important; /* Regular heart - outline only */
+    color: #ff0000 !important; /* Red color for outline hearts */
+}
+
+/* Ensure favorite button icons display correctly */
+.favorite-btn i.fas.fa-heart {
+    font-weight: 900 !important; /* Solid heart when favorited */
+    color: #ff0000 !important;
+    font-style: normal !important;
+}
+
+.favorite-btn i.far.fa-heart {
+    font-weight: 400 !important; /* Outline heart when not favorited */
+    color: #ff0000 !important;
+    font-style: normal !important;
+}
+
+/* Additional Font Awesome fixes for all icons */
+i[class*="fa-"], i[class^="fa-"], i.fa, i.fas, i.far, i.fab, i.fal, i.fad {
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+    font-style: normal !important; /* Prevent italic inheritance */
+    speak: never; /* For accessibility */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure proper weights for different Font Awesome styles */
+i.fas, i.fa-solid, i.fa:not(.far):not(.fab):not(.fal):not(.fad) {
+    font-weight: 900 !important;
+}
+
+i.far, i.fa-regular {
+    font-weight: 400 !important;
+}
+
+i.fab, i.fa-brands {
+    font-weight: 400 !important;
+    font-family: "Font Awesome 6 Brands", "Font Awesome 5 Brands", "FontAwesome" !important;
+}
+
+/* Additional heart icon fixes for consistency */
+.fa-heart, i.fa-heart {
+    color: #ff0000 !important;
+    font-style: normal !important;
+}
+
+.fas.fa-heart, i.fas.fa-heart {
+    font-weight: 900 !important; /* Solid/filled heart */
+}
+
+.far.fa-heart, i.far.fa-heart {
+    font-weight: 400 !important; /* Outline heart */
+}

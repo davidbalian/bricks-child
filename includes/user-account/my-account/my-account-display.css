@@ -1,0 +1,179 @@
+/**
+ * My Account Display CSS
+ * 
+ * @package Astra Child
+ * @since 1.0.0
+ */
+
+.my-account-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.account-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.account-section {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.account-section h3 {
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+}
+
+.info-row {
+    display: flex;
+    margin-bottom: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5;
+    align-items: center;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.label {
+    width: 150px;
+    font-weight: 600;
+    color: #666;
+}
+
+.value {
+    flex: 1;
+    color: #333;
+}
+
+.account-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.button {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #0073aa;
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #005177;
+    color: white;
+}
+
+.button-small {
+    padding: 4px 8px;
+    font-size: 12px;
+    margin-left: auto;
+}
+
+.name-input {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.name-edit-row .button-small {
+    margin-right: 10px;
+}
+
+.name-edit-row .button-small:last-child {
+    margin-right: 0;
+}
+
+/* Success message styling */
+.success-message {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    color: #155724;
+    padding: 12px 16px;
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.success-icon {
+    background-color: #28a745;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+/* Email verification status styling */
+.email-status {
+    margin-left: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.email-status.verified {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.email-status.not-verified {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Edit email button styling */
+.edit-email-btn {
+    margin-left: 10px;
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
+/* Email editing styles (same pattern as name editing) */
+.email-input {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.email-edit-row .button-small {
+    margin-right: 10px;
+}
+
+.email-edit-row .button-small:last-child {
+    margin-right: 0;
+} 

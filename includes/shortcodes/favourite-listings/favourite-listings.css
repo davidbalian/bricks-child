@@ -1,0 +1,432 @@
+/* Favorite Listings CSS - Separated for better organization */
+
+.favorite-listings-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Guest user landing page styles */
+.favorites-guest-message {
+    background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+    border-radius: 12px;
+    padding: 60px 40px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+    border: 1px solid #e6e9ff;
+}
+
+.favorites-icon {
+    margin-bottom: 30px;
+}
+
+.favorites-icon i {
+    font-size: 64px;
+    color: #ff6b6b;
+    opacity: 0.8;
+}
+
+.favorites-guest-message h1 {
+    font-size: 32px;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.favorites-guest-message p {
+    font-size: 16px;
+    color: #5a6c7d;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.favorites-guest-message h2 {
+    font-size: 24px;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    margin-top: 40px;
+    font-weight: 500;
+}
+
+.favorites-auth-buttons {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.favorites-signin-btn,
+.favorites-register-btn {
+    display: inline-block;
+    padding: 14px 28px;
+    border-radius: 6px;
+    text-decoration: none !important;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.favorites-signin-btn {
+    background-color: #3498db;
+    color: white !important;
+}
+
+.favorites-signin-btn:hover {
+    background-color: #2980b9;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.favorites-register-btn {
+    background-color: #2ecc71;
+    color: white !important;
+}
+
+.favorites-register-btn:hover {
+    background-color: #27ae60;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+}
+
+.auth-separator {
+    font-size: 18px;
+    color: #bdc3c7;
+    font-weight: 300;
+}
+
+/* Responsive design for guest message */
+@media (max-width: 768px) {
+    .favorites-guest-message {
+        padding: 40px 25px;
+        margin: 0 15px;
+    }
+    
+    .favorites-icon i {
+        font-size: 48px;
+    }
+    
+    .favorites-guest-message h1 {
+        font-size: 26px;
+        margin-bottom: 12px;
+    }
+    
+    .favorites-guest-message h2 {
+        font-size: 20px;
+        margin-top: 30px;
+    }
+    
+    .favorites-auth-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .favorites-signin-btn,
+    .favorites-register-btn {
+        width: 100%;
+        max-width: 250px;
+        text-align: center;
+    }
+    
+    .auth-separator {
+        display: none;
+    }
+}
+
+/* Logged in user no favorites message styles */
+.no-favorites-message {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 40px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.no-favorites-message h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.no-favorites-message p {
+    margin-bottom: 25px;
+    color: #666;
+}
+
+.browse-cars-button {
+    display: inline-block;
+    background: #007bff;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.3s ease;
+}
+
+.browse-cars-button:hover {
+    background: #0056b3;
+    color: white;
+}
+
+.favorite-listings-title {
+    margin-bottom: 30px;
+    font-size: 28px;
+    color: #333;
+    text-align: center;
+}
+
+.car-listings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.car-listing-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s;
+    position: relative;
+}
+
+.car-listing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.car-listing-link {
+    text-decoration: none !important;
+    color: inherit;
+    display: block;
+}
+
+.car-listing-link:hover {
+    text-decoration: none !important;
+}
+
+.car-title {
+    margin: 0 0 8px 0;
+    font-size: 1.50em !important;
+    font-weight: bold;
+    color: #000;
+}
+
+.car-specs {
+    font-size: 0.95em !important;
+    color: #000;
+    margin-bottom: 12px;
+    line-height: 1.4;
+    text-decoration: none !important;
+}
+
+.car-info-boxes {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.info-box {
+    flex: 1;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 6px 10px;
+    text-align: center;
+}
+
+.info-value {
+    display: block;
+    font-size: 0.95em !important;
+    color: #000;
+    font-weight: 500;
+    text-decoration: none !important;
+}
+
+.car-price {
+    font-size: 1.3em !important;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 8px;
+    text-decoration: none !important;
+}
+
+.car-publication-date {
+    color: #666;
+    margin-bottom: 0;
+    font-size: 0.95em !important;
+    text-decoration: none !important;
+}
+
+.car-location {
+    color: #000;
+    margin-bottom: 0;
+    font-size: 1.1em !important;
+    text-decoration: none !important;
+}
+
+.carousel-nav, .see-all-images {
+    z-index: 10;
+    position: absolute;
+}
+
+.car-listing-image-carousel {
+    position: relative;
+}
+
+.car-listing-image-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.car-listing-image-carousel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.car-listing-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.car-listing-image.active {
+    opacity: 1;
+}
+
+.car-listing-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 10px 15px;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-nav:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.carousel-nav.prev {
+    left: 10px;
+}
+
+.carousel-nav.next {
+    right: 10px;
+}
+
+.see-all-images {
+    text-decoration: none !important;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    z-index: 2;
+    transition: background 0.3s ease;
+    text-align: center;
+}
+
+.see-all-images:hover {
+    background: rgba(0, 0, 0, 0.9);
+    text-decoration: none !important;
+}
+
+.car-listing-details {
+    padding: 15px;
+    text-decoration: none !important;
+}
+
+.car-listings-pagination {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.car-listings-pagination .page-numbers {
+    padding: 8px 15px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.car-listings-pagination .current {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.favorite-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 0.2s ease;
+}
+
+.favorite-btn i {
+    font-size: 24px;
+    color: #ff0000;
+    transition: all 0.2s ease;
+}
+
+.favorite-btn:hover {
+    transform: scale(1.1);
+}
+
+.favorite-btn:hover i {
+    transform: scale(1.1);
+}
+
+.favorite-btn.active i {
+    opacity: 1;
+}
+
+/* Results Counter Styles */
+.results-counter {
+    text-align: left;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+    color: #333;
+    font-weight: 500;
+    padding-left: 10px;
+}
+
+.results-counter .count {
+    font-weight: bold;
+    color: #007bff;
+} 

@@ -1,0 +1,42 @@
+{
+  "Alfa Romeo": {
+    "164": [
+      "V6 24V"
+    ],
+    "4C": [
+      "4C",
+      "Spider"
+    ],
+    "GT": [
+      "GT 1.9 JTD",
+      "GT 3.2 V6",
+      "GT 2.0 JTS"
+    ],
+    "GTV": [
+      "GTV",
+      "Spider",
+      "Cup",
+      "V6",
+      "Cloverleaf"
+    ],
+    "Giulia": [
+      "Giulia",
+      "Giulia Veloce",
+      "Giulia Quadrifoglio"
+    ],
+    "Milano": [],
+    "Spider": [
+      "Spider",
+      "Spider Veloce 2000",
+      "Duetto",
+      "Graduate",
+      "Quadrifoglio."
+    ],
+    "Stelvio": [
+      "Stelvio",
+      "Stelvio Ti",
+      "Stelvio Quadrifoglio"
+    ],
+    "Tonale eAWD": []
+  }
+}

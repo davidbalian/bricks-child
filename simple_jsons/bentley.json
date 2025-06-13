@@ -1,0 +1,74 @@
+{
+  "Bentley": {
+    "Arnage": [
+      "Arnage",
+      "Arnage RL",
+      "T",
+      "R",
+      "Final Series"
+    ],
+    "Azure": [
+      "Azure",
+      "Azure T"
+    ],
+    "Bentayga": [
+      "Bentayga",
+      "Bentayga Hybrid",
+      "Bentayga Speed",
+      "Bentayga V8",
+      "Bentayga Diesel"
+    ],
+    "Brooklands": [],
+    "Continental": [
+      "Continental GT",
+      "Continental GT Speed",
+      "Continental GT V8",
+      "Continental GT3-R",
+      "Continental GTC",
+      "Continental R",
+      "Continental T",
+      "Continental Flying Spur",
+      "Continental Flying Spur Speed",
+      "Continental Supersports"
+    ],
+    "Continental Flying Spur": [
+      "Continental Flying Spur",
+      "Speed",
+      "V8",
+      "W12 S"
+    ],
+    "Continental GT Convertible": [
+      "Continental GT",
+      "Continental GT Speed",
+      "Continental GT V8",
+      "Continental GT Mulliner",
+      "Continental GT First Edition"
+    ],
+    "Continental Supersports": [
+      "Continental Supersports",
+      "1. Bentley Continental GT 2. Bentley Continental Flying Spur 3. Bentley Continental GT Speed 4. Bentley Continental GT"
+    ],
+    "Continental Supersports Convertible": [
+      "Continental Supersports",
+      "1. Bentley Continental GT 2. Bentley Continental Flying Spur 3. Bentley Bentayga"
+    ],
+    "Flying Spur": [
+      "Flying Spur",
+      "V8",
+      "W12"
+    ],
+    "Mulsanne": [
+      "Mulsanne",
+      "Mulsanne EWB",
+      "Speed",
+      "Extended Wheelbase"
+    ],
+    "Turbo RT": [
+      "Turbo RT",
+      "Brooklands",
+      "Arnage T",
+      "Azure",
+      "Continental R"
+    ]
+  }
+}

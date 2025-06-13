@@ -1,0 +1,58 @@
+{
+  "Lotus": {
+    "Elan": [
+      "Elan",
+      "Sprint",
+      "+2",
+      "SE Turbo",
+      "M100",
+      "S4",
+      "S3",
+      "S2",
+      "S1"
+    ],
+    "Elise/Exige": [
+      "Elise/Exige",
+      "Sport 220",
+      "Cup 250",
+      "Sport 410",
+      "Cup 430"
+    ],
+    "Elise/exige": [
+      "Elise/exige",
+      "Sport 220",
+      "Cup 250",
+      "Cup 260",
+      "Sport 240",
+      "Sport 250"
+    ],
+    "Emira": [
+      "Emira",
+      "S",
+      "R",
+      "GT",
+      "V6",
+      "V6 First Edition",
+      "V6 First Edition Performance"
+    ],
+    "Esprit": [
+      "98 Esprit V8",
+      "Esprit",
+      "Esprit Turbo",
+      "Esprit Turbo HC PI",
+      "Esprit V8",
+      "Esprit S3",
+      "Esprit S4",
+      "Esprit S4s",
+      "Esprit GT3"
+    ],
+    "Evora": [
+      "Evora",
+      "Evora GT",
+      "Evora 400",
+      "Evora Sport 410",
+      "Evora GT430",
+      "Evora GT410 Sport"
+    ]
+  }
+}

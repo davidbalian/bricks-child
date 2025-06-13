@@ -1,0 +1,132 @@
+{
+  "Dodge": {
+    "600": [],
+    "Aries": [],
+    "Avenger": [],
+    "B150/B250 Van": [],
+    "B150/B250 Wagon": [],
+    "B1500 Van": [],
+    "B1500 Wagon": [],
+    "B1500/B2500 Van": [],
+    "B1500/B2500 Wagon": [],
+    "B2500 Van": [],
+    "B2500 Wagon": [],
+    "B350 Van": [],
+    "B350 Wagon": [],
+    "B3500 Van": [],
+    "B3500 Wagon": [],
+    "CSX": [],
+    "Caliber": [],
+    "Caravan C/V/Grand Caravan": [
+      "Caravan C/V/Grand Caravan 2WD",
+      "Caravan SE",
+      "Grand Caravan SXT",
+      "Grand Caravan GT"
+    ],
+    "Caravan/Grand Caravan": [
+      "Caravan/Grand Caravan 2WD",
+      "Caravan/Grand Caravan",
+      "SXT"
+    ],
+    "Caravan/Grand Caravan/Ram Van": [
+      "Caravan/Grand Caravan/Ram 2WD"
+    ],
+    "Caravan/Ram Van": [
+      "Caravan/Ram 2WD",
+      "Grand Caravan/Ram",
+      "Caravan/Ram SXT"
+    ],
+    "Challenger": [
+      "Challenger",
+      "Challenger GT",
+      "Challenger SRT",
+      "Challenger SRT Widebody",
+      "Challenger SRT8",
+      "Challenger Widebody",
+      "Challenger R/T",
+      "Challenger R/T Scat Pack",
+      "Challenger Hellcat",
+      "Challenger Hellcat Redeye"
+    ],
+    "Charger": [
+      "Charger",
+      "Charger SRT",
+      "Charger SRT8",
+      "Charger R/T",
+      "Charger Daytona",
+      "Charger Scat Pack"
+    ],
+    "Colt": [],
+    "Conquest": [],
+    "D100/D150 Pickup": [
+      "D100/D150 Pickup 2WD"
+    ],
+    "D250 Cab Chassis": [],
+    "D250 Pickup": [],
+    "D250 Pickup Cab Chassis": [],
+    "Dakota Cab Chassis": [],
+    "Dakota Pickup": [],
+    "Dart": [],
+    "Daytona": [],
+    "Diplomat": [],
+    "Durango": [
+      "Durango",
+      "Durango GT",
+      "Durango R/T"
+    ],
+    "Dynasty": [],
+    "GLH-S": [],
+    "Grand Caravan": [
+      "SXT"
+    ],
+    "Hornet": [],
+    "Intrepid": [],
+    "Journey": [
+      "Journey",
+      "Journey 2WD",
+      "Crossroad",
+      "SXT",
+      "R/T"
+    ],
+    "Lancer": [],
+    "Magnum": [],
+    "Monaco": [],
+    "Neon": [],
+    "Neon/SRT-4/SX 2.0": [],
+    "Nitro": [],
+    "Omni": [],
+    "Power Ram 50 Pickup": [],
+    "Raider": [],
+    "Ram 1500 Pickup": [
+      "Ram 1500 Pickup 2WD",
+      "Ram 1500 Pickup",
+      "Rebel",
+      "Laramie",
+      "Limited",
+      "Big Horn",
+      "Tradesman."
+    ],
+    "Ram 2500 Pickup": [
+      "Ram 2500 Pickup 2WD",
+      "Ram 2500 Pickup",
+      "Laramie",
+      "Tradesman"
+    ],
+    "Ram 50 Pickup": [],
+    "Ram Van 1500": [],
+    "Ram Van 2500": [],
+    "Ram Wagon 1500": [],
+    "Ram Wagon 2500": [],
+    "Ramcharger": [],
+    "Rampage Pickup": [],
+    "Shadow": [],
+    "Spirit": [],
+    "Stealth": [],
+    "Stratus": [],
+    "Viper": [
+      "Viper GTS"
+    ],
+    "W100/W150 Pickup": [],
+    "W250 Pickup": []
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "Mini": {
+    "Clubman": [
+      "Clubman",
+      "Clubman S",
+      "Cooper Clubman",
+      "Cooper Clubman All4",
+      "Cooper S Clubman",
+      "Cooper S Clubman All4",
+      "John Cooper Works Clubman",
+      "John Cooper Works Clubman All4",
+      "One popular variant missing from the list is the Clubman D."
+    ],
+    "Cooper": [
+      "Cooper",
+      "Cooper (3-doors)",
+      "Cooper (5-doors)",
+      "Cooper Clubvan",
+      "Cooper Hardtop 2 door",
+      "Cooper Hardtop 4 door",
+      "Cooper S",
+      "Cooper S (3-doors)",
+      "Cooper S (5-doors)",
+      "Cooper S Hardtop 2 door",
+      "Cooper S Hardtop 4 door",
+      "Cooper S JCWorks GP Kit",
+      "Cooper SE Hardtop 2 door",
+      "Some other popular variants that are commonly available in the Cypriot and British markets and are missing from the list are: Countryman",
+      "Paceman",
+      "John Cooper Works"
+    ],
+    "Countryman": [
+      "Cooper Countryman",
+      "Cooper Countryman All4",
+      "Cooper S Countryman",
+      "Cooper S Countryman All4",
+      "Cooper SE Countryman All4",
+      "Countryman S All4",
+      "JCW Countryman All4",
+      "One popular variant missing from the list is the Mini Countryman John Cooper Works (JCW) which is commonly available in both the Cypriot and British markets."
+    ],
+    "John Cooper Works": [
+      "JCW Countryman All4",
+      "John Cooper Works",
+      "John Cooper Works Clubman All4",
+      "John Cooper Works GP",
+      "John Cooper Works GP-2",
+      "John Cooper Works Hardtop",
+      "John Cooper Works Hardtop 2 door",
+      "JCW Paceman All4",
+      "JCW"
+    ],
+    "MiniE": [
+      "MiniE Cooper",
+      "MiniE Countryman",
+      "MiniE Clubman"
+    ],
+    "Paceman": [
+      "Cooper Paceman",
+      "Cooper S Paceman",
+      "Cooper S Paceman All4",
+      "JCW Paceman All4",
+      "One popular variant missing from the list is the John Cooper Works Paceman."
+    ],
+    "Roadster": [
+      "Cooper",
+      "Cooper S",
+      "John Cooper Works"
+    ]
+  }
+}

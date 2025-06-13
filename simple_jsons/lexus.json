@@ -1,0 +1,146 @@
+{
+  "Lexus": {
+    "CT": [
+      "CT 200h",
+      "CT 200h F Sport",
+      "CT 200h Executive",
+      "CT 200h Luxury"
+    ],
+    "ES": [
+      "ES 300",
+      "ES 300h",
+      "ES 330",
+      "ES 350",
+      "ES 350 F Sport",
+      "ES 200"
+    ],
+    "GS": [
+      "GS 200t",
+      "GS 200t F Sport",
+      "GS 300",
+      "GS 300 F Sport",
+      "GS 300/GS 400",
+      "GS 300/GS 430",
+      "GS 350",
+      "GS 350 F Sport",
+      "GS 430",
+      "GS 450h",
+      "GS 460",
+      "GS F",
+      "GS300",
+      "GS 450h F Sport",
+      "GS 450h Premier",
+      "GS 450h Luxury",
+      "GS 450h Executive",
+      "GS 450h Sport",
+      "GS 450h F Sport Premier",
+      "GS 450h F Sport Luxury",
+      "GS 450h F Sport Executive",
+      "GS 450h F Sport Sport"
+    ],
+    "GX": [
+      "GX 460",
+      "GX 470"
+    ],
+    "HS": [],
+    "IS": [
+      "IS 200t",
+      "IS 250",
+      "IS 250 C",
+      "IS 250/IS 250C",
+      "IS 300",
+      "IS 350",
+      "IS 350 C",
+      "IS 350/IS 350C",
+      "IS 500",
+      "IS 200",
+      "IS 220d",
+      "IS F"
+    ],
+    "IS F": [
+      "IS F",
+      "IS 350",
+      "IS 200t",
+      "IS 250"
+    ],
+    "LC": [
+      "LC 500",
+      "LC 500h"
+    ],
+    "LFA": [
+      "LFA",
+      "Nurburgring Package"
+    ],
+    "LS": [
+      "LS 400",
+      "LS 430",
+      "LS 460",
+      "LS 460 L",
+      "LS 500",
+      "LS 500h",
+      "LS 600h L",
+      "LS 600h."
+    ],
+    "LX": [
+      "LX 450",
+      "LX 470",
+      "LX 570"
+    ],
+    "NX": [
+      "NX 200t",
+      "NX 200t F Sport",
+      "NX 250",
+      "NX 300",
+      "NX 300 F Sport",
+      "NX 300h",
+      "NX 350",
+      "NX 350 F Sport",
+      "NX 350h",
+      "NX 300h F Sport",
+      "NX 450h F Sport"
+    ],
+    "RC": [
+      "RC 200t",
+      "RC 300",
+      "RC 350",
+      "RC F",
+      "RC 300h",
+      "RC 450h"
+    ],
+    "RC F": [
+      "RC F",
+      "RC F Track Edition"
+    ],
+    "RX": [
+      "RX 300",
+      "RX 330 2WD",
+      "RX 330",
+      "RX 350",
+      "RX 350 2WD",
+      "RX 350 L",
+      "RX 350h",
+      "RX 400h 2WD",
+      "RX 400h",
+      "RX 450h",
+      "RX 450h L",
+      "RX 500h",
+      "RX 450h F Sport",
+      "RX 450h F Sport L",
+      "RX 350 F Sport",
+      "RX 350 F Sport L"
+    ],
+    "RZ": [],
+    "SC": [
+      "SC",
+      "SC 300/SC 430",
+      "SC 430"
+    ],
+    "TX": [],
+    "UX": [
+      "UX 200",
+      "UX 250h",
+      "UX 300h",
+      "UX 250"
+    ]
+  }
+}

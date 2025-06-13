@@ -1,0 +1,22 @@
+{
+  "Daewoo": {
+    "Kalos": [
+      "Kalos",
+      "Lacetti",
+      "Matiz"
+    ],
+    "Lacetti": [
+      "Lacetti"
+    ],
+    "Lanos": [
+      "Lanos",
+      "Nubira",
+      "Leganza"
+    ],
+    "Leganza": [],
+    "Magnus": [],
+    "Nubira": [
+      "Lacetti"
+    ]
+  }
+}

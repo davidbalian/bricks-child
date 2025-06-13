@@ -1,0 +1,39 @@
+{
+  "Fiat": {
+    "124 Spider": [
+      "124 Spider",
+      "Abarth 124 Spider",
+      "Lusso",
+      "Classica"
+    ],
+    "500": [
+      "500",
+      "500 Abarth",
+      "500 Cabrio",
+      "500 L",
+      "500X",
+      "500C",
+      "500L Trekking",
+      "500L Living",
+      "500L Cross"
+    ],
+    "500 L": [
+      "500 L",
+      "Trekking",
+      "Lounge",
+      "Pop Star",
+      "S-Design"
+    ],
+    "500 X": [
+      "500 X",
+      "Pop Star",
+      "Cross Plus",
+      "S-Design"
+    ],
+    "500e": [
+      "500e",
+      "Pop",
+      "Lounge"
+    ]
+  }
+}

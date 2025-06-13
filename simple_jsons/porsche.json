@@ -1,0 +1,328 @@
+{
+  "Porsche": {
+    "718": [
+      "718 Boxster",
+      "718 Boxster GTS",
+      "718 Boxster S",
+      "718 Boxster T",
+      "718 Cayman",
+      "718 Cayman GT4",
+      "718 Cayman GTS",
+      "718 Cayman S",
+      "718 Cayman T",
+      "718 Spyder",
+      "718 Cayman R"
+    ],
+    "911": [
+      "911",
+      "911 C4 GTS",
+      "911 Carrera",
+      "911 Carrera 2/4",
+      "911 Carrera 4",
+      "911 Carrera 4 GTS",
+      "911 Carrera 4 Targa",
+      "911 Carrera 4/2",
+      "911 Carrera 4S",
+      "911 Carrera 4S Targa",
+      "911 Carrera GTS",
+      "911 Carrera S",
+      "911 Carrera T",
+      "911 GT2",
+      "911 GT2 RS",
+      "911 GT3",
+      "911 GT3 RS",
+      "911 GTS",
+      "911 R",
+      "911 SC",
+      "911 Speedster",
+      "911 Targa",
+      "911 Targa 4",
+      "911 Targa 4 GTS",
+      "911 Targa 4S",
+      "911 Turbo",
+      "911 Turbo S",
+      "911 Turbo S Exclusive",
+      "911 Carrera 4 GTS Targa",
+      "911 Carrera Targa",
+      "911 GT2 Clubsport",
+      "911 GT2 R",
+      "911 GT3 Cup",
+      "911 GT3 R",
+      "911 GT3 RSR",
+      "911 RSR",
+      "911 T"
+    ],
+    "918 Spyder": [
+      "918 Spyder",
+      "We are missing the following popular variants: 918 Spyder Weissach Package"
+    ],
+    "924": [
+      "924 S",
+      "924 Turbo",
+      "924 Carrera GT"
+    ],
+    "928": [
+      "928 GTS",
+      "928 S",
+      "928 S4",
+      "928 GT",
+      "928 SE"
+    ],
+    "944": [
+      "944",
+      "944 S",
+      "944 S2",
+      "944 Turbo",
+      "944 Turbo S",
+      "944 Turbo Cup"
+    ],
+    "968": [
+      "968",
+      "Club Sport"
+    ],
+    "Boxster": [
+      "Boxster",
+      "Boxster GTS",
+      "Boxster S",
+      "Boxster Spyder",
+      "Boxster Black Edition",
+      "Boxster 718 Cayman S",
+      "Boxster 718 Cayman GTS"
+    ],
+    "Carrera": [
+      "Carrera",
+      "Targa",
+      "GTS",
+      "Turbo",
+      "GT3",
+      "GT3 RS"
+    ],
+    "Carrera 2 911 GT3": [
+      "Carrera 2 911 GT3",
+      "Carrera 2 911 GT3 RS",
+      "Carrera 2 911 GT3 R"
+    ],
+    "Carrera 2 Cabriolet": [
+      "Carrera 2",
+      "Carrera 4",
+      "Carrera S"
+    ],
+    "Carrera 2 Cabriolet Kit": [],
+    "Carrera 2 Coupe": [
+      "Carrera 2",
+      "Carrera 2 Targa",
+      "Carrera 2 S",
+      "Carrera 2 GTS"
+    ],
+    "Carrera 2 Coupe Kit": [],
+    "Carrera 2 S Cabriolet": [
+      "Carrera 2 S",
+      "Carrera 4 S",
+      "Carrera GTS"
+    ],
+    "Carrera 2 S Coupe": [
+      "Carrera 2 S",
+      "Carrera 2 S Targa"
+    ],
+    "Carrera 4": [
+      "Carrera 4",
+      "Carrera 4S",
+      "Carrera 4 GTS",
+      "Carrera 4 Targa"
+    ],
+    "Carrera 4 Cabriolet": [
+      "Carrera 4",
+      "Carrera 4S",
+      "Carrera GTS"
+    ],
+    "Carrera 4 Cabriolet Kit": [],
+    "Carrera 4 Coupe": [
+      "Carrera 4",
+      "Carrera 4S",
+      "Carrera 4 GTS",
+      "Carrera 4 Targa."
+    ],
+    "Carrera 4 S": [
+      "Carrera 4 S",
+      "Turbo S",
+      "GTS",
+      "Targa 4S"
+    ],
+    "Carrera 4 S Cabriolet": [
+      "Carrera 4 S",
+      "Carrera 4"
+    ],
+    "Carrera 4 S Cabriolet Kit": [],
+    "Carrera 4 S Coupe": [
+      "Carrera 4 S",
+      "Turbo",
+      "GTS",
+      "Targa."
+    ],
+    "Carrera 4 S Kit": [],
+    "Carrera 4 S Targa": [
+      "Carrera 4 S Targa"
+    ],
+    "Carrera 4 Targa": [
+      "Carrera 4 Targa",
+      "Carrera 4S Targa",
+      "Carrera GTS Targa",
+      "Carrera Targa 4 GTS"
+    ],
+    "Carrera GT": [
+      "Carrera GT"
+    ],
+    "Cayenne": [
+      "Cayenne",
+      "Cayenne / Cayenne",
+      "Cayenne GTS",
+      "Cayenne Platinum",
+      "Cayenne S",
+      "Cayenne S Hybrid",
+      "Cayenne S e-Hybrid",
+      "Cayenne Turbo",
+      "Cayenne Turbo GT",
+      "Cayenne Turbo Kit",
+      "Cayenne Turbo S",
+      "Cayenne Turbo S e-Hybrid",
+      "Cayenne Turbo S/Coupe E-Hybrid",
+      "Cayenne e-Hybrid",
+      "Cayenne/Coupe E-Hybrid",
+      "Cayenne E-Hybrid",
+      "Cayenne E-Hybrid Turbo."
+    ],
+    "Cayman": [
+      "Cayman",
+      "Cayman GT4",
+      "Cayman GTS",
+      "Cayman R",
+      "Cayman S"
+    ],
+    "Macan": [
+      "Macan",
+      "Macan GTS",
+      "Macan S",
+      "Macan Turbo",
+      "Macan Hybrid"
+    ],
+    "New 911 Carrera": [
+      "New 911 Carrera",
+      "New 911 Carrera S",
+      "911 Carrera 4",
+      "911 Carrera 4S"
+    ],
+    "Panamera": [
+      "Panamera",
+      "Panamera 4",
+      "Panamera 4 E-Hybrid/Exec/ST",
+      "Panamera 4 Executive",
+      "Panamera 4 ST",
+      "Panamera 4 e-Hybrid",
+      "Panamera 4 e-Hybrid Executive",
+      "Panamera 4 e-Hybrid ST",
+      "Panamera 4S",
+      "Panamera 4S E-Hybrid",
+      "Panamera 4S E-Hybrid/Exec/ST",
+      "Panamera 4S Executive",
+      "Panamera 4S e-Hybrid",
+      "Panamera 4S e-Hybrid Executive",
+      "Panamera 4S e-Hybrid ST",
+      "Panamera GTS",
+      "Panamera S",
+      "Panamera S E-Hybrid",
+      "Panamera S Hybrid",
+      "Panamera Turbo",
+      "Panamera Turbo Exec",
+      "Panamera Turbo Executive",
+      "Panamera Turbo S",
+      "Panamera Turbo S E-Hybrid/Exec/ST",
+      "Panamera Turbo S Executive",
+      "Panamera Turbo S e-Hybrid",
+      "Panamera Turbo S e-Hybrid Executive",
+      "Panamera Turbo S e-Hybrid ST",
+      "Panamera Turbo S/Exec/ST",
+      "Panamera 4 E-Hybrid Sport Turismo",
+      "Panamera GTS Sport Turismo",
+      "Panamera Turbo Sport Turismo",
+      "Panamera Turbo S Sport Turismo"
+    ],
+    "Targa": [
+      "Targa",
+      "4S",
+      "GTS",
+      "Turbo",
+      "Turbo S",
+      "4",
+      "4 GTS"
+    ],
+    "Taycan": [
+      "Taycan 4 Cross Turismo",
+      "Taycan 4S Cross Turismo",
+      "Taycan 4S Perf Battery",
+      "Taycan 4S Perf Battery Plus",
+      "Taycan 4S Performance Battery",
+      "Taycan 4S Performance Battery Plus",
+      "Taycan GTS",
+      "Taycan Perf Battery",
+      "Taycan Perf Battery Plus",
+      "Taycan Performance Battery",
+      "Taycan Performance Battery Plus",
+      "Taycan Turbo",
+      "Taycan Turbo Cross Turismo",
+      "Taycan Turbo S",
+      "Taycan Turbo S Cross Turismo",
+      "Taycan 4",
+      "Taycan 4S"
+    ],
+    "Turbo": [
+      "Turbo",
+      "Turbo S",
+      "Turbo S Exclusive Series",
+      "Turbo S E-Hybrid"
+    ],
+    "Turbo 2 911 GT2": [
+      "Turbo 2 911 GT2",
+      "Turbo 2 911 GT2 RS"
+    ],
+    "Turbo 2 911 Gt2": [
+      "Turbo 2 911 Gt2",
+      "Turbo 2 911 Gt2 RS"
+    ],
+    "Turbo 4 911": [
+      "Turbo 4 911",
+      "Turbo S 911",
+      "Turbo 4S 911",
+      "Turbo 4 GTS 911"
+    ],
+    "Turbo 4 911 Cab": [
+      "Turbo 4 911 Cab",
+      "Turbo S 911 Cab",
+      "Turbo 4S 911 Cab",
+      "Turbo GTS 911 Cab"
+    ],
+    "Turbo 4 911 Cab Kit": [],
+    "Turbo 4 911 Kit": [
+      "Turbo S 911 Kit"
+    ],
+    "Turbo 4 911 S": [
+      "Turbo 4 911 S",
+      "Turbo 4 911 S Targa"
+    ],
+    "Turbo 4 911 Turbo": [
+      "Turbo 4 911 Turbo",
+      "Turbo S 911 Turbo",
+      "GT3 911 Turbo",
+      "Carrera 911 Turbo"
+    ],
+    "Turbo 4 911 Turbo Cab S": [
+      "Turbo 4 911 Turbo Cab S",
+      "Turbo 4 911 Turbo Cab S Sport"
+    ],
+    "Turbo GT2": [
+      "Turbo GT2 RS"
+    ],
+    "Turbo Kit": [
+      "1. Turbo S 2. Turbo S Exclusive Series 3. Turbo S 4. Turbo S Exclusive Series"
+    ]
+  }
+}

@@ -1,0 +1,220 @@
+{
+  "Ford": {
+    "Aerostar Van": [],
+    "Aerostar Wagon": [],
+    "Aspire": [],
+    "Bronco": [
+      "Bronco Wildtrak"
+    ],
+    "Bronco II": [],
+    "Bronco Sport": [
+      "Bronco Sport"
+    ],
+    "C-MAX": [
+      "C-MAX Energi Plug-In Hybrid",
+      "C-MAX Energi Plug-in Hybrid",
+      "C-MAX Hybrid",
+      "C-MAX Titanium",
+      "C-MAX Zetec",
+      "C-MAX ST-Line."
+    ],
+    "Contour": [
+      "Ghia"
+    ],
+    "Courier": [
+      "Courier"
+    ],
+    "Crown Victoria": [],
+    "E150 Club Wagon": [],
+    "E150 Econoline": [],
+    "E150 Van": [
+      "E150 XL"
+    ],
+    "E150 Wagon": [],
+    "E250 Econoline": [],
+    "E250 Van": [
+      "E250 Cargo"
+    ],
+    "E350 Van": [
+      "E350",
+      "E350 Super Duty",
+      "E350 Extended",
+      "E350 Cargo",
+      "E350 Passenger"
+    ],
+    "E350 Wagon": [
+      "E350",
+      "XLT",
+      "XL"
+    ],
+    "EXP": [],
+    "EcoSport": [
+      "EcoSport",
+      "EcoSport Titanium",
+      "EcoSport ST-Line"
+    ],
+    "Edge": [
+      "Edge",
+      "Titanium",
+      "ST-Line",
+      "Vignale"
+    ],
+    "Escape": [
+      "Escape 2WD",
+      "Escape",
+      "Escape HEV",
+      "Escape Plug-in Hybrid 2WD",
+      "Escape Plug-in Hybrid"
+    ],
+    "Escort": [
+      "Escort",
+      "Escort ZX2",
+      "Estate",
+      "XR3",
+      "RS Turbo",
+      "GTi."
+    ],
+    "Expedition": [
+      "Expedition 2WD",
+      "Expedition",
+      "Expedition MAX 2WD",
+      "Expedition MAX",
+      "Expedition Limited",
+      "Expedition XLT",
+      "Expedition XLT MAX"
+    ],
+    "Explorer": [
+      "Explorer 2WD",
+      "Explorer",
+      "Explorer Sport",
+      "Explorer Limited",
+      "Explorer XLT"
+    ],
+    "F-150 Lightning": [],
+    "F150": [
+      "F150 Pickup 2WD",
+      "F150 Pickup",
+      "F150 Pickup Limited",
+      "F150 Pickup XL/XLT",
+      "F150 RAPTOR 37",
+      "F150 RAPTOR",
+      "F150 RAPTOR R",
+      "F150 Raptor Pickup",
+      "F150 Lariat",
+      "F150 Platinum",
+      "F150 Limited"
+    ],
+    "F250": [
+      "F250 Pickup 2WD",
+      "F250 Pickup",
+      "F250 Pickup Cab Chassis 2WD",
+      "F250 Super Duty",
+      "F250 Super Duty Crew Cab",
+      "F250 Super Duty Lariat"
+    ],
+    "Festiva": [],
+    "Fiesta": [
+      "Fiesta",
+      "Fiesta SFE",
+      "Fiesta ST",
+      "Fiesta Titanium"
+    ],
+    "Five Hundred": [],
+    "Flex": [],
+    "Focus": [
+      "Focus",
+      "Focus Electric",
+      "Focus FFV",
+      "Focus RS",
+      "Focus SFE",
+      "Focus ST",
+      "Focus Station",
+      "Focus Titanium",
+      "Focus Zetec"
+    ],
+    "Freestar": [],
+    "Freestyle": [],
+    "Fusion": [
+      "Fusion",
+      "Fusion Energi Plug-in Hybrid",
+      "Fusion Hybrid",
+      "Fusion S",
+      "Fusion Titanium",
+      "Fusion SE"
+    ],
+    "GT": [
+      "GT",
+      "Heritage Edition"
+    ],
+    "LTD": [],
+    "LTD Crown Victoria": [],
+    "LTD Crown Victoria/Country Squire Wagon": [],
+    "Laser": [],
+    "Maverick": [],
+    "Mustang": [
+      "Mustang",
+      "Mustang Bullitt",
+      "Mustang Mach 1",
+      "Mustang Performance Package",
+      "Shelby GT350 Mustang",
+      "Shelby GT500 Mustang",
+      "Mustang GT",
+      "Mustang EcoBoost",
+      "Mustang GT Premium",
+      "Mustang California Special",
+      "Mustang RTR",
+      "Mustang Shelby GT350R"
+    ],
+    "Mustang Mach-E": [
+      "MUSTANG MACH-E CAL RT 1 ER",
+      "Mustang Mach-E",
+      "Mustang Mach-E Extended",
+      "Mustang Mach-E GT",
+      "Mustang Mach-E GT Performance",
+      "Mustang Mach-E LFP",
+      "Mustang Mach-E Premium",
+      "Mustang Mach-E Select"
+    ],
+    "Postal Vehicle": [],
+    "Probe": [
+      "Probe",
+      "GT",
+      "LX",
+      "GT Turbo"
+    ],
+    "Ranger": [
+      "Ranger 2WD",
+      "Ranger 2WD Incomplete",
+      "Ranger",
+      "Ranger Pickup 2WD",
+      "Ranger Pickup",
+      "Ranger Pickup Cab Chassis",
+      "Ranger Pickup Cab Chassis 2WD",
+      "Ranger RAPTOR",
+      "Ranger Tremor",
+      "Wildtrak",
+      "Limited",
+      "XL",
+      "XLT"
+    ],
+    "Taurus": [
+      "Taurus",
+      "Taurus EcoBoost"
+    ],
+    "Tempo": [],
+    "Th!nk": [],
+    "Thunderbird": [],
+    "Transit Connect": [
+      "Transit Connect",
+      "Transit Connect USPS",
+      "Transit Connect 2WD",
+      "Transit Connect FFV",
+      "Transit Connect LWB FFV",
+      "Transit Connect LWB"
+    ],
+    "Transit T150 Wagon": [
+      "Transit T150"
+    ],
+    "Windstar": []
+  }
+}

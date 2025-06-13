@@ -1,0 +1,58 @@
+{
+  "Lamborghini": {
+    "Aventador": [
+      "Aventador",
+      "Aventador LP740-4",
+      "Aventador S",
+      "Aventador SVJ"
+    ],
+    "Countach": [
+      "Countach",
+      "Countach Lp500s",
+      "Countach 25th Anniversary",
+      "Countach 5000 QV"
+    ],
+    "Diablo": [
+      "DB132/144 - Diablo",
+      "DB132/Diablo",
+      "GT",
+      "SV",
+      "VT",
+      "SE30",
+      "6.0",
+      ""
+    ],
+    "Gallardo": [
+      "Gallardo",
+      "Gallardo Spyder",
+      "L-140/141 Gallardo",
+      "L-140/715 Gallardo",
+      "Gallardo LP560-4",
+      "Gallardo LP570-4 Superleggera",
+      "Gallardo LP570-4 Performante",
+      "Gallardo LP550-2",
+      "Gallardo LP570-4 Squadra Corse"
+    ],
+    "Huracan": [
+      "Huracan",
+      "Huracan 2WD",
+      "Huracan Spyder",
+      "Huracan Performante",
+      "Huracan Performante Spyder",
+      "Huracan EVO"
+    ],
+    "Murcielago": [
+      "L-147 Murcielago",
+      "L-147/148 Murcielago",
+      "Murcielago",
+      "LP640 Murcielago",
+      "LP670-4 SV Murcielago"
+    ],
+    "Urus": [
+      "Urus",
+      "Urus S",
+      "Urus Evo"
+    ],
+    "Veneno": []
+  }
+}

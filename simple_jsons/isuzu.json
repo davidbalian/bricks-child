@@ -1,0 +1,37 @@
+{
+  "Isuzu": {
+    "750C/I-Mark": [],
+    "Amigo": [],
+    "Ascender": [],
+    "Axiom": [],
+    "Hombre Pickup": [],
+    "I-Mark": [],
+    "Impulse": [],
+    "Oasis": [],
+    "Pickup": [
+      "Pickup 2WD",
+      "Pickup 2WD 1-Ton",
+      "Pickup",
+      "Rodeo",
+      "D-Max"
+    ],
+    "Rodeo": [
+      "Rodeo 2WD",
+      "Rodeo",
+      "Trooper",
+      "D-Max"
+    ],
+    "Stylus": [],
+    "Trooper": [
+      "Trooper",
+      "D-Max",
+      "Rodeo"
+    ],
+    "Vehicross": [],
+    "i-280 Extended Cab": [],
+    "i-290 Extended Cab": [],
+    "i-350 Crew Cab": [],
+    "i-370 Crew Cab": [],
+    "i-370 Extended Cab": []
+  }
+}

@@ -1,0 +1,323 @@
+{
+  "Ferrari": {
+    "296 GTB": [
+      "296 GTB",
+      "Ferrari 296 GTB PHEV"
+    ],
+    "296 GTB Spider": [],
+    "3.2 Mondial/Cabriolet": [
+      "3.2 Mondial/Cabriolet",
+      "3.2 Mondial/Cabriolet QV"
+    ],
+    "308": [
+      "308",
+      "GTB",
+      "GTS",
+      "GTSi",
+      "QV"
+    ],
+    "328 GTS/GTB": [
+      "328 GTS/GTB"
+    ],
+    "348 TB/TS": [
+      "348 TB/TS",
+      "348 GTB/GTS",
+      "348 Spider"
+    ],
+    "360 Modena/Modena F1": [
+      "360 Modena/Modena F1",
+      "Challenge Stradale",
+      "360 Spider",
+      "360 Challenge",
+      "360 GT"
+    ],
+    "360 Modena/Spider": [
+      "360 Modena/Spider",
+      "Challenge Stradale",
+      "F1",
+      "360 Challenge",
+      "360 GT"
+    ],
+    "360 Modena/Spider/Challenge": [
+      "360 Modena/Spider/Challenge",
+      "360 Challenge Stradale",
+      "360 GT",
+      "360 N-GT"
+    ],
+    "456 MGT/MGA": [
+      "456 MGT/MGA",
+      "456 GT",
+      "456 GTA"
+    ],
+    "458 Italia": [
+      "458 Italia",
+      "458 Italia Spider",
+      "458 Speciale",
+      "458 Speciale Aperta",
+      "458 Challenge",
+      "458 GT3",
+      "458 GT2"
+    ],
+    "458 Speciale": [
+      "458 Speciale",
+      "458 Speciale Spider",
+      "458 Italia",
+      "458 Spider",
+      "458 Aperta"
+    ],
+    "458 Spider": [
+      "458 Spider",
+      "458 Speciale",
+      "458 Speciale Aperta",
+      "458 Italia"
+    ],
+    "488 GTB": [
+      "488 GTB",
+      "488 Pista",
+      "488 Pista Spider",
+      "488 Spider"
+    ],
+    "488 Pista": [
+      "488 Pista",
+      "488 Pista Spider",
+      "488 Pista Piloti",
+      "488 Pista \"Piloti Ferrari\""
+    ],
+    "488 Pista Spider": [
+      "488 Pista Spider",
+      "488 Pista",
+      "488 GTB",
+      "488 Spider",
+      "F8 Tributo",
+      "F8 Spider"
+    ],
+    "488 Spider": [
+      "488 Spider",
+      "F8 Spider"
+    ],
+    "550 Maranello": [
+      "550 Maranello"
+    ],
+    "550 Maranello/Barchetta": [
+      "550 Maranello/Barchetta",
+      "550 Maranello",
+      "550 Barchetta"
+    ],
+    "575": [
+      "575",
+      "Maranello"
+    ],
+    "575 M Maranello": [
+      "575 M Maranello",
+      "575 Superamerica"
+    ],
+    "575 M Maranello and Superamerica": [
+      "575 M Maranello and Superamerica",
+      "F1A Sequential Manual Gearbox"
+    ],
+    "599 GTB": [
+      "599 GTB"
+    ],
+    "599 GTB Fiorano": [
+      "599 GTB Fiorano",
+      "599 GTO"
+    ],
+    "599 GTO": [
+      "599 GTO",
+      "599 GTB"
+    ],
+    "599 SA Aperta": [],
+    "612 Scaglietti": [
+      "612 Scaglietti"
+    ],
+    "812 Competizione": [
+      "812 Superfast"
+    ],
+    "812 GTS": [
+      "812 GTS",
+      "812 Superfast"
+    ],
+    "812 Superfast": [
+      "812 Superfast",
+      "VS"
+    ],
+    "California": [
+      "California",
+      "T",
+      "T Handling Speciale",
+      "HS",
+      "Handling Speciale",
+      "California 30",
+      "30 Handling Speciale",
+      "California T"
+    ],
+    "California T": [
+      "California T",
+      "Portofino",
+      "Roma",
+      "F8 Tributo",
+      "SF90 Stradale"
+    ],
+    "Daytona SP3": [],
+    "Enzo Ferrari": [
+      "Enzo Ferrari"
+    ],
+    "F 40": [
+      "F 40"
+    ],
+    "F12": [
+      "F12",
+      "TDF",
+      "Berlinetta"
+    ],
+    "F12 Berlinetta": [
+      "F12 Berlinetta"
+    ],
+    "F12 tdf": [
+      "F12 tdf",
+      "F12 Berlinetta",
+      "F12tdf SPeciale"
+    ],
+    "F141": [],
+    "F175 AHA": [],
+    "F355/355 F1": [
+      "F355/355 F1",
+      "F355 GTS",
+      "F355 Spider"
+    ],
+    "F40": [
+      "F40",
+      "F40 LM"
+    ],
+    "F430": [
+      "F430",
+      "Scuderia",
+      "Spider",
+      "Scuderia 16M"
+    ],
+    "F60 America": [],
+    "F8 Spider": [
+      "F8 Spider",
+      "F8 Tributo"
+    ],
+    "F8 Tributo": [
+      "F8 Tributo",
+      "Spider",
+      "Pista"
+    ],
+    "FF": [
+      "FF",
+      "GTC4Lusso",
+      "GTC4Lusso T"
+    ],
+    "Ferrari 348 TB/TS": [
+      "Ferrari 348 TB/TS",
+      "Ferrari 348 GTB/GTS",
+      "Ferrari 348 Spider"
+    ],
+    "Ferrari 348 TB/TS/Spider": [
+      "Ferrari 348 TB/TS/Spider",
+      "Ferrari 348 GTB/GTS",
+      "Ferrari 348 Challenge"
+    ],
+    "Ferrari 456": [
+      "Ferrari 456 GT",
+      "Ferrari 456 GT/GTA",
+      "Ferrari 456M",
+      "Ferrari 456M GT",
+      "Ferrari 456M GTA"
+    ],
+    "Ferrari 512 TR": [
+      "Ferrari 512 TR",
+      "Ferrari Testarossa"
+    ],
+    "Ferrari 550 Maranello": [
+      "Ferrari 550 Maranello",
+      "Ferrari 575M Maranello"
+    ],
+    "Ferrari F355": [
+      "Ferrari F355",
+      "Spider",
+      "GTS",
+      "Berlinetta"
+    ],
+    "Ferrari F355 Berlinetta/GTS": [
+      "Ferrari F355 Berlinetta/GTS",
+      "Ferrari F355 Spider",
+      "Ferrari F355 Challenge",
+      "Ferrari F355 Fiorano",
+      "Ferrari F355 F1 Berlinetta/GTS"
+    ],
+    "Ferrari F355/355 F1": [
+      "Ferrari F355/355 F1",
+      "Ferrari F355 Spider",
+      "Ferrari F355 GTS",
+      "Ferrari F355 Challenge"
+    ],
+    "Ferrari F50": [],
+    "Ferrari F512M": [
+      "Ferrari Testarossa"
+    ],
+    "Ferrari Mondial T/Cabriolet": [
+      "Ferrari Mondial T/Cabriolet"
+    ],
+    "GTC4Lusso": [
+      "GTC4Lusso",
+      "GTC4Lusso T"
+    ],
+    "LaFerrari": [
+      "LaFerrari Aperta",
+      "LaFerrari Hybrid"
+    ],
+    "Mondial": [
+      "Mondial",
+      "T",
+      "3.2",
+      "QV",
+      "8",
+      ""
+    ],
+    "Mondial T/Cabriolet": [
+      "Mondial 8",
+      "Mondial QV",
+      "Mondial 3.2"
+    ],
+    "Mondial/Cabriolet": [
+      "Mondial/Cabriolet",
+      "Mondial 8",
+      "Mondial",
+      "Mondial 3.2"
+    ],
+    "Monza SP1": [],
+    "Monza SP2": [],
+    "Portofino": [
+      "Portofino",
+      "Portofino M",
+      "GTS",
+      "HS"
+    ],
+    "Purosangue": [],
+    "Roma": [
+      "Roma",
+      "Roma Spider",
+      "Portofino",
+      "F8 Tributo",
+      "812 Superfast"
+    ],
+    "SF90 Spider": [],
+    "SF90 Stradale": [
+      "SF90 Stradale",
+      "Assetto Fiorano"
+    ],
+    "SF90 Stradale Coupe": [
+      "SF90 Stradale",
+      "Assetto Fiorano"
+    ],
+    "Testarossa": [
+      "Testarossa",
+      "GTS",
+      "512 TR",
+      "F512 M"
+    ]
+  }
+}

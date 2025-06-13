@@ -1,0 +1,16 @@
+/* Keep Text and List Styles for Registration */
+
+#password-remaining-reqs ul {
+  list-style: disc;
+  padding-left: 20px;
+  margin: 0;
+}
+
+#password-remaining-reqs li {
+  color: #dc3545; /* Default unmet color (red) */
+  transition: color 0.3s ease;
+}
+
+#password-remaining-reqs li.met {
+  color: #28a745; /* Met color (green) */
+}

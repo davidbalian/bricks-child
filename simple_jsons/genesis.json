@@ -1,0 +1,28 @@
+{
+  "Genesis": {
+    "G70": [
+      "G70",
+      "G70 Sport",
+      "G70 Prestige",
+      "G70 Ultimate"
+    ],
+    "G80": [
+      "G80",
+      "Sport G80",
+      "Luxury G80"
+    ],
+    "G90": [
+      "G90",
+      "G90 MHEV",
+      "G90 3.3T",
+      "G90 5.0 Ultimate"
+    ],
+    "GV60": [],
+    "GV70": [],
+    "GV80": [
+      "GV80",
+      "GV80 2.5T",
+      "GV80 3.5T"
+    ]
+  }
+}

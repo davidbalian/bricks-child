@@ -1,0 +1,184 @@
+{
+  "Jaguar": {
+    "E-Pace": [
+      "E-Pace",
+      "E-Pace (296 Hp)",
+      "E-Pace MHEV",
+      "E-Pace P250",
+      "E-Pace P300",
+      "E-Pace D150",
+      "E-Pace D180",
+      "E-Pace R-Dynamic S",
+      "E-Pace R-Dynamic SE",
+      "E-Pace R-Dynamic HSE"
+    ],
+    "F-Pace": [
+      "F-Pace",
+      "F-Pace (296 Hp)",
+      "F-Pace 30t",
+      "F-Pace MHEV",
+      "F-Pace P340 MHEV",
+      "F-Pace P400 MHEV",
+      "F-Pace SVR",
+      "F-Pace D200 MHEV",
+      "F-Pace D240 MHEV",
+      "F-Pace P250 MHEV",
+      "F-Pace P400e PHEV"
+    ],
+    "F-Type": [
+      "F-Type",
+      "F-Type P450 R-Dynamic",
+      "F-Type P450",
+      "F-Type R",
+      "F-Type S",
+      "F-Type SVR",
+      "F-Type SVR GEN2",
+      "F-Type V8 S",
+      "F-Type 2.0",
+      "F-Type P300",
+      "F-Type P380"
+    ],
+    "I-Pace": [
+      "I-Pace",
+      "I-Pace EV400",
+      "I-Pace EV400 (20 inch tires)",
+      "I-Pace EV400 (22 inch tires)",
+      "I-Pace S",
+      "I-Pace SE",
+      "I-Pace HSE"
+    ],
+    "S-Type": [
+      "S-Type",
+      "R-Dynamic",
+      "SE",
+      "SE Sport",
+      "HSE",
+      "R",
+      "R-Dynamic Black",
+      "Portfolio",
+      "Sport"
+    ],
+    "S-type": [
+      "S-Type 3.0 Litre",
+      "S-Type 4.2 Litre",
+      "S-Type R",
+      "S-type (X200) V6",
+      "S-type (X200) V8",
+      "S-Type 2.7 Litre Diesel",
+      "S-Type 2.5 Litre"
+    ],
+    "Super V8": [
+      "Super V8",
+      "XJR",
+      "XJ6",
+      "XJ8"
+    ],
+    "Vanden Plas": [
+      "Plas",
+      "Plas S.C.",
+      "Sovereign",
+      "Daimler"
+    ],
+    "Vdp": [
+      "Vdp",
+      "Vdp 4.2 Litre",
+      "Vdp Lwb",
+      "XJ6",
+      "XJ8",
+      "XJR",
+      "XJ12"
+    ],
+    "X-Type": [
+      "X-Type",
+      "X-Type Sport Brake",
+      "X-Type SE",
+      "X-Type Executive",
+      "X-Type Sovereign"
+    ],
+    "XE": [
+      "XE",
+      "XE (296 Hp)",
+      "XE 30t",
+      "XE P250",
+      "XE P300",
+      "XE R-Dynamic",
+      "XE R-Dynamic 300",
+      "XE R-Dynamic Black Edition",
+      "XE R-Dynamic S",
+      "XE R-Dynamic SE",
+      "XE R-Dynamic HSE"
+    ],
+    "XF": [
+      "XF",
+      "XF (296 Hp)",
+      "XF 30t",
+      "XF FFV",
+      "XF P250",
+      "XF P300",
+      "XF Sportbrake",
+      "XF Supercharged",
+      "XF R-Sport",
+      "XF Portfolio",
+      "XF S"
+    ],
+    "XJ": [
+      "XJ",
+      "XJ LWB",
+      "XJ12",
+      "XJ6",
+      "XJ6L",
+      "XJ8",
+      "XJ8 4.2 Litre",
+      "XJ8L",
+      "XJ8l",
+      "XJL",
+      "XJR",
+      "XJR 575",
+      "XJ50",
+      "XJ Portfolio",
+      "XJ Executive",
+      "XJ Sovereign",
+      "XJ Super V8"
+    ],
+    "XJL": [
+      "XJL",
+      "XJL Portfolio",
+      "XJL Supercharged",
+      "XJL Ultimate"
+    ],
+    "XJR": [
+      "XJR",
+      "XJR 4.2 Litre",
+      "XJR 575",
+      "XJR 575 LWB",
+      "XJR 575 50th Anniversary Edition"
+    ],
+    "XJRS": [
+      "XJRS"
+    ],
+    "XJS": [
+      "XJ-S",
+      "XJ-SC",
+      "XJS",
+      "XJS V12",
+      "XJS V6",
+      "XJS V8"
+    ],
+    "XK": [
+      "XK",
+      "XKR",
+      "XKR-S",
+      "XKR-S GT"
+    ],
+    "XK8": [
+      "XK8",
+      "XKR"
+    ],
+    "XKR": [
+      "XKR",
+      "XKR-S",
+      "XKR-S GT",
+      "XKR 75"
+    ]
+  }
+}

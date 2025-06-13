@@ -1,0 +1,158 @@
+{
+  "Hyundai": {
+    "Accent": [
+      "Accent",
+      "Accent (SOHC)",
+      "Accent (Sporty)",
+      "SE",
+      "SEL",
+      "Limited"
+    ],
+    "Accent/Brio": [
+      "Accent/Brio",
+      "1. Accent/Brio SE 2. Accent/Brio Sport 3. Accent/Brio Limited Edition"
+    ],
+    "Azera": [],
+    "Elantra": [
+      "Elantra",
+      "Elantra GT",
+      "Elantra Hybrid",
+      "Elantra Hybrid Blue",
+      "Elantra Limited",
+      "Elantra SE",
+      "Elantra Sport"
+    ],
+    "Entourage": [],
+    "Equus": [],
+    "Excel": [
+      "Excel",
+      "Accent",
+      "Getz",
+      "i10",
+      "i20",
+      "i30",
+      "ix35",
+      "Kona"
+    ],
+    "Genesis": [
+      "Genesis"
+    ],
+    "Ioniq": [
+      "Ioniq",
+      "Ioniq Blue",
+      "Ioniq Electric",
+      "Ioniq Plug-in Hybrid",
+      "Ioniq Hybrid"
+    ],
+    "Ioniq 5": [
+      "Ioniq 5 (Long Range)",
+      "Ioniq 5 Long range",
+      "Ioniq 5 (Standard Range)",
+      "Ioniq 5 Standard range",
+      "Ioniq 5 Ultimate (Long Range)",
+      "Ioniq 5 SE (Standard Range)",
+      "Ioniq 5 Premium (Long Range)"
+    ],
+    "Ioniq 6": [],
+    "J-Car/Elantra": [
+      "J-Car/Elantra",
+      "i30",
+      "i20",
+      "Kona",
+      "Tucson",
+      "Santa Fe"
+    ],
+    "Kona": [
+      "Kona",
+      "Kona Electric",
+      "Kona Electric Long Range",
+      "Kona Electric Standard Range",
+      "Kona Hybrid",
+      "Kona Plug-in Hybrid"
+    ],
+    "Nexo": [
+      "Nexo",
+      "Nexo Blue",
+      "Nexo Ultimate",
+      "Nexo Premium"
+    ],
+    "Palisade": [
+      "Palisade",
+      "Palisade Limited",
+      "Palisade SE",
+      "Palisade SEL"
+    ],
+    "Pony Excel": [],
+    "Precis": [
+      "1. Hyundai Excel 2. Hyundai Accent 3. Hyundai Getz 4. Hyundai i10 5. Hyundai i20"
+    ],
+    "Santa Cruz": [],
+    "Santa Fe": [
+      "Santa Fe 2WD",
+      "Santa Fe",
+      "Santa Fe Hybrid",
+      "Santa Fe Hybrid Blue",
+      "Santa Fe Sport 2WD",
+      "Santa Fe Sport",
+      "Santa Fe Sport Ultimate",
+      "Santa Fe Ultimate 2WD",
+      "Santa Fe Ultimate",
+      "Santa Fe XL",
+      "Santa Fe XL Ultimate",
+      "Some other popular variants of the Hyundai Santa Fe that are commonly available in the Cypriot market and/or the British market and are missing from this list include: Santa Fe Premium",
+      "Santa Fe SE",
+      "Santa Fe SEL",
+      "Santa Fe SEL Plus",
+      "Santa Fe Limited",
+      "Santa Fe Calligraphy."
+    ],
+    "Scoupe": [],
+    "Sonata": [
+      "Sonata",
+      "Sonata Hybrid",
+      "Sonata Hybrid Limited",
+      "Sonata Hybrid SE",
+      "Sonata Limited",
+      "Sonata Plug-in Hybrid",
+      "Sonata SE",
+      "Sonata Sport Limited",
+      "Sonata N Line"
+    ],
+    "Tiburon": [
+      "GT",
+      "SE",
+      "GS"
+    ],
+    "Tucson": [
+      "Tucson 2WD",
+      "Tucson",
+      "Tucson Eco",
+      "Tucson Fuel Cell",
+      "Tucson Hybrid",
+      "Tucson Hybrid Blue",
+      "Tucson Plug-in Hybrid",
+      "Tucson N Line",
+      "Tucson N Line S",
+      "Tucson N Line SE",
+      "Tucson N Line Premium",
+      "Tucson Sport",
+      "Tucson SE Nav",
+      "Tucson Premium",
+      "Tucson Ultimate."
+    ],
+    "Veloster": [
+      "Veloster",
+      "Veloster N",
+      "Veloster Turbo",
+      "Veloster Turbo R-Spec"
+    ],
+    "Venue": [
+      "Venue",
+      "SE",
+      "SEL",
+      "Limited"
+    ],
+    "Veracruz": [],
+    "XG": []
+  }
+}

@@ -1,0 +1,235 @@
+{
+  "Nissan": {
+    "200SX": [
+      "200SX",
+      "S13",
+      "S14",
+      "S15"
+    ],
+    "240SX": [
+      "240SX",
+      "180SX",
+      "Silvia S13",
+      "Silvia S14"
+    ],
+    "300ZX": [
+      "300ZX",
+      "300ZX 2x2",
+      "300ZX Turbo",
+      "300ZX Twin Turbo"
+    ],
+    "350z": [
+      "350z",
+      "Nismo",
+      "Track",
+      "",
+      "Enthusiast"
+    ],
+    "370Z": [
+      "370Z",
+      "Nismo",
+      "Nismo RS",
+      "Heritage Edition"
+    ],
+    "370z": [
+      "370z",
+      "Nismo",
+      "",
+      "Heritage Edition"
+    ],
+    "ARIYA": [],
+    "Altima": [
+      "Altima",
+      "Altima SL/SR",
+      "Altima SR",
+      "Altima SR/Platinum",
+      "Altima SV/SL",
+      "Altima S",
+      "Altima SV"
+    ],
+    "Altima / Stanza": [
+      "Altima / Stanza",
+      "1. Altima 2. Altima Hybrid 3. Altima SE-R 4. Altima Nismo"
+    ],
+    "Altra EV": [],
+    "Armada": [
+      "Armada 2WD",
+      "Armada",
+      "Armada Platinum",
+      "Armada Platinum Reserve",
+      "Armada SV",
+      "Armada SL"
+    ],
+    "Axxess": [],
+    "Cube": [
+      "Cube",
+      "Nissan Cube S",
+      "Nissan Cube SL"
+    ],
+    "Frontier": [
+      "Frontier 2WD",
+      "Frontier",
+      "Frontier PRO4X",
+      "Frontier V6 2WD",
+      "Frontier V6",
+      "Frontier King Cab",
+      "Frontier Crew Cab"
+    ],
+    "GT-R": [
+      "GT-R",
+      "Nismo",
+      "Track Edition",
+      "Pure",
+      "Prestige"
+    ],
+    "Hardbody": [
+      "Hardbody 2WD",
+      "Hardbody",
+      "King Cab",
+      "Double Cab"
+    ],
+    "Hyper-Mini": [],
+    "Juke": [
+      "Juke",
+      "Juke Nismo RS",
+      "Juke Tekna",
+      "Juke Tekna+"
+    ],
+    "Kicks": [
+      "Kicks",
+      "Visia",
+      "Acenta",
+      "N-Connecta",
+      "Tekna"
+    ],
+    "LEAF": [
+      "LEAF",
+      "LEAF SV",
+      "LEAF S",
+      "LEAF S Plus",
+      "LEAF SL"
+    ],
+    "Leaf": [
+      "Leaf",
+      "Leaf (24 kW-hr battery pack)",
+      "Leaf (30 kW-hr battery pack)",
+      "Leaf (40 kW-hr battery pack)",
+      "Leaf (62 kW-hr battery pack)",
+      "Leaf SV/SL (62 kW-hr battery pack)",
+      "Leaf Acenta",
+      "Leaf N-Connecta",
+      "Leaf Tekna"
+    ],
+    "Maxima": [
+      "Maxima",
+      "SV",
+      "Platinum",
+      "SR",
+      "SL",
+      "S",
+      "SV Premium"
+    ],
+    "Murano": [
+      "Murano 2WD",
+      "Murano",
+      "Murano Platinum",
+      "Murano SL",
+      "Murano SV"
+    ],
+    "NV200 Cargo Van": [
+      "NV200 Cargo",
+      "NV200 Taxi",
+      "NV200 Combi"
+    ],
+    "NV200 NYC Taxi": [
+      "NV200 Evalia"
+    ],
+    "NX": [],
+    "Pathfinder": [
+      "Pathfinder 2WD",
+      "Pathfinder",
+      "Pathfinder Platinum",
+      "Pathfinder Rock Creek",
+      "Pathfinder SL/Platinum",
+      "Pathfinder FE 2WD",
+      "Pathfinder Tekna",
+      "Pathfinder N-Connecta",
+      "Pathfinder Visia"
+    ],
+    "Pickup": [
+      "Pickup",
+      "Pickup Cab Chassis",
+      "Navara",
+      "Frontier",
+      "D22",
+      "D40",
+      "NP300",
+      "Titan"
+    ],
+    "Pulsar NX": [
+      "1. Pulsar NX SE 2. Pulsar NX XE 3. Pulsar NX SSS 4. Pulsar NX GTI-R"
+    ],
+    "Pulsar/Pulsar-NX": [
+      "Pulsar/Pulsar-NX",
+      "Nissan Pulsar GTI-R",
+      "Nissan Pulsar SSS."
+    ],
+    "Quest": [
+      "Quest"
+    ],
+    "Rogue": [
+      "Rogue",
+      "Rogue SV/SL/Platinum",
+      "Rogue SL/Platinum",
+      "Rogue Sport",
+      "Rogue S",
+      "Rogue SV",
+      "Rogue SL"
+    ],
+    "Rogue Sport": [
+      "Rogue Sport",
+      "Visia",
+      "N-Connecta",
+      "Tekna"
+    ],
+    "Sentra": [
+      "Sentra",
+      "Sentra SR",
+      "Sentra SE-R",
+      "Sentra SE-R Spec V",
+      "Sentra SL"
+    ],
+    "Sentra/200SX": [
+      "Sentra/200SX"
+    ],
+    "Stanza": [],
+    "Titan": [
+      "Titan",
+      "Titan PRO-4X"
+    ],
+    "Truck": [
+      "King Cab",
+      "Crew Cab 2WD",
+      "Crew Cab"
+    ],
+    "Van": [
+      "NV300",
+      "NV400"
+    ],
+    "Versa": [
+      "Versa",
+      "Nissan Versa SV",
+      "Nissan Versa SR",
+      "Nissan Versa S",
+      "Nissan Versa SL"
+    ],
+    "Xterra": [],
+    "Z": [
+      "Z",
+      "Z NISMO",
+      "370Z",
+      "350Z",
+      "300ZX"
+    ]
+  }
+}

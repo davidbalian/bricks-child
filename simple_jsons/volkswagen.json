@@ -1,0 +1,169 @@
+{
+  "Volkswagen": {
+    "Arteon": [
+      "Arteon",
+      "Arteon 4motion",
+      "R-Line",
+      "Elegance",
+      "SEL",
+      "SE",
+      "SE Nav",
+      "R-Line Edition",
+      "R-Line 4motion",
+      "Elegance 4motion",
+      "SEL 4motion",
+      "SE 4motion",
+      "SE Nav 4motion"
+    ],
+    "Atlas": [
+      "Atlas",
+      "Atlas 4motion",
+      "Atlas Cross Sport",
+      "Atlas Cross Sport 4motion",
+      "Atlas SE 4motion",
+      "Atlas SEL 4motion",
+      "Atlas R-Line",
+      "Atlas SEL Premium 4motion"
+    ],
+    "Beetle": [
+      "Beetle",
+      "Beetle Dune",
+      "New Beetle"
+    ],
+    "CC": [
+      "CC",
+      "CC 4motion",
+      "R-Line",
+      "GT",
+      "R-Line Plus"
+    ],
+    "Cabrio": [
+      "Cabrio",
+      "Beetle Cabrio",
+      "Eos Cabrio"
+    ],
+    "Cabriolet": [
+      "",
+      "1. Cabrio 2. Golf 3. Beetle"
+    ],
+    "Corrado": [
+      "Corrado",
+      "Corrado SLC",
+      "G60",
+      "VR6"
+    ],
+    "Eos": [
+      "Eos"
+    ],
+    "Eurovan": [
+      "Eurovan",
+      "Multivan",
+      "Caravelle"
+    ],
+    "Fox": [],
+    "GLI": [
+      "GLI",
+      "GTI",
+      "R-Line"
+    ],
+    "Golf/GTI": [
+      "GTI",
+      "GTI 16v",
+      "GTI VR6",
+      "GTI/Golf GT",
+      "Golf",
+      "Golf Alltrack",
+      "Golf III",
+      "Golf III / GTI",
+      "Golf R",
+      "Golf SportWagen",
+      "Golf-R",
+      "Golf/GTI",
+      "New GTI",
+      "New Golf",
+      "e-Golf",
+      "GTI TCR",
+      "Golf GTD",
+      "Golf GTE",
+      "Golf GTI Clubsport",
+      "Golf GTI Performance",
+      "Golf R32",
+      "Golf R-Line"
+    ],
+    "ID.4": [
+      "ID.4",
+      "ID.4 1st",
+      "ID.4 Pro",
+      "ID.4 Pro S",
+      "ID.4 S",
+      "ID.4 Style",
+      "ID.4 Business"
+    ],
+    "Jetta": [
+      "Jetta",
+      "Jetta GLI",
+      "Jetta GLI/Wolfsburg Edition",
+      "Jetta GLX",
+      "Jetta III",
+      "Jetta III GLX",
+      "Jetta SE/SEL",
+      "Jetta Sport/SE/SEL",
+      "New Jetta",
+      "Jetta R-Line",
+      "Jetta S"
+    ],
+    "Passat": [
+      "Passat",
+      "Passat 4motion",
+      "Passat GTE",
+      "Passat R-Line",
+      "Passat Alltrack"
+    ],
+    "Phaeton": [],
+    "Quantum": [],
+    "R32": [
+      "R32",
+      "Golf R",
+      "GTI",
+      "GTD",
+      "TSI"
+    ],
+    "Rabbit": [
+      "Rabbit",
+      "Golf",
+      "GTI",
+      "R32"
+    ],
+    "Routan": [],
+    "Scirocco": [
+      "Scirocco",
+      "Scirocco 16v",
+      "Scirocco R",
+      "Scirocco GT"
+    ],
+    "Taos": [
+      "R-Line"
+    ],
+    "Tiguan": [
+      "Tiguan",
+      "Tiguan 4motion",
+      "Tiguan R-Line 4motion",
+      "Tiguan S",
+      "Tiguan SE",
+      "Tiguan SEL",
+      "Tiguan SEL Premium",
+      "Tiguan SE R-Line Black"
+    ],
+    "Touareg": [
+      "Touareg",
+      "Touareg V6 TDI",
+      "Touareg E-Hybrid"
+    ],
+    "Vanagon": [
+      "2WD",
+      "Caravelle",
+      "Multivan",
+      "Westfalia."
+    ]
+  }
+}

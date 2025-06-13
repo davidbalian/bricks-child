@@ -1,0 +1,101 @@
+{
+  "Subaru": {
+    "Ascent": [
+      "Premium",
+      "Limited"
+    ],
+    "BRZ": [
+      "BRZ",
+      "BRZ tS",
+      "BRZ Limited",
+      "BRZ Series.Yellow"
+    ],
+    "Baja": [],
+    "Brat": [],
+    "Crosstrek": [
+      "Crosstrek",
+      "Crosstrek Hybrid",
+      "XV Crosstrek",
+      "XV Crosstrek Hybrid",
+      "Crosstrek Premium",
+      "Crosstrek Limited",
+      "Crosstrek Sport"
+    ],
+    "Forester": [
+      "Forester",
+      "Forester Sport/Touring",
+      "Forester e-Boxer",
+      "Forester Limited",
+      "Forester Premium"
+    ],
+    "Hatchback": [
+      "",
+      "Impreza",
+      "WRX",
+      "WRX STI"
+    ],
+    "Impreza": [
+      "Impreza",
+      "Impreza 4-Door",
+      "Impreza 5-Door",
+      "Impreza Sport 4-Door",
+      "Impreza Sport 5-Door",
+      "Impreza WRX",
+      "Impreza WRX STI"
+    ],
+    "Impreza/Outback Sport": [
+      "Impreza",
+      "Impreza 4-Door",
+      "Impreza 5-Door",
+      "Impreza Sport 4-Door",
+      "Impreza Sport 5-Door",
+      "Impreza Sport",
+      "Impreza SPT",
+      "Impreza WRX",
+      "Impreza WRX STI"
+    ],
+    "Justy": [
+      "GL"
+    ],
+    "Legacy": [
+      "Legacy",
+      "Legacy Limited"
+    ],
+    "Legacy/Outback": [
+      "Legacy",
+      "Legacy (incl. Outback)",
+      "Legacy Turbo",
+      "Legacy/Outback",
+      "Outback",
+      "Legacy GT",
+      "Legacy GT Spec.B",
+      "Legacy 3.0R"
+    ],
+    "Loyale": [],
+    "Outback": [
+      "Outback",
+      "Outback Limited",
+      "Outback Premium"
+    ],
+    "RX Turbo": [],
+    "SVX": [],
+    "Sedan": [
+      ""
+    ],
+    "Solterra": [],
+    "Tribeca": [],
+    "WRX": [
+      "WRX",
+      "WRX STI Type RA",
+      "WRX STI",
+      "WRX STI Limited"
+    ],
+    "Wagon": [
+      "",
+      "Outback",
+      "XV",
+      "Levorg"
+    ],
+    "XT": []
+  }
+}

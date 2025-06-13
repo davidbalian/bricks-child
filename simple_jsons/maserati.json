@@ -1,0 +1,107 @@
+{
+  "Maserati": {
+    "222E": [],
+    "225": [],
+    "228": [],
+    "430": [],
+    "Biturbo": [
+      "Biturbo",
+      "Spyder",
+      "228",
+      "Shamal"
+    ],
+    "Biturbo Spyder": [],
+    "Coupe Cambiocorsa/Coupe GT": [
+      "Cambiocorsa/Coupe GT",
+      "GranSport",
+      "GranSport MC Victory",
+      "4200GT",
+      "GranTurismo",
+      "GranTurismo S",
+      "GranTurismo MC Stradale"
+    ],
+    "Coupe Cambiocorsa/GT/G-Sport": [
+      "Cambiocorsa/GT/G-Sport",
+      "GranSport",
+      "GranSport LE",
+      "GranSport MC Victory"
+    ],
+    "Coupe Cambiocorsa/coupe GT": [
+      "Cambiocorsa/coupe GT",
+      "GranSport",
+      "GranSport Spyder",
+      "GranSport Spyder F1"
+    ],
+    "Coupe and Gransport": [
+      "and Gransport",
+      "Spyder",
+      "Trofeo"
+    ],
+    "Ghibli": [
+      "Ghibli",
+      "Ghibli S",
+      "Ghibli V6",
+      "Ghibli GT",
+      "Ghibli Modena",
+      "Ghibli SQ4",
+      "Ghibli Trofeo",
+      "Ghibli V6 SQ4",
+      "Ghibli GranSport",
+      "Ghibli GranLusso"
+    ],
+    "GranTurismo": [
+      "GranTurismo",
+      "GranTurismo Modena",
+      "GranTurismo MC Stradale",
+      "GranTurismo S",
+      "GranTurismo Sport"
+    ],
+    "Grancabrio": [
+      "Grancabrio Sport"
+    ],
+    "Granturismo": [
+      "GranTurismo MC Stradale",
+      "GranTurismo Sport",
+      "GranTurismo MC",
+      "GranTurismo"
+    ],
+    "Grecale": [],
+    "Karif": [],
+    "Levante": [
+      "Levante",
+      "Levante GT",
+      "Levante GTS",
+      "Levante Modena",
+      "Levante Modena V8",
+      "Levante S",
+      "Levante Trofeo",
+      "Levante GranSport",
+      "Levante GranLusso"
+    ],
+    "MC20": [],
+    "Q": [
+      "Ghibli",
+      "Levante",
+      "GranTurismo",
+      "GranCabrio."
+    ],
+    "Quattroporte": [
+      "",
+      "GT",
+      "GTS",
+      "S",
+      "SQ4",
+      "SQ4 V6",
+      "V8",
+      "Sport GT",
+      "GranSport",
+      "GranLusso"
+    ],
+    "Spyder": [
+      "Spider Cambiocorsa/Spider GT",
+      "Spider Cambiocorsa/spider GT",
+      "Spyder",
+      "GranSport"
+    ]
+  }
+}

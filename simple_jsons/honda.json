@@ -1,0 +1,115 @@
+{
+  "Honda": {
+    "Accord": [
+      "Accord",
+      "Accord 2.0T Sport/Touring",
+      "Accord Hybrid",
+      "Accord Hybrid Sport/Touring",
+      "Accord Sport/Touring",
+      "Accord Euro R",
+      "Accord SiR"
+    ],
+    "CR-V": [
+      "CR-V 2WD",
+      "CR-V",
+      "CR-V Hybrid",
+      "CR-V Executive",
+      "CR-V SE",
+      "CR-V SE Plus",
+      "CR-V EX",
+      "CR-V Black Edition",
+      "CR-V Sport"
+    ],
+    "CR-Z": [
+      "CR-Z",
+      "1. CR-Z GT 2. CR-Z Sport 3. CR-Z Mugen"
+    ],
+    "Civic": [
+      "Civic",
+      "Civic 2Dr",
+      "Civic 4Dr",
+      "Civic 5Dr",
+      "Civic 5Dr - Type R",
+      "Civic 5Dr Sport",
+      "Civic CNG",
+      "Civic CRX",
+      "Civic HF",
+      "Civic HX",
+      "Civic Hybrid",
+      "Civic Natural Gas",
+      "Civic Si 2Dr",
+      "Civic Si 4Dr",
+      "Civic Type R",
+      "Civic Tourer"
+    ],
+    "Clarity": [
+      "Clarity EV",
+      "Clarity Plug-in Hybrid",
+      "Clarity Hybrid",
+      "Clarity EX"
+    ],
+    "Crosstour": [
+      "Some other popular variants of the Honda Crosstour that are commonly available in the Cypriot market and/or the British market and are missing from this list are: - Honda Crosstour EX - Honda Crosstour EX-L - Honda Crosstour"
+    ],
+    "Del Sol": [
+      "Civic Del Sol",
+      "Del Sol",
+      "Si Del Sol"
+    ],
+    "EV Plus": [],
+    "Element": [],
+    "Fit": [
+      "Fit",
+      "Sport"
+    ],
+    "HR-V": [
+      "HR-V 2WD",
+      "HR-V",
+      "HR-V Hybrid"
+    ],
+    "Insight": [
+      "Insight",
+      "EX",
+      "LX",
+      "Executive",
+      "SE"
+    ],
+    "Odyssey": [
+      "Odyssey",
+      "",
+      "EX-L",
+      "Elite"
+    ],
+    "Passport": [
+      "Passport 2WD",
+      "Passport",
+      "Passport Sport"
+    ],
+    "Pilot": [
+      "Pilot 2WD",
+      "Pilot",
+      "Some other popular variants of the Honda Pilot that are commonly available in the Cypriot market and/or the British market and are missing from this list are: EX",
+      "EX-L",
+      "SE",
+      "LX."
+    ],
+    "Prelude": [
+      "Prelude",
+      "Type SH",
+      "Si",
+      "VTEC",
+      "SiR"
+    ],
+    "Prologue": [],
+    "Ridgeline": [
+      "Ridgeline",
+      "Ridgeline Sport",
+      "Ridgeline Black Edition"
+    ],
+    "S2000": [
+      "S2000",
+      "S2000 CR",
+      "S2000 Type V"
+    ]
+  }
+}

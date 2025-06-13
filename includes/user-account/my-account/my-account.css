@@ -1,0 +1,42 @@
+.my-account-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.account-info-table {
+  margin-bottom: 30px;
+}
+
+.wp-list-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.wp-list-table th,
+.wp-list-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.wp-list-table th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+.button {
+  display: inline-block;
+  padding: 5px 10px;
+  margin: 0 5px;
+  background-color: #0073aa;
+  color: white;
+  text-decoration: none;
+  border-radius: 3px;
+  font-size: 14px;
+}
+
+.button:hover {
+  background-color: #005177;
+  color: white;
+}

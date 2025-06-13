@@ -1,0 +1,705 @@
+.car-listings-container {
+  max-width: 1700px !important;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.page-id-127 #content .ast-container:first-child {
+  max-width: 1700px !important;
+}
+
+.car-listings-filters {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f5f5f5;
+  border-radius: 5px;
+}
+
+.filters-form {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.filter-group label {
+  font-weight: bold;
+}
+
+.filter-group select,
+.filter-group input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.filter-submit {
+  padding: 8px 20px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.car-listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 40px;
+}
+
+.car-listing-card {
+  border: var(--border);
+  border-radius: var(--border-radius-large);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+.car-listing-card:hover {
+  box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.1);
+}
+
+.car-listing-image {
+  height: 200px;
+  overflow: hidden;
+}
+
+.car-listing-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.car-listing-details {
+  padding: 15px;
+}
+
+.car-listing-details h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.2em;
+}
+
+.car-listing-price {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: var(--light-blue);
+  margin-bottom: 10px;
+}
+
+.car-listing-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: #666;
+  margin-bottom: 15px;
+  font-size: 0.9em;
+}
+
+.car-listing-meta span {
+  background: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.view-details {
+  display: block;
+  text-align: center;
+  padding: 10px;
+  background: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.view-details:hover {
+  background: #0056b3;
+}
+
+.car-listings-pagination {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.car-listings-pagination .page-numbers {
+  padding: 8px 15px;
+  margin: 0 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.car-listings-pagination .current {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+/* == Styles previously inline in car-listings.php == */
+
+.active-filters-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: var(--white);
+  border-radius: var(--border-radius-large);
+  border: var(--border);
+  margin-bottom: 20px;
+}
+
+.active-filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+  margin-right: 10px;
+}
+
+.active-filter {
+  display: flex;
+  align-items: center;
+  background: var(--light-blue);
+  padding: 6px 12px;
+  border-radius: var(--border-radius-medium);
+  font-size: 14px;
+  color: var(--white);
+}
+
+.active-filter .filter-label {
+  margin-right: 5px;
+  font-weight: bold;
+}
+
+.active-filter .filter-value {
+  margin-right: 5px;
+}
+
+.active-filter .remove-filter {
+  background: none;
+  border: none;
+  color: var(--white);
+  cursor: pointer;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.active-filter .remove-filter:hover {
+  cursor: pointer;
+}
+
+.filters-button {
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filters-button:hover {
+  background: #0056b3;
+}
+
+.filters-popup-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.filters-popup-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 1000px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.filters-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.filters-popup-header h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.close-filters {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+/* Overwrite/Extend existing .filters-form */
+.filters-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.filter-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+}
+
+/* Extend existing .filter-group styles if needed */
+.filter-group select,
+.filter-group input {
+  color: #000; /* Added from inline style */
+}
+
+.filter-group select option {
+  color: #000; /* Added from inline style */
+}
+
+/* Extend existing .filter-submit */
+.filter-submit {
+  padding: 10px 20px;
+}
+
+.reset-filters {
+  padding: 10px 20px;
+  background: #6c757d;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.checkbox-dropdown {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.checkbox-dropdown-button {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  color: #000;
+}
+
+.checkbox-group {
+  display: none;
+  position: absolute;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.checkbox-label {
+  display: block;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.range-fields {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+
+.range-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.range-field label {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.range-field select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Extend existing .car-listing-card */
+.car-listing-card {
+  position: relative; /* Added from inline style */
+}
+
+.car-listing-link {
+  text-decoration: none !important;
+  color: inherit;
+  display: block;
+}
+
+.car-listing-link:hover {
+  text-decoration: none !important;
+}
+
+.car-title {
+  font-size: 1.3em !important;
+  font-weight: bold;
+  color: var(--text-color);
+  margin-bottom: 6px !important;
+}
+
+.car-specs {
+  font-size: 0.85em !important;
+  color: var(--light-text-color);
+  margin-bottom: 12px;
+  line-height: 1.4;
+  text-decoration: none !important;
+  height: 40px;
+}
+
+.car-info-boxes {
+  display: flex;
+  gap: 10px;
+  margin: 1.25rem 0;
+}
+
+.info-box {
+  /* flex: 1; */
+  background: var(--light-bg);
+  border: none;
+  border-radius: var(--border-radius-small);
+  padding: 6px 18px;
+  text-align: center;
+}
+
+.info-box:first-child {
+  width: 35%;
+}
+
+.info-box:last-child {
+  width: 65%;
+}
+
+.info-value {
+  display: block;
+  font-size: 0.95em !important;
+  color: var(--text-color);
+  font-weight: 500;
+  text-decoration: none !important;
+}
+
+.car-price {
+  font-size: 1.3em !important;
+  font-weight: bold;
+  color: #007bff;
+  margin: 2.5rem 0 0.5rem 0;
+  text-decoration: none !important;
+}
+
+.car-location {
+  color: var(--text-color);
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9em !important;
+  margin-bottom: 0 !important;
+}
+
+.car-location i {
+  color: #666;
+  font-size: 0.9em;
+}
+
+/* Remove old carousel styles */
+.carousel-nav,
+.see-all-images {
+  z-index: 10;
+  position: absolute;
+}
+
+.car-listing-image-carousel {
+  position: relative;
+  height: 100%;
+}
+
+.car-listing-image-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.car-listing-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.car-listing-image.active {
+  opacity: 1;
+}
+
+.car-listing-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: black;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+  padding: 0;
+  line-height: 1;
+}
+
+.carousel-nav i {
+  font-size: 14px;
+  color: white;
+}
+
+.car-listing-image-container:hover .carousel-nav {
+  opacity: 1;
+}
+
+.carousel-nav.prev {
+  left: 10px;
+}
+
+.carousel-nav.next {
+  right: 10px;
+}
+
+.car-listing-additional-info {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.see-all-images {
+  text-decoration: none !important;
+  position: absolute;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 2;
+  transition: background 0.3s ease;
+  text-align: center;
+}
+
+.see-all-images:hover {
+  background: rgba(0, 0, 0, 0.9);
+  text-decoration: none !important;
+}
+
+/* Extend existing .car-listing-details */
+.car-listing-details {
+  text-decoration: none !important; /* Added */
+}
+
+.favorite-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  padding: 0 !important;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+  background: var(--white);
+}
+
+.favorite-btn:hover {
+  background: var(--white);
+  transform: scale(1.05);
+}
+
+.favorite-btn i {
+  width: 100%;
+  height: auto;
+  color: #ff0000 !important;
+  transition: all 0.2s ease;
+  font-style: normal !important; /* Prevent italic inheritance */
+}
+
+/* Empty heart state - outline only */
+.favorite-btn i.far {
+  opacity: 0.8;
+  font-weight: 400 !important; /* Required for Font Awesome 6 regular icons */
+  font-style: normal !important; /* Prevent italic inheritance */
+}
+
+/* Filled heart state (will be added via JavaScript when favorited) */
+.favorite-btn i.fas {
+  opacity: 1;
+  font-weight: 900 !important; /* Required for Font Awesome 6 solid icons */
+  font-style: normal !important; /* Prevent italic inheritance */
+}
+
+/* Hover state */
+.favorite-btn:hover i.far {
+  opacity: 1;
+  font-weight: 400 !important; /* Required for Font Awesome 6 regular icons */
+  font-style: normal !important; /* Prevent italic inheritance */
+}
+
+/* NOTE: Global input/select styles moved to style.css */
+
+/* Add styles for loading overlay and spinner */
+.car-listings-container.is-loading {
+  position: relative;
+  min-height: 200px; /* Ensure container has height while loading */
+}
+
+.car-listings-container.is-loading::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.7
+  ); /* Semi-transparent white overlay */
+  z-index: 10;
+}
+
+.car-listings-container.is-loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  margin-top: -20px; /* Half of height */
+  margin-left: -20px; /* Half of width */
+  border: 4px solid #f3f3f3; /* Light grey */
+  border-top: 4px solid #3498db; /* Blue */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 11;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Ensure other content is below overlay while loading */
+.car-listings-container.is-loading > * {
+  position: relative; /* Needed for z-index stacking context if children use z-index */
+  z-index: 1; /* Below the overlay and spinner */
+}
+
+/* You might want to hide the grid/pagination explicitly while loading */
+/* .car-listings-container.is-loading .car-listings-grid,
+.car-listings-container.is-loading .car-listings-pagination {
+    visibility: hidden;
+} */
+
+.car-publication-date {
+  font-size: 0.85em;
+  color: var(--light-text-color);
+  font-style: italic;
+}
+
+/* Image Counter Styles */
+.image-counter {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: white;
+  color: var(--text-color);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 2;
+}
+
+/* Results Counter Styles */
+.results-counter {
+  text-align: left;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.results-counter .count {
+  font-weight: bold;
+  color: var(--dark-blue);
+}

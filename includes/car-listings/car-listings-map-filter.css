@@ -1,0 +1,372 @@
+/* Car Listings Map Filter Styles */
+.car-listings-location-filter-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+#current-location-filter-text {
+    font-size: 1em;
+    font-weight: 500;
+}
+
+#change-location-filter-btn {
+    /* Using theme's button styles if available, or add custom */
+    padding: 8px 15px;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+/* Ensure the modal itself behaves as a pop-up overlay */
+#location-filter-modal.location-picker-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Dimmed background */
+    display: flex; /* Used to center the content */
+    justify-content: center;
+    align-items: center;
+    z-index: 10000; /* High z-index to be on top; adjust if needed based on theme */
+    /* display: none; is handled by inline style initially and JS toggle */
+}
+
+/* Styles for the content box within the modal */
+#location-filter-modal .location-picker-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 950px; /* Increased max-width for a bigger modal */
+    max-height: 90vh; /* Max height relative to viewport height */
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden; /* Prevents content from spilling if too tall before scroll */
+}
+
+#location-filter-modal .location-picker-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#location-filter-modal .location-picker-header h2 {
+    margin: 0;
+    font-size: 1.3em;
+    color: #333;
+}
+
+/* New wrapper for geocoder and apply button */
+#location-filter-modal .geocoder-apply-wrapper {
+    display: flex;
+    align-items: center; /* Vertically align items */
+    gap: 10px; /* Space between geocoder and button */
+    margin-bottom: 15px; /* Space below this row */
+}
+
+#location-filter-modal .geocoder-apply-wrapper .geocoder {
+    flex-grow: 1; /* Geocoder takes available space */
+}
+
+#location-filter-modal .geocoder-apply-wrapper #apply-location-filter-btn {
+    padding: 10px 15px; /* Adjust padding if needed */
+    white-space: nowrap; /* Prevent button text from wrapping */
+    /* Remove margin-top from original button style if it exists, already handled by flex gap */
+    margin-top: 0;
+}
+
+#location-filter-modal .close-modal {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #777;
+    padding: 5px;
+    line-height: 1;
+}
+#location-filter-modal .close-modal:hover {
+    color: #333;
+}
+
+#location-filter-modal .location-picker-body {
+    padding: 20px;
+    flex: 1; /* Allows body to grow and fill available space */
+    overflow-y: auto; /* Add scroll if content is too tall */
+    display: flex;
+    flex-direction: column;
+    /* gap: 15px; Removed gap, specific margins will be used */
+}
+
+#location-filter-modal .location-selection-container {
+    /* Basic styling if needed, geocoder has its own specific styles */
+}
+
+/* Modal styles - can leverage existing .location-picker-modal styles if defined globally */
+/* Or define specifically if needed */
+#location-filter-modal .location-map {
+    height: 650px; /* Further increased map height */
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    position: relative; /* Needed for absolute positioning of children (slider) */
+    overflow: hidden; /* Ensure slider corners are clipped if map has border-radius */
+}
+
+#location-filter-modal .radius-slider-container {
+    /* margin-top: 15px; Old margin */
+    /* padding: 10px; Old padding */
+    /* background-color: #f7f7f7; Old background */
+    /* border-radius: 4px; Old border-radius */
+    position: absolute;
+    top: 10px; /* Changed from bottom: 10px */
+    left: 10px;
+    right: 10px;
+    z-index: 1000; /* Ensure slider is above map tiles */
+    background-color: rgba(255, 255, 255, 0.85); /* Semi-transparent white background */
+    padding: 12px 15px;
+    border-radius: 6px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+}
+
+#location-filter-modal .radius-slider-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.95em;
+    color: #333;
+}
+
+#location-filter-modal #radius-slider {
+    width: 100%;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+}
+
+#location-filter-modal #radius-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #007bff; /* Blue color, adjust as needed */
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+}
+
+#location-filter-modal #radius-slider::-moz-range-thumb {
+    width: 18px; /* Adjusted for consistency, border adds to size */
+    height: 18px;
+    background: #007bff;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+}
+
+#location-filter-modal #radius-slider::-webkit-slider-runnable-track {
+    height: 8px;
+    background: #ddd;
+    border-radius: 5px;
+}
+
+#location-filter-modal #radius-slider::-moz-range-track {
+    height: 8px;
+    background: #ddd;
+    border-radius: 5px;
+}
+
+/* Ensure geocoder input is visible and styled */
+#location-filter-modal .mapboxgl-ctrl-geocoder {
+    width: 100% !important;
+    max-width: none !important; /* Override plugin styles if too restrictive */
+    font-size: 1em; /* Adjust as needed */
+    margin-bottom: 10px;
+    position: relative; /* Establish stacking context for suggestions */
+    z-index: 1002;      /* Higher than slider container (1000), but suggestions will be higher */
+}
+
+#location-filter-modal .mapboxgl-ctrl-geocoder input[type="text"] {
+    height: 40px;
+    padding: 0 10px 0 35px; /* Adjust padding for icon */
+    font-size: 1em;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+#location-filter-modal .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--icon-search {
+    top: 10px; /* Adjust icon position */
+    left: 10px;
+}
+
+#location-filter-modal .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--button {
+    top:10px; /* Adjust clear button position */
+}
+
+/* Ensure Geocoder suggestions appear above other modal elements like the radius slider */
+#location-filter-modal .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--suggestions {
+    z-index: 1005; /* Significantly higher than radius slider (1000) and geocoder input wrapper */
+}
+
+/* Styling for the circle layer (if using CSS properties for simple circles) */
+.mapboxgl-canvas-container .mapboxgl-canvas {
+    /* Ensure map is interactive */
+}
+
+/* You might need to style the marker if you use a custom HTML marker */
+
+.mapboxgl-marker {
+    /* Example: Change default marker color */
+    /* background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ff5722" width="24px" height="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>'); */
+}
+
+/* Styles for the modal footer and apply button */
+/* #location-filter-modal .location-picker-footer { */
+    /* This class is no longer used for the apply button, can be removed or repurposed if needed elsewhere */
+    /* padding: 15px 20px; */
+    /* border-top: 1px solid #eee; */
+    /* display: flex; */
+    /* justify-content: flex-end; */ /* Aligns button to the right */
+    /* align-items: center; */
+/* } */
+
+#location-filter-modal #apply-location-filter-btn {
+    padding: 10px 20px; /* This will be overridden by the .geocoder-apply-wrapper specific style */
+    font-size: 1em;
+    color: white;
+    background-color: #007bff; /* Theme consistent blue */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 0; /* Resetting any default if needed, main spacing via footer padding */
+    /* margin-left: auto; /* Pushes button to the right if justify-content wasn't flex-end */
+}
+
+#location-filter-modal #apply-location-filter-btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Styling for Mapbox GL JS default controls (e.g., zoom, compass) */
+/* Position zoom controls to the middle-right */
+.mapboxgl-ctrl-top-right {
+    top: 50%;
+    transform: translateY(-50%);
+    right: 10px; /* Keep it on the right */
+}
+
+/* Ensure individual controls within the group are styled appropriately if needed */
+.mapboxgl-ctrl-top-right .mapboxgl-ctrl-group {
+    /* Add any specific group styling if default is overridden or insufficient */
+}
+
+/* Styling for the custom Locate Me text button */
+.mapboxgl-ctrl-locate-me {
+    font-family: inherit; /* Use the map's font */
+    font-size: 16px; /* Increased font size */
+    padding: 12px 18px; /* Increased padding */
+    background-color: #fff !important; /* Ensure white background */
+    border: none;
+    border-radius: 4px;
+    box-shadow: 0 0 0 2px rgba(0,0,0,.1);
+    cursor: pointer;
+    line-height: normal; /* Ensure text is vertically centered */
+    height: auto; /* Allow height to adjust to text */
+    display: flex; 
+    align-items: center; 
+    color: #000000 !important; /* Ensure black text */
+    transition: box-shadow 0.2s ease, transform 0.2s ease; /* Smooth transitions for shadow and transform */
+}
+
+.mapboxgl-ctrl-locate-me::before {
+    font-family: "Font Awesome 6 Free", "FontAwesome"; /* Updated for Font Awesome 6 */
+    content: "\f124"; /* Unicode for fa-location-arrow */
+    font-weight: 900; /* For solid style icons */
+    margin-right: 8px; /* Space between icon and text */
+    font-style: normal; /* Ensure it's not italicized by other rules */
+    speak: never; /* For accessibility */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.mapboxgl-ctrl-locate-me:hover {
+    /* background-color and color are intentionally removed to keep them consistently white/black */
+    box-shadow: 0 0 0 2px rgba(0,0,0,.1), 0 4px 10px rgba(0,0,0,0.3); /* More prominent shadow on hover */
+    transform: scale(1.03); /* Slightly enlarge button on hover */
+}
+
+/* If the button is part of a group, ensure it fits well */
+.mapboxgl-ctrl-group .mapboxgl-ctrl-locate-me {
+    width: auto; /* Allow button to size to its content */
+    height: auto; /* Override fixed height if any from group */
+    min-height: 35px; /* Adjusted min-height if necessary for new size */
+}
+
+/* Radius preset buttons styling */
+.radius-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    justify-content: space-between; /* Distribute buttons evenly */
+}
+
+.radius-preset-btn {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #495057;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-grow: 1; /* Allow buttons to grow equally */
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0; /* Allow buttons to shrink if needed */
+}
+
+.radius-preset-btn:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+    color: #495057;
+}
+
+.radius-preset-btn.active {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+    box-shadow: 0 2px 4px rgba(253, 126, 20, 0.2);
+}
+
+.radius-preset-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(253, 126, 20, 0.25);
+}
+
+/* Responsive adjustments for radius presets */
+@media (max-width: 768px) {
+    .radius-presets {
+        justify-content: center;
+    }
+    
+    .radius-preset-btn {
+        min-width: 55px;
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+} 

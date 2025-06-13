@@ -1,0 +1,114 @@
+{
+  "Jeep": {
+    "CJ": [
+      "CJ7",
+      "CJ5"
+    ],
+    "Cherokee": [
+      "Cherokee 2WD",
+      "Cherokee",
+      "Cherokee Active Drive II",
+      "Cherokee Trailhawk",
+      "Cherokee Limited",
+      "Cherokee Latitude"
+    ],
+    "Cherokee/Wagoneer": [
+      "Cherokee/Wagoneer",
+      "Limited",
+      "Trailhawk",
+      "Overland",
+      "Altitude."
+    ],
+    "Comanche": [],
+    "Comanche Pickup": [],
+    "Commander": [
+      "Limited"
+    ],
+    "Compass": [
+      "Compass 2WD",
+      "Compass",
+      "New Compass 2WD",
+      "New Compass",
+      "Longitude",
+      "Limited",
+      "Trailhawk"
+    ],
+    "Gladiator": [
+      "Gladiator",
+      "Gladiator Rubic EcoDiesel",
+      "Gladiator Sport",
+      "Gladiator Overland",
+      "Gladiator Mojave"
+    ],
+    "Gladiator Pickup": [
+      "Gladiator Pickup",
+      "Sport",
+      "Overland",
+      "Rubicon"
+    ],
+    "Grand Cherokee": [
+      "Grand Cherokee 2WD",
+      "Grand Cherokee",
+      "Grand Cherokee 4xe",
+      "Grand Cherokee L",
+      "Grand Cherokee SRT",
+      "Grand Cherokee SRT8",
+      "Grand Cherokee TrackHawk",
+      "Grand Cherokee Trackhawk",
+      "Grand Cherokee WK 2WD",
+      "Grand Cherokee WK",
+      "Limited",
+      "Overland",
+      "Summit",
+      "Trailhawk"
+    ],
+    "Grand Wagoneer": [],
+    "J-10 Pickup": [],
+    "J-20 Pickup": [],
+    "Liberty": [],
+    "Liberty/Cherokee": [
+      "Liberty/Cherokee 2WD",
+      "Liberty/Cherokee",
+      "Limited",
+      "Sport",
+      "Renegade",
+      "Trailhawk"
+    ],
+    "Patriot": [
+      "Sport"
+    ],
+    "Renegade": [
+      "Renegade 2WD",
+      "Renegade",
+      "Renegade Trailhawk",
+      "Longitude 2WD",
+      "Limited",
+      "Night Eagle"
+    ],
+    "Scrambler": [],
+    "Scrambler Pickup": [],
+    "Wagoneer": [],
+    "Wrangler": [
+      "New Wrangler",
+      "New Wrangler Unlimited",
+      "Wrangler 2dr",
+      "Wrangler",
+      "Wrangler 4dr",
+      "Wrangler 4dr 4xe",
+      "Wrangler Rubicon 2dr",
+      "Wrangler Rubicon 4dr",
+      "Wrangler Unlimited",
+      "Wrangler Sahara 4dr",
+      "Wrangler Sport 2dr",
+      "Wrangler Sport 4dr",
+      "Wrangler Sport S 2dr",
+      "Wrangler Sport S 4dr",
+      "Wrangler Willys 4dr"
+    ],
+    "Wrangler/TJ": [
+      "Wrangler/TJ",
+      "Wrangler/TJ Sahara",
+      "Wrangler/TJ Rubicon"
+    ]
+  }
+}

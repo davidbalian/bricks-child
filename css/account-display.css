@@ -1,0 +1,92 @@
+/* Account Display Shortcode Styles */
+.account-display {
+  position: relative; /* Needed for dropdown positioning */
+  display: inline-block;
+}
+
+.account-display-logged-out a {
+  text-decoration: none;
+  color: inherit; /* Inherit color from header */
+}
+
+.account-display-logged-out .separator {
+  margin: 0 3px;
+}
+
+.account-display-logged-in .user-name-display {
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: .5rem;;
+}
+
+.account-display-logged-in .user-name-display:hover {
+  color: var(--text-color);
+}
+
+/* Increase specificity for hiding */
+.account-display-logged-in .account-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-medium);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: none;
+  min-width: 200px;
+  z-index: 1000;
+  text-align: left;
+  padding: 1rem;
+}
+
+.account-display-logged-in .account-dropdown.show {
+  display: block;
+}
+
+.account-dropdown .dropdown-header {
+  border-bottom: var(--border);
+  padding-bottom: .5rem;
+}
+
+.account-dropdown a {
+  display: block;
+  text-decoration: none;
+  font-size: 0.875rem;
+  padding: .25rem 0;
+}
+
+.account-dropdown a:first-child {
+  padding: .25rem 0 .25rem 0;
+}
+
+.account-dropdown a:last-child {
+  padding: .25rem 0 0 0;
+}
+
+.account-dropdown a:hover {
+  color: var(--text-color);
+}
+
+/* User Name Display (part of account dropdown) */
+.user-name-display {
+  cursor: pointer;
+  font-weight: 500;
+  display: inline-flex; /* Make it a flex container */
+  align-items: baseline; /* Align text and chevron baselines */
+  gap: 0.5rem; /* Add gap */
+}
+
+/* Chevron icon (used in user name display and more options link) */
+.user-name-display .chevron {
+  display: inline-block;
+  transition: none;
+  transform: rotate(90deg) translateY(1px); /* Default: Point down */
+  font-size: 1.2em; /* Make chevron slightly larger */
+  line-height: 1; /* Adjust line-height for better vertical alignment */
+  transform-origin: center; /* Rotate around the center */
+}
+

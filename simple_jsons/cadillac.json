@@ -1,0 +1,74 @@
+{
+  "Cadillac": {
+    "ATS": [],
+    "ATS-V": [],
+    "Allante": [],
+    "Armored DTS": [],
+    "Armored Deville": [],
+    "Brougham": [],
+    "Brougham/DeVille": [],
+    "CT4": [],
+    "CT5": [
+      "CT5 Luxury",
+      "CT5 Premium Luxury"
+    ],
+    "CT6": [
+      "CT6 Luxury"
+    ],
+    "CTS": [
+      "CTS",
+      "CTS V",
+      "CTS-V"
+    ],
+    "CTS-V": [
+      "CTS-V"
+    ],
+    "Catera": [],
+    "Cimarron": [],
+    "Commercial Chassis": [],
+    "DTS": [],
+    "DeVille": [],
+    "DeVille/60 Special": [],
+    "DeVille/Concourse": [],
+    "ELR": [],
+    "Eldorado": [],
+    "Escalade": [
+      "Escalade 2WD",
+      "Escalade",
+      "Escalade ESV",
+      "Escalade V",
+      "Luxury",
+      "Platinum",
+      "Sport",
+      "Premium Luxury"
+    ],
+    "Fleetwood": [],
+    "Fleetwood Brougham": [],
+    "Fleetwood/DeVille": [
+      "Fleetwood/DeVille"
+    ],
+    "Funeral Coach/Hearse": [],
+    "LYRIQ": [],
+    "Limousine": [],
+    "SRX": [],
+    "STS": [],
+    "STS-V": [],
+    "Seville": [],
+    "XLR": [],
+    "XLR-V": [],
+    "XT4": [
+      "XT4",
+      "XT4 Luxury",
+      "XT4 Sport"
+    ],
+    "XT5": [
+      "XT5",
+      "XT5 Premium Luxury",
+      "XT5 Sport"
+    ],
+    "XT6": [],
+    "XTS": [],
+    "XTS Hearse": [],
+    "XTS Limo": []
+  }
+}

@@ -1,0 +1,27 @@
+/* Favourites Button Styles */
+.favourites-button {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.favourites-button a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+.favourites-button a:hover {
+  color: var(--dark-blue);
+}
+
+.favourites-button i {
+  font-size: 1.2rem;
+}
+
+.favourites-button span {
+  font-size: 0.8rem;
+  font-weight: 500;
+}

@@ -1,0 +1,82 @@
+{
+  "Chrysler": {
+    "200": [],
+    "300": [
+      "300",
+      "300 M",
+      "300C",
+      "S",
+      "Limited",
+      "",
+      "C",
+      "C Luxury Series"
+    ],
+    "300 SRT8": [
+      "300C/SRT-8"
+    ],
+    "Aspen": [],
+    "Cirrus": [],
+    "Concorde": [],
+    "Concorde/LHS": [
+      "Some missing popular variants of the Chrysler Concorde/LHS commonly available in the Cypriot and/or British market are 300M"
+    ],
+    "Conquest": [],
+    "Crossfire": [
+      "Crossfire",
+      "Limited"
+    ],
+    "E Class/New Yorker": [],
+    "Executive Sedan/Limousine": [],
+    "Fifth Avenue/Imperial": [],
+    "Imperial/New Yorker Fifth Avenue": [],
+    "JX/JXI/Limited Convertible": [],
+    "LHS": [],
+    "Laser": [],
+    "Laser/Daytona": [],
+    "LeBaron": [],
+    "Limousine": [
+      "Stretch"
+    ],
+    "New Yorker": [],
+    "New Yorker Fifth Avenue/Imperial": [
+      "Some other popular variants of the Chrysler New Yorker Fifth Avenue/Imperial that are commonly available in the Cypriot market and/or the British market and are missing from this list are: New Yorker"
+    ],
+    "New Yorker/5th Avenue": [],
+    "New Yorker/LHS": [],
+    "Newport/Fifth Avenue": [],
+    "PT Cruiser": [
+      "PT Cruiser",
+      "PT Cruiser GT",
+      "PT Cruiser Limited",
+      "PT Cruiser Classic",
+      "PT Cruiser Street Cruiser."
+    ],
+    "Pacifica": [
+      "Pacifica",
+      "Pacifica Hybrid"
+    ],
+    "Prowler": [],
+    "QC Car": [],
+    "Sebring": [
+      "Sebring"
+    ],
+    "TC": [],
+    "Town and Country": [
+      ""
+    ],
+    "Town and Country/Voyager/Grand Voyager": [
+      "Town and Country/Voyager/Grand Voy."
+    ],
+    "Voyager": [
+      "Voyager",
+      "Grand Voyager",
+      "LXi",
+      "Limited",
+      "SE",
+      "SXT"
+    ],
+    "Voyager/Town and Country": [
+      "Voyager/Town and Country 2WD"
+    ]
+  }
+}

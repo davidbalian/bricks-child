@@ -1,0 +1,207 @@
+{
+  "Volvo": {
+    "240": [
+      "240",
+      "240 DL/240 GL",
+      "240 DL/GL/Turbo",
+      "240 DL/GL/turbo",
+      "240 SE",
+      "240 GLE",
+      "240 GLT"
+    ],
+    "740/760": [
+      "740",
+      "740 16-Valve",
+      "740/760",
+      "760",
+      "760 GLE",
+      "740 Turbo",
+      "760 Turbo"
+    ],
+    "780": [
+      "780"
+    ],
+    "850": [
+      "850",
+      "S70",
+      "V70",
+      "C70"
+    ],
+    "940": [
+      "940",
+      "940 GLE 16-Valve",
+      "940 SE",
+      "940 Turbo",
+      "940 GL",
+      "940 GLT"
+    ],
+    "960": [
+      "960",
+      "S90",
+      "V90"
+    ],
+    "960 Wagon/V90": [
+      "960",
+      "1. 960 Estate/V90 2. 960 SE/V90 3. 960 Executive/V90 4. 960 R Design/V90"
+    ],
+    "960/S90": [
+      "960/S90",
+      "1. 960 Executive 2. S90 Executive 3. 960 CD 4. S90 CD 5. 960 Turbo 6. S90 Turbo"
+    ],
+    "C30": [
+      "C30",
+      "C30 T5",
+      "C30 R-Design",
+      "C30 Polestar"
+    ],
+    "C40": [
+      "C40 Recharge",
+      "C40 Recharge twin",
+      "C40 Inscription",
+      "C40 R-Design"
+    ],
+    "C70": [
+      "C70",
+      "New C70",
+      "C70 T5",
+      "C70 Inscription"
+    ],
+    "Coupe": [
+      "",
+      "1. R-Design 2. Inscription 3. Polestar Engineered"
+    ],
+    "S40": [
+      "S40",
+      "S40 T5",
+      "S40 R-Design",
+      "S40 SE Lux"
+    ],
+    "S60": [
+      "S60",
+      "S60 PHEV",
+      "S60 B5",
+      "S60 CC",
+      "S60 Inscription",
+      "S60 PoleStar",
+      "S60 Polestar",
+      "S60 R",
+      "S60 T8 Recharge",
+      "S60 T8 Recharge ext. Range",
+      "S60 T5",
+      "S60 T6",
+      "S60 T6 R-Design",
+      "S60 T6 Inscription"
+    ],
+    "S70": [
+      "S70",
+      "T5",
+      "R",
+      "GLT"
+    ],
+    "S80": [
+      "S80",
+      "S80/S80 Executive",
+      "S80/S80 Premier",
+      "S80 T6",
+      "S80 D5",
+      "S80 D4",
+      "S80 T5",
+      "S80 T4",
+      "S80 Hybrid"
+    ],
+    "S90": [
+      "S90",
+      "S90 PHEV",
+      "S90 B6",
+      "S90 T8 Recharge",
+      "S90 T8 Recharge ext. Range",
+      "S90 B5",
+      "S90 B5 Mild Hybrid"
+    ],
+    "V40": [
+      "V40",
+      "Cross Country",
+      "R-Design",
+      "Inscription"
+    ],
+    "V50": [
+      "V50",
+      "V50 T5",
+      "V50 D3",
+      "V50 D4"
+    ],
+    "V60": [
+      "V60",
+      "V60 PHEV",
+      "V60 CC",
+      "V60 PoleStar",
+      "V60 Polestar",
+      "V60 T8 Recharge",
+      "V60 T8 Recharge ext. Range",
+      "V60CC B5",
+      "V60CC T5",
+      "V60 T6",
+      "V60 T6 Polestar Engineered"
+    ],
+    "V70": [
+      "V70",
+      "V70 R",
+      "V70 T5",
+      "V70 D5",
+      "V70 T6"
+    ],
+    "V70 XC": [
+      "V70 XC",
+      "V70 XC T5",
+      "V70 XC D5",
+      "V70 XC Ocean Race"
+    ],
+    "V90": [
+      "V90",
+      "V90 CC",
+      "V90CC B6",
+      "V90 T5",
+      "V90 T6",
+      "V90 T8 Twin Engine"
+    ],
+    "XC40": [
+      "XC40",
+      "XC40 BEV",
+      "XC40 B4",
+      "XC40 B5",
+      "XC40 Recharge",
+      "XC40 Recharge twin",
+      "XC40 T4",
+      "XC40 T5",
+      "XC40 T3",
+      "XC40 T5 Twin Engine"
+    ],
+    "XC60": [
+      "XC60",
+      "XC60 PHEV",
+      "XC60 B5",
+      "XC60 B6",
+      "XC60 T8 Recharge",
+      "XC60 T8 Recharge ext. Range",
+      "XC60 B4",
+      "XC60 T6 Recharge"
+    ],
+    "XC70": [
+      "XC70",
+      "XC70 T6",
+      "XC70 D5",
+      "XC70 SE Lux"
+    ],
+    "XC90": [
+      "XC90",
+      "XC90 PHEV",
+      "XC90 B5",
+      "XC90 B6",
+      "XC90 T5",
+      "XC90 T6",
+      "XC90 T8 Recharge",
+      "XC90 T8 Recharge ext. Range",
+      "XC90 B4"
+    ]
+  }
+}
