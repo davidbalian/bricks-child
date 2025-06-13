@@ -1,6 +1,7 @@
 :root {
   --dark-blue: #0b72c1;
   --light-blue: #0d86e3;
+  --opaque-blue: rgba(13, 134, 227, 0.2);
   --light-bg: #f9f9f9;
   --white: #ffffff;
   --borders: #ccc;
@@ -415,164 +416,187 @@ textarea.error {
 
 /* Car Listings Filter Styles */
 .loading-filter {
-    opacity: 0.6;
-    pointer-events: none;
-    position: relative;
+  opacity: 0.6;
+  pointer-events: none;
+  position: relative;
 }
 
 .loading-filter::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(0, 0, 0, 0.2);
-    border-top-color: #000;
-    border-radius: 50%;
-    animation: filter-loading 0.8s linear infinite;
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: filter-loading 0.8s linear infinite;
 }
 
 @keyframes filter-loading {
-    to {
-        transform: translateY(-50%) rotate(360deg);
-    }
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
 }
 
 /* Disabled filter options */
 select option:disabled {
-    color: #999;
-    font-style: italic;
+  color: #999;
+  font-style: italic;
 }
 
 /* Loading spinner for listings grid */
 .loading-spinner {
-    text-align: center;
-    padding: 40px;
-    font-size: 16px;
-    color: #666;
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: #666;
 }
 
 .loading-spinner::after {
-    content: '';
-    display: block;
-    width: 40px;
-    height: 40px;
-    margin: 20px auto;
-    border: 3px solid rgba(0, 0, 0, 0.1);
-    border-top-color: #007bff;
-    border-radius: 50%;
-    animation: spinner 1s linear infinite;
+  content: "";
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin: 20px auto;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #007bff;
+  border-radius: 50%;
+  animation: spinner 1s linear infinite;
 }
 
 @keyframes spinner {
-    to {
-        transform: rotate(360deg);
-    }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Global Font Awesome 6 fixes */
-.fas, .fa-solid {
-    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
-    font-weight: 900 !important;
-    font-style: normal !important; /* Prevent italic inheritance */
+.fas,
+.fa-solid {
+  font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+  font-weight: 900 !important;
+  font-style: normal !important; /* Prevent italic inheritance */
 }
 
-.far, .fa-regular {
-    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
-    font-weight: 400 !important;
-    font-style: normal !important; /* Prevent italic inheritance */
+.far,
+.fa-regular {
+  font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+  font-weight: 400 !important;
+  font-style: normal !important; /* Prevent italic inheritance */
 }
 
-.fab, .fa-brands {
-    font-family: "Font Awesome 6 Brands", "Font Awesome 5 Brands", "FontAwesome" !important;
-    font-weight: 400 !important;
-    font-style: normal !important; /* Prevent italic inheritance */
+.fab,
+.fa-brands {
+  font-family: "Font Awesome 6 Brands", "Font Awesome 5 Brands", "FontAwesome" !important;
+  font-weight: 400 !important;
+  font-style: normal !important; /* Prevent italic inheritance */
 }
 
 .fa {
-    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
-    font-weight: 900 !important;
-    font-style: normal !important; /* Prevent italic inheritance */
+  font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+  font-weight: 900 !important;
+  font-style: normal !important; /* Prevent italic inheritance */
 }
 
 /* Ensure pseudo-elements work properly */
-.fas::before, .fa-solid::before, .fa::before {
-    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
-    font-weight: 900 !important;
-    font-style: normal !important; /* Prevent italic inheritance */
+.fas::before,
+.fa-solid::before,
+.fa::before {
+  font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+  font-weight: 900 !important;
+  font-style: normal !important; /* Prevent italic inheritance */
 }
 
-.far::before, .fa-regular::before {
-    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
-    font-weight: 400 !important;
-    font-style: normal !important; /* Prevent italic inheritance */
+.far::before,
+.fa-regular::before {
+  font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+  font-weight: 400 !important;
+  font-style: normal !important; /* Prevent italic inheritance */
 }
 
-.fab::before, .fa-brands::before {
-    font-family: "Font Awesome 6 Brands", "Font Awesome 5 Brands", "FontAwesome" !important;
-    font-weight: 400 !important;
-    font-style: normal !important; /* Prevent italic inheritance */
+.fab::before,
+.fa-brands::before {
+  font-family: "Font Awesome 6 Brands", "Font Awesome 5 Brands", "FontAwesome" !important;
+  font-weight: 400 !important;
+  font-style: normal !important; /* Prevent italic inheritance */
 }
 
 /* Specific heart icon fixes */
-.fa-heart.fas, .fas.fa-heart {
-    font-weight: 900 !important; /* Solid heart - filled */
-    color: #ff0000 !important; /* Red color for filled hearts */
+.fa-heart.fas,
+.fas.fa-heart {
+  font-weight: 900 !important; /* Solid heart - filled */
+  color: #ff0000 !important; /* Red color for filled hearts */
 }
 
-.fa-heart.far, .far.fa-heart {
-    font-weight: 400 !important; /* Regular heart - outline only */
-    color: #ff0000 !important; /* Red color for outline hearts */
+.fa-heart.far,
+.far.fa-heart {
+  font-weight: 400 !important; /* Regular heart - outline only */
+  color: #ff0000 !important; /* Red color for outline hearts */
 }
 
 /* Ensure favorite button icons display correctly */
 .favorite-btn i.fas.fa-heart {
-    font-weight: 900 !important; /* Solid heart when favorited */
-    color: #ff0000 !important;
-    font-style: normal !important;
+  font-weight: 900 !important; /* Solid heart when favorited */
+  color: #ff0000 !important;
+  font-style: normal !important;
 }
 
 .favorite-btn i.far.fa-heart {
-    font-weight: 400 !important; /* Outline heart when not favorited */
-    color: #ff0000 !important;
-    font-style: normal !important;
+  font-weight: 400 !important; /* Outline heart when not favorited */
+  color: #ff0000 !important;
+  font-style: normal !important;
 }
 
 /* Additional Font Awesome fixes for all icons */
-i[class*="fa-"], i[class^="fa-"], i.fa, i.fas, i.far, i.fab, i.fal, i.fad {
-    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
-    font-style: normal !important; /* Prevent italic inheritance */
-    speak: never; /* For accessibility */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+i[class*="fa-"],
+i[class^="fa-"],
+i.fa,
+i.fas,
+i.far,
+i.fab,
+i.fal,
+i.fad {
+  font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome" !important;
+  font-style: normal !important; /* Prevent italic inheritance */
+  speak: never; /* For accessibility */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Ensure proper weights for different Font Awesome styles */
-i.fas, i.fa-solid, i.fa:not(.far):not(.fab):not(.fal):not(.fad) {
-    font-weight: 900 !important;
+i.fas,
+i.fa-solid,
+i.fa:not(.far):not(.fab):not(.fal):not(.fad) {
+  font-weight: 900 !important;
 }
 
-i.far, i.fa-regular {
-    font-weight: 400 !important;
+i.far,
+i.fa-regular {
+  font-weight: 400 !important;
 }
 
-i.fab, i.fa-brands {
-    font-weight: 400 !important;
-    font-family: "Font Awesome 6 Brands", "Font Awesome 5 Brands", "FontAwesome" !important;
+i.fab,
+i.fa-brands {
+  font-weight: 400 !important;
+  font-family: "Font Awesome 6 Brands", "Font Awesome 5 Brands", "FontAwesome" !important;
 }
 
 /* Additional heart icon fixes for consistency */
-.fa-heart, i.fa-heart {
-    color: #ff0000 !important;
-    font-style: normal !important;
+.fa-heart,
+i.fa-heart {
+  color: #ff0000 !important;
+  font-style: normal !important;
 }
 
-.fas.fa-heart, i.fas.fa-heart {
-    font-weight: 900 !important; /* Solid/filled heart */
+.fas.fa-heart,
+i.fas.fa-heart {
+  font-weight: 900 !important; /* Solid/filled heart */
 }
 
-.far.fa-heart, i.far.fa-heart {
-    font-weight: 400 !important; /* Outline heart */
+.far.fa-heart,
+i.far.fa-heart {
+  font-weight: 400 !important; /* Outline heart */
 }
