@@ -103,7 +103,10 @@
   }
 
   .notice-text {
-    margin-bottom: 0;
+    width: min-content;
+    min-width: 25ch;
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
   }
 
   .send-verification-btn {
