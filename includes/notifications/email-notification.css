@@ -112,11 +112,10 @@
   }
 
   .dismiss-notice-btn {
-    position: relative;
-    top: auto;
-    right: auto;
-    padding: 0 5px;
-    margin-left: 5px;
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    transform: scale(1.3);
   }
 }
 
