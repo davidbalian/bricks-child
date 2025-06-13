@@ -100,8 +100,8 @@ function handle_dismiss_email_notification() {
     wp_send_json_success('Notification dismissed');
 }
 
-// Hook to show notification after header
-add_action('bricks_content_before', 'show_email_verification_notification');
+// Hook to show notification before site wrapper
+add_action('bricks_before_site_wrapper', 'show_email_verification_notification');
 
 // Add AJAX handler for dismissing notification
 add_action('wp_ajax_dismiss_email_notification', 'handle_dismiss_email_notification');
