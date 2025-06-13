@@ -50,6 +50,17 @@ function show_email_verification_notification() {
 }
 
 /**
+ * Inject email verification notification using Bricks filter (simple wrapper)
+ */
+function inject_email_verification_notification($html) {
+    ob_start();
+    show_email_verification_notification();
+    $notification_html = ob_get_clean();
+    
+    return $notification_html . $html;
+}
+
+/**
  * Handle notification dismissal via AJAX
  */
 function handle_dismiss_email_notification() {
@@ -76,8 +87,13 @@ function handle_dismiss_email_notification() {
     wp_send_json_success('Notification dismissed');
 }
 
-// Hook to show notification after header
-add_action('bricks_content_before', 'show_email_verification_notification');
+
+
+// Hook to show notification after header using the correct Bricks hook
+add_filter('bricks/content/html_after_begin', 'inject_email_verification_notification');
+
+// Also add fallback using wp_body_open hook for additional compatibility
+add_action('wp_body_open', 'show_email_verification_notification');
 
 // Add AJAX handler for dismissing notification
 add_action('wp_ajax_dismiss_email_notification', 'handle_dismiss_email_notification');
