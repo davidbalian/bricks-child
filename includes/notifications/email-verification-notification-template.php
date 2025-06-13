@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
         <div class="text-and-icon">
             <span class="notice-icon"><i class="fas fa-envelope"></i></span>
             <span class="notice-text">
-                Send verification link to <strong><?php echo esc_html($user_email); ?></strong> to receive notifications
+                To receive notifications, activate your <strong><?php echo esc_html($user_email); ?></strong>
             </span>
         </div>
         <button class="send-verification-btn" data-email="<?php echo esc_attr($user_email); ?>">
