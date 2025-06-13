@@ -58,6 +58,22 @@ function show_email_verification_notification() {
 }
 
 /**
+ * Show email verification notification in footer with fixed positioning
+ * (fallback for themes that don't support wp_body_open)
+ */
+function show_email_verification_notification_footer() {
+    // Only show in footer if wp_body_open didn't work (avoid duplicates)
+    static $shown = false;
+    if ($shown) return;
+    
+    echo '<div id="email-verification-notification-footer" style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999;">';
+    show_email_verification_notification();
+    echo '</div>';
+    
+    $shown = true;
+}
+
+/**
  * Handle notification dismissal via AJAX
  */
 function handle_dismiss_email_notification() {
@@ -85,7 +101,7 @@ function handle_dismiss_email_notification() {
 }
 
 // Hook to show notification after header
-add_action('bricks_after_header', 'show_email_verification_notification');
+add_action('bricks_content_before', 'show_email_verification_notification');
 
 // Add AJAX handler for dismissing notification
 add_action('wp_ajax_dismiss_email_notification', 'handle_dismiss_email_notification');
