@@ -50,14 +50,19 @@ function show_email_verification_notification() {
 }
 
 /**
- * Inject email verification notification using Bricks filter (simple wrapper)
+ * Show email verification notification in footer with fixed positioning
+ * (fallback for themes that don't support wp_body_open)
  */
-function inject_email_verification_notification($html) {
-    ob_start();
-    show_email_verification_notification();
-    $notification_html = ob_get_clean();
+function show_email_verification_notification_footer() {
+    // Only show in footer if wp_body_open didn't work (avoid duplicates)
+    static $shown = false;
+    if ($shown) return;
     
-    return $notification_html . $html;
+    echo '<div id="email-verification-notification-footer" style="position: fixed; top: 0; left: 0; right: 0; z-index: 9999;">';
+    show_email_verification_notification();
+    echo '</div>';
+    
+    $shown = true;
 }
 
 /**
@@ -89,11 +94,11 @@ function handle_dismiss_email_notification() {
 
 
 
-// Hook to show notification after header using the correct Bricks hook
-add_filter('bricks/content/html_after_begin', 'inject_email_verification_notification');
-
-// Also add fallback using wp_body_open hook for additional compatibility
+// Hook to show notification on all pages using wp_body_open (universal)
 add_action('wp_body_open', 'show_email_verification_notification');
+
+// Also hook to wp_footer as additional fallback and position with CSS
+add_action('wp_footer', 'show_email_verification_notification_footer', 5);
 
 // Add AJAX handler for dismissing notification
 add_action('wp_ajax_dismiss_email_notification', 'handle_dismiss_email_notification');
