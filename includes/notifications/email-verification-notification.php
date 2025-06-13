@@ -17,8 +17,11 @@ if (!defined('ABSPATH')) {
  * Show email verification notification under header
  */
 function show_email_verification_notification() {
+    error_log('show_email_verification_notification function called');
+    
     // Only for logged-in users
     if (!is_user_logged_in()) {
+        error_log('User not logged in');
         return;
     }
     
@@ -27,13 +30,16 @@ function show_email_verification_notification() {
     
     // Check if email is verified
     $email_verified = get_user_meta($user_id, 'email_verified', true);
+    error_log('Email verified status: ' . $email_verified);
     
     if ($email_verified === '1') {
+        error_log('Email already verified');
         return; // Email already verified, no notification needed
     }
     
     // Check if notification was dismissed for this session
     if (isset($_SESSION['email_notification_dismissed']) && $_SESSION['email_notification_dismissed'] === true) {
+        error_log('Notification dismissed in session');
         return;
     }
     
@@ -42,9 +48,11 @@ function show_email_verification_notification() {
     
     // Skip if user has placeholder email (phone_user_)
     if (strpos($user_email, 'phone_user_') === 0) {
+        error_log('User has placeholder email');
         return;
     }
     
+    error_log('Loading notification template');
     // Load the notification template
     include get_stylesheet_directory() . '/includes/notifications/email-verification-notification-template.php';
 }
@@ -77,7 +85,7 @@ function handle_dismiss_email_notification() {
 }
 
 // Hook to show notification after header
-add_action('bricks_content_before', 'show_email_verification_notification');
+add_action('bricks_after_header', 'show_email_verification_notification');
 
 // Add AJAX handler for dismissing notification
 add_action('wp_ajax_dismiss_email_notification', 'handle_dismiss_email_notification');
