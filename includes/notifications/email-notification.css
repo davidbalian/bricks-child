@@ -20,9 +20,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
   text-align: center;
+}
+
+.notice-container .text-and-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .notice-icon {
@@ -35,7 +41,6 @@
   font-size: var(--small-font-size);
   color: var(--text-color);
   font-weight: 500;
-  margin-right: 0.5rem;
 }
 
 .notice-text strong {
@@ -54,7 +59,6 @@
   font-weight: 500;
   transition: opacity var(--transition-time);
   flex-shrink: 0;
-  margin-right: 0.5rem;
 }
 
 .send-verification-btn:hover {
