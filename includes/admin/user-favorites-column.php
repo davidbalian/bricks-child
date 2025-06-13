@@ -4,7 +4,7 @@
  * 
  * Adds a column to the WordPress users list table to display favorite cars count.
  * 
- * @package Astra Child
+ * @package Bricks Child
  * @since 1.0.0
  */
 
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
  * Add Favorite Cars column to users list table
  */
 function add_favorite_cars_column($columns) {
-    $columns['favorite_cars'] = __('Favorite Cars', 'astra-child');
+    $columns['favorite_cars'] = __('Favorite Cars', 'bricks-child');
     return $columns;
 }
 add_filter('manage_users_columns', 'add_favorite_cars_column');
@@ -84,8 +84,8 @@ function count_favorite_cars_for_sorting($value, $object_id, $meta_key, $single)
 function add_favorite_cars_page() {
     add_submenu_page(
         null, // No parent menu
-        __('User Favorite Cars', 'astra-child'),
-        __('Favorite Cars', 'astra-child'),
+        __('User Favorite Cars', 'bricks-child'),
+        __('Favorite Cars', 'bricks-child'),
         'list_users',
         'favorite-listings',
         'display_user_favorite_cars_page'
@@ -123,27 +123,27 @@ function display_user_favorite_cars_page() {
     // Start output
     ?>
     <div class="wrap">
-        <h1><?php printf(__('Favorite Cars for %s', 'astra-child'), $user->display_name); ?></h1>
+        <h1><?php printf(__('Favorite Cars for %s', 'bricks-child'), $user->display_name); ?></h1>
         
         <div class="tablenav top">
             <div class="alignleft actions">
-                <a href="<?php echo esc_url(admin_url('users.php')); ?>" class="button"><?php _e('Back to Users', 'astra-child'); ?></a>
+                <a href="<?php echo esc_url(admin_url('users.php')); ?>" class="button"><?php _e('Back to Users', 'bricks-child'); ?></a>
             </div>
         </div>
         
         <?php if (empty($favorite_cars)) : ?>
-            <p><?php _e('This user has no favorite cars.', 'astra-child'); ?></p>
+            <p><?php _e('This user has no favorite cars.', 'bricks-child'); ?></p>
         <?php else : ?>
             <table class="wp-list-table widefat fixed striped">
                 <thead>
                     <tr>
-                        <th><?php _e('ID', 'astra-child'); ?></th>
-                        <th><?php _e('Title', 'astra-child'); ?></th>
-                        <th><?php _e('Make', 'astra-child'); ?></th>
-                        <th><?php _e('Model', 'astra-child'); ?></th>
-                        <th><?php _e('Year', 'astra-child'); ?></th>
-                        <th><?php _e('Price', 'astra-child'); ?></th>
-                        <th><?php _e('Actions', 'astra-child'); ?></th>
+                        <th><?php _e('ID', 'bricks-child'); ?></th>
+                        <th><?php _e('Title', 'bricks-child'); ?></th>
+                        <th><?php _e('Make', 'bricks-child'); ?></th>
+                        <th><?php _e('Model', 'bricks-child'); ?></th>
+                        <th><?php _e('Year', 'bricks-child'); ?></th>
+                        <th><?php _e('Price', 'bricks-child'); ?></th>
+                        <th><?php _e('Actions', 'bricks-child'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -164,8 +164,8 @@ function display_user_favorite_cars_page() {
                             <td><?php echo esc_html($year); ?></td>
                             <td><?php echo esc_html($price); ?></td>
                             <td>
-                                <a href="<?php echo esc_url(get_edit_post_link($car_id)); ?>" class="button button-small"><?php _e('Edit', 'astra-child'); ?></a>
-                                <a href="<?php echo esc_url(get_permalink($car_id)); ?>" class="button button-small" target="_blank"><?php _e('View', 'astra-child'); ?></a>
+                                <a href="<?php echo esc_url(get_edit_post_link($car_id)); ?>" class="button button-small"><?php _e('Edit', 'bricks-child'); ?></a>
+                                <a href="<?php echo esc_url(get_permalink($car_id)); ?>" class="button button-small" target="_blank"><?php _e('View', 'bricks-child'); ?></a>
                             </td>
                         </tr>
                     <?php endforeach; ?>

@@ -4,7 +4,7 @@
  * 
  * Handles Terms of Service and Privacy Policy pages
  * 
- * @package Astra Child
+ * @package Bricks Child
  * @since 1.0.0
  */
 

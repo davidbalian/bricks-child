@@ -4,43 +4,43 @@
 
     <!-- Step 1: Phone Input -->
     <div id="step-phone">
-        <h2><?php _e( 'Step 1: Enter Phone Number', 'astra-child' ); ?></h2>
+        <h2><?php _e( 'Step 1: Enter Phone Number', 'bricks-child' ); ?></h2>
         <p>
-            <label for="reg_phone_number_display"><?php _e( 'Phone Number', 'astra-child' ); ?>:</label>
+            <label for="reg_phone_number_display"><?php _e( 'Phone Number', 'bricks-child' ); ?>:</label>
             <input type="tel" name="reg_phone_number_display" id="reg_phone_number_display" required> <!-- Input for intl-tel-input -->
         </p>
         <p>
-            <button type="button" id="send-otp-button"><?php esc_html_e( 'Send Verification Code', 'astra-child' ); ?></button>
+            <button type="button" id="send-otp-button"><?php esc_html_e( 'Send Verification Code', 'bricks-child' ); ?></button>
         </p>
     </div>
 
     <!-- Step 2: OTP Input (Initially Hidden) -->
     <div id="step-otp" style="display: none;">
-        <h2><?php _e( 'Step 2: Enter Verification Code', 'astra-child' ); ?></h2>
-        <p><?php _e( 'Please enter the code sent to your phone.', 'astra-child' ); ?></p>
+        <h2><?php _e( 'Step 2: Enter Verification Code', 'bricks-child' ); ?></h2>
+        <p><?php _e( 'Please enter the code sent to your phone.', 'bricks-child' ); ?></p>
         <p>
-            <label for="verification_code"><?php _e( 'Verification Code', 'astra-child' ); ?>:</label>
+            <label for="verification_code"><?php _e( 'Verification Code', 'bricks-child' ); ?>:</label>
             <input type="text" name="verification_code" id="verification_code" required>
         </p>
         <p>
-            <button type="button" id="verify-otp-button"><?php esc_html_e( 'Verify Code & Continue', 'astra-child' ); ?></button>
-            <button type="button" id="change-phone-button" style="margin-left: 10px;"><?php esc_html_e( 'Change Phone Number', 'astra-child' ); ?></button>
+            <button type="button" id="verify-otp-button"><?php esc_html_e( 'Verify Code & Continue', 'bricks-child' ); ?></button>
+            <button type="button" id="change-phone-button" style="margin-left: 10px;"><?php esc_html_e( 'Change Phone Number', 'bricks-child' ); ?></button>
         </p>
     </div>
 
     <!-- Step 3: User Details (Initially Hidden) -->
     <div id="step-details" style="display: none;">
-        <h2><?php _e( 'Step 3: Complete Registration', 'astra-child' ); ?></h2>
+        <h2><?php _e( 'Step 3: Complete Registration', 'bricks-child' ); ?></h2>
         <p>
-            <label for="reg_first_name"><?php _e( 'First Name', 'astra-child' ); ?>:</label>
+            <label for="reg_first_name"><?php _e( 'First Name', 'bricks-child' ); ?>:</label>
             <input type="text" name="reg_first_name" id="reg_first_name" required>
         </p>
         <p>
-            <label for="reg_last_name"><?php _e( 'Last Name', 'astra-child' ); ?>:</label>
+            <label for="reg_last_name"><?php _e( 'Last Name', 'bricks-child' ); ?>:</label>
             <input type="text" name="reg_last_name" id="reg_last_name" required>
         </p>
         <p>
-            <label for="reg_password"><?php _e( 'Password', 'astra-child' ); ?>:</label>
+            <label for="reg_password"><?php _e( 'Password', 'bricks-child' ); ?>:</label>
             <input type="password" name="reg_password" id="reg_password" required aria-describedby="password-strength-text password-remaining-reqs">
             <div id="password-strength-text" aria-live="polite" style="font-size: 0.9em; height: 1.2em;"></div>
             <div id="password-remaining-reqs" style="font-size: 0.9em; margin-top: 3px;">
@@ -48,14 +48,14 @@
             </div>
         </p>
         <p>
-            <label for="reg_password_confirm"><?php _e( 'Confirm Password', 'astra-child' ); ?>:</label>
+            <label for="reg_password_confirm"><?php _e( 'Confirm Password', 'bricks-child' ); ?>:</label>
             <input type="password" name="reg_password_confirm" id="reg_password_confirm" required>
         </p>
         <p>
             <input type="hidden" name="action" value="custom_register_user">
             <input type="hidden" name="reg_phone" id="reg_phone" value=""> <!-- Populated by JS -->
             <?php wp_nonce_field( 'custom_registration_nonce', 'custom_registration_nonce' ); ?>
-            <input type="submit" id="complete-registration-button" value="<?php esc_attr_e( 'Complete Registration', 'astra-child' ); ?>">
+            <input type="submit" id="complete-registration-button" value="<?php esc_attr_e( 'Complete Registration', 'bricks-child' ); ?>">
             </p>
         </div>
 
@@ -232,11 +232,11 @@
         const requirementsDiv = $('#password-remaining-reqs'); // Target the div
 
         const requirements = {
-            length: { text: '<?php esc_html_e( "8-16 characters", "astra-child" ); ?>', regex: /.{8,16}/ },
-            lowercase: { text: '<?php esc_html_e( "At least one lowercase letter", "astra-child" ); ?>', regex: /[a-z]/ },
-            uppercase: { text: '<?php esc_html_e( "At least one uppercase letter", "astra-child" ); ?>', regex: /[A-Z]/ },
-            number: { text: '<?php esc_html_e( "At least one number", "astra-child" ); ?>', regex: /[0-9]/ },
-            symbol: { text: '<?php esc_html_e( "At least one symbol (e.g., !@#$%^&*)", "astra-child" ); ?>', regex: /[!@#$%^&*(),.?":{}|<>\-_=+;\[\]~`]/ }
+            length: { text: '<?php esc_html_e( "8-16 characters", "bricks-child" ); ?>', regex: /.{8,16}/ },
+            lowercase: { text: '<?php esc_html_e( "At least one lowercase letter", "bricks-child" ); ?>', regex: /[a-z]/ },
+            uppercase: { text: '<?php esc_html_e( "At least one uppercase letter", "bricks-child" ); ?>', regex: /[A-Z]/ },
+            number: { text: '<?php esc_html_e( "At least one number", "bricks-child" ); ?>', regex: /[0-9]/ },
+            symbol: { text: '<?php esc_html_e( "At least one symbol (e.g., !@#$%^&*)", "bricks-child" ); ?>', regex: /[!@#$%^&*(),.?":{}|<>\-_=+;\[\]~`]/ }
         };
 
         // Function to update password strength UI
@@ -271,13 +271,13 @@
             // Check levels - require length met for medium/strong
             else if (!requirements.length.regex.test(password) || score <= 2) { 
                 strengthLevel = 'weak';
-                strengthLabel = '<?php esc_html_e( "Weak", "astra-child" ); ?>';
+                strengthLabel = '<?php esc_html_e( "Weak", "bricks-child" ); ?>';
             } else if (score <= 4) {
                 strengthLevel = 'medium';
-                strengthLabel = '<?php esc_html_e( "Moderate", "astra-child" ); ?>';
+                strengthLabel = '<?php esc_html_e( "Moderate", "bricks-child" ); ?>';
             } else { // Score is 5 and length is met
                 strengthLevel = 'strong';
-                strengthLabel = '<?php esc_html_e( "Safe", "astra-child" ); ?>';
+                strengthLabel = '<?php esc_html_e( "Safe", "bricks-child" ); ?>';
             }
 
             // Update indicator and text classes/content

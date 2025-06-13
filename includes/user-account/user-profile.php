@@ -12,14 +12,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function custom_user_profile_fields( $user ) {
     ?>
-    <h3><?php _e( 'Dealership Information', 'astra-child' ); ?></h3>
+    <h3><?php _e( 'Dealership Information', 'bricks-child' ); ?></h3>
 
     <table class="form-table">
         <tr>
-            <th><label for="dealership_name"><?php _e( 'Dealership Name', 'astra-child' ); ?></label></th>
+            <th><label for="dealership_name"><?php _e( 'Dealership Name', 'bricks-child' ); ?></label></th>
             <td>
                 <input type="text" name="dealership_name" id="dealership_name" value="<?php echo esc_attr( get_user_meta( $user->ID, 'dealership_name', true ) ); ?>" class="regular-text">
-                <span class="description"><?php _e( 'The name of the dealership (if applicable).', 'astra-child' ); ?></span>
+                <span class="description"><?php _e( 'The name of the dealership (if applicable).', 'bricks-child' ); ?></span>
             </td>
         </tr>
     </table>

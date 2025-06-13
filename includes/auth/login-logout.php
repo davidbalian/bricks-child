@@ -123,7 +123,7 @@ function allow_phone_number_login( $user, $username, $password ) {
     // If no user was found by phone, return a generic error.
     if ( ! $user && ! empty( $username ) && ! empty( $password ) ) {
         // Simulate the error structure WP expects to avoid revealing whether the phone number exists
-        return new WP_Error( 'invalid_phone_or_password', __( '<strong>Error</strong>: Invalid phone number or password.', 'astra-child' ) ); // Modified error key/message
+        return new WP_Error( 'invalid_phone_or_password', __( '<strong>Error</strong>: Invalid phone number or password.', 'bricks-child' ) ); // Modified error key/message
     }
 
     return $user; // Fallback

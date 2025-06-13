@@ -15,7 +15,7 @@ function add_custom_user_roles() {
     if ( ! get_role( 'dealership' ) ) {
         add_role(
             'dealership',
-            __( 'Dealership', 'astra-child' ),
+            __( 'Dealership', 'bricks-child' ),
             array(
                 'read' => true,
                 'edit_posts' => true,
@@ -32,7 +32,7 @@ function add_custom_user_roles() {
     if ( ! get_role( 'client' ) ) {
         add_role(
             'client',
-            __( 'Client', 'astra-child' ),
+            __( 'Client', 'bricks-child' ),
             array(
                 'read' => true,
                 'edit_posts' => true,
@@ -47,7 +47,7 @@ function add_custom_user_roles() {
 
     // Ensure the default 'subscriber' role exists
     if ( ! get_role( 'subscriber' ) ) {
-        add_role( 'subscriber', __( 'Subscriber', 'astra-child' ), array( 'read' => true ) );
+        add_role( 'subscriber', __( 'Subscriber', 'bricks-child' ), array( 'read' => true ) );
     }
 }
 add_action( 'after_switch_theme', 'add_custom_user_roles' );

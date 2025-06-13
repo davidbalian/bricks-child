@@ -4,7 +4,7 @@
  * 
  * Handles form submissions for car listings
  * 
- * @package Astra Child
+ * @package Bricks Child
  * @since 1.0.0
  */
 

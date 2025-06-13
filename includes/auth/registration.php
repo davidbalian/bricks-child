@@ -66,7 +66,7 @@ function custom_handle_registration() {
     if ( isset( $_POST['action'] ) && $_POST['action'] === 'custom_register_user' && isset( $_POST['reg_phone'] ) ) {
         // Verify the nonce for the final submission
         if ( ! isset( $_POST['custom_registration_nonce'] ) || ! wp_verify_nonce( $_POST['custom_registration_nonce'], 'custom_registration_nonce' ) ) {
-            wp_die( esc_html__( 'Security check failed.', 'astra-child' ), esc_html__( 'Error', 'astra-child' ), array( 'response' => 403 ) );
+            wp_die( esc_html__( 'Security check failed.', 'bricks-child' ), esc_html__( 'Error', 'bricks-child' ), array( 'response' => 403 ) );
         }
 
         $errors = new WP_Error();
@@ -80,20 +80,20 @@ function custom_handle_registration() {
 
         // --- Final Validation ---
         if ( empty( $first_name ) ) {
-            $errors->add( 'required', esc_html__( 'Please enter your first name.', 'astra-child' ) );
+            $errors->add( 'required', esc_html__( 'Please enter your first name.', 'bricks-child' ) );
         }
         if ( empty( $last_name ) ) {
-            $errors->add( 'required', esc_html__( 'Please enter your last name.', 'astra-child' ) );
+            $errors->add( 'required', esc_html__( 'Please enter your last name.', 'bricks-child' ) );
         }
         if ( empty( $phone ) ) { // Should not happen if flow is correct, but check anyway
-            $errors->add( 'required', esc_html__( 'Phone number is missing.', 'astra-child' ) );
+            $errors->add( 'required', esc_html__( 'Phone number is missing.', 'bricks-child' ) );
         }
         if ( strlen( $password ) < 6 ) {
-            $errors->add( 'password_length', esc_html__( 'Password must be at least 6 characters long.', 'astra-child' ) );
+            $errors->add( 'password_length', esc_html__( 'Password must be at least 6 characters long.', 'bricks-child' ) );
         }
         // Add password confirmation check
         if ( $password !== $password_confirm ) {
-            $errors->add( 'password_mismatch', esc_html__( 'Passwords do not match.', 'astra-child' ) );
+            $errors->add( 'password_mismatch', esc_html__( 'Passwords do not match.', 'bricks-child' ) );
         }
 
         // Check again if phone exists (edge case: verified but registered between steps)
@@ -104,7 +104,7 @@ function custom_handle_registration() {
             'count_total' => false,
         ));
         if (!empty($user_by_phone)) {
-            $errors->add('phone_exists', esc_html__('This phone number is already registered.', 'astra-child'));
+            $errors->add('phone_exists', esc_html__('This phone number is already registered.', 'bricks-child'));
         }
 
         if ( $errors->get_error_codes() ) {
