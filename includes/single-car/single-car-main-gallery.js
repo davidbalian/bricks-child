@@ -48,6 +48,11 @@ jQuery(document).ready(function ($) {
     ],
   });
 
+  // Update current slide number
+  $(".hero-slider").on("afterChange", function (event, slick, currentSlide) {
+    $(".current-slide").text(currentSlide + 1);
+  });
+
   // Ensure all images have the same height
   function equalizeImageHeights() {
     var maxHeight = 0;

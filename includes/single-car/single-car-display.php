@@ -158,7 +158,7 @@ if (have_posts()) :
                                     </div>
                                     <div class="image-count-overlay">
                                         <i class="fas fa-camera"></i>
-                                        <span><?php echo count($all_images); ?> photos</span>
+                                        <span class="current-slide">1</span>/<span class="total-slides"><?php echo count($all_images); ?></span> photos
                                     </div>
                                     <button class="view-gallery-btn">
                                         <i class="fas fa-images"></i>
