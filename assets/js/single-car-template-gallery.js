@@ -74,6 +74,9 @@ jQuery(document).ready(function ($) {
       var $thumbnailContainer = $thumbnailNav;
 
       if ($activeThumbnail.length && $thumbnailContainer.length) {
+        // Stop any current animations to prevent queueing
+        $thumbnailContainer.stop(true, false);
+
         var containerWidth = $thumbnailContainer.width();
         var thumbnailWidth = $activeThumbnail.outerWidth(true);
         var thumbnailOffset = $activeThumbnail.position().left;
@@ -86,7 +89,7 @@ jQuery(document).ready(function ($) {
             {
               scrollLeft: currentScroll + thumbnailOffset - 20,
             },
-            300
+            150
           );
         } else if (thumbnailOffset + thumbnailWidth > containerWidth) {
           // Thumbnail is to the right of visible area
@@ -97,7 +100,7 @@ jQuery(document).ready(function ($) {
                 (thumbnailOffset + thumbnailWidth - containerWidth) +
                 20,
             },
-            300
+            150
           );
         }
       }
@@ -263,6 +266,9 @@ jQuery(document).ready(function ($) {
         var $container = $lightboxThumbnails;
 
         if ($activeThumbnail.length && $container.length) {
+          // Stop any current animations to prevent queueing
+          $container.stop(true, false);
+
           var containerWidth = $container.width();
           var thumbnailWidth = $activeThumbnail.outerWidth(true);
           var thumbnailOffset = $activeThumbnail.position().left;
@@ -273,7 +279,7 @@ jQuery(document).ready(function ($) {
               {
                 scrollLeft: currentScroll + thumbnailOffset - 20,
               },
-              300
+              150
             );
           } else if (thumbnailOffset + thumbnailWidth > containerWidth) {
             $container.animate(
@@ -283,7 +289,7 @@ jQuery(document).ready(function ($) {
                   (thumbnailOffset + thumbnailWidth - containerWidth) +
                   20,
               },
-              300
+              150
             );
           }
         }
