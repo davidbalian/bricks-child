@@ -20,34 +20,31 @@
 }
 
 /* Main Image Slider */
-.main-image-slider {
+.main-image-slider,
+.thumbnail-nav {
+  width: 100%;
+  height: auto;
+}
+
+.main-image-slider .swiper-wrapper {
   width: 100%;
   height: 100%;
 }
 
-.main-image-slider .slide {
-  width: 100% !important;
-  max-width: 800px;
-  height: auto;
-  aspect-ratio: 4 / 3;
-  opacity: 0;
-  transition: opacity var(--transition-time) ease;
-  display: flex !important;
+.main-image-slider .swiper-slide {
+  display: flex;
   align-items: center;
   justify-content: center;
+  width: 100% !important;
+  aspect-ratio: 4 / 3;
+  background: transparent;
 }
 
-.main-image-slider .slick-center {
-  opacity: 1;
-}
-
-.main-image {
+.main-image-slider .main-image {
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: contain;
-  display: block;
   border-radius: 8px;
-  max-height: 600px;
 }
 
 /* Slider Navigation Arrows */
@@ -329,26 +326,56 @@
   }
 }
 
-/* Hide default slick arrows */
-.slick-prev,
-.slick-next {
-  display: none !important;
+/* Swiper core styles */
+.swiper-button-prev,
+.swiper-button-next {
+  color: #222;
+  background: #fff;
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  z-index: 10;
 }
-
-/* Slick slider customizations */
-.main-image-slider .slick-list,
-.main-image-slider .slick-track {
-  height: 100%;
-}
-
-.main-image-slider .slick-slide {
-  opacity: 0;
-  transition: opacity 0.1s ease;
-}
-
-.main-image-slider .slick-slide.slick-active {
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
   opacity: 1;
 }
+
+.thumbnail-nav {
+  margin-top: 1rem;
+  padding-bottom: 0.5rem;
+}
+
+.thumbnail-nav .swiper-wrapper {
+  display: flex;
+  gap: 12px;
+}
+
+.thumbnail-nav .swiper-slide.row-image-item {
+  width: 120px !important;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--border-radius-small);
+  overflow: hidden;
+  background: var(--light-bg);
+  border: 1px solid var(--borders);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.thumbnail-nav .swiper-slide.row-image-item.active,
+.thumbnail-nav .swiper-slide.row-image-item.swiper-slide-thumb-active {
+  border-color: var(--light-blue);
+}
+.thumbnail-nav .swiper-slide.row-image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Remove Slick-specific styles */
+.slick-list, .slick-track, .slick-slide, .slick-center, .slick-active, .slick-initialized, .slick-slider, .slick-arrow, .slick-prev, .slick-next { all: unset; }
 
 /* Lightbox Styles */
 .car-gallery-lightbox {

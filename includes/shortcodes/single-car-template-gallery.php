@@ -120,12 +120,17 @@ function single_car_template_gallery_shortcode( $atts ) {
 	<div class="single-car-template-gallery-wrapper" data-total-images="<?php echo $image_count; ?>">
 		<!-- Main Image Container with Slider -->
 		<div class="main-image-container">
-			<div class="main-image-slider">
-				<?php foreach ( $images as $index => $image ) : ?>
-					<div class="slide">
-						<img src="<?php echo esc_url( $image['sizes']['medium_large'] ); ?>" alt="<?php echo esc_attr( get_the_title( $image['ID'] ) ); ?>" class="main-image">
-					</div>
-				<?php endforeach; ?>
+			<div class="swiper main-image-slider">
+				<div class="swiper-wrapper">
+					<?php foreach ( $images as $index => $image ) : ?>
+						<div class="swiper-slide">
+							<img src="<?php echo esc_url( $image['sizes']['medium_large'] ); ?>" alt="<?php echo esc_attr( get_the_title( $image['ID'] ) ); ?>" class="main-image">
+						</div>
+					<?php endforeach; ?>
+				</div>
+				<!-- Swiper navigation buttons -->
+				<div class="swiper-button-prev slider-arrow slider-prev"></div>
+				<div class="swiper-button-next slider-arrow slider-next"></div>
 			</div>
 			
 			<!-- Photo Count Overlay (Top Left) -->
@@ -141,26 +146,18 @@ function single_car_template_gallery_shortcode( $atts ) {
 					View All Images
 				</button>
 			</div>
-			
-			<!-- Navigation Arrows -->
-			<div class="slider-nav">
-				<button class="slider-arrow slider-prev" type="button">
-					<i class="fas fa-chevron-left"></i>
-				</button>
-				<button class="slider-arrow slider-next" type="button">
-					<i class="fas fa-chevron-right"></i>
-				</button>
-			</div>
 		</div>
 
 		<!-- Thumbnail Navigation Row -->
 		<?php if ( $image_count >= 1 ) : ?>
-			<div class="images-row thumbnail-nav">
-				<?php foreach ( $images as $index => $image ) : ?>
-					<div class="row-image-item" data-slide="<?php echo $index; ?>">
-						<img src="<?php echo esc_url( $image['sizes']['thumbnail'] ); ?>" alt="<?php echo esc_attr( get_the_title( $image['ID'] ) ); ?>">
-					</div>
-				<?php endforeach; ?>
+			<div class="swiper thumbnail-nav images-row">
+				<div class="swiper-wrapper">
+					<?php foreach ( $images as $index => $image ) : ?>
+						<div class="swiper-slide row-image-item" data-slide="<?php echo $index; ?>">
+							<img src="<?php echo esc_url( $image['sizes']['thumbnail'] ); ?>" alt="<?php echo esc_attr( get_the_title( $image['ID'] ) ); ?>">
+						</div>
+					<?php endforeach; ?>
+				</div>
 			</div>
 		<?php endif; ?>
 	</div>
@@ -176,16 +173,15 @@ function single_car_template_gallery_enqueue_assets() {
 	$theme_version = defined('BRICKS_CHILD_THEME_VERSION') ? BRICKS_CHILD_THEME_VERSION : '1.0.0';
 	$theme_dir_uri = get_stylesheet_directory_uri();
 
-	// Enqueue Slick Slider CSS
-	wp_enqueue_style( 'slick-css', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css', array(), '1.8.1' );
-	wp_enqueue_style( 'slick-theme-css', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css', array(), '1.8.1' );
+	// Enqueue Swiper CSS
+	wp_enqueue_style( 'swiper-css', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css', array(), '11.0.0' );
 	
 	// Enqueue Custom CSS
-	wp_enqueue_style( 'single-car-template-gallery-css', $theme_dir_uri . '/assets/css/single-car-template-gallery.css', array(), $theme_version );
+	wp_enqueue_style( 'single-car-template-gallery-css', $theme_dir_uri . '/assets/css/single-car-template-gallery.css', array('swiper-css'), $theme_version );
 	
-	// Enqueue Slick Slider JS
-	wp_enqueue_script( 'slick-js', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js', array('jquery'), '1.8.1', true );
+	// Enqueue Swiper JS
+	wp_enqueue_script( 'swiper-js', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js', array(), '11.0.0', true );
 	
 	// Enqueue Custom JS
-	wp_enqueue_script( 'single-car-template-gallery-js', $theme_dir_uri . '/assets/js/single-car-template-gallery.js', array('jquery', 'slick-js'), $theme_version, true );
+	wp_enqueue_script( 'single-car-template-gallery-js', $theme_dir_uri . '/assets/js/single-car-template-gallery.js', array('swiper-js'), $theme_version, true );
 } 
