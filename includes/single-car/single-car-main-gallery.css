@@ -44,7 +44,7 @@
   height: 40px;
   background: rgba(0, 0, 0, 0.5);
   border-radius: 50%;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease;
 }
 
 .hero-slider .slick-prev:hover,
@@ -85,11 +85,13 @@
   height: 80px;
   object-fit: cover;
   border-radius: 4px;
-  transition: opacity 0.3s ease;
+  border: 3px solid transparent;
+  transition: border-color 0.2s ease;
 }
 
 .thumbnail-slide.slick-current img {
-  opacity: 0.7;
+  border-color: #007bff;
+  opacity: 1;
 }
 
 .image-count-overlay {
@@ -116,7 +118,7 @@
   cursor: pointer;
   font-size: 14px;
   z-index: 2;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease;
 }
 
 .view-gallery-btn:hover {
