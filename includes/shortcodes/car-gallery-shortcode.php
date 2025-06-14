@@ -4,14 +4,14 @@
  * 
  * Displays a slick slider gallery with full-screen popup for car images
  * 
- * Usage: [car_gallery]
+ * Usage: [car_gallery_slider]
  */
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-function car_gallery_shortcode() {
+function car_gallery_slider_shortcode() {
     // Get the current post ID
     $post_id = get_the_ID();
     
@@ -74,4 +74,4 @@ function car_gallery_shortcode() {
     <?php
     return ob_get_clean();
 }
-add_shortcode('car_gallery', 'car_gallery_shortcode'); 
+add_shortcode('car_gallery_slider', 'car_gallery_slider_shortcode'); 
