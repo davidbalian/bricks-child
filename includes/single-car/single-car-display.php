@@ -35,32 +35,31 @@ if (have_posts()) :
             $featured_image = get_post_thumbnail_id($car_id);
             $additional_images = get_field('car_images', $car_id); // ACF field
             $all_images = array();
-            
+
             if ($featured_image) {
                 $all_images[] = $featured_image;
             }
-            
+
             if (is_array($additional_images)) {
                 $all_images = array_merge($all_images, $additional_images);
             }
             ?>
 
             <div class="car-listing-detailed-container">
-                <!-- Add Gallery Popup HTML -->
                 <div class="gallery-popup" style="display: none;">
                     <div class="gallery-popup-content">
                         <button class="back-to-advert-btn">
                             <i class="fas fa-arrow-left"></i> Back to advert
                         </button>
                         <div class="gallery-main-image">
-                            <?php 
+                            <?php
                             // Set the first image as the initial main image
-                            $first_image_url = wp_get_attachment_image_url($all_images[0], 'large');
+                            $first_image_url = !empty($all_images) ? wp_get_attachment_image_url($all_images[0], 'large') : '';
                             ?>
                             <img src="<?php echo esc_url($first_image_url); ?>" alt="Gallery Image">
                         </div>
                         <div class="gallery-thumbnails">
-                            <?php foreach ($all_images as $index => $image_id) : 
+                            <?php foreach ($all_images as $index => $image_id) :
                                 $thumb_url = wp_get_attachment_image_url($image_id, 'thumbnail');
                                 $full_url = wp_get_attachment_image_url($image_id, 'large');
                                 if ($thumb_url) :
@@ -68,14 +67,13 @@ if (have_posts()) :
                                 <div class="gallery-thumbnail <?php echo $index === 0 ? 'active' : ''; ?>" data-full-url="<?php echo esc_url($full_url); ?>">
                                     <img src="<?php echo esc_url($thumb_url); ?>" alt="Gallery Thumbnail <?php echo $index + 1; ?>">
                                 </div>
-                            <?php 
+                            <?php
                                 endif;
                             endforeach; ?>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Report Listing Modal -->
+
                 <div class="report-modal" style="display: none;">
                     <div class="report-modal-content">
                         <div class="report-modal-header">
@@ -118,7 +116,7 @@ if (have_posts()) :
                         </form>
                     </div>
                 </div>
-                
+
                 <div class="car-listing-header">
                     <a href="javascript:history.back()" class="back-to-results-btn">
                         ← Back to Results
@@ -130,7 +128,7 @@ if (have_posts()) :
                     $favorite_cars = is_array($favorite_cars) ? $favorite_cars : array();
                     $is_favorite = $user_id ? in_array($car_id, $favorite_cars) : false;
                     $button_class = $is_favorite ? 'favorite-btn active' : 'favorite-btn';
-                    $heart_class = $is_favorite ? 'fas fa-heart' : 'far fa-heart'; 
+                    $heart_class = $is_favorite ? 'fas fa-heart' : 'far fa-heart';
                     ?>
                     <div class="action-buttons">
                         <button class="<?php echo esc_attr($button_class); ?>" data-car-id="<?php echo esc_attr($car_id); ?>">
@@ -146,10 +144,12 @@ if (have_posts()) :
                 </div>
                 <div class="car-listing-content">
                     <div class="car-listing-top">
-                        <!-- Image Gallery -->
                         <?php if (!empty($all_images)) : ?>
-                            <div class="car-listing-gallery">
-                                <div class="main-image">
+                            <div class="gallery-container">
+                                <div class="hero-section">
+                                    <img src="" alt="Main car image" class="hero-image" id="heroImage">
+                                    <button class="hero-nav-arrow left" id="prevArrow">&#10094;</button>
+                                    <button class="hero-nav-arrow right" id="nextArrow">&#10095;</button>
                                     <div class="image-count-overlay">
                                         <i class="fas fa-camera"></i>
                                         <span><?php echo count($all_images); ?> photos</span>
@@ -158,43 +158,15 @@ if (have_posts()) :
                                         <i class="fas fa-images"></i>
                                         View Gallery
                                     </button>
-                                    <?php
-                                    $main_image_url = wp_get_attachment_image_url($all_images[0], 'large');
-                                    if ($main_image_url) :
-                                    ?>
-                                        <img src="<?php echo esc_url($main_image_url); ?>" 
-                                             alt="<?php echo esc_attr($year . ' ' . $make . ' ' . $model); ?>" 
-                                             class="clickable-image"
-                                             data-image-index="0">
-                                    <?php endif; ?>
                                 </div>
-                                
-                                <?php if (count($all_images) > 1) : ?>
-                                    <div class="thumbnail-gallery">
-                                        <?php 
-                                        // Show up to 3 thumbnails (excluding the main image)
-                                        $max_thumbnails = 3;
-                                        $num_thumbnails = min(count($all_images) - 1, $max_thumbnails);
-                                        for ($i = 1; $i <= $num_thumbnails; $i++) : 
-                                            $thumb_url = wp_get_attachment_image_url($all_images[$i], 'medium');
-                                            $full_url = wp_get_attachment_image_url($all_images[$i], 'large');
-                                            if ($thumb_url) :
-                                        ?>
-                                            <div class="thumbnail" data-full-url="<?php echo esc_url($full_url); ?>">
-                                                <img src="<?php echo esc_url($thumb_url); ?>" 
-                                                     alt="Thumbnail <?php echo $i + 1; ?>"
-                                                     class="clickable-image"
-                                                     data-image-index="<?php echo $i; ?>">
-                                            </div>
-                                        <?php 
-                                            endif;
-                                        endfor; ?>
-                                    </div>
-                                <?php endif; ?>
+
+                                <div class="thumbnail-section">
+                                    <div class="thumbnails-wrapper" id="thumbnailsWrapper">
+                                        </div>
+                                </div>
                             </div>
                         <?php endif; ?>
 
-                        <!-- Car Details Right Side -->
                         <div class="car-listing-details-right">
                             <h1 class="car-title"><?php echo esc_html($make . ' ' . $model); ?></h1>
 
@@ -205,12 +177,12 @@ if (have_posts()) :
                             <div class="car-specs">
                                 <?php echo esc_html($engine_capacity); ?>L
                                 <?php echo !empty($variant) ? ' ' . esc_html($variant) : ''; ?>
-                                <?php 
+                                <?php
                                     $body_type = get_field('body_type', $car_id);
                                     echo !empty($body_type) ? ' ' . esc_html($body_type) : '';
                                 ?>
                                 <?php echo !empty($transmission) ? ' ' . esc_html($transmission) : ''; ?>
-                                <?php 
+                                <?php
                                     $drive_type = get_field('drive_type', $car_id);
                                     echo !empty($drive_type) ? ' ' . esc_html($drive_type) : '';
                                 ?>
@@ -232,7 +204,7 @@ if (have_posts()) :
                             </div>
 
                             <div class="car-price">€<?php echo number_format($price); ?></div>
-                            <?php 
+                            <?php
                             $publication_date = get_field('publication_date', $car_id);
                             if (!$publication_date) {
                                 $publication_date = get_the_date('Y-m-d H:i:s');
@@ -242,10 +214,10 @@ if (have_posts()) :
                             echo '<div class="car-publication-date">Listed on ' . esc_html($formatted_date) . '</div>';
                             ?>
                             <div class="car-location"><i class="fas fa-map-marker-alt"></i><?php echo esc_html($location); ?></div>
-                            <?php 
+                            <?php
             // Get the author from post_author field
             $author_id = get_post_field('post_author', $car_id);
-                            
+
                             $author_name = get_the_author_meta('display_name', $author_id);
                             $author_first_name = get_the_author_meta('first_name', $author_id);
                             $author_last_name = get_the_author_meta('last_name', $author_id);
@@ -268,7 +240,6 @@ if (have_posts()) :
                         </div>
                     </div>
 
-                    <!-- Vehicle Information -->
                     <div class="car-listing-details">
                         <div class="details-section">
                             <h2>Vehicle Information</h2>
@@ -303,7 +274,7 @@ if (have_posts()) :
                                 </div>
                                 <div class="detail-item">
                                     <span class="detail-label">MOT Status:</span>
-                                    <span class="detail-value"><?php 
+                                    <span class="detail-value"><?php
                                         $mot_status = get_field('motuntil', $car_id);
                                         if ($mot_status === 'Expired') {
                                             echo 'Expired';
@@ -346,7 +317,6 @@ if (have_posts()) :
                         </div>
                     </div>
 
-                    <!-- Specs and Features Section -->
                     <div class="car-listing-details">
                         <div class="details-section">
                             <button class="specs-features-toggle">
@@ -378,12 +348,11 @@ if (have_posts()) :
                         </div>
                     </div>
 
-                    <!-- Description Section -->
                     <div class="car-listing-details">
                         <div class="details-section">
                             <h2>Description</h2>
                             <div class="description-content">
-                                <?php 
+                                <?php
                                 // Description truncation logic (copied from car-listing-detailed.php)
                                 $description_length = strlen($description);
                                 $max_length = 360;
@@ -411,6 +380,208 @@ if (have_posts()) :
                 </div>
             </div>
 
+            <style>
+                .gallery-container {
+                    width: 100%;
+                    max-width: 800px; /* Adjust as needed for your layout */
+                    background-color: #fff;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                    border-radius: 8px;
+                    overflow: hidden;
+                    margin-bottom: 20px; /* Spacing below the gallery */
+                }
+
+                /* Hero Image Section */
+                .hero-section {
+                    position: relative;
+                    width: 100%;
+                    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+                    overflow: hidden;
+                    background-color: #eee;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+
+                .hero-image {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                    transition: opacity 0.3s ease-in-out;
+                }
+
+                .hero-nav-arrow {
+                    position: absolute;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background-color: rgba(0, 0, 0, 0.5);
+                    color: white;
+                    border: none;
+                    padding: 15px 10px;
+                    cursor: pointer;
+                    font-size: 1.5em;
+                    z-index: 10;
+                    border-radius: 4px;
+                    opacity: 0.8;
+                    transition: opacity 0.2s ease;
+                }
+
+                .hero-nav-arrow:hover {
+                    opacity: 1;
+                }
+
+                .hero-nav-arrow.left {
+                    left: 10px;
+                }
+
+                .hero-nav-arrow.right {
+                    right: 10px;
+                }
+
+                /* Thumbnails Section */
+                .thumbnail-section {
+                    padding: 15px;
+                    background-color: #f9f9f9;
+                    position: relative;
+                    overflow: hidden; /* This is crucial for controlling the scroll via transform */
+                }
+
+                .thumbnails-wrapper {
+                    display: flex;
+                    transition: transform 0.3s ease-in-out;
+                    gap: 10px; /* Space between thumbnails */
+                    width: fit-content; /* Allows the wrapper to be wider than its parent */
+                }
+
+                .thumbnail-item {
+                    min-width: calc((100% / 3) - 7px); /* Approx 1/3 width minus gap */
+                    max-width: calc((100% / 3) - 7px);
+                    flex-shrink: 0;
+                    height: 80px; /* Fixed height for thumbnails */
+                    object-fit: cover;
+                    cursor: pointer;
+                    border: 3px solid transparent;
+                    border-radius: 4px;
+                    transition: border-color 0.2s ease, transform 0.1s ease;
+                }
+
+                .thumbnail-item:hover {
+                    transform: scale(1.03);
+                }
+
+                .thumbnail-item.active {
+                    border-color: #007bff; /* Active border color */
+                }
+
+                /* Basic responsiveness */
+                @media (max-width: 600px) {
+                    .thumbnail-item {
+                        height: 60px; /* Smaller thumbnails on small screens */
+                    }
+                }
+            </style>
+
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // PHP generated array of image URLs
+                const allImagesData = <?php
+                    $image_urls = array();
+                    foreach ($all_images as $image_id) {
+                        $image_urls[] = wp_get_attachment_image_url($image_id, 'large'); // Or 'full' if you prefer
+                    }
+                    echo json_encode($image_urls);
+                ?>;
+
+                if (allImagesData.length === 0) {
+                    // Hide the gallery container if no images are available
+                    const galleryContainer = document.querySelector('.gallery-container');
+                    if (galleryContainer) {
+                        galleryContainer.style.display = 'none';
+                    }
+                    return; // Exit if no images
+                }
+
+                const heroImage = document.getElementById('heroImage');
+                const prevArrow = document.getElementById('prevArrow');
+                const nextArrow = document.getElementById('nextArrow');
+                const thumbnailsWrapper = document.getElementById('thumbnailsWrapper');
+                const thumbnailSection = document.querySelector('.thumbnail-section');
+
+                let currentIndex = 0;
+
+                function updateGallery() {
+                    heroImage.src = allImagesData[currentIndex];
+
+                    document.querySelectorAll('.thumbnail-item').forEach(thumb => {
+                        thumb.classList.remove('active');
+                    });
+
+                    const activeThumbnail = document.querySelector(`.thumbnail-item[data-index="${currentIndex}"]`);
+                    if (activeThumbnail) {
+                        activeThumbnail.classList.add('active');
+
+                        const thumbWidthWithGap = activeThumbnail.offsetWidth + 10;
+                        const wrapperTotalWidth = thumbnailsWrapper.scrollWidth;
+                        const visibleContainerWidth = thumbnailSection.offsetWidth;
+
+                        let targetScrollOffset = 0;
+
+                        if (allImagesData.length * thumbWidthWithGap <= visibleContainerWidth) {
+                            targetScrollOffset = 0; // All thumbnails fit, no scrolling needed
+                        } else {
+                            const centerOffset = (visibleContainerWidth / 2) - (thumbWidthWithGap / 2);
+                            targetScrollOffset = (currentIndex * thumbWidthWithGap) - centerOffset;
+
+                            targetScrollOffset = Math.max(0, targetScrollOffset);
+
+                            const maxPossibleScroll = wrapperTotalWidth - visibleContainerWidth;
+                            targetScrollOffset = Math.min(targetScrollOffset, maxPossibleScroll);
+                        }
+                        thumbnailsWrapper.style.transform = `translateX(-${targetScrollOffset}px)`;
+                    }
+                }
+
+                function createThumbnails() {
+                    thumbnailsWrapper.innerHTML = '';
+                    allImagesData.forEach((image, index) => {
+                        const img = document.createElement('img');
+                        img.src = image; // Use the large image for thumbnails as well, CSS will size it
+                        img.alt = `Car thumbnail ${index + 1}`;
+                        img.classList.add('thumbnail-item');
+                        img.dataset.index = index;
+
+                        img.addEventListener('click', () => {
+                            currentIndex = index;
+                            updateGallery();
+                        });
+                        thumbnailsWrapper.appendChild(img);
+                    });
+                    updateGallery();
+                }
+
+                function showNext() {
+                    currentIndex = (currentIndex + 1) % allImagesData.length;
+                    updateGallery();
+                }
+
+                function showPrev() {
+                    currentIndex = (currentIndex - 1 + allImagesData.length) % allImagesData.length;
+                    updateGallery();
+                }
+
+                nextArrow.addEventListener('click', showNext);
+                prevArrow.addEventListener('click', showPrev);
+                window.addEventListener('resize', updateGallery);
+
+                // Initial setup
+                createThumbnails();
+            });
+            </script>
+
             <?php
 
         else:
@@ -423,4 +594,4 @@ else :
     // If no post is found (standard WordPress Loop practice)
     get_template_part('template-parts/content', 'none'); // Or your theme's way of showing "not found"
 endif;
-?> 
+?>
