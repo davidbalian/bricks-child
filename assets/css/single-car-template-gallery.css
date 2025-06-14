@@ -82,10 +82,7 @@
 }
 
 /* Photo Count Overlay (Top Left) */
-.photo-count-overlay, .lightbox-counter {
-  position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
+.photo-count-overlay, .lightbox-counter { 
   background: white;
   color: black;
   padding: 0.5rem 0.75rem;
@@ -95,6 +92,12 @@
   z-index: 2;
   display: flex;
   align-items: center;
+}
+
+.photo-count-overlay {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
 }
 
 .photo-count-overlay i, .lightbox-counter i {
@@ -203,12 +206,6 @@
 .lightbox-counter {
   top: 2rem;
   left: 2rem;
-}
-
-.lightbox-close {
-  position: absolute;
-  top: 2rem !important;
-  right: 2rem !important;
 }
 
 .lightbox-total {
