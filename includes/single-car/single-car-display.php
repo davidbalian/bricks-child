@@ -46,34 +46,6 @@ if (have_posts()) :
             ?>
 
             <div class="car-listing-detailed-container">
-                <div class="gallery-popup" style="display: none;">
-                    <div class="gallery-popup-content">
-                        <button class="back-to-advert-btn">
-                            <i class="fas fa-arrow-left"></i> Back to advert
-                        </button>
-                        <div class="gallery-main-image">
-                            <?php
-                            // Set the first image as the initial main image
-                            $first_image_url = !empty($all_images) ? wp_get_attachment_image_url($all_images[0], 'large') : '';
-                            ?>
-                            <img src="<?php echo esc_url($first_image_url); ?>" alt="Gallery Image">
-                        </div>
-                        <div class="gallery-thumbnails">
-                            <?php foreach ($all_images as $index => $image_id) :
-                                $thumb_url = wp_get_attachment_image_url($image_id, 'thumbnail');
-                                $full_url = wp_get_attachment_image_url($image_id, 'large');
-                                if ($thumb_url) :
-                            ?>
-                                <div class="gallery-thumbnail <?php echo $index === 0 ? 'active' : ''; ?>" data-full-url="<?php echo esc_url($full_url); ?>">
-                                    <img src="<?php echo esc_url($thumb_url); ?>" alt="Gallery Thumbnail <?php echo $index + 1; ?>">
-                                </div>
-                            <?php
-                                endif;
-                            endforeach; ?>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="report-modal" style="display: none;">
                     <div class="report-modal-content">
                         <div class="report-modal-header">
