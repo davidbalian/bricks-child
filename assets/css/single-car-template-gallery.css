@@ -331,7 +331,7 @@
 
 .main-image-slider .slick-slide {
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.1s ease;
 }
 
 .main-image-slider .slick-slide.slick-active {
