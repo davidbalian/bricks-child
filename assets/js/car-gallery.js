@@ -1,104 +1,135 @@
 jQuery(document).ready(function ($) {
-  // Initialize hero slider
-  $(".hero-slider").slick({
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: true,
-    fade: true,
-    asNavFor: ".thumbnail-slider",
-    adaptiveHeight: true,
-  });
-
-  // Initialize thumbnail slider
-  $(".thumbnail-slider").slick({
-    slidesToShow: 5,
-    slidesToScroll: 1,
-    asNavFor: ".hero-slider",
-    dots: false,
-    centerMode: false,
-    focusOnSelect: true,
-    responsive: [
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 4,
+  // Configuration
+  const config = {
+    heroSlider: {
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      arrows: true,
+      fade: true,
+      adaptiveHeight: true,
+    },
+    thumbnailSlider: {
+      slidesToShow: 5,
+      slidesToScroll: 1,
+      dots: false,
+      centerMode: false,
+      focusOnSelect: true,
+      responsive: [
+        {
+          breakpoint: 768,
+          settings: {
+            slidesToShow: 4,
+          },
         },
-      },
-      {
-        breakpoint: 576,
-        settings: {
-          slidesToShow: 3,
+        {
+          breakpoint: 576,
+          settings: {
+            slidesToShow: 3,
+          },
         },
-      },
-    ],
-  });
+      ],
+    },
+    fullpageSlider: {
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      arrows: true,
+      fade: true,
+      adaptiveHeight: true,
+    },
+  };
 
-  // Initialize fullpage slider
-  $(".fullpage-slider").slick({
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: true,
-    fade: true,
-    adaptiveHeight: true,
-  });
+  // Initialize sliders
+  function initializeSliders() {
+    // Hero slider
+    const $heroSlider = $(".hero-slider");
+    $heroSlider.slick({
+      ...config.heroSlider,
+      asNavFor: ".thumbnail-slider",
+    });
 
-  // Update current slide number
-  $(".hero-slider").on("afterChange", function (event, slick, currentSlide) {
-    $(".current-slide").text(currentSlide + 1);
-  });
+    // Thumbnail slider
+    const $thumbnailSlider = $(".thumbnail-slider");
+    $thumbnailSlider.slick({
+      ...config.thumbnailSlider,
+      asNavFor: ".hero-slider",
+    });
 
-  // View Gallery Button Click
-  $(".view-gallery-btn").on("click", function () {
-    const currentSlide = $(".hero-slider").slick("slickCurrentSlide");
-    $(".fullpage-gallery").addClass("active");
-    $(".fullpage-slider").slick("slickGoTo", currentSlide);
-    $("body").css("overflow", "hidden");
-  });
+    // Fullpage slider
+    const $fullpageSlider = $(".fullpage-slider");
+    $fullpageSlider.slick(config.fullpageSlider);
 
-  // Close Fullpage Gallery
-  $(".fullpage-close").on("click", function () {
-    $(".fullpage-gallery").removeClass("active");
-    $("body").css("overflow", "");
-  });
+    return { $heroSlider, $thumbnailSlider, $fullpageSlider };
+  }
 
-  // Close on click outside image
-  $(".fullpage-slide").on("click", function (e) {
-    if (e.target === this) {
-      $(".fullpage-gallery").removeClass("active");
-      $("body").css("overflow", "");
+  // Gallery controls
+  function initializeGalleryControls($heroSlider, $fullpageSlider) {
+    const $fullpageGallery = $(".fullpage-gallery");
+    const $body = $("body");
+
+    // Update slide counter
+    $heroSlider.on("afterChange", function (event, slick, currentSlide) {
+      $(".current-slide").text(currentSlide + 1);
+    });
+
+    // Open fullpage gallery
+    $(".view-gallery-btn").on("click", function () {
+      const currentSlide = $heroSlider.slick("slickCurrentSlide");
+      $fullpageGallery.addClass("active");
+      $fullpageSlider.slick("slickGoTo", currentSlide);
+      $body.css("overflow", "hidden");
+    });
+
+    // Close fullpage gallery
+    function closeFullpageGallery() {
+      $fullpageGallery.removeClass("active");
+      $body.css("overflow", "");
     }
-  });
 
-  // Close on escape key
-  $(document).on("keydown", function (e) {
-    if (e.key === "Escape" && $(".fullpage-gallery").hasClass("active")) {
-      $(".fullpage-gallery").removeClass("active");
-      $("body").css("overflow", "");
-    }
-  });
+    // Close button
+    $(".fullpage-close").on("click", closeFullpageGallery);
 
-  // Fullpage Navigation
-  $(".fullpage-prev").on("click", function () {
-    $(".fullpage-slider").slick("slickPrev");
-  });
+    // Close on click outside
+    $(".fullpage-slide").on("click", function (e) {
+      if (e.target === this) {
+        closeFullpageGallery();
+      }
+    });
 
-  $(".fullpage-next").on("click", function () {
-    $(".fullpage-slider").slick("slickNext");
-  });
+    // Close on escape key
+    $(document).on("keydown", function (e) {
+      if (e.key === "Escape" && $fullpageGallery.hasClass("active")) {
+        closeFullpageGallery();
+      }
+    });
 
-  // Equalize image heights
-  function equalizeImageHeights() {
-    const maxHeight = Math.max.apply(
-      null,
-      $(".hero-slide")
+    // Navigation controls
+    $(".fullpage-prev").on("click", function () {
+      $fullpageSlider.slick("slickPrev");
+    });
+
+    $(".fullpage-next").on("click", function () {
+      $fullpageSlider.slick("slickNext");
+    });
+  }
+
+  // Image height management
+  function manageImageHeights() {
+    const $heroSlides = $(".hero-slide");
+    const maxHeight = Math.max(
+      ...$heroSlides
         .map(function () {
           return $(this).height();
         })
         .get()
     );
-    $(".hero-slide").height(maxHeight);
+
+    $heroSlides.height(maxHeight);
   }
 
-  // Call on load and resize
-  $(window).on("load resize", equalizeImageHeights);
+  // Initialize everything
+  const sliders = initializeSliders();
+  initializeGalleryControls(sliders.$heroSlider, sliders.$fullpageSlider);
+
+  // Handle image heights on load and resize
+  $(window).on("load resize", manageImageHeights);
 });
