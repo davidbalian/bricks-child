@@ -23,39 +23,60 @@ document.addEventListener("DOMContentLoaded", function () {
   const thumbnailSection = document.querySelector(".thumbnail-section");
 
   let currentIndex = 0;
+  let isTransitioning = false;
 
   function updateGallery() {
-    heroImage.src = allImagesData[currentIndex];
+    if (isTransitioning) return;
+    isTransitioning = true;
 
-    document.querySelectorAll(".thumbnail-item").forEach((thumb) => {
-      thumb.classList.remove("active");
-    });
+    // Add fade-out class to start the transition
+    heroImage.classList.add("fade-out");
 
-    const activeThumbnail = document.querySelector(
-      `.thumbnail-item[data-index="${currentIndex}"]`
-    );
-    if (activeThumbnail) {
-      activeThumbnail.classList.add("active");
+    // Wait for the fade-out animation to complete
+    setTimeout(() => {
+      // Update the image source
+      heroImage.src = allImagesData[currentIndex];
 
-      const thumbWidthWithGap = activeThumbnail.offsetWidth + 10;
-      const wrapperTotalWidth = thumbnailsWrapper.scrollWidth;
-      const visibleContainerWidth = thumbnailSection.offsetWidth;
+      // Remove fade-out class to start fade-in
+      heroImage.classList.remove("fade-out");
 
-      let targetScrollOffset = 0;
+      // Update thumbnails
+      document.querySelectorAll(".thumbnail-item").forEach((thumb) => {
+        thumb.classList.remove("active");
+      });
 
-      if (allImagesData.length * thumbWidthWithGap <= visibleContainerWidth) {
-        targetScrollOffset = 0; // All thumbnails fit, no scrolling needed
-      } else {
-        const centerOffset = visibleContainerWidth / 2 - thumbWidthWithGap / 2;
-        targetScrollOffset = currentIndex * thumbWidthWithGap - centerOffset;
+      const activeThumbnail = document.querySelector(
+        `.thumbnail-item[data-index="${currentIndex}"]`
+      );
+      if (activeThumbnail) {
+        activeThumbnail.classList.add("active");
 
-        targetScrollOffset = Math.max(0, targetScrollOffset);
+        const thumbWidthWithGap = activeThumbnail.offsetWidth + 10;
+        const wrapperTotalWidth = thumbnailsWrapper.scrollWidth;
+        const visibleContainerWidth = thumbnailSection.offsetWidth;
 
-        const maxPossibleScroll = wrapperTotalWidth - visibleContainerWidth;
-        targetScrollOffset = Math.min(targetScrollOffset, maxPossibleScroll);
+        let targetScrollOffset = 0;
+
+        if (allImagesData.length * thumbWidthWithGap <= visibleContainerWidth) {
+          targetScrollOffset = 0; // All thumbnails fit, no scrolling needed
+        } else {
+          const centerOffset =
+            visibleContainerWidth / 2 - thumbWidthWithGap / 2;
+          targetScrollOffset = currentIndex * thumbWidthWithGap - centerOffset;
+
+          targetScrollOffset = Math.max(0, targetScrollOffset);
+
+          const maxPossibleScroll = wrapperTotalWidth - visibleContainerWidth;
+          targetScrollOffset = Math.min(targetScrollOffset, maxPossibleScroll);
+        }
+        thumbnailsWrapper.style.transform = `translateX(-${targetScrollOffset}px)`;
       }
-      thumbnailsWrapper.style.transform = `translateX(-${targetScrollOffset}px)`;
-    }
+
+      // Reset transition flag after animation completes
+      setTimeout(() => {
+        isTransitioning = false;
+      }, 300); // Match this with the CSS transition duration
+    }, 150); // Half of the transition duration for a smooth effect
   }
 
   function createThumbnails() {
@@ -68,8 +89,10 @@ document.addEventListener("DOMContentLoaded", function () {
       img.dataset.index = index;
 
       img.addEventListener("click", () => {
-        currentIndex = index;
-        updateGallery();
+        if (!isTransitioning) {
+          currentIndex = index;
+          updateGallery();
+        }
       });
       thumbnailsWrapper.appendChild(img);
     });
@@ -77,14 +100,18 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function showNext() {
-    currentIndex = (currentIndex + 1) % allImagesData.length;
-    updateGallery();
+    if (!isTransitioning) {
+      currentIndex = (currentIndex + 1) % allImagesData.length;
+      updateGallery();
+    }
   }
 
   function showPrev() {
-    currentIndex =
-      (currentIndex - 1 + allImagesData.length) % allImagesData.length;
-    updateGallery();
+    if (!isTransitioning) {
+      currentIndex =
+        (currentIndex - 1 + allImagesData.length) % allImagesData.length;
+      updateGallery();
+    }
   }
 
   nextArrow.addEventListener("click", showNext);
