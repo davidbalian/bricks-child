@@ -29,54 +29,52 @@ document.addEventListener("DOMContentLoaded", function () {
     if (isTransitioning) return;
     isTransitioning = true;
 
+    // Change the image source immediately
+    heroImage.src = allImagesData[currentIndex];
+
     // Add fade-out class to start the transition
     heroImage.classList.add("fade-out");
 
-    // Wait for the fade-out animation to complete
-    setTimeout(() => {
-      // Update the image source
-      heroImage.src = allImagesData[currentIndex];
+    // Update thumbnails
+    document.querySelectorAll(".thumbnail-item").forEach((thumb) => {
+      thumb.classList.remove("active");
+    });
 
-      // Remove fade-out class to start fade-in
-      heroImage.classList.remove("fade-out");
+    const activeThumbnail = document.querySelector(
+      `.thumbnail-item[data-index="${currentIndex}"]`
+    );
+    if (activeThumbnail) {
+      activeThumbnail.classList.add("active");
 
-      // Update thumbnails
-      document.querySelectorAll(".thumbnail-item").forEach((thumb) => {
-        thumb.classList.remove("active");
-      });
+      const thumbWidthWithGap = activeThumbnail.offsetWidth + 10;
+      const wrapperTotalWidth = thumbnailsWrapper.scrollWidth;
+      const visibleContainerWidth = thumbnailSection.offsetWidth;
 
-      const activeThumbnail = document.querySelector(
-        `.thumbnail-item[data-index="${currentIndex}"]`
-      );
-      if (activeThumbnail) {
-        activeThumbnail.classList.add("active");
+      let targetScrollOffset = 0;
 
-        const thumbWidthWithGap = activeThumbnail.offsetWidth + 10;
-        const wrapperTotalWidth = thumbnailsWrapper.scrollWidth;
-        const visibleContainerWidth = thumbnailSection.offsetWidth;
+      if (allImagesData.length * thumbWidthWithGap <= visibleContainerWidth) {
+        targetScrollOffset = 0; // All thumbnails fit, no scrolling needed
+      } else {
+        const centerOffset = visibleContainerWidth / 2 - thumbWidthWithGap / 2;
+        targetScrollOffset = currentIndex * thumbWidthWithGap - centerOffset;
 
-        let targetScrollOffset = 0;
+        targetScrollOffset = Math.max(0, targetScrollOffset);
 
-        if (allImagesData.length * thumbWidthWithGap <= visibleContainerWidth) {
-          targetScrollOffset = 0; // All thumbnails fit, no scrolling needed
-        } else {
-          const centerOffset =
-            visibleContainerWidth / 2 - thumbWidthWithGap / 2;
-          targetScrollOffset = currentIndex * thumbWidthWithGap - centerOffset;
-
-          targetScrollOffset = Math.max(0, targetScrollOffset);
-
-          const maxPossibleScroll = wrapperTotalWidth - visibleContainerWidth;
-          targetScrollOffset = Math.min(targetScrollOffset, maxPossibleScroll);
-        }
-        thumbnailsWrapper.style.transform = `translateX(-${targetScrollOffset}px)`;
+        const maxPossibleScroll = wrapperTotalWidth - visibleContainerWidth;
+        targetScrollOffset = Math.min(targetScrollOffset, maxPossibleScroll);
       }
+      thumbnailsWrapper.style.transform = `translateX(-${targetScrollOffset}px)`;
+    }
 
-      // Reset transition flag after animation completes
-      setTimeout(() => {
-        isTransitioning = false;
-      }, 300); // Match this with the CSS transition duration
-    }, 150); // Half of the transition duration for a smooth effect
+    // Remove fade-out class to start fade-in
+    requestAnimationFrame(() => {
+      heroImage.classList.remove("fade-out");
+    });
+
+    // Reset transition flag after animation completes
+    setTimeout(() => {
+      isTransitioning = false;
+    }, 50); // Match this with the CSS transition duration
   }
 
   function createThumbnails() {
