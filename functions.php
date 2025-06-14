@@ -47,8 +47,6 @@ require_once get_stylesheet_directory() . '/includes/notifications/email-verific
 require_once get_stylesheet_directory() . '/includes/legal/legal-pages.php';
 require_once get_stylesheet_directory() . '/includes/legal/cookie-consent.php';
 
-// Include shortcodes
-require_once get_stylesheet_directory() . '/includes/shortcodes/car-gallery-slider.php';
 
 /**
  * Register and enqueue custom scripts and styles.
@@ -76,9 +74,7 @@ add_action( 'wp_enqueue_scripts', function() {
     // Enqueue single car gallery styles and scripts
     if ( is_singular('car') ) {
         $theme_dir = get_stylesheet_directory_uri();
-        wp_enqueue_style( 'single-car-gallery', $theme_dir . '/includes/single-car/single-car-gallery.css', array(), filemtime( get_stylesheet_directory() . '/includes/single-car/single-car-gallery.css' ) );
         wp_enqueue_style( 'single-car-main-gallery', $theme_dir . '/includes/single-car/single-car-main-gallery.css', array(), filemtime( get_stylesheet_directory() . '/includes/single-car/single-car-main-gallery.css' ) );
-        wp_enqueue_script( 'single-car-gallery', $theme_dir . '/includes/single-car/single-car-gallery.js', array( 'jquery' ), filemtime( get_stylesheet_directory() . '/includes/single-car/single-car-gallery.js' ), true );
         wp_enqueue_script( 'single-car-main-gallery', $theme_dir . '/includes/single-car/single-car-main-gallery.js', array( 'jquery' ), filemtime( get_stylesheet_directory() . '/includes/single-car/single-car-main-gallery.js' ), true );
     }
 } );
