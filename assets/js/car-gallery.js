@@ -6,7 +6,10 @@ jQuery(document).ready(function ($) {
     arrows: true,
     fade: true,
     asNavFor: ".thumbnail-slider",
-    adaptiveHeight: true,
+    adaptiveHeight: false,
+    infinite: true,
+    speed: 500,
+    cssEase: "linear",
   });
 
   // Initialize thumbnail slider
@@ -39,7 +42,7 @@ jQuery(document).ready(function ($) {
     slidesToScroll: 1,
     arrows: true,
     fade: true,
-    adaptiveHeight: true,
+    adaptiveHeight: false,
   });
 
   // Update current slide number
