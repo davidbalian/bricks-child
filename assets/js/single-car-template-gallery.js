@@ -23,11 +23,14 @@ jQuery(document).ready(function ($) {
       dots: false,
       arrows: false,
       infinite: true,
-      speed: 100,
+      speed: 300,
       slidesToShow: 1,
       slidesToScroll: 1,
-      fade: true,
+      centerMode: true,
+      variableWidth: true,
+      fade: false,
       adaptiveHeight: true,
+      cssEase: 'ease-out'
     });
 
     // Custom arrow functionality
@@ -219,11 +222,14 @@ jQuery(document).ready(function ($) {
         dots: false,
         arrows: false,
         infinite: true,
-        speed: 100,
+        speed: 300,
         slidesToShow: 1,
         slidesToScroll: 1,
-        fade: true,
+        centerMode: true,
+        variableWidth: true,
+        fade: false,
         initialSlide: currentSlide,
+        cssEase: 'ease-out'
       });
 
       // Lightbox navigation

@@ -1,9 +1,11 @@
 /* Single Car Template Gallery Styles */
 .single-car-template-gallery-wrapper {
-  position: absolute;
-  left: 0;
-  right: 0;
-  background-color: white;
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  background: var(--light-bg);
+  border-radius: var(--border-radius);
   overflow: hidden;
 }
 
@@ -27,6 +29,12 @@
   width: 100%;
   height: 100%;
   aspect-ratio: 4 / 3;
+  opacity: 0;
+  transition: opacity var(--transition-time) ease;
+}
+
+.main-image-slider .slick-center {
+  opacity: 1;
 }
 
 .main-image {
@@ -599,4 +607,13 @@ body.lightbox-open {
     height: 60px;
     min-width: 80px;
   }
+}
+
+.lightbox-slider .slick-slide {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.lightbox-slider .slick-slide.slick-active {
+  opacity: 1;
 }
