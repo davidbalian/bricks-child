@@ -1,6 +1,6 @@
 <?php
 /**
- * The template for displaying single Car posts
+ * The template for displaying single car listings
  *
  * @package Astra Child
  * @since 1.0.0
@@ -57,6 +57,11 @@ get_header(); // Ensure Astra's header is loaded
 
 // Include the separated display file
 include get_stylesheet_directory() . '/includes/single-car/single-car-display.php';
+
+// Add the gallery section
+echo '<div class="car-gallery-section">';
+echo do_shortcode('[car_gallery]');
+echo '</div>';
 
 get_footer(); // Ensure Astra's footer is loaded
 ?> 
