@@ -297,7 +297,7 @@ jQuery(document).ready(function ($) {
 
       // Close lightbox functionality
       function closeLightbox() {
-        $lightbox.fadeOut(300, function () {
+        $lightbox.fadeOut(100, function () {
           $(this).remove();
           $("body").removeClass("lightbox-open");
         });
