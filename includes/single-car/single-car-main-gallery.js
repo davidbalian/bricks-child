@@ -111,18 +111,4 @@ jQuery(document).ready(function ($) {
       $("body").css("overflow", "");
     }
   });
-
-  // Ensure all images have the same height
-  function equalizeImageHeights() {
-    var maxHeight = 0;
-    $(".hero-slide img").each(function () {
-      var height = $(this).height();
-      maxHeight = height > maxHeight ? height : maxHeight;
-    });
-    $(".hero-slide img").height(maxHeight);
-  }
-
-  // Call on load and resize
-  $(window).on("load resize", equalizeImageHeights);
-  $(".hero-slider").on("setPosition", equalizeImageHeights);
 });
