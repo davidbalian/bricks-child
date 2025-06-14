@@ -60,7 +60,7 @@ include get_stylesheet_directory() . '/includes/single-car/single-car-display.ph
 
 // Add the gallery section
 echo '<div class="car-gallery-section">';
-echo do_shortcode('[car_gallery_slider]');
+echo do_shortcode('[car_gallery]');
 echo '</div>';
 
 get_footer(); // Ensure Astra's footer is loaded
