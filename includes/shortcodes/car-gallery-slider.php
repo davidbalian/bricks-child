@@ -29,9 +29,33 @@ function car_gallery_slider_shortcode( $atts ) {
         return '<!-- Car Gallery: Post ID not found -->';
     }
 
-    // Get images from ACF gallery field 'car_images'.
-    $images = get_field( 'car_images', $post_id );
+    // Get image IDs from ACF gallery field 'car_images'.
+    $image_ids = get_field( 'car_images', $post_id );
+    $images = [];
 
+    if ( ! empty( $image_ids ) && is_array($image_ids) ) {
+        foreach ( $image_ids as $image_id ) {
+            $image_id = (int) $image_id;
+            if ( ! $image_id ) continue;
+
+            $thumb_src = wp_get_attachment_image_src( $image_id, 'thumbnail' );
+            $medium_large_src = wp_get_attachment_image_src( $image_id, 'medium_large' );
+            $full_src = wp_get_attachment_url( $image_id );
+
+            if ( $thumb_src && $medium_large_src ) {
+                $images[] = [
+                   'ID' => $image_id,
+                   'url' => $full_src,
+                   'sizes' => [
+                       'thumbnail' => $thumb_src[0],
+                       'medium_large' => $medium_large_src[0],
+                   ]
+               ];
+            }
+        }
+    }
+
+    // Fallback if ACF field is empty
     if ( empty( $images ) ) {
         // Try to get attached images as a fallback
         $attached_images = get_attached_media('image', $post_id);
