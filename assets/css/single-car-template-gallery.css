@@ -225,6 +225,16 @@
   right: 2rem;
 }
 
+.lightbox-counter {
+  top: 2rem;
+  left: 2rem;
+}
+
+.lightbox-close {
+  top: 2rem;
+  right: 2rem;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   .single-car-template-gallery-wrapper {
