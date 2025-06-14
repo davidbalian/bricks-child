@@ -14,7 +14,7 @@ jQuery(document).ready(function ($) {
     adaptiveHeight: false,
     swipe: true,
     touchThreshold: 10,
-    speed: 200,
+    speed: 100,
     cssEase: "linear",
     responsive: [
       {
@@ -35,7 +35,7 @@ jQuery(document).ready(function ($) {
     centerMode: false,
     focusOnSelect: true,
     arrows: true,
-    speed: 200,
+    speed: 100,
     cssEase: "linear",
     responsive: [
       {
