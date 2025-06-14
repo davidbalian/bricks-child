@@ -32,9 +32,10 @@ jQuery(document).ready(function ($) {
     slidesToScroll: 1,
     asNavFor: ".hero-slider",
     dots: false,
+    adaptiveHeight: false,
     centerMode: false,
     focusOnSelect: true,
-    arrows: true,
+    arrows: false,
     speed: 100,
     cssEase: "linear",
     responsive: [
