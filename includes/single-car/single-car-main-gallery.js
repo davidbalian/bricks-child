@@ -11,9 +11,11 @@ jQuery(document).ready(function ($) {
     arrows: true,
     fade: true,
     asNavFor: ".thumbnail-slider",
-    adaptiveHeight: true,
+    adaptiveHeight: false,
     swipe: true,
     touchThreshold: 10,
+    speed: 200,
+    cssEase: "linear",
     responsive: [
       {
         breakpoint: 768,
@@ -33,6 +35,8 @@ jQuery(document).ready(function ($) {
     centerMode: false,
     focusOnSelect: true,
     arrows: true,
+    speed: 200,
+    cssEase: "linear",
     responsive: [
       {
         breakpoint: 768,
@@ -44,15 +48,29 @@ jQuery(document).ready(function ($) {
     ],
   });
 
+  // Ensure all images have the same height
+  function equalizeImageHeights() {
+    var maxHeight = 0;
+    $(".hero-slide img").each(function () {
+      var height = $(this).height();
+      maxHeight = height > maxHeight ? height : maxHeight;
+    });
+    $(".hero-slide img").height(maxHeight);
+  }
+
+  // Call on load and resize
+  $(window).on("load resize", equalizeImageHeights);
+  $(".hero-slider").on("setPosition", equalizeImageHeights);
+
   // Handle view gallery button click
   $(".view-gallery-btn").on("click", function () {
-    $(".gallery-popup").fadeIn(300);
+    $(".gallery-popup").fadeIn(200);
     $("body").css("overflow", "hidden");
   });
 
   // Handle back to advert button click
   $(".back-to-advert-btn").on("click", function () {
-    $(".gallery-popup").fadeOut(300);
+    $(".gallery-popup").fadeOut(200);
     $("body").css("overflow", "");
   });
 
@@ -62,7 +80,7 @@ jQuery(document).ready(function ($) {
       $(e.target).closest(".gallery-popup-content").length === 0 &&
       $(e.target).closest(".view-gallery-btn").length === 0
     ) {
-      $(".gallery-popup").fadeOut(300);
+      $(".gallery-popup").fadeOut(200);
       $("body").css("overflow", "");
     }
   });
