@@ -12,7 +12,7 @@ jQuery(document).ready(function ($) {
       dots: false,
       arrows: false,
       infinite: true,
-      speed: 300,
+      speed: 100,
       slidesToShow: 1,
       slidesToScroll: 1,
       fade: true,
