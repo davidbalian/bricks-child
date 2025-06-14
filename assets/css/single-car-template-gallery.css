@@ -47,14 +47,10 @@
   transform: translateY(-50%);
   display: flex;
   justify-content: space-between;
-  pointer-events: none;
   z-index: 3;
 }
 
-/* Common Button Styles */
-.slider-arrow,
-.lightbox-close,
-.lightbox-arrow {
+.slider-arrow {
   background: white;
   color: black;
   border: none;
@@ -69,21 +65,17 @@
   justify-content: center;
   transition: opacity 0.2s ease;
   opacity: 0.75;
+  pointer-events: auto;
 }
 
-.slider-arrow:hover,
-.lightbox-close:hover,
-.lightbox-arrow:hover {
+.slider-arrow:hover {
   opacity: 1;
 }
 
-.slider-arrow:active,
-.lightbox-close:active,
-.lightbox-arrow:active {
+.slider-arrow:active {
   transform: scale(0.95);
 }
 
-/* Button-specific overrides */
 .slider-prev {
   margin-left: 20px;
 }
