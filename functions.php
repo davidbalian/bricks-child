@@ -48,7 +48,6 @@ require_once get_stylesheet_directory() . '/includes/legal/legal-pages.php';
 require_once get_stylesheet_directory() . '/includes/legal/cookie-consent.php';
 
 // Include shortcodes
-require_once get_stylesheet_directory() . '/includes/shortcodes/car-gallery-shortcode.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-gallery-slider.php';
 
 /**
