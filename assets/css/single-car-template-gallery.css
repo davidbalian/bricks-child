@@ -173,7 +173,7 @@
   border-radius: var(--border-radius-small);
   overflow: hidden;
   background: var(--light-bg);
-  border: 2px solid transparent;
+  border: 1px solid var(--borders);
   transition: all var(--transition-time) ease;
   cursor: pointer;
   position: relative;
@@ -501,7 +501,7 @@
   border-radius: var(--border-radius-small);
   overflow: hidden;
   background: var(--light-bg);
-  border: 2px solid transparent;
+    border: 1px solid var(--borders);
   transition: all var(--transition-time) ease;
   cursor: pointer;
   position: relative;
