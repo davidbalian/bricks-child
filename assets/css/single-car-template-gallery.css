@@ -190,14 +190,14 @@
 .row-image-item img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   display: block;
   transition: transform var(--transition-time) ease;
 }
 
 .lightbox-nav {
-  left: 2rem !important;
-  right: 2rem !important;
+  left: -6rem !important;
+  right: -6rem !important;
 }
 
 .lightbox-counter {
@@ -514,7 +514,7 @@
 .lightbox-thumbnail-item img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   display: block;
   transition: transform var(--transition-time) ease;
 }
