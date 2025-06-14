@@ -131,7 +131,7 @@ function single_car_template_gallery_shortcode( $atts ) {
 			<!-- Photo Count Overlay (Top Left) -->
 			<div class="photo-count-overlay">
 				<i class="fas fa-camera"></i>
-				<span class="current-photo">1</span>/<span class="total-photos"><?php echo $image_count; ?></span> photos
+				<span class="current-photo">1</span>/<span class="total-photos"><?php echo $image_count; ?> </span>photos
 			</div>
 			
 			<!-- View All Images Button (Bottom Right) -->
