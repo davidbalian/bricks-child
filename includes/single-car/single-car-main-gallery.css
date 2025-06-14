@@ -9,6 +9,110 @@
   margin-bottom: 20px;
 }
 
+/* Full Page Lightbox Styles */
+.fullpage-gallery {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  display: none;
+}
+
+.fullpage-gallery.active {
+  display: block;
+}
+
+.fullpage-gallery-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fullpage-slider {
+  width: 100%;
+  height: 100%;
+}
+
+.fullpage-slide {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fullpage-slide img {
+  max-width: 90%;
+  max-height: 90vh;
+  object-fit: contain;
+}
+
+.fullpage-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 2;
+  transition: background-color 0.2s ease;
+}
+
+.fullpage-nav:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.fullpage-nav.prev {
+  left: 20px;
+}
+
+.fullpage-nav.next {
+  right: 20px;
+}
+
+.fullpage-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 2;
+  transition: background-color 0.2s ease;
+}
+
+.fullpage-close:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.fullpage-counter {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  z-index: 2;
+}
+
 /* Hero Image Section */
 .hero-section {
   position: relative;
@@ -146,6 +250,20 @@
   }
 
   .hero-slider .slick-next {
+    right: 10px;
+  }
+
+  .fullpage-nav {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .fullpage-nav.prev {
+    left: 10px;
+  }
+
+  .fullpage-nav.next {
     right: 10px;
   }
 }

@@ -178,6 +178,28 @@ if (have_posts()) :
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Full Page Lightbox -->
+                            <div class="fullpage-gallery">
+                                <div class="fullpage-gallery-content">
+                                    <div class="fullpage-slider">
+                                        <?php foreach ($all_images as $image_id) : 
+                                            $image_url = wp_get_attachment_image_url($image_id, 'full');
+                                        ?>
+                                            <div class="fullpage-slide">
+                                                <img src="<?php echo esc_url($image_url); ?>" alt="Car image">
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    <button class="fullpage-nav prev">&#10094;</button>
+                                    <button class="fullpage-nav next">&#10095;</button>
+                                    <button class="fullpage-close">&times;</button>
+                                    <div class="fullpage-counter">
+                                        <i class="fas fa-camera"></i>
+                                        <span class="fullpage-current">1</span>/<span class="fullpage-total"><?php echo count($all_images); ?></span> photos
+                                    </div>
+                                </div>
+                            </div>
                         <?php endif; ?>
 
                         <div class="car-listing-details-right">

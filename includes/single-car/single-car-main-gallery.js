@@ -48,9 +48,68 @@ jQuery(document).ready(function ($) {
     ],
   });
 
-  // Update current slide number
+  // Initialize fullpage slider
+  $(".fullpage-slider").slick({
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    arrows: false,
+    fade: true,
+    speed: 100,
+    cssEase: "linear",
+  });
+
+  // Update current slide number for main gallery
   $(".hero-slider").on("afterChange", function (event, slick, currentSlide) {
     $(".current-slide").text(currentSlide + 1);
+  });
+
+  // Update current slide number for fullpage gallery
+  $(".fullpage-slider").on(
+    "afterChange",
+    function (event, slick, currentSlide) {
+      $(".fullpage-current").text(currentSlide + 1);
+    }
+  );
+
+  // Handle view gallery button click
+  $(".view-gallery-btn").on("click", function () {
+    $(".fullpage-gallery").addClass("active");
+    $("body").css("overflow", "hidden");
+
+    // Sync fullpage slider with main slider
+    var currentSlide = $(".hero-slider").slick("slickCurrentSlide");
+    $(".fullpage-slider").slick("slickGoTo", currentSlide);
+  });
+
+  // Handle fullpage navigation
+  $(".fullpage-nav.prev").on("click", function () {
+    $(".fullpage-slider").slick("slickPrev");
+  });
+
+  $(".fullpage-nav.next").on("click", function () {
+    $(".fullpage-slider").slick("slickNext");
+  });
+
+  // Handle fullpage close
+  $(".fullpage-close").on("click", function () {
+    $(".fullpage-gallery").removeClass("active");
+    $("body").css("overflow", "");
+  });
+
+  // Close fullpage gallery on escape key
+  $(document).on("keydown", function (e) {
+    if (e.key === "Escape" && $(".fullpage-gallery").hasClass("active")) {
+      $(".fullpage-gallery").removeClass("active");
+      $("body").css("overflow", "");
+    }
+  });
+
+  // Close fullpage gallery when clicking outside the image
+  $(".fullpage-gallery").on("click", function (e) {
+    if ($(e.target).hasClass("fullpage-gallery")) {
+      $(".fullpage-gallery").removeClass("active");
+      $("body").css("overflow", "");
+    }
   });
 
   // Ensure all images have the same height
@@ -66,27 +125,4 @@ jQuery(document).ready(function ($) {
   // Call on load and resize
   $(window).on("load resize", equalizeImageHeights);
   $(".hero-slider").on("setPosition", equalizeImageHeights);
-
-  // Handle view gallery button click
-  $(".view-gallery-btn").on("click", function () {
-    $(".gallery-popup").fadeIn(200);
-    $("body").css("overflow", "hidden");
-  });
-
-  // Handle back to advert button click
-  $(".back-to-advert-btn").on("click", function () {
-    $(".gallery-popup").fadeOut(200);
-    $("body").css("overflow", "");
-  });
-
-  // Close gallery popup when clicking outside
-  $(document).on("click", function (e) {
-    if (
-      $(e.target).closest(".gallery-popup-content").length === 0 &&
-      $(e.target).closest(".view-gallery-btn").length === 0
-    ) {
-      $(".gallery-popup").fadeOut(200);
-      $("body").css("overflow", "");
-    }
-  });
 });
