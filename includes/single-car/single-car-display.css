@@ -2,607 +2,478 @@
 
 /* Styles copied directly from single-car.php */
 .car-listing-detailed-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 .car-listing-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .car-listing-header h1 {
-    margin: 0 0 10px 0;
-    font-size: 2em;
+  margin: 0 0 10px 0;
+  font-size: 2em;
 }
 
 .car-listing-price {
-    font-size: 1.8em;
-    font-weight: bold;
-    color: #007bff;
+  font-size: 1.8em;
+  font-weight: bold;
+  color: #007bff;
 }
 
 .car-listing-content {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
 }
 
 .car-listing-top {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-}
-
-/* Image Gallery Styles */
-.car-listing-gallery {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    max-height: 100vh;
-}
-
-.main-image {
-    position: relative;
-    width: 100%;
-    height: 400px;
-    border-radius: 8px;
-    overflow: hidden;
-    cursor: pointer;
-}
-
-.main-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.main-image:hover img {
-    transform: scale(1.05);
-}
-
-.image-count-overlay {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    z-index: 2;
-}
-
-.thumbnail-gallery {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #ccc transparent;
-    padding-bottom: 10px;
-    width: 100%;
-    justify-content: space-between;
-}
-
-.thumbnail-gallery::-webkit-scrollbar {
-    height: 6px;
-}
-
-.thumbnail-gallery::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.thumbnail-gallery::-webkit-scrollbar-thumb {
-    background-color: #ccc;
-    border-radius: 3px;
-}
-
-.thumbnail {
-    width: 180px;
-    height: 135px;
-    border-radius: 4px;
-    overflow: hidden;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: border-color 0.2s ease;
-    flex-shrink: 0;
-}
-
-.thumbnail.active {
-    border-color: #007bff;
-}
-
-.thumbnail img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
 }
 
 .car-listing-details-right {
-    padding: 20px;
-    border-radius: 8px;
+  padding: 20px;
+  border-radius: 8px;
 }
 
 .car-title {
-    margin: 0 0 15px 0;
-    font-size: 2em;
-    color: #333;
+  margin: 0 0 15px 0;
+  font-size: 2em;
+  color: #333;
 }
 
 .description-content {
-    margin-bottom: 20px;
-    line-height: 1.6;
-    color: #333;
+  margin-bottom: 20px;
+  line-height: 1.6;
+  color: #333;
 }
 
 .description-text {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .car-specs {
-    font-size: 1.1em;
-    color: #666;
-    margin-bottom: 15px;
+  font-size: 1.1em;
+  color: #666;
+  margin-bottom: 15px;
 }
 
 .car-info-boxes {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
 .info-box {
-    flex: 1;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 8px 12px;
-    text-align: center;
+  flex: 1;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 12px;
+  text-align: center;
 }
 
 .info-value {
-    display: block;
-    font-size: 0.95em;
-    color: #333;
-    font-weight: 500;
+  display: block;
+  font-size: 0.95em;
+  color: #333;
+  font-weight: 500;
 }
 
 .car-price {
-    font-size: 1.8em;
-    font-weight: bold;
-    color: #007bff;
-    margin-bottom: 10px;
+  font-size: 1.8em;
+  font-weight: bold;
+  color: #007bff;
+  margin-bottom: 10px;
 }
 
 .car-location {
-    color: #666;
-    font-size: 1.1em;
-    margin-bottom: 10px;
+  color: #666;
+  font-size: 1.1em;
+  margin-bottom: 10px;
 }
 
 .car-seller {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    background: #f8f9fa;
-    padding: 12px 15px;
-    border-radius: 6px;
-    margin-top: 15px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #f8f9fa;
+  padding: 12px 15px;
+  border-radius: 6px;
+  margin-top: 15px;
 }
 
 .car-seller i {
-    color: #007bff;
-    font-size: 1.2em;
-    margin-top: 3px;
+  color: #007bff;
+  font-size: 1.2em;
+  margin-top: 3px;
 }
 
 .seller-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .seller-name {
-    color: #333;
-    font-weight: 500;
+  color: #333;
+  font-weight: 500;
 }
 
 .seller-full-name {
-    color: #666;
-    font-size: 0.9em;
+  color: #666;
+  font-size: 0.9em;
 }
 
 .seller-email {
-    color: #666;
-    font-size: 0.9em;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  color: #666;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .seller-email i {
-    color: #007bff;
-    font-size: 0.9em;
+  color: #007bff;
+  font-size: 0.9em;
 }
 
 .car-listing-details {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
 }
 
 .details-section {
-    margin-bottom: 30px;
+  margin-bottom: 30px;
 }
 
 .details-section h2 {
-    margin: 0 0 20px 0;
-    font-size: 1.5em;
-    color: #333;
+  margin: 0 0 20px 0;
+  font-size: 1.5em;
+  color: #333;
 }
 
 .details-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
 }
 
 .detail-item {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .detail-label {
-    font-weight: bold;
-    color: #666;
+  color: #666;
+  font-size: 0.9em;
 }
 
 .detail-value {
-    color: #333;
+  color: #333;
+  font-weight: 500;
 }
 
 .back-to-results-btn {
-    display: inline-block;
-    color: #007bff;
-    text-decoration: none;
-    margin-bottom: 20px;
-    font-size: 14px;
-    font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  text-decoration: none;
+  font-size: 0.95em;
+  transition: color 0.2s ease;
 }
 
 .back-to-results-btn:hover {
-    text-decoration: underline;
+  color: #007bff;
 }
 
 .sold-badge {
-    display: inline-block;
-    background-color: #dc3545;
-    color: white;
-    padding: 5px 15px;
-    border-radius: 4px;
-    font-weight: bold;
-    margin-bottom: 15px;
+  display: inline-block;
+  background: #dc3545;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-weight: 500;
+  margin-bottom: 10px;
 }
 
-/* Specs and Features Styles */
 .specs-features-toggle {
-    background: none;
-    border: none;
-    color: #007bff;
-    font-size: 1.1em;
-    font-weight: 500;
-    padding: 0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 1em;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 15px;
 }
 
 .specs-features-toggle:hover {
-    text-decoration: underline;
+  color: #0056b3;
 }
 
 .specs-features-toggle i {
-    transition: transform 0.3s ease;
+  transition: transform 0.2s ease;
 }
 
 .specs-features-toggle.active i {
-    transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 
 .extras-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
 }
 
 .extra-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    background: #fff;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+  font-size: 0.95em;
 }
 
 .extra-item i {
-    color: #28a745;
-    font-size: 14px;
+  color: #28a745;
+  font-size: 0.9em;
 }
 
 .extra-item span {
-    color: #333;
-    font-size: 0.95em;
+  color: #333;
 }
 
-/* Action Buttons */
 .action-buttons {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
-/* Override favorite button position for detailed page - needs to be more specific */
 .car-listing-detailed-container .action-buttons .favorite-btn {
-    position: static !important; /* Reset position from car-listings.css absolute positioning */
-    top: auto !important;
-    right: auto !important;
-    background: rgba(255, 255, 255, 0.9) !important;
-    border: 1px solid #ddd !important;
-    padding: 10px !important;
-    width: auto !important;
-    height: auto !important;
-    border-radius: 4px !important;
-    min-width: 40px !important;
-    min-height: 40px !important;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 .car-listing-detailed-container .action-buttons .share-btn {
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #ddd;
-    cursor: pointer;
-    padding: 10px;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-    min-width: 40px;
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 .car-listing-detailed-container .action-buttons .favorite-btn:hover,
 .car-listing-detailed-container .action-buttons .share-btn:hover {
-    background: #f0f0f0 !important;
-    border-color: #007bff !important;
+  background: #f8f9fa;
 }
 
 .car-listing-detailed-container .action-buttons .favorite-btn i,
 .car-listing-detailed-container .action-buttons .share-btn i {
-    font-size: 18px !important;
-    color: #333 !important;
+  font-size: 1.2em;
 }
 
 .car-listing-detailed-container .action-buttons .favorite-btn.active i {
-    color: #ff0000 !important;
+  color: #dc3545;
 }
 
-/* Report Button */
 .car-listing-detailed-container .action-buttons .report-btn {
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #ddd;
-    cursor: pointer;
-    padding: 10px;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-    min-width: 40px;
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 .car-listing-detailed-container .action-buttons .report-btn:hover {
-    background: #f0f0f0 !important;
-    border-color: #007bff !important;
+  background: #f8f9fa;
 }
 
 .car-listing-detailed-container .action-buttons .report-btn i {
-    font-size: 18px !important;
-    color: #333 !important;
+  font-size: 1.2em;
 }
 
-/* Report Modal */
 .report-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
 .report-modal-content {
-    background: white;
-    padding: 0;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .report-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid #eee;
-    background: #f8f9fa;
-    border-radius: 8px 8px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
 }
 
 .report-modal-header h3 {
-    margin: 0;
-    color: #333;
-    font-size: 1.3em;
+  margin: 0;
+  font-size: 1.3em;
+  color: #333;
 }
 
 .close-report-modal {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #666;
-    padding: 0;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: background-color 0.2s ease;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 1.2em;
+  transition: color 0.2s ease;
 }
 
 .close-report-modal:hover {
-    background-color: #e9ecef;
-    color: #333;
+  color: #333;
 }
 
 #report-listing-form {
-    padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .report-form-group {
-    margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .report-form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 500;
-    color: #333;
+  color: #333;
+  font-weight: 500;
+  font-size: 0.95em;
 }
 
 .report-form-group select,
-.report-form-group textarea,
 .report-form-group input[type="email"] {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: inherit;
-    transition: border-color 0.2s ease;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95em;
+  color: #333;
 }
 
 .report-form-group select:focus,
-.report-form-group textarea:focus,
 .report-form-group input[type="email"]:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  outline: none;
+  border-color: #007bff;
 }
 
 .report-form-group textarea {
-    resize: vertical;
-    min-height: 80px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+  min-height: 100px;
 }
 
 .report-form-group small {
-    display: block;
-    margin-top: 4px;
-    color: #666;
-    font-size: 12px;
+  color: #666;
+  font-size: 0.85em;
 }
 
 .report-form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .cancel-report-btn,
 .submit-report-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .cancel-report-btn {
-    background: #f8f9fa;
-    color: #666;
-    border: 1px solid #ddd;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  color: #666;
 }
 
 .cancel-report-btn:hover {
-    background: #e9ecef;
-    color: #333;
+  background: #e9ecef;
 }
 
 .submit-report-btn {
-    background: #dc3545;
-    color: white;
+  background: #007bff;
+  border: none;
+  color: white;
 }
 
 .submit-report-btn:hover {
-    background: #c82333;
+  background: #0056b3;
 }
 
 .submit-report-btn:disabled {
-    background: #6c757d;
-    cursor: not-allowed;
+  background: #ccc;
+  cursor: not-allowed;
 }
 
-/* Read More Button */
 .read-more-btn {
-    background: none;
-    border: none;
-    color: #007bff;
-    cursor: pointer;
-    font-weight: 500;
-    padding: 0;
-    text-decoration: underline;
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.95em;
+  text-decoration: underline;
 }
 
 .read-more-btn:hover {
-    color: #0056b3;
+  color: #0056b3;
 }
 
-/* Car Publication Date */
 .car-publication-date {
-    color: #666;
-    font-size: 0.9em;
-    margin-bottom: 10px;
+  color: #666;
+  font-size: 0.9em;
+  margin-bottom: 10px;
 }
 
 @media (max-width: 768px) {
-    .car-listing-top {
-        grid-template-columns: 1fr;
-    }
-} 
+  .car-listing-top {
+    grid-template-columns: 1fr;
+  }
+}
