@@ -15,8 +15,8 @@ function car_gallery_slider_shortcode() {
     // Get the current post ID
     $post_id = get_the_ID();
     
-    // Get gallery images
-    $gallery_images = get_post_meta($post_id, 'gallery_images', true);
+    // Get gallery images from ACF field
+    $gallery_images = get_field('car_images', $post_id);
     if (empty($gallery_images)) {
         return '';
     }
@@ -35,18 +35,22 @@ function car_gallery_slider_shortcode() {
     <div class="car-gallery-container">
         <!-- Hero Slider -->
         <div class="hero-slider">
-            <?php foreach ($gallery_images as $image) : ?>
+            <?php foreach ($gallery_images as $image_id) : 
+                $image_url = wp_get_attachment_image_url($image_id, 'large');
+            ?>
                 <div class="hero-slide">
-                    <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr(get_the_title()); ?>" class="hero-image">
+                    <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr(get_the_title()); ?>" class="hero-image">
                 </div>
             <?php endforeach; ?>
         </div>
 
         <!-- Thumbnail Slider -->
         <div class="thumbnail-slider">
-            <?php foreach ($gallery_images as $image) : ?>
+            <?php foreach ($gallery_images as $image_id) : 
+                $thumb_url = wp_get_attachment_image_url($image_id, 'thumbnail');
+            ?>
                 <div class="thumbnail-slide">
-                    <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr(get_the_title()); ?>" class="thumbnail-image">
+                    <img src="<?php echo esc_url($thumb_url); ?>" alt="<?php echo esc_attr(get_the_title()); ?>" class="thumbnail-image">
                 </div>
             <?php endforeach; ?>
         </div>
@@ -57,9 +61,11 @@ function car_gallery_slider_shortcode() {
         <!-- Full Page Gallery -->
         <div class="fullpage-gallery">
             <div class="fullpage-slider">
-                <?php foreach ($gallery_images as $image) : ?>
+                <?php foreach ($gallery_images as $image_id) : 
+                    $full_url = wp_get_attachment_image_url($image_id, 'full');
+                ?>
                     <div class="fullpage-slide">
-                        <img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr(get_the_title()); ?>" class="fullpage-image">
+                        <img src="<?php echo esc_url($full_url); ?>" alt="<?php echo esc_attr(get_the_title()); ?>" class="fullpage-image">
                     </div>
                 <?php endforeach; ?>
             </div>
