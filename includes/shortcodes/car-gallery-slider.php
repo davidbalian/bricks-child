@@ -17,37 +17,54 @@ add_shortcode( 'car_gallery_slider', 'car_gallery_slider_shortcode' );
  * @return string The gallery HTML.
  */
 function car_gallery_slider_shortcode( $atts ) {
-	// Ensure we are on a single car page.
+	// Ensure we are on a single car page or in the Bricks builder.
 	if ( ! is_singular( 'car' ) && ! ( defined( 'BRICKS_IS_BUILDER' ) && BRICKS_IS_BUILDER ) ) {
 		return '';
 	}
 
-    global $post;
-    $post_id = $post->ID;
+    // Use get_the_ID() for better compatibility with Bricks templates.
+    $post_id = get_the_ID();
+
+    if ( ! $post_id ) {
+        return '<!-- Car Gallery: Post ID not found -->';
+    }
 
     // Get images from ACF gallery field 'car_images'.
     $images = get_field( 'car_images', $post_id );
 
     if ( empty( $images ) ) {
         // Try to get attached images as a fallback
-        $images = get_attached_media('image', $post_id);
-        if (empty($images)) {
-            return '<p>No images found for this listing.</p>';
+        $attached_images = get_attached_media('image', $post_id);
+        if (empty($attached_images)) {
+            if ( current_user_can( 'edit_posts' ) ) {
+                return '<p>No images found for this listing (ID: ' . esc_html($post_id) . '). Please add images to the "car_images" gallery field or attach them to the post.</p>';
+            }
+            return '<!-- No images found for this car listing -->';
         }
         // format to match ACF
-        $formatted_images = [];
-        foreach($images as $image_post) {
-            $formatted_images[] = [
-                'ID' => $image_post->ID,
-                'url' => wp_get_attachment_url($image_post->ID),
-                'sizes' => [
-                    'thumbnail' => wp_get_attachment_image_src($image_post->ID, 'thumbnail')[0],
-                    'medium_large' => wp_get_attachment_image_src($image_post->ID, 'medium_large')[0],
-                ]
-            ];
+        $images = [];
+        foreach($attached_images as $image_post) {
+            $image_id = $image_post->ID;
+            $thumb_src = wp_get_attachment_image_src($image_id, 'thumbnail');
+            $medium_large_src = wp_get_attachment_image_src($image_id, 'medium_large');
+            $full_src = wp_get_attachment_url($image_id);
+
+            if ($thumb_src && $medium_large_src) {
+                 $images[] = [
+                    'ID' => $image_id,
+                    'url' => $full_src,
+                    'sizes' => [
+                        'thumbnail' => $thumb_src[0],
+                        'medium_large' => $medium_large_src[0],
+                    ]
+                ];
+            }
         }
-        $images = $formatted_images;
     }
+
+	if ( empty( $images ) ) {
+		 return '<!-- No valid images found to display in gallery -->';
+	}
 
 	// Enqueue scripts and styles for the gallery.
 	car_gallery_slider_enqueue_scripts();
