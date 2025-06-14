@@ -231,8 +231,12 @@
 }
 
 .lightbox-close {
-  top: 2rem;
-  right: 2rem;
+  top: 2rem !important;
+  right: 2rem !important;
+}
+
+.lightbox-total {
+  margin-right: 0.15rem;
 }
 
 /* Responsive styles */
