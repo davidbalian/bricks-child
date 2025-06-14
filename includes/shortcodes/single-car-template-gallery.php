@@ -17,16 +17,36 @@ add_shortcode( 'single_car_template_gallery', 'single_car_template_gallery_short
  * @return string The gallery HTML.
  */
 function single_car_template_gallery_shortcode( $atts ) {
-	// Ensure we are on a single car page or in the Bricks builder.
-	if ( ! is_singular( 'car' ) && ! ( defined( 'BRICKS_IS_BUILDER' ) && BRICKS_IS_BUILDER ) ) {
-		return '';
-	}
+    // Parse shortcode attributes
+    $atts = shortcode_atts( array(
+        'post_id' => null,
+        'debug' => false,
+    ), $atts );
 
-    // Use get_the_ID() for better compatibility with Bricks templates.
-    $post_id = get_the_ID();
+    // Get post ID - use attribute if provided, otherwise get current post ID
+    $post_id = $atts['post_id'] ? (int) $atts['post_id'] : get_the_ID();
+
+    // Debug mode for troubleshooting
+    if ( $atts['debug'] && current_user_can( 'edit_posts' ) ) {
+        $debug_info = array(
+            'post_id' => $post_id,
+            'is_singular_car' => is_singular( 'car' ),
+            'is_bricks_builder' => defined( 'BRICKS_IS_BUILDER' ) && BRICKS_IS_BUILDER,
+            'post_type' => get_post_type( $post_id ),
+        );
+        return '<pre>' . print_r( $debug_info, true ) . '</pre>';
+    }
 
     if ( ! $post_id ) {
         return '<!-- Single Car Template Gallery: Post ID not found -->';
+    }
+
+    // Check if post is a car post type
+    if ( get_post_type( $post_id ) !== 'car' ) {
+        if ( current_user_can( 'edit_posts' ) ) {
+            return '<p>Single Car Template Gallery: This shortcode only works with car post type. Current post type: ' . esc_html( get_post_type( $post_id ) ) . '</p>';
+        }
+        return '<!-- Single Car Template Gallery: Not a car post type -->';
     }
 
     // Get image IDs from ACF gallery field 'car_images'.
