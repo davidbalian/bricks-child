@@ -88,20 +88,4 @@ jQuery(document).ready(function ($) {
   $(".fullpage-next").on("click", function () {
     $(".fullpage-slider").slick("slickNext");
   });
-
-  // Equalize image heights
-  function equalizeImageHeights() {
-    const maxHeight = Math.max.apply(
-      null,
-      $(".hero-slide")
-        .map(function () {
-          return $(this).height();
-        })
-        .get()
-    );
-    $(".hero-slide").height(maxHeight);
-  }
-
-  // Call on load and resize
-  $(window).on("load resize", equalizeImageHeights);
 });
