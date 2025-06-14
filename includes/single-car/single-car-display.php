@@ -147,9 +147,15 @@ if (have_posts()) :
                         <?php if (!empty($all_images)) : ?>
                             <div class="gallery-container">
                                 <div class="hero-section">
-                                    <img src="" alt="Main car image" class="hero-image" id="heroImage">
-                                    <button class="hero-nav-arrow left" id="prevArrow">&#10094;</button>
-                                    <button class="hero-nav-arrow right" id="nextArrow">&#10095;</button>
+                                    <div class="hero-slider">
+                                        <?php foreach ($all_images as $image_id) : 
+                                            $image_url = wp_get_attachment_image_url($image_id, 'large');
+                                        ?>
+                                            <div class="hero-slide">
+                                                <img src="<?php echo esc_url($image_url); ?>" alt="Car image" class="hero-image">
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
                                     <div class="image-count-overlay">
                                         <i class="fas fa-camera"></i>
                                         <span><?php echo count($all_images); ?> photos</span>
@@ -161,8 +167,15 @@ if (have_posts()) :
                                 </div>
 
                                 <div class="thumbnail-section">
-                                    <div class="thumbnails-wrapper" id="thumbnailsWrapper">
-                                        </div>
+                                    <div class="thumbnail-slider">
+                                        <?php foreach ($all_images as $index => $image_id) : 
+                                            $thumb_url = wp_get_attachment_image_url($image_id, 'thumbnail');
+                                        ?>
+                                            <div class="thumbnail-slide">
+                                                <img src="<?php echo esc_url($thumb_url); ?>" alt="Thumbnail <?php echo $index + 1; ?>">
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
                                 </div>
                             </div>
                         <?php endif; ?>
