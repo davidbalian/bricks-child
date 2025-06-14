@@ -70,6 +70,15 @@ add_action( 'wp_enqueue_scripts', function() {
         wp_enqueue_style( 'car-listings-style', $theme_dir . '/includes/car-listings/car-listings.css', array(), filemtime( get_stylesheet_directory() . '/includes/car-listings/car-listings.css' ) );
         wp_enqueue_script( 'car-listings-js', $theme_dir . '/includes/car-listings/car-listings.js', array( 'jquery' ), filemtime( get_stylesheet_directory() . '/includes/car-listings/car-listings.js' ), true );
     }
+
+    // Enqueue single car gallery styles and scripts
+    if ( is_singular('car') ) {
+        $theme_dir = get_stylesheet_directory_uri();
+        wp_enqueue_style( 'single-car-gallery', $theme_dir . '/includes/single-car/single-car-gallery.css', array(), filemtime( get_stylesheet_directory() . '/includes/single-car/single-car-gallery.css' ) );
+        wp_enqueue_style( 'single-car-main-gallery', $theme_dir . '/includes/single-car/single-car-main-gallery.css', array(), filemtime( get_stylesheet_directory() . '/includes/single-car/single-car-main-gallery.css' ) );
+        wp_enqueue_script( 'single-car-gallery', $theme_dir . '/includes/single-car/single-car-gallery.js', array( 'jquery' ), filemtime( get_stylesheet_directory() . '/includes/single-car/single-car-gallery.js' ), true );
+        wp_enqueue_script( 'single-car-main-gallery', $theme_dir . '/includes/single-car/single-car-main-gallery.js', array( 'jquery' ), filemtime( get_stylesheet_directory() . '/includes/single-car/single-car-main-gallery.js' ), true );
+    }
 } );
 
 /**
