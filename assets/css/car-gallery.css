@@ -1,0 +1,219 @@
+/* Car Gallery Container */
+.car-gallery-container {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Hero Slider */
+.hero-slider {
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.hero-slide {
+  position: relative;
+  width: 100%;
+  height: 500px;
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Thumbnail Slider */
+.thumbnail-slider {
+  margin: 0 -5px;
+}
+
+.thumbnail-slide {
+  padding: 5px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.thumbnail-slide.slick-current {
+  opacity: 1;
+}
+
+.thumbnail-image {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* View Gallery Button */
+.view-gallery-btn {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.view-gallery-btn:hover {
+  background: #fff;
+  transform: translateY(-2px);
+}
+
+/* Fullpage Gallery */
+.fullpage-gallery {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.fullpage-gallery.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.fullpage-slider {
+  height: 100%;
+}
+
+.fullpage-slide {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fullpage-image {
+  max-width: 90%;
+  max-height: 90vh;
+  object-fit: contain;
+}
+
+/* Navigation Controls */
+.fullpage-close,
+.fullpage-prev,
+.fullpage-next {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.fullpage-close {
+  top: 20px;
+  right: 20px;
+}
+
+.fullpage-prev {
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.fullpage-next {
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.fullpage-close:hover,
+.fullpage-prev:hover,
+.fullpage-next:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Slide Counter */
+.fullpage-counter {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 14px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 5px 15px;
+  border-radius: 20px;
+}
+
+/* Slick Slider Customization */
+.slick-prev,
+.slick-next {
+  z-index: 1;
+}
+
+.slick-prev {
+  left: 10px;
+}
+
+.slick-next {
+  right: 10px;
+}
+
+.slick-prev:before,
+.slick-next:before {
+  font-size: 24px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .hero-slide {
+    height: 400px;
+  }
+
+  .thumbnail-image {
+    height: 60px;
+  }
+
+  .view-gallery-btn {
+    bottom: 20px;
+    right: 20px;
+    padding: 8px 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-slide {
+    height: 300px;
+  }
+
+  .thumbnail-image {
+    height: 50px;
+  }
+
+  .fullpage-prev,
+  .fullpage-next {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+  }
+
+  .fullpage-close {
+    top: 10px;
+    right: 10px;
+  }
+}
