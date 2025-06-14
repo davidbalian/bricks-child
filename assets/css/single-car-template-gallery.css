@@ -448,6 +448,7 @@
   border-radius: 8px;
 }
 
+/* Lightbox Navigation */
 .lightbox-nav {
   position: absolute;
   top: 50%;
@@ -456,9 +457,7 @@
   transform: translateY(-50%);
   display: flex;
   justify-content: space-between;
-  pointer-events: none;
-  z-index: 5;
-  padding: 0 40px;
+  z-index: 3;
 }
 
 .lightbox-arrow {
@@ -468,13 +467,15 @@
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 400;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
   transition: opacity 0.2s ease;
   opacity: 0.75;
+  pointer-events: auto;
 }
 
 .lightbox-arrow:hover {
