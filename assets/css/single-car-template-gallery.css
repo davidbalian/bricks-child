@@ -220,6 +220,11 @@
   transform: scale(1.02);
 }
 
+.lightbox-nav {
+  left: 2rem;
+  right: 2rem;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   .single-car-template-gallery-wrapper {
