@@ -170,51 +170,29 @@
   flex: 0 0 auto;
   width: 120px;
   aspect-ratio: 4 / 3;
-  border-radius: 6px;
+  border-radius: var(--border-radius-small);
   overflow: hidden;
-  background: #f5f5f5;
-  border: 3px solid transparent;
-  transition: all 0.3s ease;
+  background: var(--light-bg);
+  border: 2px solid transparent;
+  transition: all var(--transition-time) ease;
   cursor: pointer;
   position: relative;
 }
 
 .row-image-item:hover {
-  border-color: #007bff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+  border-color: var(--light-blue);
 }
 
 .row-image-item.active {
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
-}
-
-.row-image-item.active::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 123, 255, 0.1);
-  pointer-events: none;
+  border-color: var(--light-blue);
 }
 
 .row-image-item img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
-  transition: transform 0.3s ease;
-}
-
-.row-image-item:hover img {
-  transform: scale(1.05);
-}
-
-.row-image-item.active img {
-  transform: scale(1.02);
+  transition: transform var(--transition-time) ease;
 }
 
 .lightbox-nav {
