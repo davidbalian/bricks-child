@@ -286,4 +286,14 @@ function autoagora_enqueue_car_listings_map_filter_assets() {
         ));
     }
 }
-add_action('wp_enqueue_scripts', 'autoagora_enqueue_car_listings_map_filter_assets', 21); 
+add_action('wp_enqueue_scripts', 'autoagora_enqueue_car_listings_map_filter_assets', 21);
+
+function enqueue_theme_scripts() {
+    $theme_dir = get_stylesheet_directory_uri();
+
+    // Enqueue Slick Slider CSS and JS
+    wp_enqueue_style('slick-css', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css');
+    wp_enqueue_style('slick-theme-css', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css');
+    wp_enqueue_script('slick-js', 'https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js', array('jquery'), '1.8.1', true);
+}
+add_action('wp_enqueue_scripts', 'enqueue_theme_scripts'); 
