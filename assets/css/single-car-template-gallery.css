@@ -53,7 +53,6 @@
 
 /* Common Button Styles */
 .slider-arrow,
-.view-all-images-btn,
 .lightbox-close,
 .lightbox-arrow {
   background: white;
@@ -73,14 +72,12 @@
 }
 
 .slider-arrow:hover,
-.view-all-images-btn:hover,
 .lightbox-close:hover,
 .lightbox-arrow:hover {
   opacity: 1;
 }
 
 .slider-arrow:active,
-.view-all-images-btn:active,
 .lightbox-close:active,
 .lightbox-arrow:active {
   transform: scale(0.95);
@@ -95,10 +92,6 @@
   margin-right: 20px;
 }
 
-.view-all-images-btn i {
-  font-size: 1rem;
-}
-
 /* Photo Count Overlay (Top Left) */
 .photo-count-overlay {
   position: absolute;
@@ -107,18 +100,12 @@
   background: white;
   color: black;
   padding: 0.5rem 0.75rem;
-  border-radius: 50%;
+  border-radius: var(--border-radius-small);
   font-size: 0.75rem;
   font-weight: 400;
   z-index: 2;
   display: flex;
   align-items: center;
-  opacity: 0.75;
-  transition: opacity 0.2s ease;
-}
-
-.photo-count-overlay:hover {
-  opacity: 1;
 }
 
 .photo-count-overlay i {
@@ -138,29 +125,18 @@
   background: white;
   color: black;
   border: none;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
-  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--border-radius-small);
+  font-size: 0.75rem;
   font-weight: 400;
   cursor: pointer;
-  transition: opacity 0.2s ease;
   display: flex;
   align-items: center;
-  justify-content: center;
-  opacity: 0.75;
-}
-
-.view-all-images-btn:hover {
-  opacity: 1;
-}
-
-.view-all-images-btn:active {
-  transform: scale(0.95);
+  gap: 0.5rem;
 }
 
 .view-all-images-btn i {
-  font-size: 1rem;
+  font-size: 0.75rem;
 }
 
 /* Thumbnail Navigation Row */
@@ -254,10 +230,10 @@
   }
 
   .photo-count-overlay {
-    top: 0.5rem;
-    left: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.75rem;
+    top: 15px;
+    left: 15px;
+    padding: 6px 10px;
+    font-size: 12px;
   }
 
   .photo-count-overlay i {
@@ -270,13 +246,11 @@
   }
 
   .view-all-images-btn {
-    width: 2.5rem;
-    height: 2.5rem;
-    font-size: 0.875rem;
+    padding: 8px 12px;
+    font-size: 12px;
   }
 
   .slider-arrow,
-  .view-all-images-btn,
   .lightbox-close,
   .lightbox-arrow {
     width: 2.5rem;
@@ -304,10 +278,10 @@
 
 @media (max-width: 480px) {
   .photo-count-overlay {
-    top: 0.5rem;
-    left: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.75rem;
+    top: 10px;
+    left: 10px;
+    padding: 5px 8px;
+    font-size: 11px;
   }
 
   .photo-count-overlay i {
@@ -320,13 +294,11 @@
   }
 
   .view-all-images-btn {
-    width: 2.25rem;
-    height: 2.25rem;
-    font-size: 0.75rem;
+    padding: 6px 10px;
+    font-size: 11px;
   }
 
   .slider-arrow,
-  .view-all-images-btn,
   .lightbox-close,
   .lightbox-arrow {
     width: 2.25rem;
