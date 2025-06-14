@@ -20,11 +20,70 @@
   overflow: hidden;
 }
 
+/* Main Image Slider */
+.main-image-slider {
+  width: 100%;
+  height: 100%;
+}
+
+.main-image-slider .slide {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 3;
+}
+
 .main-image {
   width: 100%;
   height: 100%;
   object-fit: contain;
   display: block;
+}
+
+/* Slider Navigation Arrows */
+.slider-nav {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.slider-arrow {
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  pointer-events: all;
+  backdrop-filter: blur(5px);
+}
+
+.slider-arrow:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+}
+
+.slider-arrow:active {
+  transform: scale(0.95);
+}
+
+.slider-prev {
+  margin-left: 20px;
+}
+
+.slider-next {
+  margin-right: 20px;
 }
 
 /* Photo Count Overlay (Top Left) */
@@ -84,29 +143,72 @@
   font-size: 12px;
 }
 
-/* Images Row */
+/* Thumbnail Navigation Row */
 .images-row {
   display: flex;
   gap: 12px;
   padding: 20px;
   background: #fff;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+}
+
+.images-row.thumbnail-nav {
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+}
+
+.images-row::-webkit-scrollbar {
+  height: 6px;
+}
+
+.images-row::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.images-row::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.images-row::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 .row-image-item {
-  flex: 1;
+  flex: 0 0 auto;
+  width: 120px;
   aspect-ratio: 4 / 3;
   border-radius: 6px;
   overflow: hidden;
   background: #f5f5f5;
-  border: 2px solid transparent;
+  border: 3px solid transparent;
   transition: all 0.3s ease;
   cursor: pointer;
+  position: relative;
 }
 
 .row-image-item:hover {
   border-color: #007bff;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+}
+
+.row-image-item.active {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+}
+
+.row-image-item.active::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 123, 255, 0.1);
+  pointer-events: none;
 }
 
 .row-image-item img {
@@ -121,16 +223,8 @@
   transform: scale(1.05);
 }
 
-.row-image-item.empty {
-  background: #e9ecef;
-  border: 2px dashed #dee2e6;
-  cursor: default;
-}
-
-.row-image-item.empty:hover {
-  border-color: #dee2e6;
-  transform: none;
-  box-shadow: none;
+.row-image-item.active img {
+  transform: scale(1.02);
 }
 
 /* Responsive styles */
@@ -156,22 +250,31 @@
     font-size: 12px;
   }
 
+  .slider-arrow {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .slider-prev {
+    margin-left: 15px;
+  }
+
+  .slider-next {
+    margin-right: 15px;
+  }
+
   .images-row {
     padding: 15px;
     gap: 10px;
   }
+
+  .row-image-item {
+    width: 100px;
+  }
 }
 
 @media (max-width: 480px) {
-  .images-row {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .row-image-item {
-    aspect-ratio: 16 / 9;
-  }
-
   .photo-count-overlay {
     top: 10px;
     left: 10px;
@@ -188,4 +291,49 @@
     padding: 6px 10px;
     font-size: 11px;
   }
+
+  .slider-arrow {
+    width: 35px;
+    height: 35px;
+    font-size: 12px;
+  }
+
+  .slider-prev {
+    margin-left: 10px;
+  }
+
+  .slider-next {
+    margin-right: 10px;
+  }
+
+  .images-row {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .row-image-item {
+    width: 80px;
+    min-width: 80px;
+  }
+}
+
+/* Hide default slick arrows */
+.slick-prev,
+.slick-next {
+  display: none !important;
+}
+
+/* Slick slider customizations */
+.main-image-slider .slick-list,
+.main-image-slider .slick-track {
+  height: 100%;
+}
+
+.main-image-slider .slick-slide {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.main-image-slider .slick-slide.slick-active {
+  opacity: 1;
 }

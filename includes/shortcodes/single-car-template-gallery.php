@@ -110,54 +110,57 @@ function single_car_template_gallery_shortcode( $atts ) {
 		 return '<!-- No valid images found to display in gallery -->';
 	}
 
-	// Enqueue styles for the single car template gallery.
-	single_car_template_gallery_enqueue_styles();
+	// Enqueue styles and scripts for the single car template gallery.
+	single_car_template_gallery_enqueue_assets();
 
 	$image_count = count( $images );
 
 	ob_start();
 	?>
-	<div class="single-car-template-gallery-wrapper">
-		<!-- Main Image Container -->
+	<div class="single-car-template-gallery-wrapper" data-total-images="<?php echo $image_count; ?>">
+		<!-- Main Image Container with Slider -->
 		<div class="main-image-container">
-			<?php if ( isset( $images[0] ) ) : ?>
-				<img src="<?php echo esc_url( $images[0]['sizes']['medium_large'] ); ?>" alt="<?php echo esc_attr( get_the_title( $images[0]['ID'] ) ); ?>" class="main-image">
-				
-				<!-- Photo Count Overlay (Top Left) -->
-				<div class="photo-count-overlay">
-					<i class="fas fa-camera"></i>
-					<?php echo $image_count; ?> photos
-				</div>
-				
-				<!-- View All Images Button (Bottom Right) -->
-				<div class="view-all-button-container">
-					<button class="view-all-images-btn" type="button">
-						<i class="fas fa-images"></i>
-						View All Images
-					</button>
-				</div>
-			<?php endif; ?>
+			<div class="main-image-slider">
+				<?php foreach ( $images as $index => $image ) : ?>
+					<div class="slide">
+						<img src="<?php echo esc_url( $image['sizes']['medium_large'] ); ?>" alt="<?php echo esc_attr( get_the_title( $image['ID'] ) ); ?>" class="main-image">
+					</div>
+				<?php endforeach; ?>
+			</div>
+			
+			<!-- Photo Count Overlay (Top Left) -->
+			<div class="photo-count-overlay">
+				<i class="fas fa-camera"></i>
+				<span class="current-photo">1</span>/<span class="total-photos"><?php echo $image_count; ?></span> photos
+			</div>
+			
+			<!-- View All Images Button (Bottom Right) -->
+			<div class="view-all-button-container">
+				<button class="view-all-images-btn" type="button">
+					<i class="fas fa-images"></i>
+					View All Images
+				</button>
+			</div>
+			
+			<!-- Navigation Arrows -->
+			<div class="slider-nav">
+				<button class="slider-arrow slider-prev" type="button">
+					<i class="fas fa-chevron-left"></i>
+				</button>
+				<button class="slider-arrow slider-next" type="button">
+					<i class="fas fa-chevron-right"></i>
+				</button>
+			</div>
 		</div>
 
-		<!-- First 3 Images Row -->
+		<!-- Thumbnail Navigation Row -->
 		<?php if ( $image_count >= 1 ) : ?>
-			<div class="images-row">
-				<?php 
-				$row_images = array_slice( $images, 0, 3 ); // Get first 3 images
-				foreach ( $row_images as $image ) : 
-				?>
-					<div class="row-image-item">
+			<div class="images-row thumbnail-nav">
+				<?php foreach ( $images as $index => $image ) : ?>
+					<div class="row-image-item" data-slide="<?php echo $index; ?>">
 						<img src="<?php echo esc_url( $image['sizes']['thumbnail'] ); ?>" alt="<?php echo esc_attr( get_the_title( $image['ID'] ) ); ?>">
 					</div>
 				<?php endforeach; ?>
-				
-				<!-- Fill empty slots if less than 3 images -->
-				<?php 
-				$remaining_slots = 3 - count( $row_images );
-				for ( $i = 0; $i < $remaining_slots; $i++ ) : 
-				?>
-					<div class="row-image-item empty"></div>
-				<?php endfor; ?>
 			</div>
 		<?php endif; ?>
 	</div>
@@ -167,12 +170,22 @@ function single_car_template_gallery_shortcode( $atts ) {
 }
 
 /**
- * Enqueue styles for the single car template gallery.
+ * Enqueue styles and scripts for the single car template gallery.
  */
-function single_car_template_gallery_enqueue_styles() {
+function single_car_template_gallery_enqueue_assets() {
 	$theme_version = defined('BRICKS_CHILD_THEME_VERSION') ? BRICKS_CHILD_THEME_VERSION : '1.0.0';
 	$theme_dir_uri = get_stylesheet_directory_uri();
 
+	// Enqueue Slick Slider CSS
+	wp_enqueue_style( 'slick-css', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css', array(), '1.8.1' );
+	wp_enqueue_style( 'slick-theme-css', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css', array(), '1.8.1' );
+	
 	// Enqueue Custom CSS
 	wp_enqueue_style( 'single-car-template-gallery-css', $theme_dir_uri . '/assets/css/single-car-template-gallery.css', array(), $theme_version );
+	
+	// Enqueue Slick Slider JS
+	wp_enqueue_script( 'slick-js', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js', array('jquery'), '1.8.1', true );
+	
+	// Enqueue Custom JS
+	wp_enqueue_script( 'single-car-template-gallery-js', $theme_dir_uri . '/assets/js/single-car-template-gallery.js', array('jquery', 'slick-js'), $theme_version, true );
 } 
