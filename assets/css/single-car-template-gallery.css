@@ -206,6 +206,7 @@
 }
 
 .lightbox-close {
+  position: absolute;
   top: 2rem !important;
   right: 2rem !important;
 }
@@ -371,9 +372,6 @@
 
 .lightbox-header {
   position: relative;
-  top: 0;
-  left: 0;
-  right: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
