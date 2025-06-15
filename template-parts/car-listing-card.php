@@ -20,7 +20,7 @@ if ( ! $car_post_id ) {
 }
 
 // --- Start Car Card HTML (Adapted from car-listings.php AJAX handler) ---
-$car_detail_url = esc_url( get_permalink( $car_post_id ) );
+$car_detail_url = esc_url( add_query_arg( 'car_id', $car_post_id, get_permalink( $car_post_id ) ) );
 
 // Get car details
 $make             = get_field( 'make', $car_post_id );
