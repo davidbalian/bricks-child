@@ -9,10 +9,12 @@
 }
 
 /* Override favorite button position for detailed page - needs to be more specific */
-.car-listing-detailed-container .action-buttons .favorite-btn {
+.action-buttons .favorite-btn {
     position: static !important; /* Reset position from car-listings.css absolute positioning */
     top: auto !important;
     right: auto !important;
+    left: auto !important;
+    transform: none !important;
     background: rgba(255, 255, 255, 0.9) !important;
     border: 1px solid #ddd !important;
     padding: 10px !important;
@@ -21,6 +23,28 @@
     border-radius: 4px !important;
     min-width: 40px !important;
     min-height: 40px !important;
+    margin: 0 !important;
+    float: none !important;
+}
+
+/* Even more specific override for favorite button */
+.car-listing-detailed-container .action-buttons .favorite-btn,
+body .action-buttons .favorite-btn {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    left: auto !important;
+    transform: none !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid #ddd !important;
+    padding: 10px !important;
+    width: auto !important;
+    height: auto !important;
+    border-radius: 4px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    margin: 0 !important;
+    float: none !important;
 }
 
 .car-listing-detailed-container .action-buttons .share-btn {
