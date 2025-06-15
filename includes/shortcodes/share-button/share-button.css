@@ -5,17 +5,12 @@
 
 /* === BASE SHARE BUTTON STYLES === */
 .share-btn {
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-    border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
     position: relative;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
 }
 
 .share-btn:hover {
@@ -67,14 +62,27 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Single page design - more prominent */
+/* Single page design - matches original styling */
 .share-btn-single {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    padding: 10px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    box-shadow: none;
 }
 
 .share-btn-single:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    background: #f0f0f0 !important;
+    border-color: #007bff !important;
+    box-shadow: none;
+    transform: none;
+}
+
+.share-btn-single i {
+    font-size: 18px !important;
+    color: #333 !important;
 }
 
 /* Minimal design - clean and subtle */

@@ -5,17 +5,12 @@
 
 /* === BASE FAVORITE BUTTON STYLES === */
 .favorite-btn {
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-    border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
     position: relative;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
 }
 
 .favorite-btn:hover {
@@ -92,17 +87,34 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Single page design - more prominent */
+/* Single page design - matches original styling */
 .favorite-btn-single {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    padding: 10px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
     position: static !important;
     top: auto !important;
     right: auto !important;
+    box-shadow: none;
 }
 
 .favorite-btn-single:hover {
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    background: #f0f0f0 !important;
+    border-color: #007bff !important;
+    box-shadow: none;
+    transform: none;
+}
+
+.favorite-btn-single i {
+    font-size: 18px !important;
+    color: #333 !important;
+}
+
+.favorite-btn-single.active i {
+    color: #ff0000 !important;
 }
 
 /* === RESPONSIVE ADJUSTMENTS === */
