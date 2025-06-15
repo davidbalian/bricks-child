@@ -5,6 +5,7 @@
     display: flex;
     gap: 10px;
     align-items: center;
+    margin: 20px 0;
 }
 
 /* Override favorite button position for detailed page - needs to be more specific */
@@ -23,27 +24,47 @@
 }
 
 .car-listing-detailed-container .action-buttons .share-btn {
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #ddd;
-    cursor: pointer;
-    padding: 10px;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-    min-width: 40px;
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid #ddd !important;
+    cursor: pointer !important;
+    padding: 10px !important;
+    border-radius: 4px !important;
+    transition: all 0.3s ease !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* More specific selectors for share and report buttons */
+.action-buttons .share-btn,
+.action-buttons .report-btn {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid #ddd !important;
+    cursor: pointer !important;
+    padding: 10px !important;
+    border-radius: 4px !important;
+    transition: all 0.3s ease !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .car-listing-detailed-container .action-buttons .favorite-btn:hover,
-.car-listing-detailed-container .action-buttons .share-btn:hover {
+.car-listing-detailed-container .action-buttons .share-btn:hover,
+.action-buttons .share-btn:hover,
+.action-buttons .report-btn:hover {
     background: #f0f0f0 !important;
     border-color: #007bff !important;
 }
 
 .car-listing-detailed-container .action-buttons .favorite-btn i,
-.car-listing-detailed-container .action-buttons .share-btn i {
+.car-listing-detailed-container .action-buttons .share-btn i,
+.action-buttons .share-btn i,
+.action-buttons .report-btn i {
     font-size: 18px !important;
     color: #333 !important;
 }

@@ -35,6 +35,12 @@ function single_car_buttons_shortcode($atts) {
     // Enqueue styles and scripts
     wp_enqueue_style('single-car-page-css', get_stylesheet_directory_uri() . '/includes/shortcodes/single-car-page/single-car-page.css', array(), '1.0.0');
     wp_enqueue_script('single-car-buttons-js', get_stylesheet_directory_uri() . '/includes/shortcodes/single-car-page/single-car-buttons.js', array('jquery'), '1.0.0', true);
+    
+    // Localize script with AJAX data (same as existing car listings)
+    wp_localize_script('single-car-buttons-js', 'carListingsData', array(
+        'ajaxurl' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('car_listings_nonce')
+    ));
 
     // Get current user info for favorites
     $current_user_id = get_current_user_id();
