@@ -11,6 +11,8 @@
     justify-content: center;
     transition: all 0.3s ease;
     position: relative;
+    border: none;
+    outline: none;
 }
 
 .favorite-btn:hover {
@@ -66,29 +68,49 @@
 /* === DESIGN VARIATIONS === */
 
 /* Default design */
-.favorite-btn-default {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+.favorite-btn.favorite-btn-default {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
     position: static !important;
     top: auto !important;
     right: auto !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 50% !important;
 }
 
-/* Listing card design - subtle and clean */
-.favorite-btn-listing {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 10;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    background: rgba(255, 255, 255, 0.95);
+/* Listing card design - overlay on top */
+.favorite-btn.favorite-btn-listing {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    z-index: 100 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    border: none !important;
 }
 
-.favorite-btn-listing:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.favorite-btn.favorite-btn-listing:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+    background: rgba(255, 255, 255, 1) !important;
+}
+
+.favorite-btn.favorite-btn-listing i {
+    color: #ff0000 !important;
+    font-style: normal !important;
+}
+
+.favorite-btn.favorite-btn-listing:not(.active) i {
+    opacity: 0.6 !important;
+}
+
+.favorite-btn.favorite-btn-listing.active i,
+.favorite-btn.favorite-btn-listing:hover i {
+    opacity: 1 !important;
 }
 
 /* Single page design - matches original styling */
-.favorite-btn-single {
+.favorite-btn.favorite-btn-single {
     background: rgba(255, 255, 255, 0.9) !important;
     border: 1px solid #ddd !important;
     border-radius: 4px !important;
@@ -98,36 +120,36 @@
     position: static !important;
     top: auto !important;
     right: auto !important;
-    box-shadow: none;
+    box-shadow: none !important;
 }
 
-.favorite-btn-single:hover {
+.favorite-btn.favorite-btn-single:hover {
     background: #f0f0f0 !important;
     border-color: #007bff !important;
-    box-shadow: none;
-    transform: none;
+    box-shadow: none !important;
+    transform: none !important;
 }
 
-.favorite-btn-single i {
+.favorite-btn.favorite-btn-single i {
     font-size: 18px !important;
     color: #333 !important;
 }
 
-.favorite-btn-single.active i {
+.favorite-btn.favorite-btn-single.active i {
     color: #ff0000 !important;
 }
 
 /* === RESPONSIVE ADJUSTMENTS === */
 @media (max-width: 768px) {
-    .favorite-btn-listing {
-        width: 36px;
-        height: 36px;
-        top: 8px;
-        right: 8px;
+    .favorite-btn.favorite-btn-listing {
+        width: 36px !important;
+        height: 36px !important;
+        top: 8px !important;
+        right: 8px !important;
     }
     
-    .favorite-btn-listing i {
-        font-size: 14px;
+    .favorite-btn.favorite-btn-listing i {
+        font-size: 14px !important;
     }
 }
 
@@ -155,4 +177,28 @@
     0% { transform: scale(1); }
     50% { transform: scale(1.2); }
     100% { transform: scale(1); }
+}
+
+/* === OVERRIDE CONFLICTING STYLES === */
+/* Make sure our component styles take precedence over theme/plugin styles */
+.car-listing-card .favorite-btn.favorite-btn-listing,
+.car-listings-grid .favorite-btn.favorite-btn-listing {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    z-index: 100 !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    width: 36px !important;
+    height: 36px !important;
+    border: none !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    transform: none !important;
+}
+
+.car-listing-card .favorite-btn.favorite-btn-listing:hover,
+.car-listings-grid .favorite-btn.favorite-btn-listing:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
 } 
