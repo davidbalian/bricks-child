@@ -1,0 +1,140 @@
+/**
+ * Shared Favorite Button Styles
+ * Base styles and design variations for different contexts
+ */
+
+/* === BASE FAVORITE BUTTON STYLES === */
+.favorite-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.favorite-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.1);
+}
+
+.favorite-btn i {
+    transition: all 0.3s ease;
+    color: #ff4757;
+}
+
+.favorite-btn.active i {
+    color: #ff4757;
+}
+
+.favorite-btn:not(.active) i {
+    color: #ccc;
+}
+
+.favorite-btn:not(.active):hover i {
+    color: #ff4757;
+}
+
+/* === SIZE VARIATIONS === */
+.favorite-btn-small {
+    width: 32px;
+    height: 32px;
+}
+
+.favorite-btn-small i {
+    font-size: 14px;
+}
+
+.favorite-btn-normal {
+    width: 40px;
+    height: 40px;
+}
+
+.favorite-btn-normal i {
+    font-size: 16px;
+}
+
+.favorite-btn-large {
+    width: 48px;
+    height: 48px;
+}
+
+.favorite-btn-large i {
+    font-size: 20px;
+}
+
+/* === DESIGN VARIATIONS === */
+
+/* Default design */
+.favorite-btn-default {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Listing card design - subtle and clean */
+.favorite-btn-listing {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.favorite-btn-listing:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Single page design - more prominent */
+.favorite-btn-single {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.favorite-btn-single:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* === RESPONSIVE ADJUSTMENTS === */
+@media (max-width: 768px) {
+    .favorite-btn-listing {
+        width: 36px;
+        height: 36px;
+        top: 8px;
+        right: 8px;
+    }
+    
+    .favorite-btn-listing i {
+        font-size: 14px;
+    }
+}
+
+/* === ACCESSIBILITY === */
+.favorite-btn:focus {
+    outline: 2px solid #007cba;
+    outline-offset: 2px;
+}
+
+.favorite-btn:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* === ANIMATION FOR HEART FILL === */
+.favorite-btn i {
+    animation-duration: 0.3s;
+    animation-timing-function: ease-out;
+}
+
+.favorite-btn.active i {
+    animation-name: heartFill;
+}
+
+@keyframes heartFill {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+} 
