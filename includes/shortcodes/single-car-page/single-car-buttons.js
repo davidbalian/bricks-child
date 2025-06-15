@@ -8,12 +8,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // === FAVORITE BUTTON FUNCTIONALITY ===
     const favoriteBtn = document.querySelector('.favorite-btn');
     if (favoriteBtn) {
-        favoriteBtn.addEventListener('click', function(e) {
+                favoriteBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-
-            if (typeof carListingsData === 'undefined' || typeof carListingsData.ajaxurl === 'undefined' || typeof carListingsData.nonce === 'undefined') {
+            
+            // Check if user is logged in first
+            if (typeof carListingsData === 'undefined' || !carListingsData.is_user_logged_in) {
                 alert('Log in to favourite a listing.');
+                return;
+            }
+            
+            // Security checks for logged-in users
+            if (typeof carListingsData.ajaxurl === 'undefined' || typeof carListingsData.nonce === 'undefined') {
+                alert('Error: Missing data. Please refresh the page and try again.');
                 return;
             }
 
