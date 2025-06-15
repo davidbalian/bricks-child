@@ -1,0 +1,143 @@
+/**
+ * Shared Share Button Styles
+ * Base styles and design variations for different contexts
+ */
+
+/* === BASE SHARE BUTTON STYLES === */
+.share-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.share-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.1);
+}
+
+.share-btn i {
+    transition: all 0.3s ease;
+    color: #2196F3;
+}
+
+.share-btn:hover i {
+    color: #1976D2;
+}
+
+/* === SIZE VARIATIONS === */
+.share-btn-small {
+    width: 32px;
+    height: 32px;
+}
+
+.share-btn-small i {
+    font-size: 14px;
+}
+
+.share-btn-normal {
+    width: 40px;
+    height: 40px;
+}
+
+.share-btn-normal i {
+    font-size: 16px;
+}
+
+.share-btn-large {
+    width: 48px;
+    height: 48px;
+}
+
+.share-btn-large i {
+    font-size: 20px;
+}
+
+/* === DESIGN VARIATIONS === */
+
+/* Default design */
+.share-btn-default {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Single page design - more prominent */
+.share-btn-single {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.share-btn-single:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* Minimal design - clean and subtle */
+.share-btn-minimal {
+    background: transparent;
+    box-shadow: none;
+}
+
+.share-btn-minimal:hover {
+    background: rgba(33, 150, 243, 0.1);
+}
+
+/* === TEXT VARIATIONS (when text is included) === */
+.share-btn.has-text {
+    border-radius: 20px;
+    padding: 8px 16px;
+    width: auto;
+    gap: 8px;
+}
+
+.share-btn-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2196F3;
+    white-space: nowrap;
+}
+
+/* === RESPONSIVE ADJUSTMENTS === */
+@media (max-width: 768px) {
+    .share-btn.has-text .share-btn-text {
+        display: none;
+    }
+    
+    .share-btn.has-text {
+        border-radius: 50%;
+        padding: 0;
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* === ACCESSIBILITY === */
+.share-btn:focus {
+    outline: 2px solid #2196F3;
+    outline-offset: 2px;
+}
+
+.share-btn:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* === ANIMATION FOR SHARE ACTION === */
+.share-btn i {
+    animation-duration: 0.3s;
+    animation-timing-function: ease-out;
+}
+
+.share-btn:active i {
+    animation-name: shareClick;
+}
+
+@keyframes shareClick {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+} 

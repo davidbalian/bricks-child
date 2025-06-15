@@ -1,0 +1,311 @@
+/**
+ * Shared Report Button Styles
+ * Base styles, design variations, and modal styles
+ */
+
+/* === BASE REPORT BUTTON STYLES === */
+.report-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.report-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.1);
+}
+
+.report-btn i {
+    transition: all 0.3s ease;
+    color: #f44336;
+}
+
+.report-btn:hover i {
+    color: #d32f2f;
+}
+
+/* === SIZE VARIATIONS === */
+.report-btn-small {
+    width: 32px;
+    height: 32px;
+}
+
+.report-btn-small i {
+    font-size: 14px;
+}
+
+.report-btn-normal {
+    width: 40px;
+    height: 40px;
+}
+
+.report-btn-normal i {
+    font-size: 16px;
+}
+
+.report-btn-large {
+    width: 48px;
+    height: 48px;
+}
+
+.report-btn-large i {
+    font-size: 20px;
+}
+
+/* === DESIGN VARIATIONS === */
+
+/* Default design */
+.report-btn-default {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Single page design - more prominent */
+.report-btn-single {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.report-btn-single:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+/* Minimal design - clean and subtle */
+.report-btn-minimal {
+    background: transparent;
+    box-shadow: none;
+}
+
+.report-btn-minimal:hover {
+    background: rgba(244, 67, 54, 0.1);
+}
+
+/* === TEXT VARIATIONS (when text is included) === */
+.report-btn.has-text {
+    border-radius: 20px;
+    padding: 8px 16px;
+    width: auto;
+    gap: 8px;
+}
+
+.report-btn-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #f44336;
+    white-space: nowrap;
+}
+
+/* === REPORT MODAL STYLES === */
+.report-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.report-modal-content {
+    background: white;
+    padding: 0;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.report-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #eee;
+    background: #f8f9fa;
+    border-radius: 8px 8px 0 0;
+}
+
+.report-modal-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.3em;
+}
+
+.close-report-modal {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.close-report-modal:hover {
+    background-color: #e9ecef;
+    color: #333;
+}
+
+#report-listing-form {
+    padding: 24px;
+}
+
+.report-form-group {
+    margin-bottom: 20px;
+}
+
+.report-form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #333;
+}
+
+.report-form-group select,
+.report-form-group textarea,
+.report-form-group input[type="email"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.report-form-group select:focus,
+.report-form-group textarea:focus,
+.report-form-group input[type="email"]:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.report-form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.report-form-group small {
+    display: block;
+    margin-top: 4px;
+    color: #666;
+    font-size: 12px;
+}
+
+.report-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.cancel-report-btn,
+.submit-report-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancel-report-btn {
+    background: #f8f9fa;
+    color: #666;
+    border: 1px solid #ddd;
+}
+
+.cancel-report-btn:hover {
+    background: #e9ecef;
+    color: #333;
+}
+
+.submit-report-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.submit-report-btn:hover {
+    background: #c82333;
+}
+
+.submit-report-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+/* === RESPONSIVE ADJUSTMENTS === */
+@media (max-width: 768px) {
+    .report-btn.has-text .report-btn-text {
+        display: none;
+    }
+    
+    .report-btn.has-text {
+        border-radius: 50%;
+        padding: 0;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .report-modal-content {
+        width: 95%;
+        margin: 10px;
+    }
+    
+    .report-modal-header {
+        padding: 16px 20px;
+    }
+    
+    #report-listing-form {
+        padding: 20px;
+    }
+}
+
+/* === ACCESSIBILITY === */
+.report-btn:focus {
+    outline: 2px solid #f44336;
+    outline-offset: 2px;
+}
+
+.report-btn:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* === ANIMATION FOR REPORT ACTION === */
+.report-btn i {
+    animation-duration: 0.3s;
+    animation-timing-function: ease-out;
+}
+
+.report-btn:active i {
+    animation-name: reportClick;
+}
+
+@keyframes reportClick {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+} 

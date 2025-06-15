@@ -243,8 +243,10 @@ add_action('before_delete_post', 'delete_car_listing_images', 10, 2);
 // Hook for when post is moved to trash (most common scenario)
 add_action('wp_trash_post', 'delete_car_listing_images', 10, 1);
 
-// Include shared favorite button component
+// Include shared button components
 require_once get_stylesheet_directory() . '/includes/shortcodes/favorite-button/favorite-button.php';
+require_once get_stylesheet_directory() . '/includes/shortcodes/share-button/share-button.php';
+require_once get_stylesheet_directory() . '/includes/shortcodes/report-button/report-button.php';
 
 
 // =========================================================================
