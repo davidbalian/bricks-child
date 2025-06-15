@@ -39,7 +39,7 @@ function single_car_buttons_shortcode($atts) {
     // Localize script with AJAX data (same as existing car listings)
     wp_localize_script('single-car-buttons-js', 'carListingsData', array(
         'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('car_listings_nonce')
+        'nonce' => wp_create_nonce('toggle_favorite_car')
     ));
 
     // Get current user info for favorites

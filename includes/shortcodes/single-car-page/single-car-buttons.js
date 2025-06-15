@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 if (!data.success) {
+                    // Revert the visual changes
                     this.classList.toggle('active');
                     if (isActive) {
                         heartIcon.classList.remove('far');
@@ -57,8 +58,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         heartIcon.classList.remove('fas');
                         heartIcon.classList.add('far');
                     }
-                    console.error('Favorite toggle failed:', data);
-                    alert('Failed to update favorites. Please try again.');
+                    
+                    // Show specific error message
+                    const errorMessage = data.data || 'Unknown error occurred';
+                    console.error('Favorite toggle failed:', errorMessage);
+                    alert('Failed to update favorites: ' + errorMessage);
                 }
             })
             .catch(error => {
