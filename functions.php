@@ -41,6 +41,7 @@ require_once get_stylesheet_directory() . '/includes/shortcodes/account-display.
 require_once get_stylesheet_directory() . '/includes/shortcodes/favourites-button.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-search-form.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/single-car-template-gallery.php';
+require_once get_stylesheet_directory() . '/includes/shortcodes/favorites-toggle-button.php';
 require_once get_stylesheet_directory() . '/includes/admin/user-favorites-column.php';
 
 // NEWLY ADDED FROM ASTRA CHILD (SECOND FILE)
