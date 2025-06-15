@@ -100,11 +100,12 @@ function single_car_buttons_shortcode($atts) {
             </div>
             <form id="report-listing-form">
                 <?php wp_nonce_field('report_listing_nonce', 'report_nonce'); ?>
-                <input type="hidden" name="car_id" value="<?php echo esc_attr($car_id); ?>">
+                <input type="hidden" name="action" value="submit_listing_report">
+                <input type="hidden" name="reported_listing_id" value="<?php echo esc_attr($car_id); ?>">
                 
                 <div class="report-form-group">
                     <label for="report-reason">Reason for reporting *</label>
-                    <select name="reason" id="report-reason" required>
+                    <select name="report_reason" id="report-reason" required>
                         <option value="">Select a reason</option>
                         <option value="inappropriate_content">Inappropriate Content</option>
                         <option value="spam">Spam</option>
@@ -118,14 +119,14 @@ function single_car_buttons_shortcode($atts) {
 
                 <div class="report-form-group">
                     <label for="report-details">Additional Details</label>
-                    <textarea name="details" id="report-details" rows="4" 
+                    <textarea name="report_details" id="report-details" rows="4" 
                               placeholder="Please provide more details about why you're reporting this listing..."></textarea>
                     <small>Help us understand the issue better (optional)</small>
                 </div>
 
                 <div class="report-form-group">
                     <label for="report-email">Your Email</label>
-                    <input type="email" name="email" id="report-email" 
+                    <input type="email" name="reporter_email" id="report-email" 
                            value="<?php echo $current_user_id ? esc_attr(wp_get_current_user()->user_email) : ''; ?>"
                            placeholder="your@email.com">
                     <small>We may contact you for follow-up (optional)</small>
