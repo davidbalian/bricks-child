@@ -13,6 +13,7 @@
     position: relative;
     border: none;
     outline: none;
+    box-sizing: border-box;
 }
 
 .favorite-btn:hover {
@@ -23,6 +24,11 @@
 .favorite-btn i {
     transition: all 0.3s ease;
     color: #ff4757;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    text-align: center;
 }
 
 .favorite-btn.active i {
@@ -45,6 +51,8 @@
 
 .favorite-btn-small i {
     font-size: 14px;
+    width: 32px;
+    height: 32px;
 }
 
 .favorite-btn-normal {
@@ -54,6 +62,8 @@
 
 .favorite-btn-normal i {
     font-size: 16px;
+    width: 40px;
+    height: 40px;
 }
 
 .favorite-btn-large {
@@ -63,6 +73,8 @@
 
 .favorite-btn-large i {
     font-size: 20px;
+    width: 48px;
+    height: 48px;
 }
 
 /* === DESIGN VARIATIONS === */
@@ -88,6 +100,9 @@
     border-radius: 50% !important;
     padding: 0 !important;
     border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .favorite-btn.favorite-btn-listing:hover {
@@ -98,6 +113,12 @@
 .favorite-btn.favorite-btn-listing i {
     color: #ff0000 !important;
     font-style: normal !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .favorite-btn.favorite-btn-listing:not(.active) i {
@@ -121,6 +142,9 @@
     top: auto !important;
     right: auto !important;
     box-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .favorite-btn.favorite-btn-single:hover {
@@ -133,6 +157,12 @@
 .favorite-btn.favorite-btn-single i {
     font-size: 18px !important;
     color: #333 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .favorite-btn.favorite-btn-single.active i {
@@ -150,6 +180,8 @@
     
     .favorite-btn.favorite-btn-listing i {
         font-size: 14px !important;
+        width: 36px !important;
+        height: 36px !important;
     }
 }
 
@@ -195,10 +227,25 @@
     border: none !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
     transform: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .car-listing-card .favorite-btn.favorite-btn-listing:hover,
 .car-listings-grid .favorite-btn.favorite-btn-listing:hover {
     transform: scale(1.05) !important;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.car-listing-card .favorite-btn.favorite-btn-listing i,
+.car-listings-grid .favorite-btn.favorite-btn-listing i {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
 } 
