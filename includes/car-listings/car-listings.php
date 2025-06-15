@@ -198,8 +198,8 @@ function display_car_listings($atts) {
                 foreach ($precisely_filtered_posts as $post_object) :
                     $post = $post_object; // Set the global $post
                     setup_postdata($post);
-                    // Generate the detail page URL once
-                    $car_detail_url = esc_url(get_permalink(get_the_ID()));
+                    // Generate the detail page URL once with car_id parameter
+                    $car_detail_url = esc_url(add_query_arg('car_id', get_the_ID(), get_permalink(get_the_ID())));
 
                     // Get car details
                     $make = get_field('make', get_the_ID());
