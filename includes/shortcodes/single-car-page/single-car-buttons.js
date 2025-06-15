@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
 
             if (typeof carListingsData === 'undefined' || typeof carListingsData.ajaxurl === 'undefined' || typeof carListingsData.nonce === 'undefined') {
-                alert('Please log in to add favorites. (Error: Script data missing)');
+                alert('Log in to favourite a listing.');
                 return;
             }
 

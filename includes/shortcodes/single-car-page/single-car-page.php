@@ -69,7 +69,7 @@ function single_car_buttons_shortcode($atts) {
             </button>
         <?php else: ?>
             <button class="favorite-btn" 
-                    onclick="alert('Please log in to add favorites');" 
+                    data-car-id="<?php echo esc_attr($car_id); ?>" 
                     title="Login to add favorites">
                 <i class="far fa-heart"></i>
             </button>
