@@ -73,6 +73,9 @@
 /* Default design */
 .favorite-btn-default {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
 }
 
 /* Listing card design - subtle and clean */
@@ -93,6 +96,9 @@
 .favorite-btn-single {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     background: rgba(255, 255, 255, 0.95);
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
 }
 
 .favorite-btn-single:hover {
