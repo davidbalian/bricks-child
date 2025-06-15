@@ -256,6 +256,4 @@ function get_suggested_actions($reason) {
     );
 
     return isset($actions[$reason]) ? $actions[$reason] : "🎯 RECOMMENDED ACTIONS:\n- Review the reported listing\n- Take appropriate action as needed";
-}
-
- 
+} 

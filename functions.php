@@ -170,7 +170,7 @@ add_action('wp_ajax_nopriv_submit_listing_report', 'handle_listing_report_submis
 // Load the actual handler function only when AJAX is called
 function handle_listing_report_submission() {
     // Load the report handler file only when this AJAX call is made
-    require_once get_stylesheet_directory() . '/includes/single-car/report-handler.php';
+    require_once get_stylesheet_directory() . '/includes/shortcodes/single-car-page/report-handler.php';
     
     // Call the actual handler function
     process_listing_report_submission();
