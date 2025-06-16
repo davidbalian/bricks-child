@@ -3,7 +3,9 @@
  * Car Views Database Operations
  * 
  * Handles database table creation, cleanup, and core database operations
- * for the car views tracking system.
+ * for the car views tracking system with dual metrics:
+ * - Unique Views: One per visitor per listing (forever)
+ * - Total Views: 5-minute cooldown per visitor per listing
  * 
  * @package Bricks Child
  * @since 1.0.0
@@ -29,59 +31,117 @@ class CarViewsDatabase {
         // No ongoing checks needed - table assumed to exist after manual setup
     }
     
-
-    
     /**
-     * Record a new view for a car
+     * Record a new view for a car - implements MVP dual tracking logic
      * 
      * @param int $car_id The car post ID
      * @param string $ip_address The visitor's IP address
      * @param string $user_agent The visitor's user agent
      * @param int $user_id The user ID if logged in (0 for guests)
-     * @return bool True if view was recorded, false if duplicate/error
+     * @return array Results with unique_view and total_view booleans
      */
     public function record_view($car_id, $ip_address, $user_agent, $user_id = 0) {
         global $wpdb;
         
         if (!$car_id || !$ip_address || !$user_agent) {
-            return false;
+            return array('unique_view' => false, 'total_view' => false);
         }
         
-        // Create privacy-compliant hashes
-        $ip_hash = hash('sha256', $ip_address . wp_salt());
-        $agent_hash = hash('sha256', $user_agent . wp_salt());
+        // Create fingerprint hash (IP + User Agent combined)
+        $fingerprint = hash('sha256', $ip_address . '|' . $user_agent . wp_salt());
         
-        // Try to insert the view (will fail silently if duplicate due to UNIQUE constraint)
-        $result = $wpdb->insert(
-            $this->table_name,
-            array(
-                'car_id' => $car_id,
-                'user_ip_hash' => $ip_hash,
-                'user_id' => $user_id,
-                'user_agent_hash' => $agent_hash,
-                'view_date' => current_time('mysql')
-            ),
-            array('%d', '%s', '%d', '%s', '%s')
-        );
+        $results = array('unique_view' => false, 'total_view' => false);
         
-        if ($result !== false) {
-            // Update the cached count
-            $this->update_total_views_cache($car_id);
-            return true;
+        // Check for existing unique view
+        $existing_unique = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM {$this->table_name} 
+             WHERE car_id = %d AND fingerprint_hash = %s AND view_type = 'unique'",
+            $car_id, $fingerprint
+        ));
+        
+        // If no unique view exists, record it
+        if (!$existing_unique) {
+            $unique_result = $wpdb->insert(
+                $this->table_name,
+                array(
+                    'car_id' => $car_id,
+                    'user_ip_hash' => hash('sha256', $ip_address . wp_salt()),
+                    'user_id' => $user_id,
+                    'user_agent_hash' => hash('sha256', $user_agent . wp_salt()),
+                    'view_date' => current_time('mysql'),
+                    'view_type' => 'unique',
+                    'fingerprint_hash' => $fingerprint
+                ),
+                array('%d', '%s', '%d', '%s', '%s', '%s', '%s')
+            );
+            
+            if ($unique_result !== false) {
+                $results['unique_view'] = true;
+                $this->update_unique_views_cache($car_id);
+            }
         }
         
-        return false;
+        // Check for recent total view (within 5 minutes)
+        $recent_total = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM {$this->table_name} 
+             WHERE car_id = %d AND fingerprint_hash = %s AND view_type = 'total'
+             AND view_date > DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+             ORDER BY view_date DESC LIMIT 1",
+            $car_id, $fingerprint
+        ));
+        
+        // If no recent total view, record it
+        if (!$recent_total) {
+            $total_result = $wpdb->insert(
+                $this->table_name,
+                array(
+                    'car_id' => $car_id,
+                    'user_ip_hash' => hash('sha256', $ip_address . wp_salt()),
+                    'user_id' => $user_id,
+                    'user_agent_hash' => hash('sha256', $user_agent . wp_salt()),
+                    'view_date' => current_time('mysql'),
+                    'view_type' => 'total',
+                    'fingerprint_hash' => $fingerprint
+                ),
+                array('%d', '%s', '%d', '%s', '%s', '%s', '%s')
+            );
+            
+            if ($total_result !== false) {
+                $results['total_view'] = true;
+                $this->update_total_views_cache($car_id);
+            }
+        }
+        
+        return $results;
     }
     
     /**
-     * Get total unique views for a car
+     * Get unique views count for a car
      * 
      * @param int $car_id The car post ID
-     * @return int Number of unique views
+     * @return int Number of unique visitors
+     */
+    public function get_unique_views($car_id) {
+        // First try to get from cache (post meta)
+        $cached_views = get_post_meta($car_id, 'unique_views_count', true);
+        
+        if ($cached_views !== '') {
+            return (int) $cached_views;
+        }
+        
+        // If not cached, calculate and cache it
+        return $this->update_unique_views_cache($car_id);
+    }
+    
+    /**
+     * Get total views count for a car
+     * 
+     * @param int $car_id The car post ID
+     * @return int Number of total views
      */
     public function get_total_views($car_id) {
         // First try to get from cache (post meta)
-        $cached_views = get_post_meta($car_id, 'total_unique_views', true);
+        $cached_views = get_post_meta($car_id, 'total_views_count', true);
         
         if ($cached_views !== '') {
             return (int) $cached_views;
@@ -89,6 +149,39 @@ class CarViewsDatabase {
         
         // If not cached, calculate and cache it
         return $this->update_total_views_cache($car_id);
+    }
+    
+    /**
+     * Get both view counts for display
+     * 
+     * @param int $car_id The car post ID
+     * @return array Array with 'total' and 'unique' counts
+     */
+    public function get_view_counts($car_id) {
+        return array(
+            'total' => $this->get_total_views($car_id),
+            'unique' => $this->get_unique_views($car_id)
+        );
+    }
+    
+    /**
+     * Update the cached unique views count for a car
+     * 
+     * @param int $car_id The car post ID
+     * @return int The updated view count
+     */
+    private function update_unique_views_cache($car_id) {
+        global $wpdb;
+        
+        $count = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$this->table_name} WHERE car_id = %d AND view_type = 'unique'",
+            $car_id
+        ));
+        
+        $count = (int) $count;
+        update_post_meta($car_id, 'unique_views_count', $count);
+        
+        return $count;
     }
     
     /**
@@ -101,12 +194,12 @@ class CarViewsDatabase {
         global $wpdb;
         
         $count = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(DISTINCT CONCAT(user_ip_hash, user_agent_hash)) FROM {$this->table_name} WHERE car_id = %d",
+            "SELECT COUNT(*) FROM {$this->table_name} WHERE car_id = %d AND view_type = 'total'",
             $car_id
         ));
         
         $count = (int) $count;
-        update_post_meta($car_id, 'total_unique_views', $count);
+        update_post_meta($car_id, 'total_views_count', $count);
         
         return $count;
     }
@@ -130,7 +223,8 @@ class CarViewsDatabase {
             );
             
             // Also remove the cached meta
-            delete_post_meta($post_id, 'total_unique_views');
+            delete_post_meta($post_id, 'unique_views_count');
+            delete_post_meta($post_id, 'total_views_count');
         }
     }
     
@@ -157,22 +251,20 @@ class CarViewsDatabase {
         
         $stats = array();
         
-        // Total unique views
-        $stats['total_unique'] = $this->get_total_views($car_id);
+        // Current counts
+        $stats['total_views'] = $this->get_total_views($car_id);
+        $stats['unique_views'] = $this->get_unique_views($car_id);
         
-        // Views in last 7 days
-        $stats['last_7_days'] = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(DISTINCT CONCAT(user_ip_hash, user_agent_hash)) 
-             FROM {$this->table_name} 
-             WHERE car_id = %d AND view_date >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+        // Recent activity
+        $stats['total_last_7_days'] = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$this->table_name} 
+             WHERE car_id = %d AND view_type = 'total' AND view_date >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
             $car_id
         ));
         
-        // Views in last 30 days
-        $stats['last_30_days'] = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(DISTINCT CONCAT(user_ip_hash, user_agent_hash)) 
-             FROM {$this->table_name} 
-             WHERE car_id = %d AND view_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
+        $stats['unique_last_7_days'] = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$this->table_name} 
+             WHERE car_id = %d AND view_type = 'unique' AND view_date >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
             $car_id
         ));
         
@@ -187,8 +279,10 @@ class CarViewsDatabase {
     public function cleanup_old_records($days_old = 365) {
         global $wpdb;
         
+        // Only clean up total view records (keep unique views forever for analytics)
         $wpdb->query($wpdb->prepare(
-            "DELETE FROM {$this->table_name} WHERE view_date < DATE_SUB(NOW(), INTERVAL %d DAY)",
+            "DELETE FROM {$this->table_name} 
+             WHERE view_type = 'total' AND view_date < DATE_SUB(NOW(), INTERVAL %d DAY)",
             $days_old
         ));
     }

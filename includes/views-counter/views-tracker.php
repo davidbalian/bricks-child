@@ -71,39 +71,44 @@ class CarViewsTracker {
      * Track a view for a specific car
      * 
      * @param int $car_id The car post ID
-     * @return bool True if view was tracked, false otherwise
+     * @return array Results with unique_view and total_view booleans
      */
     public function track_view($car_id) {
         // Validate car ID
         if (!$car_id || !$this->is_valid_car($car_id)) {
-            return false;
+            return array('unique_view' => false, 'total_view' => false);
         }
         
         // Don't track admin users (optional)
         if (current_user_can('manage_options')) {
-            return false;
+            return array('unique_view' => false, 'total_view' => false);
         }
         
         // Don't track the car owner's views
         if ($this->is_car_owner($car_id)) {
-            return false;
+            return array('unique_view' => false, 'total_view' => false);
         }
         
         // Don't track bot visits
         if ($this->is_bot_visit()) {
-            return false;
+            return array('unique_view' => false, 'total_view' => false);
+        }
+        
+        // Don't track if missing or suspicious User-Agent (MVP abuse protection)
+        $user_agent = $this->get_visitor_user_agent();
+        if (!$user_agent || strlen($user_agent) < 10) {
+            return array('unique_view' => false, 'total_view' => false);
         }
         
         // Get visitor information
         $ip_address = $this->get_visitor_ip();
-        $user_agent = $this->get_visitor_user_agent();
         $user_id = get_current_user_id();
         
-        if (!$ip_address || !$user_agent) {
-            return false;
+        if (!$ip_address) {
+            return array('unique_view' => false, 'total_view' => false);
         }
         
-        // Record the view
+        // Record the view using new dual tracking system
         return $this->database->record_view($car_id, $ip_address, $user_agent, $user_id);
     }
     
