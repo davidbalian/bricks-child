@@ -566,7 +566,7 @@ function bulk_create_car_listings() {
         update_field('numowners', $num_owners, $post_id);
         update_field('isantique', ($year < 1990) ? 1 : 0, $post_id);
         
-        // Assign random 5-7 images from stock
+        // Assign random 5-7 images from stock - properly structured
         $num_images = rand(5, 7);
         $random_image_keys = array_rand($stock_car_image_ids, $num_images);
         $selected_images = [];
@@ -579,7 +579,13 @@ function bulk_create_car_listings() {
             $selected_images[] = $stock_car_image_ids[$random_image_keys];
         }
         
+        // Update car_images field with ALL images (first image acts as main/featured)
         update_field('car_images', $selected_images, $post_id);
+        
+        // Ensure no separate featured image to avoid duplication (as per your system)
+        if (has_post_thumbnail($post_id)) {
+            delete_post_thumbnail($post_id);
+        }
         
         $created_count++;
         echo "<span style='color:green;'>✅ Created: $post_title (ID: $post_id)</span><br>";
