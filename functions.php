@@ -103,7 +103,7 @@ add_action('wp_footer', function() {
         
         // Force create table if missing
         if (!$table_exists) {
-            $charset_collate = $wpdb->get_charset_collate();
+            // Try simple table creation first
             $sql = "CREATE TABLE $table_name (
                 id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
                 car_id bigint(20) unsigned NOT NULL,
@@ -112,13 +112,10 @@ add_action('wp_footer', function() {
                 view_date datetime DEFAULT CURRENT_TIMESTAMP,
                 user_agent_hash varchar(64) NOT NULL,
                 PRIMARY KEY (id),
-                KEY car_id (car_id),
-                KEY user_ip_hash (user_ip_hash),
-                KEY view_date (view_date),
-                UNIQUE KEY unique_view (car_id, user_ip_hash, user_agent_hash, DATE(view_date))
-            ) $charset_collate;";
+                KEY car_id (car_id)
+            ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
             
-            // Try direct MySQL creation instead of dbDelta
+            // Try direct MySQL creation
             $create_result = $wpdb->query($sql);
             
             // Check if it worked
@@ -127,10 +124,13 @@ add_action('wp_footer', function() {
             if ($table_exists_now) {
                 echo '• <strong style="color: green;">✅ TABLE CREATED!</strong><br>';
                 update_option('car_views_table_created', 'yes');
+                
+                // Add the unique constraint after table creation
+                $wpdb->query("ALTER TABLE $table_name ADD UNIQUE KEY unique_view (car_id, user_ip_hash, user_agent_hash, DATE(view_date))");
             } else {
-                echo '• <strong style="color: red;">❌ TABLE FAILED!</strong><br>';
-                echo '• Error: ' . $wpdb->last_error . '<br>';
-                echo '• SQL: ' . substr($sql, 0, 100) . '...<br>';
+                echo '• <strong style="color: red;">❌ SIMPLE TABLE FAILED!</strong><br>';
+                echo '• MySQL Error: ' . $wpdb->last_error . '<br>';
+                echo '• Create result: ' . ($create_result === false ? 'FALSE' : $create_result) . '<br>';
             }
         }
     }
