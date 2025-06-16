@@ -600,8 +600,15 @@ function bulk_create_car_listings() {
         if (!is_array($selected_extras)) $selected_extras = [$selected_extras];
         
         // Ensure ACF is loaded before saving fields
-        if (!function_exists('update_field') && function_exists('acf_include')) {
-            acf_include('includes/api/api-helpers.php');
+        if (!function_exists('update_field')) {
+            // Force load ACF API
+            if (function_exists('acf_include')) {
+                acf_include('includes/api/api-helpers.php');
+            }
+            // Alternative: Load admin functions to ensure ACF works
+            if (!function_exists('update_field') && defined('ACF_PATH')) {
+                require_once(ACF_PATH . 'includes/api/api-helpers.php');
+            }
         }
         
         // Add all the ACF fields (like manual submissions)
@@ -668,7 +675,12 @@ function bulk_create_car_listings() {
         }
         
         $created_count++;
+        // Debug: Check if ACF data was saved correctly
+        $saved_fuel_type = get_field('fuel_type', $post_id);
+        $saved_transmission = get_field('transmission', $post_id);
+        
         echo "<span style='color:green;'>✅ Created: $post_title (ID: $post_id)</span><br>";
+        echo "<span style='color:purple;'>🔍 Debug - Fuel: $saved_fuel_type, Trans: $saved_transmission</span><br>";
         
         // Flush output for real-time progress
         flush();
