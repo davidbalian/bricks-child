@@ -464,13 +464,13 @@ function bulk_create_car_listings() {
     
     echo "<p>🚗 Found " . count($makes_data) . " car makes</p>";
     
-    // Realistic data arrays
-    $fuel_types = ['Petrol', 'Diesel', 'Hybrid', 'Electric', 'Plug-in hybrid'];
-    $transmissions = ['Manual', 'Automatic', 'CVT'];
-    $body_types = ['Sedan', 'Hatchback', 'SUV', 'Coupe', 'Convertible', 'Estate', 'MPV'];
-    $drive_types = ['FWD', 'RWD', 'AWD', '4WD'];
-    $colors = ['Black', 'White', 'Silver', 'Grey', 'Blue', 'Red', 'Green', 'Brown', 'Beige'];
-    $interior_colors = ['Black', 'Beige', 'Grey', 'Brown', 'Red', 'Blue'];
+    // Realistic data arrays (matching form options exactly)
+    $fuel_types = ['Petrol', 'Diesel', 'Electric', 'Petrol hybrid', 'Diesel hybrid', 'Plug-in petrol', 'Plug-in diesel', 'Bi Fuel', 'Hydrogen', 'Natural Gas'];
+    $transmissions = ['Manual', 'Automatic'];
+    $body_types = ['Hatchback', 'Saloon', 'Coupe', 'Convertible', 'Estate', 'SUV', 'MPV', 'Pickup', 'Camper', 'Minibus'];
+    $drive_types = ['Front-Wheel Drive', 'Rear-Wheel Drive', 'All-Wheel Drive', '4-Wheel Drive'];
+    $colors = ['Black', 'White', 'Silver', 'Gray', 'Red', 'Blue', 'Green', 'Yellow', 'Brown', 'Beige', 'Orange', 'Purple', 'Gold', 'Bronze'];
+    $interior_colors = ['Black', 'Gray', 'Beige', 'Brown', 'White', 'Red', 'Blue', 'Tan', 'Cream'];
     $cities = ['Nicosia', 'Limassol', 'Larnaca', 'Paphos', 'Famagusta', 'Kyrenia'];
     $districts = ['Nicosia District', 'Limassol District', 'Larnaca District', 'Paphos District', 'Famagusta District', 'Kyrenia District'];
     
@@ -568,6 +568,37 @@ function bulk_create_car_listings() {
             continue;
         }
         
+        // Generate additional realistic data
+        $availability = rand(0, 1) ? 'In Stock' : 'In Transit';
+        
+        // MOT Status - random future date or expired
+        $mot_options = ['Expired'];
+        $current_date = new DateTime();
+        for ($j = 0; $j < 24; $j++) { // Next 24 months
+            $future_date = new DateTime();
+            $future_date->modify("+$j months");
+            $mot_options[] = $future_date->format('Y-m');
+        }
+        $mot_status = $mot_options[array_rand($mot_options)];
+        
+        // Vehicle History - select 2-5 random positive history items
+        $vehicle_history_options = [
+            'no_accidents', 'regular_maintenance', 'no_modifications', 'clear_title', 'no_known_issues'
+        ];
+        $num_history = rand(2, 5);
+        $selected_history = array_rand(array_flip($vehicle_history_options), $num_history);
+        if (!is_array($selected_history)) $selected_history = [$selected_history];
+        
+        // Extras - select 3-8 random extras
+        $extras_options = [
+            'alloy_wheels', 'cruise_control', 'rear_view_camera', 'heated_seats', 
+            'android_auto', 'apple_carplay', 'leather_seats', 'parking_sensors',
+            'sunroof', 'keyless_start', 'start_stop'
+        ];
+        $num_extras = rand(3, 8);
+        $selected_extras = array_rand(array_flip($extras_options), $num_extras);
+        if (!is_array($selected_extras)) $selected_extras = [$selected_extras];
+        
         // Add all the ACF fields
         update_field('make', $random_make, $post_id);
         update_field('model', $random_model, $post_id);
@@ -591,6 +622,12 @@ function bulk_create_car_listings() {
         update_field('numowners', $num_owners, $post_id);
         update_field('isantique', ($year < 1990) ? 1 : 0, $post_id);
         
+        // New fields that were missing
+        update_field('availability', $availability, $post_id);
+        update_field('motuntil', $mot_status, $post_id);
+        update_field('vehiclehistory', $selected_history, $post_id);
+        update_field('extras', $selected_extras, $post_id);
+        
         // Assign random 5-7 images from stock - properly structured
         $num_images = rand(5, 7);
         $random_image_keys = array_rand($stock_car_image_ids, $num_images);
@@ -604,13 +641,13 @@ function bulk_create_car_listings() {
             $selected_images[] = $stock_car_image_ids[$random_image_keys];
         }
         
-        // Update car_images field with ALL images (first image acts as main/featured)
-        update_field('car_images', $selected_images, $post_id);
-        
-        // Ensure no separate featured image to avoid duplication (as per your system)
-        if (has_post_thumbnail($post_id)) {
-            delete_post_thumbnail($post_id);
+        // Set first image as featured image (like manual submissions)
+        if (!empty($selected_images)) {
+            set_post_thumbnail($post_id, $selected_images[0]);
         }
+        
+        // Update car_images field with ALL images
+        update_field('car_images', $selected_images, $post_id);
         
         $created_count++;
         echo "<span style='color:green;'>✅ Created: $post_title (ID: $post_id)</span><br>";
