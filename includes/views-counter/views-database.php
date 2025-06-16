@@ -27,7 +27,7 @@ class CarViewsDatabase {
         add_action('before_delete_post', array($this, 'cleanup_views_on_delete'));
         add_action('wp_trash_post', array($this, 'cleanup_views_on_trash'));
         
-        // NOTE: Table creation handled by one-time script (create-views-table.php)
+        // NOTE: Table creation handled 
         // No ongoing checks needed - table assumed to exist after manual setup
     }
     
