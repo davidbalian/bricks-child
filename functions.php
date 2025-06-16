@@ -599,7 +599,12 @@ function bulk_create_car_listings() {
         $selected_extras = array_rand(array_flip($extras_options), $num_extras);
         if (!is_array($selected_extras)) $selected_extras = [$selected_extras];
         
-        // Add all the ACF fields
+        // Ensure ACF is loaded before saving fields
+        if (!function_exists('update_field') && function_exists('acf_include')) {
+            acf_include('includes/api/api-helpers.php');
+        }
+        
+        // Add all the ACF fields (like manual submissions)
         update_field('make', $random_make, $post_id);
         update_field('model', $random_model, $post_id);
         update_field('variant', $random_variant, $post_id);
@@ -621,33 +626,46 @@ function bulk_create_car_listings() {
         update_field('hp', $hp, $post_id);
         update_field('numowners', $num_owners, $post_id);
         update_field('isantique', ($year < 1990) ? 1 : 0, $post_id);
-        
-        // New fields that were missing
         update_field('availability', $availability, $post_id);
         update_field('motuntil', $mot_status, $post_id);
         update_field('vehiclehistory', $selected_history, $post_id);
         update_field('extras', $selected_extras, $post_id);
         
         // Assign random 5-7 images from stock - properly structured
-        $num_images = rand(5, 7);
-        $random_image_keys = array_rand($stock_car_image_ids, $num_images);
         $selected_images = [];
-        
-        if (is_array($random_image_keys)) {
-            foreach ($random_image_keys as $key) {
-                $selected_images[] = $stock_car_image_ids[$key];
+        if (!empty($stock_car_image_ids)) {
+            $num_images = rand(5, 7);
+            $available_images = count($stock_car_image_ids);
+            
+            // Don't try to select more images than available
+            $num_images = min($num_images, $available_images);
+            
+            if ($num_images > 1) {
+                $random_image_keys = array_rand($stock_car_image_ids, $num_images);
+                if (is_array($random_image_keys)) {
+                    foreach ($random_image_keys as $key) {
+                        $selected_images[] = $stock_car_image_ids[$key];
+                    }
+                } else {
+                    $selected_images[] = $stock_car_image_ids[$random_image_keys];
+                }
+            } else {
+                // If only one image available
+                $selected_images[] = $stock_car_image_ids[0];
             }
+            
+            // Set first image as featured image (like manual submissions)
+            if (!empty($selected_images)) {
+                set_post_thumbnail($post_id, $selected_images[0]);
+            }
+            
+            // Update car_images field with ALL images (like manual submissions)
+            update_field('car_images', $selected_images, $post_id);
+            
+            echo "<span style='color:blue;'>📸 Assigned " . count($selected_images) . " images</span><br>";
         } else {
-            $selected_images[] = $stock_car_image_ids[$random_image_keys];
+            echo "<span style='color:red;'>❌ No stock images available!</span><br>";
         }
-        
-        // Set first image as featured image (like manual submissions)
-        if (!empty($selected_images)) {
-            set_post_thumbnail($post_id, $selected_images[0]);
-        }
-        
-        // Update car_images field with ALL images
-        update_field('car_images', $selected_images, $post_id);
         
         $created_count++;
         echo "<span style='color:green;'>✅ Created: $post_title (ID: $post_id)</span><br>";
