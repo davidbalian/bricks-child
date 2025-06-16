@@ -8,23 +8,29 @@
  * 3. Delete this file after running
  */
 
-// Load WordPress
-define('WP_USE_THEMES', false);
-require_once('wp-load.php');
+// Get database config from wp-config.php
+require_once('wp-config.php');
 
-global $wpdb;
-$table_name = $wpdb->prefix . 'car_views';
+// Connect to database directly
+$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+
+if ($mysqli->connect_error) {
+    die('Database connection failed: ' . $mysqli->connect_error);
+}
+
+// Get table prefix
+$table_prefix = isset($table_prefix) ? $table_prefix : 'wp_';
+$table_name = $table_prefix . 'car_views';
 
 // Check if table exists
-$table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name;
+$result = $mysqli->query("SHOW TABLES LIKE '$table_name'");
+$table_exists = $result && $result->num_rows > 0;
 
 if ($table_exists) {
     $status = 'exists';
     $message = 'Table already exists - no action needed';
 } else {
     // Create table
-    $charset_collate = $wpdb->get_charset_collate();
-    
     $sql = "CREATE TABLE $table_name (
         id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
         car_id bigint(20) unsigned NOT NULL,
@@ -37,21 +43,23 @@ if ($table_exists) {
         KEY user_ip_hash (user_ip_hash),
         KEY view_date (view_date),
         UNIQUE KEY unique_view (car_id, user_ip_hash, user_agent_hash, DATE(view_date))
-    ) $charset_collate;";
+    ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
     
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    $result = dbDelta($sql);
-    
-    // Verify creation
-    $table_exists_now = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name;
-    
-    if ($table_exists_now) {
-        $status = 'created';
-        $message = 'Table created successfully';
-        update_option('car_views_table_created', 'yes');
+    if ($mysqli->query($sql)) {
+        // Verify creation
+        $result = $mysqli->query("SHOW TABLES LIKE '$table_name'");
+        $table_exists_now = $result && $result->num_rows > 0;
+        
+        if ($table_exists_now) {
+            $status = 'created';
+            $message = 'Table created successfully';
+        } else {
+            $status = 'error';
+            $message = 'Table creation verified failed';
+        }
     } else {
         $status = 'error';
-        $message = 'Failed to create table';
+        $message = 'SQL Error: ' . $mysqli->error;
     }
 }
 ?>
@@ -91,7 +99,7 @@ if ($table_exists) {
     <ul>
         <li><strong>Table name:</strong> <code><?php echo $table_name; ?></code></li>
         <li><strong>Status:</strong> <?php echo $message; ?></li>
-        <li><strong>Database:</strong> <?php echo DB_NAME; ?></li>
+        <li><strong>Database:</strong> <?php echo defined('DB_NAME') ? DB_NAME : 'Connected'; ?></li>
     </ul>
     
     <?php if ($status === 'created' || $status === 'exists'): ?>
