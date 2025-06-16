@@ -70,6 +70,14 @@ add_action('wp_footer', function() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'car_views';
     $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name;
+    
+    // Check what tables actually exist with car_views
+    $actual_tables = $wpdb->get_results("SHOW TABLES LIKE '%car_views%'", ARRAY_N);
+    $found_tables = array();
+    foreach($actual_tables as $table) {
+        $found_tables[] = $table[0];
+    }
+    
     $total_views = get_post_meta($car_id_from_url, 'total_unique_views', true);
     $db_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE car_id = %d", $car_id_from_url));
     
@@ -77,7 +85,9 @@ add_action('wp_footer', function() {
     echo '<strong>🔍 Database Debug:</strong><br>';
     echo '• Should track: ' . ($should_track ? '✅ YES' : '❌ NO') . '<br>';
     echo '• Table exists: ' . ($table_exists ? '✅ YES' : '❌ NO') . '<br>';
-    echo '• Table name: ' . $table_name . '<br>';
+    echo '• Looking for: ' . $table_name . '<br>';
+    echo '• Found tables: ' . implode(', ', $found_tables) . '<br>';
+    echo '• DB prefix: ' . $wpdb->prefix . '<br>';
     echo '• Cached views: ' . ($total_views ?: '0') . '<br>';
     echo '• DB records: ' . ($db_count ?: '0') . '<br>';
     
