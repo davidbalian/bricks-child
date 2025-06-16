@@ -474,14 +474,25 @@ function bulk_create_car_listings() {
     $cities = ['Nicosia', 'Limassol', 'Larnaca', 'Paphos', 'Famagusta', 'Kyrenia'];
     $districts = ['Nicosia District', 'Limassol District', 'Larnaca District', 'Paphos District', 'Famagusta District', 'Kyrenia District'];
     
-    // Start bulk creation
+    // Start bulk creation with chunking for large batches
     $created_count = 0;
-    $target_count = isset($_GET['count']) ? intval($_GET['count']) : 10; // Default to 10, can specify ?count=1000
+    $target_count = isset($_GET['count']) ? intval($_GET['count']) : 10;
+    $chunk_size = 50; // Process in chunks of 50 to avoid timeouts
+    $current_chunk = isset($_GET['chunk']) ? intval($_GET['chunk']) : 1;
     
-    echo "<p><strong>🚀 Starting bulk creation of $target_count listings...</strong></p>";
+    // Calculate start and end for this chunk
+    $start_index = ($current_chunk - 1) * $chunk_size + 1;
+    $end_index = min($current_chunk * $chunk_size, $target_count);
+    $total_chunks = ceil($target_count / $chunk_size);
+    
+    echo "<p><strong>🚀 Processing chunk $current_chunk of $total_chunks (listings $start_index to $end_index)...</strong></p>";
     echo "<div style='background:#f0f0f0; padding:10px; margin:10px 0; font-family:monospace; height:300px; overflow-y:scroll;'>";
     
-    for ($i = 1; $i <= $target_count; $i++) {
+    // Increase memory and time limits
+    ini_set('memory_limit', '512M');
+    set_time_limit(300); // 5 minutes per chunk
+    
+    for ($i = $start_index; $i <= $end_index; $i++) {
         // Select random make and model
         $make_names = array_keys($makes_data);
         $random_make = $make_names[array_rand($make_names)];
@@ -583,15 +594,31 @@ function bulk_create_car_listings() {
     
     echo "</div>";
     
-    echo "<h2>🎉 Bulk Creation Complete!</h2>";
-    echo "<p><strong>Successfully created:</strong> $created_count car listings</p>";
-    echo "<p>🔗 <a href='" . home_url() . "' target='_blank'>Visit your site to see the new listings!</a></p>";
+    echo "<h2>🎉 Chunk $current_chunk Complete!</h2>";
+    echo "<p><strong>Successfully created:</strong> $created_count car listings in this chunk</p>";
+    
+    // Show progress and next chunk link
+    if ($current_chunk < $total_chunks) {
+        $next_chunk = $current_chunk + 1;
+        $completed_so_far = ($current_chunk - 1) * $chunk_size + $created_count;
+        echo "<div style='background:#e7f3ff; padding:15px; border-left:4px solid #2196F3; margin:20px 0;'>";
+        echo "<h3>📊 Progress: $completed_so_far / $target_count listings completed</h3>";
+        echo "<p><strong>⏭️ Continue to next chunk:</strong></p>";
+        echo "<p><a href='" . home_url("?bulk_create_listings=1&count=$target_count&chunk=$next_chunk") . "' style='background:#2196F3;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;'>Process Chunk $next_chunk</a></p>";
+        echo "</div>";
+    } else {
+        echo "<div style='background:#e8f5e8; padding:15px; border-left:4px solid #4CAF50; margin:20px 0;'>";
+        echo "<h3>🎉 ALL DONE!</h3>";
+        echo "<p><strong>Successfully created all $target_count car listings!</strong></p>";
+        echo "<p>🔗 <a href='" . home_url() . "' target='_blank'>Visit your site to see the new listings!</a></p>";
+        echo "</div>";
+    }
     
     if ($target_count == 10) {
         echo "<div style='background:#fffbf0; padding:15px; border-left:4px solid #ffb900; margin:20px 0;'>";
         echo "<h3>🚀 Ready for Full Scale?</h3>";
         echo "<p>Test completed successfully! To create 1000 listings:</p>";
-        echo "<p><a href='" . home_url('?bulk_create_listings=1&count=1000') . "'>Click here to create 1000 listings</a></p>";
+        echo "<p><a href='" . home_url('?bulk_create_listings=1&count=1000') . "'>Click here to create 1000 listings (will process in chunks of 50)</a></p>";
         echo "</div>";
     }
 }
