@@ -552,13 +552,20 @@ function bulk_create_car_listings() {
                       "This $exterior_color $body_type features a $engine_capacity" . "L $fuel_type engine with $transmission transmission. " .
                       "Well maintained with $mileage km on the odometer. Perfect for daily driving.";
         
-        // Create the WordPress post (like manual submissions)
+        // Create the WordPress post with proper user assignment
+        $current_user_id = get_current_user_id();
+        if (!$current_user_id) {
+            // Get the first admin user as fallback
+            $admin_users = get_users(['role' => 'administrator', 'number' => 1]);
+            $current_user_id = !empty($admin_users) ? $admin_users[0]->ID : 1;
+        }
+        
         $post_data = [
             'post_title' => $post_title,
             'post_content' => '',
-            'post_status' => 'pending',
+            'post_status' => 'publish', // Published immediately like you want
             'post_type' => 'car',
-            'post_author' => get_current_user_id(),
+            'post_author' => $current_user_id,
         ];
         
         $post_id = wp_insert_post($post_data);
@@ -675,7 +682,8 @@ function bulk_create_car_listings() {
         }
         
         $created_count++;
-        echo "<span style='color:green;'>✅ Created: $post_title (ID: $post_id)</span><br>";
+        $actual_status = get_post_status($post_id);
+        echo "<span style='color:green;'>✅ Created: $post_title (ID: $post_id) - Status: $actual_status</span><br>";
         
         // Flush output for real-time progress
         flush();
