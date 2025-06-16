@@ -331,4 +331,272 @@ function bricks_filter_builder_elements( $elements ) {
 // } );
 
 
+// =========================================================================
+// TEMPORARY BULK CAR LISTING CREATOR - REMOVE AFTER USE
+// =========================================================================
+
+// Upload images functionality
+add_action('init', function() {
+    if (isset($_GET['bulk_upload_images']) && current_user_can('manage_options')) {
+        bulk_upload_car_images();
+        exit;
+    }
+    
+    if (isset($_GET['bulk_create_listings']) && current_user_can('manage_options')) {
+        bulk_create_car_listings();
+        exit;
+    }
+});
+
+function bulk_upload_car_images() {
+    require_once(ABSPATH . 'wp-admin/includes/file.php');
+    require_once(ABSPATH . 'wp-admin/includes/image.php');
+    require_once(ABSPATH . 'wp-admin/includes/media.php');
+    
+    echo "<h1>🚗 Car Images Bulk Upload</h1>";
+    
+    // Path to images
+    $images_folder = ABSPATH . 'wp-content/uploads/temp-car-images/';
+    
+    // Check if folder exists
+    if (!is_dir($images_folder)) {
+        die("<p style='color:red;'>❌ Folder not found: $images_folder</p><p>Please create the folder and add your 100 car images.</p>");
+    }
+    
+    // Get image files
+    $image_files = glob($images_folder . '*.{jpg,jpeg,png,gif,webp}', GLOB_BRACE);
+    
+    if (empty($image_files)) {
+        die("<p style='color:red;'>❌ No images found in: $images_folder</p>");
+    }
+    
+    echo "<p>📸 Found " . count($image_files) . " images to upload...</p>";
+    echo "<div style='background:#f0f0f0; padding:10px; margin:10px 0; font-family:monospace;'>";
+    
+    $attachment_ids = [];
+    
+    foreach ($image_files as $index => $image_path) {
+        $filename = basename($image_path);
+        
+        // Create file array for WordPress
+        $file_array = [
+            'name' => 'stock-car-' . ($index + 1) . '.jpg',
+            'tmp_name' => $image_path,
+            'type' => mime_content_type($image_path),
+            'size' => filesize($image_path),
+            'error' => 0
+        ];
+        
+        // Upload to WordPress
+        $attachment_id = media_handle_sideload($file_array, 0, 'Stock car image ' . ($index + 1));
+        
+        if (is_wp_error($attachment_id)) {
+            echo "<span style='color:red;'>❌ Failed: $filename - " . $attachment_id->get_error_message() . "</span><br>";
+            continue;
+        }
+        
+        $attachment_ids[] = $attachment_id;
+        echo "<span style='color:green;'>✅ Uploaded: $filename (ID: $attachment_id)</span><br>";
+        
+        // Flush output for real-time progress
+        flush();
+        ob_flush();
+        
+        // Small delay
+        usleep(100000);
+    }
+    
+    echo "</div>";
+    
+    if (!empty($attachment_ids)) {
+        echo "<h2>🎉 Upload Complete!</h2>";
+        echo "<p><strong>Total uploaded:</strong> " . count($attachment_ids) . " images</p>";
+        
+        // Save IDs to WordPress option
+        update_option('bulk_car_image_ids', $attachment_ids);
+        
+        echo "<p>💾 Image IDs saved to database</p>";
+        echo "<p><strong>🚀 Next step:</strong> Visit <a href='" . home_url('?bulk_create_listings=1') . "'>?bulk_create_listings=1</a> to create your car listings!</p>";
+        
+        echo "<details><summary>📋 Image IDs (for reference)</summary>";
+        echo "<textarea style='width:100%;height:100px;'>" . implode(',', $attachment_ids) . "</textarea>";
+        echo "</details>";
+    } else {
+        echo "<p style='color:red;'>❌ No images were uploaded successfully.</p>";
+    }
+}
+
+function bulk_create_car_listings() {
+    echo "<h1>🚗 Bulk Create Car Listings</h1>";
+    
+    // Load stock car image IDs
+    $stock_car_image_ids = get_option('bulk_car_image_ids', []);
+    
+    if (empty($stock_car_image_ids)) {
+        die("<p style='color:red;'>❌ No stock images found. Please run ?bulk_upload_images=1 first.</p>");
+    }
+    
+    echo "<p>📸 Found " . count($stock_car_image_ids) . " stock images</p>";
+    
+    // Load car makes data from JSON files
+    $makes_data = [];
+    $jsons_dir = get_stylesheet_directory() . '/simple_jsons/';
+    
+    if (is_dir($jsons_dir)) {
+        $json_files = glob($jsons_dir . '*.json');
+        foreach ($json_files as $file) {
+            $content = file_get_contents($file);
+            if ($content) {
+                $data = json_decode($content, true);
+                if ($data && json_last_error() === JSON_ERROR_NONE) {
+                    $make_name = array_key_first($data);
+                    if ($make_name) {
+                        $makes_data[$make_name] = $data[$make_name];
+                    }
+                }
+            }
+        }
+    }
+    
+    if (empty($makes_data)) {
+        die("<p style='color:red;'>❌ No car makes data found in simple_jsons folder.</p>");
+    }
+    
+    echo "<p>🚗 Found " . count($makes_data) . " car makes</p>";
+    
+    // Realistic data arrays
+    $fuel_types = ['Petrol', 'Diesel', 'Hybrid', 'Electric', 'Plug-in hybrid'];
+    $transmissions = ['Manual', 'Automatic', 'CVT'];
+    $body_types = ['Sedan', 'Hatchback', 'SUV', 'Coupe', 'Convertible', 'Estate', 'MPV'];
+    $drive_types = ['FWD', 'RWD', 'AWD', '4WD'];
+    $colors = ['Black', 'White', 'Silver', 'Grey', 'Blue', 'Red', 'Green', 'Brown', 'Beige'];
+    $interior_colors = ['Black', 'Beige', 'Grey', 'Brown', 'Red', 'Blue'];
+    $cities = ['Nicosia', 'Limassol', 'Larnaca', 'Paphos', 'Famagusta', 'Kyrenia'];
+    $districts = ['Nicosia District', 'Limassol District', 'Larnaca District', 'Paphos District', 'Famagusta District', 'Kyrenia District'];
+    
+    // Start bulk creation
+    $created_count = 0;
+    $target_count = isset($_GET['count']) ? intval($_GET['count']) : 10; // Default to 10, can specify ?count=1000
+    
+    echo "<p><strong>🚀 Starting bulk creation of $target_count listings...</strong></p>";
+    echo "<div style='background:#f0f0f0; padding:10px; margin:10px 0; font-family:monospace; height:300px; overflow-y:scroll;'>";
+    
+    for ($i = 1; $i <= $target_count; $i++) {
+        // Select random make and model
+        $make_names = array_keys($makes_data);
+        $random_make = $make_names[array_rand($make_names)];
+        $models = array_keys($makes_data[$random_make]);
+        $random_model = $models[array_rand($models)];
+        $variants = $makes_data[$random_make][$random_model];
+        $random_variant = $variants[array_rand($variants)];
+        
+        // Generate realistic specs
+        $year = rand(2010, 2024);
+        $mileage = rand(5000, 300000);
+        $price = rand(5000, 150000);
+        $engine_capacity = rand(10, 60) / 10;
+        $hp = rand(100, 500);
+        $doors = rand(3, 5);
+        $seats = rand(2, 8);
+        $num_owners = rand(1, 4);
+        
+        // Random selections
+        $fuel_type = $fuel_types[array_rand($fuel_types)];
+        $transmission = $transmissions[array_rand($transmissions)];
+        $body_type = $body_types[array_rand($body_types)];
+        $drive_type = $drive_types[array_rand($drive_types)];
+        $exterior_color = $colors[array_rand($colors)];
+        $interior_color = $interior_colors[array_rand($interior_colors)];
+        $city = $cities[array_rand($cities)];
+        $district = $districts[array_rand($districts)];
+        
+        // Create post title and description
+        $post_title = "$year $random_make $random_model $random_variant";
+        $description = "Beautiful $year $random_make $random_model $random_variant in excellent condition. " .
+                      "This $exterior_color $body_type features a $engine_capacity" . "L $fuel_type engine with $transmission transmission. " .
+                      "Well maintained with $mileage km on the odometer. Perfect for daily driving.";
+        
+        // Create the WordPress post
+        $post_data = [
+            'post_title' => $post_title,
+            'post_content' => '',
+            'post_status' => 'publish',
+            'post_type' => 'car',
+            'post_author' => 1,
+        ];
+        
+        $post_id = wp_insert_post($post_data);
+        
+        if (is_wp_error($post_id)) {
+            echo "<span style='color:red;'>❌ Failed listing $i: " . $post_id->get_error_message() . "</span><br>";
+            continue;
+        }
+        
+        // Add all the ACF fields
+        update_field('make', $random_make, $post_id);
+        update_field('model', $random_model, $post_id);
+        update_field('variant', $random_variant, $post_id);
+        update_field('year', $year, $post_id);
+        update_field('mileage', $mileage, $post_id);
+        update_field('price', $price, $post_id);
+        update_field('engine_capacity', $engine_capacity, $post_id);
+        update_field('fuel_type', $fuel_type, $post_id);
+        update_field('transmission', $transmission, $post_id);
+        update_field('body_type', $body_type, $post_id);
+        update_field('drive_type', $drive_type, $post_id);
+        update_field('exterior_color', $exterior_color, $post_id);
+        update_field('interior_color', $interior_color, $post_id);
+        update_field('description', $description, $post_id);
+        update_field('number_of_doors', $doors, $post_id);
+        update_field('number_of_seats', $seats, $post_id);
+        update_field('car_city', $city, $post_id);
+        update_field('car_district', $district, $post_id);
+        update_field('hp', $hp, $post_id);
+        update_field('numowners', $num_owners, $post_id);
+        update_field('isantique', ($year < 1990) ? 1 : 0, $post_id);
+        
+        // Assign random 5-7 images from stock
+        $num_images = rand(5, 7);
+        $random_image_keys = array_rand($stock_car_image_ids, $num_images);
+        $selected_images = [];
+        
+        if (is_array($random_image_keys)) {
+            foreach ($random_image_keys as $key) {
+                $selected_images[] = $stock_car_image_ids[$key];
+            }
+        } else {
+            $selected_images[] = $stock_car_image_ids[$random_image_keys];
+        }
+        
+        update_field('car_images', $selected_images, $post_id);
+        
+        $created_count++;
+        echo "<span style='color:green;'>✅ Created: $post_title (ID: $post_id)</span><br>";
+        
+        // Flush output for real-time progress
+        flush();
+        ob_flush();
+        
+        // Small delay
+        usleep(50000);
+    }
+    
+    echo "</div>";
+    
+    echo "<h2>🎉 Bulk Creation Complete!</h2>";
+    echo "<p><strong>Successfully created:</strong> $created_count car listings</p>";
+    echo "<p>🔗 <a href='" . home_url() . "' target='_blank'>Visit your site to see the new listings!</a></p>";
+    
+    if ($target_count == 10) {
+        echo "<div style='background:#fffbf0; padding:15px; border-left:4px solid #ffb900; margin:20px 0;'>";
+        echo "<h3>🚀 Ready for Full Scale?</h3>";
+        echo "<p>Test completed successfully! To create 1000 listings:</p>";
+        echo "<p><a href='" . home_url('?bulk_create_listings=1&count=1000') . "'>Click here to create 1000 listings</a></p>";
+        echo "</div>";
+    }
+}
+
+// END TEMPORARY BULK CAR LISTING CREATOR
+
+
 
