@@ -563,7 +563,7 @@ function bulk_create_car_listings() {
         $post_data = [
             'post_title' => $post_title,
             'post_content' => '',
-            'post_status' => 'publish', // Published immediately like you want
+            'post_status' => 'Published', // Published immediately like you want
             'post_type' => 'car',
             'post_author' => $current_user_id,
         ];
