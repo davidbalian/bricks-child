@@ -675,12 +675,7 @@ function bulk_create_car_listings() {
         }
         
         $created_count++;
-        // Debug: Check if ACF data was saved correctly
-        $saved_fuel_type = get_field('fuel_type', $post_id);
-        $saved_transmission = get_field('transmission', $post_id);
-        
         echo "<span style='color:green;'>✅ Created: $post_title (ID: $post_id)</span><br>";
-        echo "<span style='color:purple;'>🔍 Debug - Fuel: $saved_fuel_type, Trans: $saved_transmission</span><br>";
         
         // Flush output for real-time progress
         flush();
@@ -692,8 +687,26 @@ function bulk_create_car_listings() {
     
     echo "</div>";
     
+    // Clear any caches that might affect filter queries
+    if (function_exists('wp_cache_flush')) {
+        wp_cache_flush();
+    }
+    
+    // Force clear object cache
+    wp_cache_delete('car_filter_data', 'car_listings');
+    
     echo "<h2>🎉 Chunk $current_chunk Complete!</h2>";
     echo "<p><strong>Successfully created:</strong> $created_count car listings in this chunk</p>";
+    
+    // Test the filter data immediately
+    if (function_exists('get_car_fuel_types_with_counts')) {
+        $fuel_test = get_car_fuel_types_with_counts();
+        echo "<div style='background:#fff3cd; padding:10px; margin:10px 0; border-left:4px solid #ffc107;'>";
+        echo "<h4>🔍 Filter Test Results:</h4>";
+        echo "<p><strong>Fuel types found:</strong> " . count($fuel_test['fuel_types']) . "</p>";
+        echo "<p><strong>Sample data:</strong> " . implode(', ', array_slice($fuel_test['fuel_types'], 0, 5)) . "</p>";
+        echo "</div>";
+    }
     
     // Show progress and next chunk link
     if ($current_chunk < $total_chunks) {
