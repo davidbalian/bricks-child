@@ -54,7 +54,7 @@ require_once get_stylesheet_directory() . '/includes/views-counter/views-databas
 require_once get_stylesheet_directory() . '/includes/views-counter/views-tracker.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-views-counter.php';
 
-// TEMPORARY DEBUG: Views Tracking (REMOVE AFTER DEBUGGING)
+// TEMPORARY DEBUG: Database Operations (REMOVE AFTER DEBUGGING)
 add_action('wp_footer', function() {
     if (!is_singular('car')) return;
     
@@ -64,19 +64,33 @@ add_action('wp_footer', function() {
     $user_id = get_current_user_id();
     $post = get_post($current_post_id);
     $is_owner = $post && $post->post_author == $user_id;
-    
-    echo '<div style="position: fixed; bottom: 10px; right: 10px; background: #333; color: #fff; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; z-index: 99999; max-width: 300px;">';
-    echo '<strong>🔍 Views Debug:</strong><br>';
-    echo '• URL: ' . $_SERVER['REQUEST_URI'] . '<br>';
-    echo '• is_singular(car): ' . (is_singular('car') ? '✅' : '❌') . '<br>';
-    echo '• car_id URL: ' . ($car_id_from_url ?: '❌ NONE') . '<br>';
-    echo '• Post ID: ' . $current_post_id . '<br>';
-    echo '• IDs match: ' . ($car_id_from_url === $current_post_id ? '✅' : '❌') . '<br>';
-    echo '• Is admin: ' . ($is_admin ? '❌ YES' : '✅ NO') . '<br>';
-    echo '• Is owner: ' . ($is_owner ? '❌ YES' : '✅ NO') . '<br>';
-    
     $should_track = is_singular('car') && isset($_GET['car_id']) && !empty($_GET['car_id']) && $car_id_from_url === $current_post_id && !$is_admin && !$is_owner;
-    echo '• <strong>Should track: ' . ($should_track ? '✅ YES' : '❌ NO') . '</strong>';
+    
+    // Check database
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'car_views';
+    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name;
+    $total_views = get_post_meta($car_id_from_url, 'total_unique_views', true);
+    $db_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE car_id = %d", $car_id_from_url));
+    
+    echo '<div style="position: fixed; bottom: 10px; right: 10px; background: #333; color: #fff; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; z-index: 99999; max-width: 350px;">';
+    echo '<strong>🔍 Database Debug:</strong><br>';
+    echo '• Should track: ' . ($should_track ? '✅ YES' : '❌ NO') . '<br>';
+    echo '• Table exists: ' . ($table_exists ? '✅ YES' : '❌ NO') . '<br>';
+    echo '• Table name: ' . $table_name . '<br>';
+    echo '• Cached views: ' . ($total_views ?: '0') . '<br>';
+    echo '• DB records: ' . ($db_count ?: '0') . '<br>';
+    
+    if ($should_track) {
+        echo '• <strong style="color: #90EE90;">TRACKING SHOULD WORK!</strong><br>';
+        // Try manual track test
+        global $car_views_tracker;
+        if ($car_views_tracker) {
+            echo '• Tracker exists: ✅ YES<br>';
+        } else {
+            echo '• Tracker exists: ❌ NO<br>';
+        }
+    }
     echo '</div>';
 }, 999);
 // END DEBUG
