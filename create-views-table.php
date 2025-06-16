@@ -11,9 +11,9 @@
  * This is a one-time setup script, not permanent code.
  */
 
-// Load WordPress
-require_once('wp-config.php');
-require_once('wp-includes/wp-db.php');
+// Load WordPress properly
+define('WP_USE_THEMES', false);
+require_once('wp-load.php');
 
 // Security check - only run if not already done
 if (get_option('car_views_table_created') === 'yes') {
