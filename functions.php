@@ -575,6 +575,12 @@ function bulk_create_car_listings() {
             continue;
         }
         
+        // Force publish status if something is overriding it
+        wp_update_post([
+            'ID' => $post_id,
+            'post_status' => 'publish'
+        ]);
+        
         // Generate additional realistic data
         $availability = rand(0, 1) ? 'In Stock' : 'In Transit';
         
@@ -683,7 +689,8 @@ function bulk_create_car_listings() {
         
         $created_count++;
         $actual_status = get_post_status($post_id);
-        echo "<span style='color:green;'>✅ Created: $post_title (ID: $post_id) - Status: $actual_status</span><br>";
+        $post_author = get_post_field('post_author', $post_id);
+        echo "<span style='color:green;'>✅ Created: $post_title (ID: $post_id) - Status: $actual_status - Author: $post_author</span><br>";
         
         // Flush output for real-time progress
         flush();
