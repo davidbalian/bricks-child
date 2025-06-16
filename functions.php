@@ -492,14 +492,39 @@ function bulk_create_car_listings() {
     ini_set('memory_limit', '512M');
     set_time_limit(300); // 5 minutes per chunk
     
+    echo "<span style='color:blue;'>🔧 Starting processing loop...</span><br>";
+    flush();
+    ob_flush();
+    
     for ($i = $start_index; $i <= $end_index; $i++) {
-        // Select random make and model
-        $make_names = array_keys($makes_data);
-        $random_make = $make_names[array_rand($make_names)];
-        $models = array_keys($makes_data[$random_make]);
-        $random_model = $models[array_rand($models)];
-        $variants = $makes_data[$random_make][$random_model];
-        $random_variant = $variants[array_rand($variants)];
+        echo "<span style='color:blue;'>🔄 Processing listing $i...</span><br>";
+        flush();
+        ob_flush();
+        
+        // Select random make and model with error handling
+        try {
+            $make_names = array_keys($makes_data);
+            $random_make = $make_names[array_rand($make_names)];
+            
+            if (!isset($makes_data[$random_make]) || empty($makes_data[$random_make])) {
+                echo "<span style='color:orange;'>⚠️ No models for $random_make, skipping...</span><br>";
+                continue;
+            }
+            
+            $models = array_keys($makes_data[$random_make]);
+            $random_model = $models[array_rand($models)];
+            
+            if (!isset($makes_data[$random_make][$random_model]) || empty($makes_data[$random_make][$random_model])) {
+                echo "<span style='color:orange;'>⚠️ No variants for $random_make $random_model, skipping...</span><br>";
+                continue;
+            }
+            
+            $variants = $makes_data[$random_make][$random_model];
+            $random_variant = $variants[array_rand($variants)];
+        } catch (Exception $e) {
+            echo "<span style='color:red;'>❌ Error selecting car data: " . $e->getMessage() . "</span><br>";
+            continue;
+        }
         
         // Generate realistic specs
         $year = rand(2010, 2024);
