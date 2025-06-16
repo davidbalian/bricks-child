@@ -552,13 +552,13 @@ function bulk_create_car_listings() {
                       "This $exterior_color $body_type features a $engine_capacity" . "L $fuel_type engine with $transmission transmission. " .
                       "Well maintained with $mileage km on the odometer. Perfect for daily driving.";
         
-        // Create the WordPress post
+        // Create the WordPress post (like manual submissions)
         $post_data = [
             'post_title' => $post_title,
             'post_content' => '',
-            'post_status' => 'publish',
+            'post_status' => 'pending',
             'post_type' => 'car',
-            'post_author' => 1,
+            'post_author' => get_current_user_id(),
         ];
         
         $post_id = wp_insert_post($post_data);
