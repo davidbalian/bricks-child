@@ -54,89 +54,7 @@ require_once get_stylesheet_directory() . '/includes/views-counter/views-databas
 require_once get_stylesheet_directory() . '/includes/views-counter/views-tracker.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-views-counter.php';
 
-// TEMPORARY DEBUG: Database Operations (REMOVE AFTER DEBUGGING)
-add_action('wp_footer', function() {
-    if (!is_singular('car')) return;
-    
-    $car_id_from_url = isset($_GET['car_id']) ? intval($_GET['car_id']) : 0;
-    $current_post_id = get_the_ID();
-    $is_admin = current_user_can('manage_options');
-    $user_id = get_current_user_id();
-    $post = get_post($current_post_id);
-    $is_owner = $post && $post->post_author == $user_id;
-    $should_track = is_singular('car') && isset($_GET['car_id']) && !empty($_GET['car_id']) && $car_id_from_url === $current_post_id && !$is_admin && !$is_owner;
-    
-    // Check database
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'car_views';
-    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name;
-    
-    // Check what tables actually exist with car_views
-    $actual_tables = $wpdb->get_results("SHOW TABLES LIKE '%car_views%'", ARRAY_N);
-    $found_tables = array();
-    foreach($actual_tables as $table) {
-        $found_tables[] = $table[0];
-    }
-    
-    $total_views = get_post_meta($car_id_from_url, 'total_unique_views', true);
-    $db_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM $table_name WHERE car_id = %d", $car_id_from_url));
-    
-    echo '<div style="position: fixed; bottom: 10px; right: 10px; background: #333; color: #fff; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; z-index: 99999; max-width: 350px;">';
-    echo '<strong>🔍 Database Debug:</strong><br>';
-    echo '• Should track: ' . ($should_track ? '✅ YES' : '❌ NO') . '<br>';
-    echo '• Table exists: ' . ($table_exists ? '✅ YES' : '❌ NO') . '<br>';
-    echo '• Looking for: ' . $table_name . '<br>';
-    echo '• Found tables: ' . implode(', ', $found_tables) . '<br>';
-    echo '• DB prefix: ' . $wpdb->prefix . '<br>';
-    echo '• Cached views: ' . ($total_views ?: '0') . '<br>';
-    echo '• DB records: ' . ($db_count ?: '0') . '<br>';
-    
-    if ($should_track) {
-        echo '• <strong style="color: #90EE90;">TRACKING SHOULD WORK!</strong><br>';
-        // Try manual track test
-        global $car_views_tracker;
-        if ($car_views_tracker) {
-            echo '• Tracker exists: ✅ YES<br>';
-        } else {
-            echo '• Tracker exists: ❌ NO<br>';
-        }
-        
-        // Force create table if missing
-        if (!$table_exists) {
-            // Try simple table creation first
-            $sql = "CREATE TABLE $table_name (
-                id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-                car_id bigint(20) unsigned NOT NULL,
-                user_ip_hash varchar(64) NOT NULL,
-                user_id bigint(20) unsigned DEFAULT 0,
-                view_date datetime DEFAULT CURRENT_TIMESTAMP,
-                user_agent_hash varchar(64) NOT NULL,
-                PRIMARY KEY (id),
-                KEY car_id (car_id)
-            ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
-            
-            // Try direct MySQL creation
-            $create_result = $wpdb->query($sql);
-            
-            // Check if it worked
-            $table_exists_now = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name;
-            
-            if ($table_exists_now) {
-                echo '• <strong style="color: green;">✅ TABLE CREATED!</strong><br>';
-                update_option('car_views_table_created', 'yes');
-                
-                // Add the unique constraint after table creation
-                $wpdb->query("ALTER TABLE $table_name ADD UNIQUE KEY unique_view (car_id, user_ip_hash, user_agent_hash, DATE(view_date))");
-            } else {
-                echo '• <strong style="color: red;">❌ SIMPLE TABLE FAILED!</strong><br>';
-                echo '• MySQL Error: ' . $wpdb->last_error . '<br>';
-                echo '• Create result: ' . ($create_result === false ? 'FALSE' : $create_result) . '<br>';
-            }
-        }
-    }
-    echo '</div>';
-}, 999);
-// END DEBUG
+
 
 
 /**
@@ -411,4 +329,87 @@ function bricks_filter_builder_elements( $elements ) {
 // add_filter( 'bricks/builder/map_styles', function( $map_styles ) {
 //   return $map_styles;
 // } );
+
+// TEMPORARY: Add missing UNIQUE constraint to car_views table
+add_action('wp_footer', function() {
+    if (!is_singular('car')) return;
+    
+    // Only run once
+    if (get_option('car_views_unique_constraint_added') === 'yes') return;
+    
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'car_views';
+    
+    // Check if table exists
+    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name;
+    
+    echo '<div style="position: fixed; bottom: 10px; left: 10px; background: #333; color: #fff; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; z-index: 99999; max-width: 400px;">';
+    echo '<strong>🔧 CONSTRAINT DEBUG:</strong><br>';
+    echo '• Table exists: ' . ($table_exists ? '✅ YES' : '❌ NO') . '<br>';
+    echo '• Table name: ' . $table_name . '<br>';
+    
+    if ($table_exists) {
+        // Check current table structure
+        $columns = $wpdb->get_results("DESCRIBE $table_name");
+        echo '• Columns found: ' . count($columns) . '<br>';
+        
+        // Check if constraint already exists
+        $indexes = $wpdb->get_results("SHOW INDEX FROM $table_name");
+        $has_unique_constraint = false;
+        foreach($indexes as $index) {
+            if (strpos($index->Key_name, 'unique') !== false) {
+                $has_unique_constraint = true;
+                break;
+            }
+        }
+        
+        echo '• Has unique constraint: ' . ($has_unique_constraint ? '✅ YES' : '❌ NO') . '<br>';
+        
+        if (!$has_unique_constraint) {
+            echo '• <strong style="color: yellow;">ADDING CONSTRAINT...</strong><br>';
+            
+            // Add the missing UNIQUE constraint for proper duplicate detection
+            $constraint_sql = "ALTER TABLE $table_name ADD UNIQUE KEY unique_daily_view (car_id, user_ip_hash, user_agent_hash, DATE(view_date))";
+            
+            $result = $wpdb->query($constraint_sql);
+            $error = $wpdb->last_error;
+            
+            echo '• SQL: ' . substr($constraint_sql, 0, 50) . '...<br>';
+            echo '• Result: ' . ($result !== false ? 'SUCCESS' : 'FAILED') . '<br>';
+            
+            if ($error) {
+                echo '• Error: ' . htmlspecialchars($error) . '<br>';
+            }
+            
+            if ($result !== false && !$error) {
+                update_option('car_views_unique_constraint_added', 'yes');
+                echo '• <strong style="color: #90EE90;">✅ CONSTRAINT ADDED SUCCESSFULLY!</strong><br>';
+                echo '• Option saved: car_views_unique_constraint_added = yes<br>';
+                
+                // Verify it was added
+                $indexes_after = $wpdb->get_results("SHOW INDEX FROM $table_name");
+                $constraint_verified = false;
+                foreach($indexes_after as $index) {
+                    if (strpos($index->Key_name, 'unique') !== false) {
+                        $constraint_verified = true;
+                        echo '• Verification: ✅ Constraint found in table!<br>';
+                        break;
+                    }
+                }
+                if (!$constraint_verified) {
+                    echo '• Verification: ❌ Constraint not found after creation!<br>';
+                }
+            } else {
+                echo '• <strong style="color: #ff6b6b;">❌ CONSTRAINT FAILED!</strong><br>';
+            }
+        } else {
+            echo '• <strong style="color: #90EE90;">✅ CONSTRAINT ALREADY EXISTS!</strong><br>';
+            update_option('car_views_unique_constraint_added', 'yes');
+        }
+    } else {
+        echo '• <strong style="color: #ff6b6b;">❌ TABLE NOT FOUND!</strong><br>';
+    }
+    echo '</div>';
+}, 999);
+// END CONSTRAINT FIX
 
