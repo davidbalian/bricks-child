@@ -54,6 +54,33 @@ require_once get_stylesheet_directory() . '/includes/views-counter/views-databas
 require_once get_stylesheet_directory() . '/includes/views-counter/views-tracker.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-views-counter.php';
 
+// TEMPORARY DEBUG: Views Tracking (REMOVE AFTER DEBUGGING)
+add_action('wp_footer', function() {
+    if (!is_singular('car')) return;
+    
+    $car_id_from_url = isset($_GET['car_id']) ? intval($_GET['car_id']) : 0;
+    $current_post_id = get_the_ID();
+    $is_admin = current_user_can('manage_options');
+    $user_id = get_current_user_id();
+    $post = get_post($current_post_id);
+    $is_owner = $post && $post->post_author == $user_id;
+    
+    echo '<div style="position: fixed; bottom: 10px; right: 10px; background: #333; color: #fff; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; z-index: 99999; max-width: 300px;">';
+    echo '<strong>🔍 Views Debug:</strong><br>';
+    echo '• URL: ' . $_SERVER['REQUEST_URI'] . '<br>';
+    echo '• is_singular(car): ' . (is_singular('car') ? '✅' : '❌') . '<br>';
+    echo '• car_id URL: ' . ($car_id_from_url ?: '❌ NONE') . '<br>';
+    echo '• Post ID: ' . $current_post_id . '<br>';
+    echo '• IDs match: ' . ($car_id_from_url === $current_post_id ? '✅' : '❌') . '<br>';
+    echo '• Is admin: ' . ($is_admin ? '❌ YES' : '✅ NO') . '<br>';
+    echo '• Is owner: ' . ($is_owner ? '❌ YES' : '✅ NO') . '<br>';
+    
+    $should_track = is_singular('car') && isset($_GET['car_id']) && !empty($_GET['car_id']) && $car_id_from_url === $current_post_id && !$is_admin && !$is_owner;
+    echo '• <strong>Should track: ' . ($should_track ? '✅ YES' : '❌ NO') . '</strong>';
+    echo '</div>';
+}, 999);
+// END DEBUG
+
 
 /**
  * Register and enqueue custom scripts and styles.
