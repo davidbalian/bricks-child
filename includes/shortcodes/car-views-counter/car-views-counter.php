@@ -87,48 +87,16 @@ function car_views_counter_shortcode($atts) {
 add_shortcode('car_views_counter', 'car_views_counter_shortcode');
 
 /**
- * Add basic CSS for the views counter
+ * Enqueue CSS for car views counter
  */
-function car_views_counter_styles() {
+function car_views_counter_enqueue_styles() {
     if (is_singular('car')) {
-        echo '<style>
-            .car-views-counter {
-                display: inline-block;
-                font-size: 14px;
-                color: #666;
-                margin: 5px 0;
-            }
-            
-            .car-views-counter.full-format {
-                background: #f8f9fa;
-                padding: 5px 10px;
-                border-radius: 4px;
-                border-left: 3px solid #007cba;
-            }
-            
-            .car-views-error {
-                color: #d63638;
-                font-size: 12px;
-                font-style: italic;
-            }
-            
-            @media (max-width: 768px) {
-                .car-views-counter {
-                    font-size: 12px;
-                }
-            }
-        </style>';
+        wp_enqueue_style(
+            'car-views-counter-css',
+            get_stylesheet_directory_uri() . '/includes/shortcodes/car-views-counter/car-views-counter.css',
+            array(),
+            '1.0.0'
+        );
     }
 }
-add_action('wp_head', 'car_views_counter_styles');
-
-/**
- * Helper function to get formatted view count (for use in PHP)
- * 
- * @param int $car_id The car post ID
- * @param string $format The format type
- * @return string Formatted view count
- */
-function get_car_view_count_formatted($car_id, $format = 'simple') {
-    return do_shortcode('[car_views_counter car_id="' . intval($car_id) . '" format="' . esc_attr($format) . '" show_icon="false"]');
-} 
+add_action('wp_enqueue_scripts', 'car_views_counter_enqueue_styles'); 

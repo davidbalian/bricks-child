@@ -52,7 +52,7 @@ require_once get_stylesheet_directory() . '/includes/legal/cookie-consent.php';
 // Car Views Counter System
 require_once get_stylesheet_directory() . '/includes/views-counter/views-database.php';
 require_once get_stylesheet_directory() . '/includes/views-counter/views-tracker.php';
-require_once get_stylesheet_directory() . '/includes/shortcodes/car-views-counter.php';
+require_once get_stylesheet_directory() . '/includes/shortcodes/car-views-counter/car-views-counter.php';
 
 
 
