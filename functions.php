@@ -118,9 +118,20 @@ add_action('wp_footer', function() {
                 UNIQUE KEY unique_view (car_id, user_ip_hash, user_agent_hash, DATE(view_date))
             ) $charset_collate;";
             
-            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-            $result = dbDelta($sql);
-            echo '• <strong style="color: yellow;">CREATING TABLE NOW...</strong><br>';
+            // Try direct MySQL creation instead of dbDelta
+            $create_result = $wpdb->query($sql);
+            
+            // Check if it worked
+            $table_exists_now = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name;
+            
+            if ($table_exists_now) {
+                echo '• <strong style="color: green;">✅ TABLE CREATED!</strong><br>';
+                update_option('car_views_table_created', 'yes');
+            } else {
+                echo '• <strong style="color: red;">❌ TABLE FAILED!</strong><br>';
+                echo '• Error: ' . $wpdb->last_error . '<br>';
+                echo '• SQL: ' . substr($sql, 0, 100) . '...<br>';
+            }
         }
     }
     echo '</div>';
