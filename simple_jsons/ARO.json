@@ -1,0 +1,9 @@
+{
+    "make": "ARO",
+    "models": [
+        "10 Series",
+        "24 Series",
+        "IMS Series",
+        "M Series"
+    ]
+}

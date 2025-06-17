@@ -1,6 +1,14 @@
 {
-  "Koenigsegg": {
-    "Agera RS": [],
-    "Regera": []
-  }
+    "make": "KOENIGSEGG",
+    "models": [
+        "Agera",
+        "CC8S",
+        "CCR",
+        "CCX",
+        "CCXR",
+        "Gemera",
+        "Jesko",
+        "One:1",
+        "Regera"
+    ]
 }

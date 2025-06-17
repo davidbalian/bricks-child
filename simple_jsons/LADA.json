@@ -1,0 +1,14 @@
+{
+    "make": "LADA",
+    "models": [
+        "110",
+        "111",
+        "112",
+        "Kalina",
+        "Niva",
+        "Nova",
+        "Nova Combi",
+        "Priora",
+        "Samara"
+    ]
+}

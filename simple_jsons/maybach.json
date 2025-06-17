@@ -1,7 +1,13 @@
 {
-  "Maybach": {
-    "57": [],
-    "62": [],
-    "Landaulet": []
-  }
+    "make": "MAYBACH",
+    "models": [
+        "57",
+        "62",
+        "Landaulet",
+        "Typ 12",
+        "Typ SW 35, SW 38 and SW 42",
+        "Typ W1, W2, W3, W5 and W5 SG",
+        "Typ W6, W6 DSG and DSH",
+        "Typ Zeppelin"
+    ]
 }

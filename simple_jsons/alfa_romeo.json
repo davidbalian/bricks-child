@@ -1,42 +1,57 @@
 {
-  "Alfa Romeo": {
-    "164": [
-      "V6 24V"
-    ],
-    "4C": [
-      "4C",
-      "Spider"
-    ],
-    "GT": [
-      "GT 1.9 JTD",
-      "GT 3.2 V6",
-      "GT 2.0 JTS"
-    ],
-    "GTV": [
-      "GTV",
-      "Spider",
-      "Cup",
-      "V6",
-      "Cloverleaf"
-    ],
-    "Giulia": [
-      "Giulia",
-      "Giulia Veloce",
-      "Giulia Quadrifoglio"
-    ],
-    "Milano": [],
-    "Spider": [
-      "Spider",
-      "Spider Veloce 2000",
-      "Duetto",
-      "Graduate",
-      "Quadrifoglio."
-    ],
-    "Stelvio": [
-      "Stelvio",
-      "Stelvio Ti",
-      "Stelvio Quadrifoglio"
-    ],
-    "Tonale eAWD": []
-  }
+    "make": "ALFA ROMEO",
+    "models": [
+        "4C",
+        "4C Spider",
+        "6",
+        "6C",
+        "8C",
+        "24 HP",
+        "33",
+        "33 Sport",
+        "75",
+        "145",
+        "146",
+        "147",
+        "155",
+        "156",
+        "156 Sportwagon",
+        "159",
+        "159 Sportwagon",
+        "164",
+        "166",
+        "1900",
+        "2000",
+        "2600",
+        "Alfasud",
+        "Alfasud Giardinetta",
+        "Alfasud Sprint",
+        "Alfasud Ti",
+        "Alfetta",
+        "Arna",
+        "Brera",
+        "Crosswagon Q4",
+        "Giulia",
+        "Giulia GTA",
+        "Giulia Quadrifoglio",
+        "Giulia Veloce",
+        "Giulietta",
+        "Giulietta Quadrifoglio Verde",
+        "GT",
+        "GTV",
+        "Junior",
+        "MiTo",
+        "MiTo Quadrifoglio Verde",
+        "MiTo Veloce",
+        "Montreal",
+        "RL",
+        "RM",
+        "Spider",
+        "Sprint",
+        "Stelvio",
+        "Stelvio Quadrifoglio",
+        "Tipo 33",
+        "Tonale",
+        "Torpedo 20-30 HP"
+    ]
 }

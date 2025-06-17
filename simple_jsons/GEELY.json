@@ -1,0 +1,11 @@
+{
+    "make": "GEELY",
+    "models": [
+        "CK",
+        "Emgrand EC7",
+        "Galaxy",
+        "Galaxy M9",
+        "LC",
+        "MK"
+    ]
+}

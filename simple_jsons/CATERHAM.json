@@ -1,0 +1,13 @@
+{
+    "make": "CATERHAM",
+    "models": [
+        "Classic",
+        "CSR",
+        "Roadsport",
+        "Seven 160",
+        "Seven 620",
+        "Superlight",
+        "Supersport",
+        "The Super Seven 1600"
+    ]
+}

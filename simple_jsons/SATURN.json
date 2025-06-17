@@ -1,0 +1,13 @@
+{
+    "make": "SATURN",
+    "models": [
+        "Astra",
+        "Aura",
+        "Ion",
+        "Ion Quad",
+        "Outlook",
+        "Relay",
+        "Sky",
+        "Vue"
+    ]
+}

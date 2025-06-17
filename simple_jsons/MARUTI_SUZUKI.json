@@ -1,0 +1,14 @@
+{
+    "make": "MARUTI SUZUKI",
+    "models": [
+        "800",
+        "Alto",
+        "Baleno",
+        "Ciaz",
+        "Esteem",
+        "Gipsy",
+        "Swift",
+        "Wagon R",
+        "Zen"
+    ]
+}

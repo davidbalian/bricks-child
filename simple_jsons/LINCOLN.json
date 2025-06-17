@@ -1,0 +1,21 @@
+{
+    "make": "LINCOLN",
+    "models": [
+        "Aviator",
+        "Continental",
+        "Corsair",
+        "LS",
+        "Mark LT",
+        "MKC",
+        "MKS",
+        "MKT",
+        "MKX",
+        "MKZ",
+        "Nautilus",
+        "Navigator",
+        "Navigator L",
+        "Town Car",
+        "Zephyr",
+        "Zephyr Fastback"
+    ]
+}

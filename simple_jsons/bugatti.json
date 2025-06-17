@@ -1,16 +1,34 @@
 {
-  "Bugatti": {
-    "Chiron": [
-      "Chiron",
-      "Chiron Sport"
-    ],
-    "Divo": [],
-    "Veyron": [
-      "Veyron",
-      "Super Sport",
-      "Grand Sport",
-      "Grand Sport Vitesse",
-      "Veyron 16.4 Super Sport World Record Edition"
+    "make": "BUGATTI",
+    "models": [
+        "Bolide",
+        "Centodieci",
+        "Chiron",
+        "Divo",
+        "EB 110",
+        "La Voiture Noire",
+        "Mistral",
+        "Tourbillon",
+        "Type 2",
+        "Type 5",
+        "Type 10",
+        "Type 18",
+        "Type 19",
+        "Type 23",
+        "Type 30",
+        "Type 38",
+        "Type 40",
+        "Type 41",
+        "Type 43",
+        "Type 44",
+        "Type 46",
+        "Type 49",
+        "Type 50",
+        "Type 55",
+        "Type 57",
+        "Type 64",
+        "Type 101",
+        "Type 251",
+        "Veyron"
     ]
-  }
 }

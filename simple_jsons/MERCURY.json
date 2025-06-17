@@ -1,0 +1,15 @@
+{
+    "make": "MERCURY",
+    "models": [
+        "Cougar",
+        "Grand Marquis",
+        "Marauder",
+        "Mariner",
+        "Milan",
+        "Montego",
+        "Monterey",
+        "Mountaineer",
+        "Sable",
+        "Villager"
+    ]
+}

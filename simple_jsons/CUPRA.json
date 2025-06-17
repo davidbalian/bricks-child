@@ -1,0 +1,12 @@
+{
+    "make": "CUPRA",
+    "models": [
+        "Ateca",
+        "Born",
+        "Formentor",
+        "Leon",
+        "Leon Sportstourer",
+        "Tavascan",
+        "Terramar"
+    ]
+}

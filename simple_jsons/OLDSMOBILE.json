@@ -1,0 +1,15 @@
+{
+    "make": "OLDSMOBILE",
+    "models": [
+        "88",
+        "442",
+        "Alero",
+        "Aurora",
+        "Bravada",
+        "Curved Dash",
+        "Cutlass",
+        "Intrigue",
+        "Silhouette",
+        "Toronado"
+    ]
+}

@@ -1,0 +1,7 @@
+{
+    "make": "ARIEL",
+    "models": [
+        "Atom",
+        "Nomad"
+    ]
+}

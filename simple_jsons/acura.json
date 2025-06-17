@@ -1,50 +1,24 @@
 {
-  "Acura": {
-    "CL": [],
-    "ILX": [
-      "ILX"
-    ],
-    "Integra": [
-      "Integra",
-      "Type R",
-      "LS",
-      "GS-R"
-    ],
-    "Legend": [],
-    "MDX": [
-      "MDX",
-      "MDX 2WD",
-      "MDX Sport Hybrid",
-      "MDX Technology Package"
-    ],
-    "NSX": [
-      "NSX",
-      "NSX Hybrid"
-    ],
-    "RDX": [
-      "RDX 2WD",
-      "RDX",
-      "RDX A-SPEC"
-    ],
-    "RL": [],
-    "RLX": [],
-    "RSX": [
-      "RSX",
-      "Type-S"
-    ],
-    "SLX": [],
-    "TL": [
-      "2.5TL/3.2TL",
-      "TL"
-    ],
-    "TLX": [
-      "TLX",
-      "TLX 2WD"
-    ],
-    "TSX": [
-      "TSX"
-    ],
-    "Vigor": [],
-    "ZDX": []
-  }
+    "make": "ACURA",
+    "models": [
+        "ADX",
+        "CL",
+        "CSX",
+        "EL",
+        "ILX",
+        "Integra",
+        "Legend",
+        "MDX",
+        "NSX",
+        "RDX",
+        "RL",
+        "RLX",
+        "RSX",
+        "RSX TYPE-S",
+        "SLX",
+        "TL",
+        "TLX",
+        "TSX",
+        "ZDX"
+    ]
 }

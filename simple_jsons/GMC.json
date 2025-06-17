@@ -1,0 +1,22 @@
+{
+    "make": "GMC",
+    "models": [
+        "Acadia",
+        "Canyon Crew Cab",
+        "Canyon Double Cab",
+        "Canyon Regular Cab",
+        "Envoy",
+        "Envoy XL",
+        "Envoy XUV",
+        "Hummer EV",
+        "Jimmy",
+        "Safari",
+        "Savana",
+        "Sierra",
+        "Sierra 2500HD",
+        "Sierra 3500HD",
+        "Terrain",
+        "Yukon",
+        "Yukon XL"
+    ]
+}

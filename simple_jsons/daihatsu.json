@@ -1,6 +1,22 @@
 {
-  "Daihatsu": {
-    "Charade": [],
-    "Rocky": []
-  }
+    "make": "DAIHATSU",
+    "models": [
+        "Altis",
+        "Applause",
+        "Ayla",
+        "Copen",
+        "Cuore",
+        "Feroza Hardtop",
+        "Feroza Softtop",
+        "Gran Move",
+        "Materia",
+        "Move",
+        "Rocky",
+        "Rocky Hardtop",
+        "Sirion",
+        "Sirion 2",
+        "Terios",
+        "Trevis",
+        "Valera"
+    ]
 }

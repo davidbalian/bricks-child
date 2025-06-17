@@ -1,0 +1,9 @@
+{
+    "make": "DATSUN",
+    "models": [
+        "GO",
+        "GO+",
+        "Mi-Do",
+        "on-Do"
+    ]
+}

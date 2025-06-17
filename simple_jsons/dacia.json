@@ -1,11 +1,32 @@
 {
-  "Dacia": {
-    "Coupe": [],
-    "Sedan": [
-      "1. Sandero 2. Logan 3. Duster"
-    ],
-    "Station Wagon": [
-      "1. Stepway 2. Prestige 3. Techroad"
+    "make": "DACIA",
+    "models": [
+        "500",
+        "1100",
+        "1300",
+        "1300 Break",
+        "1310",
+        "1310 Break",
+        "1310/1410 Sport",
+        "1320",
+        "1325",
+        "Bigster",
+        "Dokker",
+        "Dokker Van",
+        "Duster",
+        "Duster Pick-Up",
+        "JOGGER",
+        "Lodgy",
+        "Logan",
+        "Logan MCV",
+        "Logan MCV Stepway",
+        "Logan Pick-Up",
+        "Logan Van",
+        "Nova",
+        "Sandero",
+        "Sandero Stepway",
+        "Solenza",
+        "Spring",
+        "SuperNova"
     ]
-  }
 }

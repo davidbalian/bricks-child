@@ -1,0 +1,12 @@
+{
+    "make": "PLYMOUTH",
+    "models": [
+        "ACCLAIM",
+        "BARRACUDA",
+        "BREEZE",
+        "LASER",
+        "NEON",
+        "Valiant",
+        "VOYAGER"
+    ]
+}

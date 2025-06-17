@@ -1,0 +1,8 @@
+{
+    "make": "EAGLE",
+    "models": [
+        "Premier",
+        "Summit",
+        "Talon"
+    ]
+}

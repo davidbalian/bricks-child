@@ -1,6 +1,13 @@
 {
-  "Hummer": {
-    "H3": [],
-    "H3T": []
-  }
+    "make": "HUMMER",
+    "models": [
+        "H1 2 Door Hardtop",
+        "H1 4 Door",
+        "H1 4 Door Hardtop",
+        "H1 4 Door Opentop",
+        "H2",
+        "H2 SUT",
+        "H3",
+        "H3 Alpha"
+    ]
 }

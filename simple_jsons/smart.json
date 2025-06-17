@@ -1,13 +1,17 @@
 {
-  "Smart": {
-    "fortwo": [
-      "EQ fortwo",
-      "fortwo",
-      "fortwo electric drive",
-      "Prime",
-      "Proxy",
-      "Passion",
-      "Brabus"
+    "make": "SMART",
+    "models": [
+        "1",
+        "5",
+        "crossblade",
+        "Electric Drive",
+        "forfour",
+        "forfour Brabus",
+        "fortwo",
+        "fortwo Brabus",
+        "fortwo Cabrio Brabus",
+        "Roadster Brabus",
+        "Roadster Coupe Brabus",
+        "SMART"
     ]
-  }
 }
