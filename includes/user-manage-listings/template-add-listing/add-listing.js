@@ -62,19 +62,25 @@ jQuery(document).ready(function($) {
         const engineCapacitySelect = $('#engine_capacity');
         
         if (selectedFuelType === 'Electric') {
-            // Set engine capacity to 0.0 and disable the field
+            // Add 0.0 option if it doesn't exist and select it
+            if (engineCapacitySelect.find('option[value="0.0"]').length === 0) {
+                // Insert 0.0 option after the placeholder option
+                engineCapacitySelect.find('option[value=""]').after('<option value="0.0">0.0</option>');
+            }
             engineCapacitySelect.val('0.0');
             engineCapacitySelect.prop('disabled', true);
             engineCapacitySelect.addClass('electric-locked');
             console.log('[Add Listing] Engine capacity locked to 0.0 for electric vehicle');
         } else {
-            // Re-enable the engine capacity field and reset if it was set to 0.0
+            // Re-enable the engine capacity field
             engineCapacitySelect.prop('disabled', false);
             engineCapacitySelect.removeClass('electric-locked');
-            // Reset to empty selection if it was 0.0 (electric default)
+            
+            // Remove the 0.0 option and reset selection if it was 0.0
             if (engineCapacitySelect.val() === '0.0') {
                 engineCapacitySelect.val('');
             }
+            engineCapacitySelect.find('option[value="0.0"]').remove();
             console.log('[Add Listing] Engine capacity unlocked for non-electric vehicle');
         }
     }
