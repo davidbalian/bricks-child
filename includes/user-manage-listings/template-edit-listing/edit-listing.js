@@ -51,7 +51,7 @@ jQuery(document).ready(function($) {
         $('#make').val(selectedMake);
     }
     
-    // Set initial model and variant options based on the selected make
+    // Set initial model options based on the selected make
     if (selectedMake && makesData[selectedMake]) {
         const modelSelect = $('#model');
         Object.keys(makesData[selectedMake]).forEach(model => {
@@ -65,33 +65,15 @@ jQuery(document).ready(function($) {
             modelSelect.append(option);
         });
         
-        // Set initial variant options
-        const selectedModel = editListingData.selectedModel;
-        if (selectedModel && makesData[selectedMake][selectedModel]) {
-            const variantSelect = $('#variant');
-            makesData[selectedMake][selectedModel].forEach(variant => {
-                if (variant) {
-                    const option = $('<option>', {
-                        value: variant,
-                        text: variant
-                    });
-                    if (variant === editListingData.selectedVariant) {
-                        option.prop('selected', true);
-                    }
-                    variantSelect.append(option);
-                }
-            });
-        }
+        // variant options removed
     }
     
     // Handle make selection change
     $('#make').on('change', function() {
         const selectedMake = $(this).val();
         const modelSelect = $('#model');
-        const variantSelect = $('#variant');
         
         modelSelect.html('<option value="">Select Model</option>');
-        variantSelect.html('<option value="">Select Variant</option>');
         
         if (selectedMake && makesData[selectedMake]) {
             Object.keys(makesData[selectedMake]).forEach(model => {
@@ -100,19 +82,7 @@ jQuery(document).ready(function($) {
         }
     });
     
-    $('#model').on('change', function() {
-        const selectedMake = $('#make').val();
-        const selectedModel = $(this).val();
-        const variantSelect = $('#variant');
-        variantSelect.html('<option value="">Select Variant</option>');
-        if (selectedMake && selectedModel && makesData[selectedMake] && makesData[selectedMake][selectedModel]) {
-            makesData[selectedMake][selectedModel].forEach(variant => {
-                if (variant) {
-                    variantSelect.append($('<option>', { value: variant, text: variant }));
-                }
-            });
-        }
-    });
+    // variant handling removed from model change
 
     // Handle click on upload area
     fileUploadArea.on('click', function(e) {

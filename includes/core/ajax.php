@@ -172,7 +172,7 @@ function ajax_filter_car_listings_handler() {
             // --- START Card Rendering Logic (copied from includes/car-listings.php) ---
             $make = get_field('make', get_the_ID());
             $model = get_field('model', get_the_ID());
-            $variant = get_field('variant', get_the_ID());
+            // Variant field removed
             $price = get_field('price', get_the_ID());
             $year = get_field('year', get_the_ID());
             $mileage = get_field('mileage', get_the_ID());
@@ -334,62 +334,7 @@ function ajax_filter_car_listings_handler() {
 add_action('wp_ajax_filter_car_listings', 'ajax_filter_car_listings_handler');
 add_action('wp_ajax_nopriv_filter_car_listings', 'ajax_filter_car_listings_handler');
 
-/**
- * AJAX handler to get variant counts for the car filter form.
- */
-function get_variant_counts_ajax_handler() {
-    // 1. Verify Nonce
-    check_ajax_referer('car_filter_variant_nonce', 'nonce');
-
-    // 2. Get and Sanitize Inputs
-    $make = isset($_POST['make']) ? sanitize_text_field($_POST['make']) : '';
-    $model = isset($_POST['model']) ? sanitize_text_field($_POST['model']) : '';
-
-    if (empty($make) || empty($model)) {
-        wp_send_json_error('Missing make or model parameters.');
-        return;
-    }
-
-    // 3. Query Database
-    global $wpdb;
-    $variant_counts = array();
-
-    try {
-        $sql = $wpdb->prepare(
-            "SELECT pm_variant.meta_value as variant, COUNT(p.ID) as count
-             FROM {$wpdb->posts} p
-             JOIN {$wpdb->postmeta} pm_make ON p.ID = pm_make.post_id AND pm_make.meta_key = 'make' AND pm_make.meta_value = %s
-             JOIN {$wpdb->postmeta} pm_model ON p.ID = pm_model.post_id AND pm_model.meta_key = 'model' AND pm_model.meta_value = %s
-             JOIN {$wpdb->postmeta} pm_variant ON p.ID = pm_variant.post_id AND pm_variant.meta_key = 'variant'
-             WHERE p.post_type = 'car'
-             AND p.post_status = 'publish'
-             AND pm_variant.meta_value IS NOT NULL AND pm_variant.meta_value != ''
-             GROUP BY pm_variant.meta_value",
-            $make,
-            $model
-        );
-        $results = $wpdb->get_results($sql, OBJECT_K); // Index by variant name
-
-        if ($results) {
-             // Extract counts into a simple variant => count array
-             foreach ($results as $variant_name => $data) {
-                $variant_counts[$variant_name] = (int)$data->count;
-             }
-        }
-        // If no results, $variant_counts remains empty, which is correct.
-
-        wp_send_json_success($variant_counts);
-
-    } catch (Exception $e) {
-        // Log the error for debugging
-        error_log("Database error in get_variant_counts_ajax_handler: " . $e->getMessage());
-        wp_send_json_error('Database error fetching variant counts.');
-    }
-}
-// Hook for logged-in users
-add_action('wp_ajax_get_variant_counts', 'get_variant_counts_ajax_handler');
-// Hook for non-logged-in users (optional, if the filter is for everyone)
-add_action('wp_ajax_nopriv_get_variant_counts', 'get_variant_counts_ajax_handler');
+// Variant functionality removed - marketplace now uses only makes and models
 
 /**
  * AJAX handler for marking a car as sold

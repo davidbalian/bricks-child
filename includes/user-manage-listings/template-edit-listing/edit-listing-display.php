@@ -45,10 +45,7 @@ if (!defined('ABSPATH')) {
                                         <label for="model"><i class="fas fa-car"></i> <?php esc_html_e('Model', 'bricks-child'); ?></label>
                                         <input type="text" id="model" name="model" class="form-control" value="<?php echo esc_attr($model); ?>" readonly>
                                     </div>
-                                    <div class="form-third">
-                                        <label for="variant"><i class="fas fa-car-side"></i> <?php esc_html_e('Variant', 'bricks-child'); ?></label>
-                                        <input type="text" id="variant" name="variant" class="form-control" value="<?php echo esc_attr($variant); ?>" readonly>
-                                    </div>
+                                    <!-- variant field removed -->
                                 </div>
 
                                 <div class="form-row form-row-thirds">

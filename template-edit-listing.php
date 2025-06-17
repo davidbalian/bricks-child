@@ -37,7 +37,7 @@ if (!$car || $car->post_type !== 'car' || $car->post_author != get_current_user_
 // Get all car details
 $make = get_field('make', $car_id);
 $model = get_field('model', $car_id);
-$variant = get_field('variant', $car_id);
+// variant field removed
 
 // Get the makes data structure
 $add_listing_makes = [];
@@ -143,7 +143,7 @@ wp_localize_script('edit-listing-script', 'editListingData', array(
     'makesData' => $add_listing_makes,
     'selectedMake' => esc_js($make),
     'selectedModel' => esc_js($model),
-    'selectedVariant' => esc_js($variant),
+            // variant data removed
     'ajaxurl' => admin_url('admin-ajax.php'),
     'nonce' => wp_create_nonce('edit_car_listing_nonce')
 ));

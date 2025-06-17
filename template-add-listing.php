@@ -189,12 +189,7 @@ get_header(); ?>
                                             <option value=""><?php esc_html_e( 'Select Model', 'bricks-child' ); ?></option>
                                         </select>
                                     </div>
-                                    <div class="form-third">
-                                        <label for="variant"><?php echo get_svg_icon('car-mirrors'); ?> <?php esc_html_e( 'Variant', 'bricks-child' ); ?></label>
-                                        <select id="variant" name="variant" class="form-control" required>
-                                            <option value=""><?php esc_html_e( 'Select Variant', 'bricks-child' ); ?></option>
-                                        </select>
-                                    </div>
+                                    <!-- variant field removed -->
                                 </div>
 
                                 <div class="form-row form-row-thirds">

@@ -40,11 +40,9 @@ jQuery(document).ready(function($) {
         console.log('[Add Listing] Makes data for selected make:', makesData[selectedMake]);
         
         const modelSelect = $('#model');
-        const variantSelect = $('#variant');
         
         // Clear existing options
         modelSelect.empty().append('<option value="">Select Model</option>');
-        variantSelect.empty().append('<option value="">Select Variant</option>');
         
         if (selectedMake && makesData && makesData[selectedMake]) {
             // Add model options
@@ -56,29 +54,7 @@ jQuery(document).ready(function($) {
         }
     });
     
-    // Handle model selection change
-    $('#model').on('change', function() {
-        const selectedMake = $('#make').val();
-        const selectedModel = $(this).val();
-        console.log('[Add Listing] Selected model:', selectedModel);
-        console.log('[Add Listing] Makes data for selected model:', makesData[selectedMake]?.[selectedModel]);
-        
-        const variantSelect = $('#variant');
-        
-        // Clear existing options
-        variantSelect.empty().append('<option value="">Select Variant</option>');
-        
-        if (selectedMake && selectedModel && makesData && makesData[selectedMake] && makesData[selectedMake][selectedModel]) {
-            // Add variant options
-            makesData[selectedMake][selectedModel].forEach(variant => {
-                if (variant) { // Only add non-empty variants
-                    variantSelect.append(`<option value="${variant}">${variant}</option>`);
-                }
-            });
-        } else {
-            console.error('[Add Listing] No data found for model:', selectedModel);
-        }
-    });
+    // variant handling removed
     
     const fileInput = $('#car_images');
     const fileUploadArea = $('#file-upload-area');

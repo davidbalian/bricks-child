@@ -94,66 +94,7 @@ function get_car_models_by_make_with_counts(array $makes) {
     return ['models_by_make' => $models_by_make, 'model_counts' => $model_counts];
 }
 
-/**
- * Get all unique variants for each make and model with counts.
- * @param array $models_by_make Models grouped by make.
- * @return array ['variants_by_make_model' => array, 'variant_counts' => array]
- */
-function get_car_variants_by_make_model_with_counts(array $models_by_make) {
-    global $wpdb;
-    $variants_by_make_model = array();
-    $variant_counts = array();
-    foreach ($models_by_make as $make => $models) {
-        $variants_by_make_model[$make] = array();
-        $variant_counts[$make] = array();
-        
-        foreach ($models as $model) {
-            $variants_query = $wpdb->get_results($wpdb->prepare(
-                "SELECT meta_value, COUNT(*) as count 
-                FROM {$wpdb->postmeta} 
-                WHERE meta_key = 'variant' 
-                AND post_id IN (
-                    SELECT post_id 
-                    FROM {$wpdb->postmeta} 
-                    WHERE meta_key = 'make' 
-                    AND meta_value = %s
-                    AND post_id IN (
-                        SELECT post_id 
-                        FROM {$wpdb->postmeta} 
-                        WHERE meta_key = 'model' 
-                        AND meta_value = %s
-                        AND post_id IN (
-                            SELECT ID 
-                            FROM {$wpdb->posts} 
-                            WHERE post_type = 'car' 
-                            AND post_status = 'publish'
-                        )
-                    )
-                )
-                GROUP BY meta_value
-                ORDER BY meta_value ASC",
-                $make,
-                $model
-            ));
-            
-            // --- DEBUGGING START ---
-            // echo "<pre>DEBUG: get_car_variants (Make: " . esc_html($make) . ", Model: " . esc_html($model) . ") results: ";
-            // print_r($variants_query);
-            // echo "</pre>";
-            // --- DEBUGGING END ---
-            
-            $variants = [];
-            $variant_counts[$make][$model] = [];
-            foreach ($variants_query as $row) {
-                $variants[] = $row->meta_value;
-                $variant_counts[$make][$model][$row->meta_value] = $row->count;
-            }
-            
-            $variants_by_make_model[$make][$model] = $variants;
-        }
-    }
-    return ['variants_by_make_model' => $variants_by_make_model, 'variant_counts' => $variant_counts];
-}
+// Variant functionality removed - marketplace now uses only makes and models
 
 /**
  * Get all unique locations from the database.

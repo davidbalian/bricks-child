@@ -22,7 +22,7 @@ function handle_add_car_listing() {
     $required_fields = array(
         'make' => 'Make',
         'model' => 'Model',
-        'variant' => 'Variant',
+        // variant field removed
         'year' => 'Year',
         'mileage' => 'Mileage',
         'price' => 'Price',
@@ -100,7 +100,7 @@ function handle_add_car_listing() {
     // Sanitize form data
     $make = sanitize_text_field($_POST['make']);
     $model = sanitize_text_field($_POST['model']);
-    $variant = sanitize_text_field($_POST['variant']);
+    // variant field removed
     $year = intval($_POST['year']);
     $mileage = intval($_POST['mileage']);
     $price = intval($_POST['price']);
@@ -147,7 +147,7 @@ function handle_add_car_listing() {
     error_log('Processed Vehicle History: ' . print_r($vehiclehistory, true));
     
     // Prepare post data
-    $post_title = $year . ' ' . $make . ' ' . $model . ' ' . $variant;
+    $post_title = $year . ' ' . $make . ' ' . $model;
     
     // Create the post
     $post_data = array(
@@ -171,7 +171,7 @@ function handle_add_car_listing() {
     // Add post meta for all the car details
     update_field('make', $make, $post_id);
     update_field('model', $model, $post_id);
-    update_field('variant', $variant, $post_id);
+    // variant field save removed
     update_field('year', $year, $post_id);
     update_field('mileage', $mileage, $post_id);
     update_field('price', $price, $post_id);

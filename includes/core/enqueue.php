@@ -72,7 +72,7 @@ function bricks_child_enqueue_styles() {
     }
     
     // Also load on car archive pages or specific templates
-    if ( is_post_type_archive('car') || is_tax('car_make') || is_tax('car_model') || is_tax('car_variant') ) {
+    if ( is_post_type_archive('car') || is_tax('car_make') || is_tax('car_model') ) {
         $load_car_listings_script = true;
     }
     
@@ -112,7 +112,7 @@ function bricks_child_enqueue_styles() {
                     'id' => $car_id,
                     'make' => get_field('make', $car_id),
                     'model' => get_field('model', $car_id),
-                    'variant' => get_field('variant', $car_id),
+                    // variant field removed
                     'location' => get_field('location', $car_id),
                     'price' => get_field('price', $car_id),
                     'year' => get_field('year', $car_id),
@@ -132,7 +132,7 @@ function bricks_child_enqueue_styles() {
         // 2. Get filter counts and data using functions from car-listings-data.php
         $make_data = get_car_makes_with_counts();
         $model_data = get_car_models_by_make_with_counts($make_data['makes']);
-        $variant_data = get_car_variants_by_make_model_with_counts($model_data['models_by_make']);
+        // variant data removed
         $price_data = get_car_price_ranges_with_counts();
         $year_data = get_car_years_with_counts();
         $kilometer_data = get_car_kilometer_ranges_with_counts();
@@ -151,8 +151,7 @@ function bricks_child_enqueue_styles() {
             'all_cars' => $all_cars_data, // Pass the array of car objects
             'make_counts' => $make_data['counts'],
             'model_counts' => $model_data['model_counts'],
-            'variants_by_make_model' => $variant_data['variants_by_make_model'], // Needed for dependent dropdowns
-            'variant_counts' => $variant_data['variant_counts'],
+            // variant data removed
             'price_counts' => $price_data['counts'],
             'year_counts' => $year_data['counts'],
             'km_counts' => $kilometer_data['counts'],
@@ -228,7 +227,7 @@ function autoagora_enqueue_car_listings_map_filter_assets() {
         $should_enqueue = true;
     }
     // Also load on car archive pages or specific templates if needed
-    if (is_post_type_archive('car') || is_tax('car_make') || is_tax('car_model') || is_tax('car_variant')) {
+    if (is_post_type_archive('car') || is_tax('car_make') || is_tax('car_model')) {
         $should_enqueue = true;
     }
     // Add any other conditions as needed (e.g., specific templates)

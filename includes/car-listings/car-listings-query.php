@@ -102,7 +102,6 @@ function build_car_listings_query_args($atts, $paged, $filters = null) {
     $filter_params = array(
         'make' => 'make',
         'model' => 'model',
-        'variant' => 'variant',
         'transmission' => 'transmission',
         'number_of_doors' => 'number_of_doors',
         'number_of_seats' => 'number_of_seats',

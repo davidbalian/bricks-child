@@ -411,7 +411,7 @@ function autoagora_filter_listings_by_location_ajax() {
         $active_filters_for_query = array();
         $active_filters_for_counts = array();
 
-        $potential_filters = ['make', 'model', 'variant', 'year_min', 'year_max', 'price_min', 'price_max', 'mileage_min', 'mileage_max', 'engine_capacity_min', 'engine_capacity_max', 'hp_min', 'hp_max', 'transmission', 'fuel_type', 'exterior_color', 'interior_color', 'body_type', 'drive_type', 'number_of_doors', 'number_of_seats', 'extras', 'availability', 'numowners_min', 'numowners_max', 'isantique', 'vehiclehistory'];
+        $potential_filters = ['make', 'model', 'year_min', 'year_max', 'price_min', 'price_max', 'mileage_min', 'mileage_max', 'engine_capacity_min', 'engine_capacity_max', 'hp_min', 'hp_max', 'transmission', 'fuel_type', 'exterior_color', 'interior_color', 'body_type', 'drive_type', 'number_of_doors', 'number_of_seats', 'extras', 'availability', 'numowners_min', 'numowners_max', 'isantique', 'vehiclehistory'];
 
         foreach ($potential_filters as $filter_key) {
             if (isset($_POST[$filter_key]) && !empty($_POST[$filter_key])) {
@@ -517,7 +517,7 @@ function autoagora_filter_listings_by_location_ajax() {
         $filter_counts = array();
         $all_makes_list = array(); // Renamed for clarity
         $all_models_by_make = array();
-        $all_variants_by_model = array();
+        // variant data removed
 
         // Use a general flag like get_all_filter_options or rely on get_all_makes for now
         if (isset($_POST['get_all_makes']) && $_POST['get_all_makes'] === 'true') { 
@@ -538,11 +538,10 @@ function autoagora_filter_listings_by_location_ajax() {
                 foreach ($all_cars_query->posts as $car_id) {
                     $make_field = get_field('make', $car_id);
                     $model_field = get_field('model', $car_id);
-                    $variant_field = get_field('variant', $car_id); // Variant is a direct string field
+                    // variant field removed
 
                     $make_name = is_object($make_field) ? $make_field->name : (is_string($make_field) ? trim($make_field) : '');
                     $model_name = is_object($model_field) ? $model_field->name : (is_string($model_field) ? trim($model_field) : '');
-                    $variant_name = is_string($variant_field) ? trim($variant_field) : '';
 
                     if ($make_name) {
                         $temp_makes[$make_name] = true; // Collect unique make names
@@ -553,15 +552,7 @@ function autoagora_filter_listings_by_location_ajax() {
                             }
                             $all_models_by_make[$make_name][$model_name] = true; // Collect unique model names for this make
 
-                            if ($variant_name) {
-                                if (!isset($all_variants_by_model[$make_name])) {
-                                    $all_variants_by_model[$make_name] = array();
-                                }
-                                if (!isset($all_variants_by_model[$make_name][$model_name])) {
-                                    $all_variants_by_model[$make_name][$model_name] = array();
-                                }
-                                $all_variants_by_model[$make_name][$model_name][$variant_name] = true; // Collect unique variant names
-                            }
+                            // variant collection removed
                         }
                     }
                 }
@@ -575,14 +566,7 @@ function autoagora_filter_listings_by_location_ajax() {
             }
             ksort($all_models_by_make);
 
-            foreach ($all_variants_by_model as $make => &$models_with_variants) {
-                foreach ($models_with_variants as $model => &$variants) {
-                    $variants = array_keys($variants);
-                    sort($variants);
-                }
-                ksort($models_with_variants);
-            }
-            ksort($all_variants_by_model);
+            // variant sorting removed
             
             // error_log('[DEBUG] AJAX - All Makes List Collected: ' . print_r($all_makes_list, true));
             // error_log('[DEBUG] AJAX - All Models by Make Collected: ' . print_r($all_models_by_make, true));
@@ -600,8 +584,8 @@ function autoagora_filter_listings_by_location_ajax() {
             'query_vars' => $car_query->query_vars, // For result count or other info
             'filter_counts' => $filter_counts,
             'all_makes' => $all_makes_list, // This now sends a simple array of make names
-            'all_models_by_make' => $all_models_by_make,
-            'all_variants_by_model' => $all_variants_by_model
+            'all_models_by_make' => $all_models_by_make
+            // variant data removed
         );
         
         wp_send_json_success($response_data);

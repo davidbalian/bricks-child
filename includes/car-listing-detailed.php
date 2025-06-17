@@ -30,7 +30,7 @@
         // Get all car details
         $make = get_field('make', $car_id);
         $model = get_field('model', $car_id);
-        $variant = get_field('variant', $car_id);
+        // variant field removed
         $year = get_field('year', $car_id);
         $price = get_field('price', $car_id);
         $mileage = get_field('mileage', $car_id);
@@ -147,7 +147,7 @@
 
                         <div class="car-specs">
                             <?php echo esc_html($engine_capacity); ?>L
-                            <?php echo !empty($variant) ? ' ' . esc_html($variant) : ''; ?>
+                            <!-- variant display removed -->
                             <?php 
                                 echo !empty($body_type) ? ' ' . esc_html($body_type) : '';
                             ?>
@@ -199,8 +199,7 @@
                                 <span class="detail-value"><?php echo esc_html($model); ?></span>
                             </div>
                             <div class="detail-item">
-                                <span class="detail-label">Variant:</span>
-                                <span class="detail-value"><?php echo esc_html($variant); ?></span>
+                                                        <!-- variant detail removed -->
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">Year:</span>

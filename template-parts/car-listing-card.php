@@ -25,7 +25,7 @@ $car_detail_url = esc_url( add_query_arg( 'car_id', $car_post_id, get_permalink(
 // Get car details
 $make             = get_field( 'make', $car_post_id );
 $model            = get_field( 'model', $car_post_id );
-$variant          = get_field( 'variant', $car_post_id ); // Make sure this field exists and is correct
+// variant field removed
 $year             = get_field( 'year', $car_post_id );
 $price            = get_field( 'price', $car_post_id );
 $mileage          = get_field( 'mileage', $car_post_id );

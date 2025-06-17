@@ -100,7 +100,7 @@ $car_query = new WP_Query($args);
                 // Get car details
                 $make = get_field('make', $post_id);
                 $model = get_field('model', $post_id);
-                $variant = get_field('variant', $post_id);
+                // variant field removed
                 $year = get_field('year', $post_id);
                 $price = get_field('price', $post_id);
                 $mileage = get_field('mileage', $post_id);
@@ -174,7 +174,7 @@ $car_query = new WP_Query($args);
                             <h2 class="car-title"><?php echo esc_html($make . ' ' . $model); ?></h2>
                             <div class="car-specs">
                                 <?php echo esc_html($engine_capacity); ?>L
-                                <?php echo !empty($variant) ? ' ' . esc_html($variant) : ''; ?>
+                                <!-- variant display removed -->
                                 <?php 
                                     echo !empty($body_type) ? ' ' . esc_html($body_type) : '';
                                 ?>
