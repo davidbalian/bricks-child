@@ -252,17 +252,6 @@ jQuery(document).ready(function($) {
         $('#hp').prop('disabled', true);
         
         console.log('[Add Listing] Form validation passed, submitting with', totalImages, 'images');
-        
-        // If the form submission would fail for any reason, we need to re-lock the engine capacity field
-        // This is handled by checking if the page reloads/redirects on successful submission
-        setTimeout(function() {
-            // If we're still on the same page after 500ms, submission likely failed
-            if (wasElectricLocked && $('#fuel_type').val() === 'Electric') {
-                engineCapacitySelect.prop('disabled', true);
-                console.log('[Add Listing] Re-locked engine capacity field after failed submission');
-            }
-        }, 500);
-        
         return true;
     });
     
