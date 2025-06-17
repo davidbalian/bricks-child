@@ -56,6 +56,35 @@ jQuery(document).ready(function($) {
     
     // variant handling removed
     
+    // Handle fuel type change to lock/unlock engine capacity for electric vehicles
+    function handleElectricFuelType() {
+        const selectedFuelType = $('#fuel_type').val();
+        const engineCapacitySelect = $('#engine_capacity');
+        
+        if (selectedFuelType === 'Electric') {
+            // Set engine capacity to 0.0 and disable the field
+            engineCapacitySelect.val('0.0');
+            engineCapacitySelect.prop('disabled', true);
+            engineCapacitySelect.addClass('electric-locked');
+            console.log('[Add Listing] Engine capacity locked to 0.0 for electric vehicle');
+        } else {
+            // Re-enable the engine capacity field and reset if it was set to 0.0
+            engineCapacitySelect.prop('disabled', false);
+            engineCapacitySelect.removeClass('electric-locked');
+            // Reset to empty selection if it was 0.0 (electric default)
+            if (engineCapacitySelect.val() === '0.0') {
+                engineCapacitySelect.val('');
+            }
+            console.log('[Add Listing] Engine capacity unlocked for non-electric vehicle');
+        }
+    }
+    
+    // Initialize electric fuel type handling on page load
+    handleElectricFuelType();
+    
+    // Handle fuel type changes
+    $('#fuel_type').on('change', handleElectricFuelType);
+    
     const fileInput = $('#car_images');
     const fileUploadArea = $('#file-upload-area');
     const imagePreview = $('#image-preview');
@@ -130,6 +159,14 @@ jQuery(document).ready(function($) {
 
     // Handle form submission
     $('#add-car-listing-form').on('submit', function(e) {
+        // Re-enable engine capacity field temporarily for form submission if it's locked for electric
+        const engineCapacitySelect = $('#engine_capacity');
+        const wasElectricLocked = engineCapacitySelect.hasClass('electric-locked');
+        if (wasElectricLocked) {
+            engineCapacitySelect.prop('disabled', false);
+            console.log('[Add Listing] Temporarily re-enabled engine capacity field for form submission');
+        }
+        
         // Validate image count - either async uploaded or traditional
         let totalImages = 0;
         
@@ -209,6 +246,17 @@ jQuery(document).ready(function($) {
         $('#hp').prop('disabled', true);
         
         console.log('[Add Listing] Form validation passed, submitting with', totalImages, 'images');
+        
+        // If the form submission would fail for any reason, we need to re-lock the engine capacity field
+        // This is handled by checking if the page reloads/redirects on successful submission
+        setTimeout(function() {
+            // If we're still on the same page after 500ms, submission likely failed
+            if (wasElectricLocked && $('#fuel_type').val() === 'Electric') {
+                engineCapacitySelect.prop('disabled', true);
+                console.log('[Add Listing] Re-locked engine capacity field after failed submission');
+            }
+        }, 500);
+        
         return true;
     });
     

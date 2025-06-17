@@ -1101,6 +1101,31 @@ label svg path,
     transition: width 0.3s ease;
 }
 
+/* Electric Engine Capacity Lock Styles */
+#engine_capacity.electric-locked {
+    background-color: #f0f8ff !important;
+    border: 2px solid #4CAF50 !important;
+    cursor: not-allowed !important;
+    opacity: 0.8;
+    position: relative;
+}
+
+#engine_capacity.electric-locked::after {
+    content: "🔒 Locked for Electric";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #4CAF50;
+    font-weight: 500;
+    pointer-events: none;
+    background: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid #4CAF50;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .upload-progress {
@@ -1120,5 +1145,11 @@ label svg path,
         right: 10px;
         left: 10px;
         font-size: 12px;
+    }
+    
+    #engine_capacity.electric-locked::after {
+        font-size: 10px;
+        padding: 1px 4px;
+        right: 8px;
     }
 }

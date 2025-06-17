@@ -243,6 +243,7 @@ get_header(); ?>
                                         <label for="engine_capacity"><?php echo get_svg_icon('engine'); ?> <?php esc_html_e( 'Engine Capacity', 'bricks-child' ); ?></label>
                                         <select id="engine_capacity" name="engine_capacity" class="form-control" required>
                                             <option value=""><?php esc_html_e( 'Select Engine Capacity', 'bricks-child' ); ?></option>
+                                            <option value="0.0">0.0</option>
                                             <?php
                                             for ($capacity = 0.4; $capacity <= 12.0; $capacity += 0.1) {
                                                 $formatted_capacity = number_format($capacity, 1);
