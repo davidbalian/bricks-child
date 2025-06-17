@@ -54,7 +54,8 @@ jQuery(document).ready(function($) {
     // Set initial model options based on the selected make
     if (selectedMake && makesData[selectedMake]) {
         const modelSelect = $('#model');
-        Object.keys(makesData[selectedMake]).forEach(model => {
+        // makesData[selectedMake] is now a simple array of models
+        makesData[selectedMake].forEach(model => {
             const option = $('<option>', {
                 value: model,
                 text: model
@@ -76,7 +77,8 @@ jQuery(document).ready(function($) {
         modelSelect.html('<option value="">Select Model</option>');
         
         if (selectedMake && makesData[selectedMake]) {
-            Object.keys(makesData[selectedMake]).forEach(model => {
+            // makesData[selectedMake] is now a simple array of models
+            makesData[selectedMake].forEach(model => {
                 modelSelect.append($('<option>', { value: model, text: model }));
             });
         }

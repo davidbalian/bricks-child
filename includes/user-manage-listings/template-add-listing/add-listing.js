@@ -45,8 +45,8 @@ jQuery(document).ready(function($) {
         modelSelect.empty().append('<option value="">Select Model</option>');
         
         if (selectedMake && makesData && makesData[selectedMake]) {
-            // Add model options
-            Object.keys(makesData[selectedMake]).forEach(model => {
+            // Add model options - makesData[selectedMake] is now a simple array of models
+            makesData[selectedMake].forEach(model => {
                 modelSelect.append(`<option value="${model}">${model}</option>`);
             });
         } else {

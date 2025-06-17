@@ -1,5 +1,6 @@
 {
-  "Shelby": {
-    "Mustang GT":
-  }
+    "make": "Shelby",
+    "models": [
+        "Mustang GT"
+    ]
 }

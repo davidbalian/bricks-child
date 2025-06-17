@@ -20,10 +20,11 @@ if (is_dir($add_listing_jsons_dir)) {
 		if ($add_listing_json_content === false) continue; 
 		$add_listing_data = json_decode($add_listing_json_content, true);
 		if (json_last_error() !== JSON_ERROR_NONE) continue;
-		if ($add_listing_data) {
-			$make_name = array_key_first($add_listing_data);
-			if ($make_name) {
-				$add_listing_makes[$make_name] = $add_listing_data[$make_name];
+		if ($add_listing_data && isset($add_listing_data['make']) && isset($add_listing_data['models'])) {
+			$make_name = $add_listing_data['make'];
+			$models = $add_listing_data['models'];
+			if ($make_name && is_array($models)) {
+				$add_listing_makes[$make_name] = $models;
 			}
 		}
 	}

@@ -41,11 +41,23 @@ $model = get_field('model', $car_id);
 
 // Get the makes data structure
 $add_listing_makes = [];
-$add_listing_data = get_field('add_listing_data', 'option');
-if ($add_listing_data) {
-    foreach ($add_listing_data as $make_name => $models) {
-        $add_listing_makes[$make_name] = $models;
+$add_listing_jsons_dir = get_stylesheet_directory() . '/simple_jsons/';
+if (is_dir($add_listing_jsons_dir)) {
+    $add_listing_files = glob($add_listing_jsons_dir . '*.json');
+    foreach ($add_listing_files as $add_listing_file) {
+        $add_listing_json_content = file_get_contents($add_listing_file);
+        if ($add_listing_json_content === false) continue; 
+        $add_listing_data = json_decode($add_listing_json_content, true);
+        if (json_last_error() !== JSON_ERROR_NONE) continue;
+        if ($add_listing_data && isset($add_listing_data['make']) && isset($add_listing_data['models'])) {
+            $make_name = $add_listing_data['make'];
+            $models = $add_listing_data['models'];
+            if ($make_name && is_array($models)) {
+                $add_listing_makes[$make_name] = $models;
+            }
+        }
     }
+    // Sort by make name while preserving keys
     ksort($add_listing_makes);
 }
 
