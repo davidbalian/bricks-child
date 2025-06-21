@@ -54,7 +54,7 @@ add_filter( 'login_url', 'custom_login_page_url', 10, 3 );
  */
 function redirect_login_page() {
     // First check: If user is already logged in, redirect to my-account
-    if (is_user_logged_in() && !current_user_can('administrator')) {
+    if (is_user_logged_in()) {
         // Check if we're on login-related pages
         $page_viewed = isset($_SERVER['REQUEST_URI']) ? basename($_SERVER['REQUEST_URI']) : '';
         $is_login_page = ($page_viewed == 'wp-login.php') || 
@@ -69,24 +69,6 @@ function redirect_login_page() {
     // Second check: Redirect wp-login.php to custom signin page for non-logged-in users
     $page_viewed = isset($_SERVER['REQUEST_URI']) ? basename($_SERVER['REQUEST_URI']) : '';
     if ( $page_viewed == 'wp-login.php' && $_SERVER['REQUEST_METHOD'] == 'GET' ) {
-        
-        // Allow admin access with special parameter
-        if (isset($_GET['admin_access']) && $_GET['admin_access'] === 'true') {
-            return; // Don't redirect, allow access to wp-login.php
-        }
-        
-        // Allow access if there are login errors (to show error messages)
-        if (isset($_GET['login']) && $_GET['login'] === 'failed') {
-            // Redirect to custom login page with error parameter
-            $custom_login_page_id = get_page_by_path( 'signin' )->ID;
-            if ( $custom_login_page_id ) {
-                $redirect_url = add_query_arg( 'login', 'failed', get_permalink( $custom_login_page_id ) );
-                wp_redirect( $redirect_url );
-                exit;
-            }
-        }
-        
-        // Default redirect to custom signin page
         $custom_login_page_id = get_page_by_path( 'signin' )->ID;
         if ( $custom_login_page_id ) {
             wp_redirect( get_permalink( $custom_login_page_id ) );
@@ -195,38 +177,4 @@ function custom_lost_password_url($url) {
     
     return $url; // Fallback to default if page not found
 }
-add_filter('lostpassword_url', 'custom_lost_password_url', 10, 1);
-
-/**
- * Handle login failures and redirect to custom login page
- */
-function custom_login_failed_redirect() {
-    $referrer = wp_get_referer();
-    
-    // Check if the referrer is our custom login page
-    $custom_login_page_id = get_page_by_path( 'signin' );
-    if ( $custom_login_page_id && $referrer && strpos( $referrer, get_permalink( $custom_login_page_id->ID ) ) !== false ) {
-        // Redirect back to custom login page with error
-        $redirect_url = add_query_arg( 'login', 'failed', get_permalink( $custom_login_page_id->ID ) );
-        wp_redirect( $redirect_url );
-        exit;
-    }
-}
-add_action( 'wp_login_failed', 'custom_login_failed_redirect' );
-
-/**
- * Handle empty username/password and redirect to custom login page  
- */
-function custom_login_empty_redirect() {
-    $referrer = wp_get_referer();
-    
-    // Check if the referrer is our custom login page
-    $custom_login_page_id = get_page_by_path( 'signin' );
-    if ( $custom_login_page_id && $referrer && strpos( $referrer, get_permalink( $custom_login_page_id->ID ) ) !== false ) {
-        // Redirect back to custom login page with error
-        $redirect_url = add_query_arg( 'login', 'failed', get_permalink( $custom_login_page_id->ID ) );
-        wp_redirect( $redirect_url );
-        exit;
-    }
-}
-add_action( 'authenticate', 'custom_login_empty_redirect', 1 ); 
+add_filter('lostpassword_url', 'custom_lost_password_url', 10, 1); 
