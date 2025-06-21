@@ -27,10 +27,9 @@ function create_dealership_account($phone_number, $dealership_name, $password) {
         return new WP_Error('phone_exists', 'This phone number is already registered.');
     }
     
-    // Split dealership name into first/last name
-    $name_parts = explode(' ', trim($dealership_name), 2);
-    $first_name = $name_parts[0];
-    $last_name = isset($name_parts[1]) ? $name_parts[1] : '';
+    // Use whole dealership name as first name (no splitting)
+    $first_name = trim($dealership_name);
+    $last_name = ''; // Leave last name empty
     
     // --- EXACT same user creation as normal registration ---
     $username = sanitize_user($phone_number);
@@ -49,9 +48,13 @@ function create_dealership_account($phone_number, $dealership_name, $password) {
     update_user_meta($user_id, 'first_name', $first_name);
     update_user_meta($user_id, 'last_name', $last_name);
     update_user_meta($user_id, 'phone_number', $phone_number); // This is KEY!
-    wp_update_user(array('ID' => $user_id, 'role' => 'dealership')); // Only difference is role
     
-
+    // Set role and display name
+    wp_update_user(array(
+        'ID' => $user_id, 
+        'role' => 'dealership',
+        'display_name' => $dealership_name // Set display name to full dealership name
+    ));
     
     return array(
         'user_id' => $user_id,
