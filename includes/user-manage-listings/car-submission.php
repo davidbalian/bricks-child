@@ -207,6 +207,73 @@ function handle_add_car_listing() {
     error_log('Saved Vehicle History (post meta): ' . print_r(get_post_meta($post_id, 'vehiclehistory', true), true));
     error_log('Saved Vehicle History (ACF): ' . print_r(get_field('vehiclehistory', $post_id), true));
     
+    // Assign taxonomy terms for make and model
+    $terms_to_assign = array();
+    
+    // Find the make term (parent)
+    $make_term = get_term_by('name', $make, 'car_make');
+    if ($make_term && !is_wp_error($make_term) && $make_term->parent == 0) {
+        $terms_to_assign[] = $make_term->term_id;
+        error_log('Found make term: ' . $make . ' (ID: ' . $make_term->term_id . ')');
+        
+        // Find the model term (child of the make)
+        if (!empty($model)) {
+            $model_terms = get_terms(array(
+                'taxonomy' => 'car_make',
+                'name' => $model,
+                'parent' => $make_term->term_id,
+                'hide_empty' => false
+            ));
+            
+            if (!empty($model_terms) && !is_wp_error($model_terms)) {
+                $terms_to_assign[] = $model_terms[0]->term_id;
+                error_log('Found model term: ' . $model . ' (ID: ' . $model_terms[0]->term_id . ')');
+            } else {
+                error_log('Model term not found: ' . $model . ' for make: ' . $make);
+                // Log available models for debugging
+                $available_models = get_terms(array(
+                    'taxonomy' => 'car_make',
+                    'parent' => $make_term->term_id,
+                    'hide_empty' => false,
+                    'fields' => 'names'
+                ));
+                error_log('Available models for ' . $make . ': ' . implode(', ', $available_models));
+            }
+        }
+    } else {
+        error_log('Make term not found: ' . $make);
+        // Log available makes for debugging
+        $available_makes = get_terms(array(
+            'taxonomy' => 'car_make',
+            'parent' => 0,
+            'hide_empty' => false,
+            'fields' => 'names'
+        ));
+        error_log('Available makes: ' . implode(', ', $available_makes));
+    }
+    
+    // Assign the taxonomy terms to the post
+    if (!empty($terms_to_assign)) {
+        $result = wp_set_post_terms($post_id, $terms_to_assign, 'car_make');
+        if (is_wp_error($result)) {
+            error_log('Error assigning taxonomy terms: ' . $result->get_error_message());
+        } else {
+            error_log('Successfully assigned taxonomy terms: ' . implode(', ', $terms_to_assign));
+            
+            // Verify the assignment
+            $assigned_terms = wp_get_post_terms($post_id, 'car_make');
+            if (!is_wp_error($assigned_terms)) {
+                $term_names = array();
+                foreach ($assigned_terms as $term) {
+                    $term_names[] = $term->name;
+                }
+                error_log('Verified assigned terms: ' . implode(', ', $term_names));
+            }
+        }
+    } else {
+        error_log('No taxonomy terms to assign for make: ' . $make . ' and model: ' . $model);
+    }
+    
     // Process images - either async or traditional
     if (!empty($async_images)) {
         // Use async uploaded images

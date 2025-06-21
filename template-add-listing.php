@@ -12,24 +12,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Get Makes data using PHP before the form
 $add_listing_makes = [];
-$add_listing_jsons_dir = get_stylesheet_directory() . '/simple_jsons/';
-if (is_dir($add_listing_jsons_dir)) {
-	$add_listing_files = glob($add_listing_jsons_dir . '*.json');
-	foreach ($add_listing_files as $add_listing_file) {
-		$add_listing_json_content = file_get_contents($add_listing_file);
-		if ($add_listing_json_content === false) continue; 
-		$add_listing_data = json_decode($add_listing_json_content, true);
-		if (json_last_error() !== JSON_ERROR_NONE) continue;
-		if ($add_listing_data && isset($add_listing_data['make']) && isset($add_listing_data['models'])) {
-			$make_name = $add_listing_data['make'];
-			$models = $add_listing_data['models'];
-			if ($make_name && is_array($models)) {
-				$add_listing_makes[$make_name] = $models;
-			}
-		}
-	}
-	// Sort by make name while preserving keys
-	ksort($add_listing_makes);
+
+// Get all top-level terms (makes) from car_make taxonomy
+$make_terms = get_terms(array(
+    'taxonomy' => 'car_make',
+    'hide_empty' => false,
+    'parent' => 0,
+    'orderby' => 'name',
+    'order' => 'ASC'
+));
+
+if (!is_wp_error($make_terms) && !empty($make_terms)) {
+    foreach ($make_terms as $make_term) {
+        // Get all child terms (models) for this make
+        $model_terms = get_terms(array(
+            'taxonomy' => 'car_make',
+            'hide_empty' => false,
+            'parent' => $make_term->term_id,
+            'orderby' => 'name',
+            'order' => 'ASC'
+        ));
+        
+        if (!is_wp_error($model_terms)) {
+            $models = array();
+            foreach ($model_terms as $model_term) {
+                $models[] = $model_term->name;
+            }
+            $add_listing_makes[$make_term->name] = $models;
+        }
+    }
 }
 
 // Ensure jQuery is loaded
@@ -58,13 +69,9 @@ wp_enqueue_script(
 
 // Localize the script with necessary data
 wp_localize_script('astra-child-add-listing-js', 'addListingData', array(
-    'makesData' => $add_listing_makes,
     'ajaxurl' => admin_url('admin-ajax.php'),
     'nonce' => wp_create_nonce('add_car_listing_nonce')
 ));
-
-// Add debug output to verify data
-error_log('Makes data being passed to JavaScript: ' . print_r($add_listing_makes, true));
 
 get_header(); ?>
 

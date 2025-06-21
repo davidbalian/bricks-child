@@ -22,10 +22,6 @@ function bricks_child_enqueue_styles() {
     
     wp_enqueue_style( 'bricks-child-theme-css', get_stylesheet_directory_uri() . '/style.css', array('bricks-frontend', 'font-awesome'), filemtime( get_stylesheet_directory() . '/style.css' ), 'all' );
 
-    // Enqueue account display styles if the shortcode might be used
-    // For simplicity, we'll load it everywhere for now. Consider conditional loading if performance is critical.
-    wp_enqueue_style( 'bricks-child-account-display-css', get_stylesheet_directory_uri() . '/css/account-display.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/css/account-display.css' ), 'all' );
-
     // Enqueue Favourites Button CSS
     wp_enqueue_style(
         'favourites-button',

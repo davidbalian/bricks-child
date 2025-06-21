@@ -8,7 +8,7 @@
  */
 
 // Redirect logged-in users to their account page
-if ( is_user_logged_in() ) {
+if ( is_user_logged_in() && !current_user_can('administrator') ) {
 	// Prevent caching of this redirect
 	nocache_headers();
 	
@@ -20,12 +20,7 @@ get_header(); ?>
 
 <div id="primary" class="content-area">
     <main id="main" class="site-main">
-        
-        <?php
-        // Include the forgot password form
-        include( get_stylesheet_directory() . '/includes/auth/forgot-password.php' );
-        ?>
-        
+        <?php echo do_shortcode('[forgot_password_form]'); ?>
     </main>
 </div>
 

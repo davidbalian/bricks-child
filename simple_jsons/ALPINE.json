@@ -1,5 +1,5 @@
 {
-    "make": "ALPINE",
+    "make": "Alpine",
     "models": [
         "A106",
         "A108",

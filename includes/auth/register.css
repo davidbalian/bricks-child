@@ -9,8 +9,136 @@
 #password-remaining-reqs li {
   color: #dc3545; /* Default unmet color (red) */
   transition: color 0.3s ease;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
 }
 
 #password-remaining-reqs li.met {
   color: #28a745; /* Met color (green) */
+}
+
+/* Registration Form Styling - Similar to Login Page */
+
+/* Phone number input */
+#reg_phone_number_display {
+  padding: 0;
+}
+
+/* Password inputs */
+#reg_password,
+#reg_password_confirm {
+  padding: 0 0.5rem;
+}
+
+/* Text inputs */
+#reg_first_name,
+#reg_last_name,
+#verification_code {
+  padding: 0 0.5rem;
+}
+
+/* All labels in registration form */
+#custom-registration-form label {
+  color: #333;
+  font-weight: 400;
+}
+
+/* Phone input container */
+#custom-registration-form > div > p:nth-child(1) > div {
+  width: 100%;
+}
+
+/* Submit buttons */
+#send-otp-button,
+#verify-otp-button,
+#complete-registration-button,
+#change-phone-button {
+  margin: 0;
+  border: none;
+  width: 100%;
+  text-align: center;
+}
+
+/* Step headings */
+#custom-registration-form h2 {
+  color: #333;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+/* Step descriptions */
+#custom-registration-form p {
+  color: #555;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+/* Messages area */
+#registration-messages {
+  margin-bottom: 1rem;
+}
+
+#registration-messages .error {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+#registration-messages .success {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+/* Password strength text */
+#password-strength-text {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+#password-strength-text.weak {
+  color: #dc3545;
+}
+
+#password-strength-text.medium {
+  color: #ffc107;
+}
+
+#password-strength-text.strong {
+  color: #28a745;
+}
+
+/* Form field spacing */
+#custom-registration-form p {
+  margin-bottom: 1rem;
+}
+
+/* Input focus states */
+#custom-registration-form input:focus {
+  outline: none;
+  border-color: var(--dark-blue, #007cba);
+  box-shadow: 0 0 0 1px var(--dark-blue, #007cba);
+}
+
+/* Button hover states */
+#send-otp-button:hover,
+#verify-otp-button:hover,
+#complete-registration-button:hover,
+#change-phone-button:hover {
+  opacity: 0.9;
+}
+
+/* Disabled button states */
+#send-otp-button:disabled,
+#verify-otp-button:disabled,
+#complete-registration-button:disabled,
+#change-phone-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

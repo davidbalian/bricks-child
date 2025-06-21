@@ -79,7 +79,7 @@ function car_views_counter_shortcode($atts) {
             $total_text = $total_views . ' view' . ($total_views != 1 ? 's' : '');
             $unique_text = $unique_views . ' unique visitor' . ($unique_views != 1 ? 's' : '');
             
-            return '<span class="car-views-counter full-format">Views: ' . $total_text . ' (' . $unique_text . ')</span>';
+            return '<span class="car-views-counter full-format">' . $total_text . ' (' . $unique_text . ')</span>';
     }
 }
 

@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Include the new filter form function
-require_once get_stylesheet_directory() . '/includes/car-listings/car-filter-form.php';
+// require_once get_stylesheet_directory() . '/includes/car-listings/car-filter-form.php'; // REMOVED: File deleted
 
 // Car Search Form Shortcode
 function car_search_form_shortcode() {

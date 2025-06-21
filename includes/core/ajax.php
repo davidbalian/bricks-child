@@ -158,10 +158,18 @@ function ajax_filter_car_listings_handler() {
      );
 
     // Include the query builder file
-    require_once get_stylesheet_directory() . '/includes/car-listings/car-listings-query.php';
+    // require_once get_stylesheet_directory() . '/includes/car-listings/car-listings-query.php'; // REMOVED: File deleted
 
     // Build query args - Assuming build_car_listings_query_args accepts filters directly now
-    $args = build_car_listings_query_args($atts_for_query, $paged, $sanitized_filters); 
+    // $args = build_car_listings_query_args($atts_for_query, $paged, $sanitized_filters); // REMOVED: Function was in deleted file
+    
+    // Basic fallback query args
+    $args = array(
+        'post_type' => 'car',
+        'posts_per_page' => 12,
+        'paged' => $paged,
+        'post_status' => 'publish'
+    ); 
 
     $car_query = new WP_Query($args);
 

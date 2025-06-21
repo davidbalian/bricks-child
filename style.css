@@ -133,7 +133,7 @@ input[type="search"],
 input[type="tel"],
 input[type="text"],
 input[type="url"],
-select,
+select:not(#brxe-wghcnr select),
 textarea {
   transition: border-color 0.2s linear, box-shadow 0.2s linear; /* Only transition border and shadow */
   /* Add other properties like background-color if needed */
@@ -148,7 +148,7 @@ label {
   font-size: 1rem;
 }
 
-select,
+select:not(#brxe-wghcnr select),
 input[type="text"],
 input[type="number"],
 input[type="url"], /* Added url */
@@ -173,7 +173,7 @@ textarea,
 }
 
 /* Specific background for SELECT only */
-select,
+select:not(#brxe-wghcnr select),
 .checkbox-dropdown-button /* Add dropdown button */ {
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
@@ -190,7 +190,7 @@ select,
 }
 
 /* Focus Styles */
-select:focus,
+select:not(#brxe-wghcnr select):focus,
 input[type="text"]:focus,
 input[type="number"]:focus,
 input[type="url"]:focus,
@@ -206,7 +206,7 @@ textarea:focus,
 }
 
 /* Disabled Styles */
-select:disabled,
+select:not(#brxe-wghcnr select):disabled,
 input:disabled,
 textarea:disabled,
 .checkbox-dropdown-button:disabled /* Add dropdown button */ {
@@ -281,7 +281,7 @@ textarea:disabled,
 }
 
 input.error,
-select.error,
+select:not(#brxe-wghcnr select).error,
 textarea.error {
   border-color: var(--error-red) !important;
 }
@@ -442,7 +442,7 @@ textarea.error {
 }
 
 /* Disabled filter options */
-select option:disabled {
+select:not(#brxe-wghcnr select) option:disabled {
   color: #999;
   font-style: italic;
 }

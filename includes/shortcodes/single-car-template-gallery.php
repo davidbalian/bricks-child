@@ -1,187 +1,109 @@
 <?php
 /**
- * Shortcode for single car template gallery with main image and thumbnail row.
+ * Single Car Template Gallery Shortcode [single_car_template_gallery post_id="{post_id}"]
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
+    exit; // Exit if accessed directly.
 }
 
-// Register the shortcode
-add_shortcode( 'single_car_template_gallery', 'single_car_template_gallery_shortcode' );
-
 /**
- * The shortcode function.
+ * Generates single car template gallery shortcode.
+ * Uses Slick slider with main slider and thumbnail navigation.
  *
- * @param array $atts Shortcode attributes.
- * @return string The gallery HTML.
+ * @param array $atts Shortcode attributes
+ * @return string HTML for the gallery
  */
 function single_car_template_gallery_shortcode( $atts ) {
-    // Parse shortcode attributes
     $atts = shortcode_atts( array(
-        'post_id' => null,
-        'debug' => false,
+        'post_id' => get_the_ID()
     ), $atts );
 
-    // Get post ID - use attribute if provided, otherwise get current post ID
-    $post_id = $atts['post_id'] ? (int) $atts['post_id'] : get_the_ID();
-
-    // Debug mode for troubleshooting
-    if ( $atts['debug'] && current_user_can( 'edit_posts' ) ) {
-        $debug_info = array(
-            'post_id' => $post_id,
-            'is_singular_car' => is_singular( 'car' ),
-            'is_bricks_builder' => defined( 'BRICKS_IS_BUILDER' ) && BRICKS_IS_BUILDER,
-            'post_type' => get_post_type( $post_id ),
-        );
-        return '<pre>' . print_r( $debug_info, true ) . '</pre>';
-    }
-
+    $post_id = intval( $atts['post_id'] );
+    
     if ( ! $post_id ) {
-        return '<!-- Single Car Template Gallery: Post ID not found -->';
+        return '<p>No post ID provided for gallery.</p>';
     }
 
-    // Check if post is a car post type
-    if ( get_post_type( $post_id ) !== 'car' ) {
-        if ( current_user_can( 'edit_posts' ) ) {
-            return '<p>Single Car Template Gallery: This shortcode only works with car post type. Current post type: ' . esc_html( get_post_type( $post_id ) ) . '</p>';
-        }
-        return '<!-- Single Car Template Gallery: Not a car post type -->';
+    // Get car images from ACF field
+    $car_images = get_field( 'car_images', $post_id );
+    
+    if ( ! $car_images || ! is_array( $car_images ) ) {
+        return '<p>No images found for this car.</p>';
     }
 
-    // Get image IDs from ACF gallery field 'car_images'.
-    $image_ids = get_field( 'car_images', $post_id );
-    $images = [];
+    // Enqueue Swiper CSS and JS
+    wp_enqueue_style( 'swiper-css', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css' );
+    wp_enqueue_script( 'swiper-js', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js', array(), '11.0.0', true );
+    
+    // Enqueue custom CSS and JS
+    $theme_dir = get_stylesheet_directory_uri();
+    wp_enqueue_style( 'single-car-gallery-css', $theme_dir . '/assets/css/single-car-template-gallery.css', array(), filemtime( get_stylesheet_directory() . '/assets/css/single-car-template-gallery.css' ) );
+    wp_enqueue_script( 'single-car-gallery-js', $theme_dir . '/assets/js/single-car-template-gallery.js', array('swiper-js'), filemtime( get_stylesheet_directory() . '/assets/js/single-car-template-gallery.js' ), true );
 
-    if ( ! empty( $image_ids ) && is_array($image_ids) ) {
-        foreach ( $image_ids as $image_id ) {
-            $image_id = (int) $image_id;
-            if ( ! $image_id ) continue;
+    ob_start();
+    ?>
+    <div class="single-car-gallery-wrapper">
+        <div class="single-car-gallery-container" data-post-id="<?php echo esc_attr( $post_id ); ?>">
+        <!-- Main slider -->
+        <div class="main-slider-wrapper">
+            <div class="swiper single-car-main-slider">
+                <div class="swiper-wrapper">
+                    <?php foreach ( $car_images as $image_id ) : 
+                        $image_url = wp_get_attachment_image_url( $image_id, 'large' );
+                        $image_alt = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
+                        ?>
+                        <div class="swiper-slide">
+                            <img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>" />
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            
+            <!-- Navigation arrows -->
+            <div class="slider-arrows">
+                <button class="custom-prev-btn" aria-label="Previous image">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="custom-next-btn" aria-label="Next image">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <!-- Photo counter -->
+            <div class="photo-counter">
+                <span class="current-slide">1</span> / <span class="total-slides"><?php echo count( $car_images ); ?></span>
+            </div>
+            
+            <!-- View all images button -->
+            <div class="view-all-button">
+                <button type="button" aria-label="View all images">
+                    View all images
+                </button>
+            </div>
+        </div>
 
-            $thumb_src = wp_get_attachment_image_src( $image_id, 'thumbnail' );
-            $medium_large_src = wp_get_attachment_image_src( $image_id, 'medium_large' );
-            $full_src = wp_get_attachment_url( $image_id );
-
-            if ( $thumb_src && $medium_large_src ) {
-                $images[] = [
-                   'ID' => $image_id,
-                   'url' => $full_src,
-                   'sizes' => [
-                       'thumbnail' => $thumb_src[0],
-                       'medium_large' => $medium_large_src[0],
-                   ]
-               ];
-            }
-        }
-    }
-
-    // Fallback if ACF field is empty
-    if ( empty( $images ) ) {
-        // Try to get attached images as a fallback
-        $attached_images = get_attached_media('image', $post_id);
-        if (empty($attached_images)) {
-            if ( current_user_can( 'edit_posts' ) ) {
-                return '<p>No images found for this listing (ID: ' . esc_html($post_id) . '). Please add images to the "car_images" gallery field or attach them to the post.</p>';
-            }
-            return '<!-- No images found for this car listing -->';
-        }
-        // format to match ACF
-        $images = [];
-        foreach($attached_images as $image_post) {
-            $image_id = $image_post->ID;
-            $thumb_src = wp_get_attachment_image_src($image_id, 'thumbnail');
-            $medium_large_src = wp_get_attachment_image_src($image_id, 'medium_large');
-            $full_src = wp_get_attachment_url($image_id);
-
-            if ($thumb_src && $medium_large_src) {
-                 $images[] = [
-                    'ID' => $image_id,
-                    'url' => $full_src,
-                    'sizes' => [
-                        'thumbnail' => $thumb_src[0],
-                        'medium_large' => $medium_large_src[0],
-                    ]
-                ];
-            }
-        }
-    }
-
-	if ( empty( $images ) ) {
-		 return '<!-- No valid images found to display in gallery -->';
-	}
-
-	// Enqueue styles and scripts for the single car template gallery.
-	single_car_template_gallery_enqueue_assets();
-
-	$image_count = count( $images );
-
-	ob_start();
-	?>
-	<div class="single-car-template-gallery-wrapper" data-total-images="<?php echo $image_count; ?>">
-		<!-- Main Image Container with Slider -->
-		<div class="main-image-container">
-			<div class="swiper main-image-slider">
-				<div class="swiper-wrapper">
-					<?php foreach ( $images as $index => $image ) : ?>
-						<div class="swiper-slide">
-							<img src="<?php echo esc_url( $image['sizes']['medium_large'] ); ?>" alt="<?php echo esc_attr( get_the_title( $image['ID'] ) ); ?>" class="main-image">
-						</div>
-					<?php endforeach; ?>
-				</div>
-				<!-- Swiper navigation buttons -->
-				<div class="swiper-button-prev slider-arrow slider-prev"></div>
-				<div class="swiper-button-next slider-arrow slider-next"></div>
-			</div>
-			
-			<!-- Photo Count Overlay (Top Left) -->
-			<div class="photo-count-overlay">
-				<i class="fas fa-camera"></i>
-				<span class="current-photo">1</span>/<span class="total-photos" style="margin-right: 0.15rem;"><?php echo $image_count; ?></span>photos
-			</div>
-			
-			<!-- View All Images Button (Bottom Right) -->
-			<div class="view-all-button-container">
-				<button class="view-all-images-btn" type="button">
-					<i class="fas fa-images"></i>
-					View All Images
-				</button>
-			</div>
-		</div>
-
-		<!-- Thumbnail Navigation Row -->
-		<?php if ( $image_count >= 1 ) : ?>
-			<div class="swiper thumbnail-nav images-row">
-				<div class="swiper-wrapper">
-					<?php foreach ( $images as $index => $image ) : ?>
-						<div class="swiper-slide row-image-item" data-slide="<?php echo $index; ?>">
-							<img src="<?php echo esc_url( $image['sizes']['thumbnail'] ); ?>" alt="<?php echo esc_attr( get_the_title( $image['ID'] ) ); ?>">
-						</div>
-					<?php endforeach; ?>
-				</div>
-			</div>
-		<?php endif; ?>
-	</div>
-
-	<?php
-	return ob_get_clean();
+        <!-- Thumbnail slider -->
+        <div class="thumbnail-slider-wrapper">
+            <div class="swiper single-car-thumbnail-slider">
+                <div class="swiper-wrapper">
+                    <?php foreach ( $car_images as $image_id ) : 
+                        $thumbnail_url = wp_get_attachment_image_url( $image_id, 'medium' );
+                        $image_alt = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
+                        ?>
+                        <div class="swiper-slide">
+                            <div class="thumbnail">
+                                <img src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>" />
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <?php
+    
+    return ob_get_clean();
 }
-
-/**
- * Enqueue styles and scripts for the single car template gallery.
- */
-function single_car_template_gallery_enqueue_assets() {
-	$theme_version = defined('BRICKS_CHILD_THEME_VERSION') ? BRICKS_CHILD_THEME_VERSION : '1.0.0';
-	$theme_dir_uri = get_stylesheet_directory_uri();
-
-	// Enqueue Swiper CSS
-	wp_enqueue_style( 'swiper-css', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css', array(), '11.0.0' );
-	
-	// Enqueue Custom CSS
-	wp_enqueue_style( 'single-car-template-gallery-css', $theme_dir_uri . '/assets/css/single-car-template-gallery.css', array('swiper-css'), $theme_version );
-	
-	// Enqueue Swiper JS
-	wp_enqueue_script( 'swiper-js', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js', array(), '11.0.0', true );
-	
-	// Enqueue Custom JS
-	wp_enqueue_script( 'single-car-template-gallery-js', $theme_dir_uri . '/assets/js/single-car-template-gallery.js', array('swiper-js'), $theme_version, true );
-} 
+add_shortcode( 'single_car_template_gallery', 'single_car_template_gallery_shortcode' ); 
