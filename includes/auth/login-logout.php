@@ -71,6 +71,11 @@ function redirect_login_page() {
     $request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
     
     if ( ($page_viewed == 'wp-login.php' || strpos($request_uri, 'wp-login.php') !== false) && $_SERVER['REQUEST_METHOD'] == 'GET' ) {
+        // Allow logout actions to proceed normally
+        if ( isset($_GET['action']) && $_GET['action'] === 'logout' ) {
+            return; // Don't redirect logout requests
+        }
+        
         // Only allow access if admin_access=true is present
         if ( !isset($_GET['admin_access']) || $_GET['admin_access'] !== 'true' ) {
             $custom_login_page_id = get_page_by_path( 'signin' )->ID;
