@@ -7,8 +7,8 @@
 
 jQuery(document).ready(function($) {
     
-    // Send verification email (reuse logic from my-account page)
-    $('.send-verification-btn').on('click', function() {
+    // Send verification email (only for notification context)
+    $('#email-verification-notification .send-verification-btn').on('click', function() {
         const button = $(this);
         const email = button.data('email');
         
