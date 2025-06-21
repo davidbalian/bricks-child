@@ -32,10 +32,19 @@ get_header(); ?>
 
 							<!-- Display Login Errors -->
 							<?php if ( isset( $_GET['login'] ) && $_GET['login'] === 'failed' ) : ?>
-								<p class="login-error"><?php esc_html_e( 'Login failed. Please check your phone number and password.', 'bricks-child' ); ?></p>
+								<div class="login-error">
+									<p><?php esc_html_e( 'Login failed. Please check your phone number and password and try again.', 'bricks-child' ); ?></p>
+								</div>
+							<?php endif; ?>
+							<?php if ( isset( $_GET['login'] ) && $_GET['login'] === 'empty' ) : ?>
+								<div class="login-error">
+									<p><?php esc_html_e( 'Please enter both your phone number and password.', 'bricks-child' ); ?></p>
+								</div>
 							<?php endif; ?>
 							<?php if ( isset( $_GET['registration'] ) && $_GET['registration'] === 'success' ) : ?>
-								<p class="login-info"><?php esc_html_e( 'Registration successful. Please log in.', 'bricks-child' ); ?></p>
+								<div class="login-info">
+									<p><?php esc_html_e( 'Registration successful. Please log in with your new account.', 'bricks-child' ); ?></p>
+								</div>
 							<?php endif; ?>
 
 							<form name="loginform" id="loginform" action="<?php echo esc_url( site_url( 'wp-login.php', 'login_post' ) ); ?>" method="post">

@@ -131,6 +131,66 @@ function allow_phone_number_login( $user, $username, $password ) {
 add_filter( 'authenticate', 'allow_phone_number_login', 30, 3 );
 
 /**
+ * Handle failed login attempts and redirect to custom login page
+ */
+function custom_login_failed( $username ) {
+    // Get the referrer URL to determine where the login attempt came from
+    $referrer = wp_get_referer();
+    
+    // Check if the login attempt came from our custom login page
+    $custom_login_page = get_page_by_path( 'signin' );
+    
+    if ( $custom_login_page && $referrer && strpos( $referrer, get_permalink( $custom_login_page->ID ) ) !== false ) {
+        // Redirect back to our custom login page with error parameter
+        $redirect_url = add_query_arg( 'login', 'failed', get_permalink( $custom_login_page->ID ) );
+        wp_redirect( $redirect_url );
+        exit;
+    }
+    
+    // If the login attempt didn't come from our custom page, fall back to default behavior
+    // This covers cases where someone tries to login directly via wp-login.php
+    if ( $custom_login_page ) {
+        $redirect_url = add_query_arg( 'login', 'failed', get_permalink( $custom_login_page->ID ) );
+        wp_redirect( $redirect_url );
+        exit;
+    }
+}
+add_action( 'wp_login_failed', 'custom_login_failed' );
+
+/**
+ * Handle empty username/password login attempts
+ */
+function custom_login_empty_credentials() {
+    // Check if this is a login attempt with empty credentials
+    if ( isset( $_POST['wp-submit'] ) && ( empty( $_POST['log'] ) || empty( $_POST['pwd'] ) ) ) {
+        $custom_login_page = get_page_by_path( 'signin' );
+        
+        if ( $custom_login_page ) {
+            wp_redirect( add_query_arg( 'login', 'failed', get_permalink( $custom_login_page->ID ) ) );
+            exit;
+        }
+    }
+}
+add_action( 'init', 'custom_login_empty_credentials' );
+
+/**
+ * Additional safety net - redirect any login error display attempts to custom page
+ */
+function redirect_wp_login_errors() {
+    global $pagenow;
+    
+    // If someone somehow ends up on wp-login.php with errors, redirect to custom page
+    if ( $pagenow === 'wp-login.php' && isset( $_GET['action'] ) && $_GET['action'] === 'login' ) {
+        $custom_login_page = get_page_by_path( 'signin' );
+        if ( $custom_login_page ) {
+            wp_redirect( add_query_arg( 'login', 'failed', get_permalink( $custom_login_page->ID ) ) );
+            exit;
+        }
+    }
+}
+add_action( 'admin_init', 'redirect_wp_login_errors' );
+
+/**
  * Override the "Lost your password?" link in login form
  */
 function redirect_lost_password_to_custom_page() {

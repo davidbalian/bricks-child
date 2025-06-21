@@ -172,6 +172,17 @@ function bricks_child_enqueue_login_styles() {
 add_action( 'login_enqueue_scripts', 'bricks_child_enqueue_login_styles' );
 
 /**
+ * Enqueue login styles on the custom signin page
+ */
+function bricks_child_enqueue_signin_page_styles() {
+    // Check if we're on the custom signin page
+    if ( is_page('signin') ) {
+        wp_enqueue_style( 'bricks-child-login-css', get_stylesheet_directory_uri() . '/includes/auth/login.css', array(), filemtime( get_stylesheet_directory() . '/includes/auth/login.css' ), 'all' );
+    }
+}
+add_action( 'wp_enqueue_scripts', 'bricks_child_enqueue_signin_page_styles' );
+
+/**
  * Enqueue intl-tel-input library assets for registration and login forms.
  */
 function enqueue_intl_tel_input_assets() {
