@@ -51,7 +51,6 @@ add_filter( 'login_url', 'custom_login_page_url', 10, 3 );
 /**
  * Redirect to the custom login page if someone tries to access wp-login.php directly.
  * Also redirect logged-in users to their account page.
- * Allow admin access only with specific parameter.
  */
 function redirect_login_page() {
     // First check: If user is already logged in, redirect to my-account
@@ -67,43 +66,13 @@ function redirect_login_page() {
         }
     }
     
-    // Second check: Handle wp-login.php access control
+    // Second check: Redirect wp-login.php to custom signin page for non-logged-in users
     $page_viewed = isset($_SERVER['REQUEST_URI']) ? basename($_SERVER['REQUEST_URI']) : '';
-    $request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
-    
-    // Check if accessing wp-login.php (either directly or with parameters)
-    if ( $page_viewed == 'wp-login.php' || strpos($request_uri, 'wp-login.php') !== false ) {
-        // Only allow GET requests for admin access check
-        if ( $_SERVER['REQUEST_METHOD'] == 'GET' ) {
-            // Check if admin_access=true is specifically provided
-            $admin_access_granted = false;
-            
-            // Check for admin_access=true in various formats
-            if ( isset($_GET['admin_access']) && $_GET['admin_access'] === 'true' ) {
-                $admin_access_granted = true;
-            }
-            // Also check in the path-style format (wp-login.php/admin_access=true)
-            elseif ( strpos($request_uri, 'wp-login.php/admin_access=true') !== false ) {
-                $admin_access_granted = true;
-            }
-            
-            // If admin access is not granted, redirect to custom login page
-            if ( !$admin_access_granted ) {
-                // Log unauthorized wp-login.php access attempts (optional security measure)
-                $user_ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-                error_log("Unauthorized wp-login.php access attempt from IP: {$user_ip}, URI: {$request_uri}");
-                
-                $custom_login_page_id = get_page_by_path( 'signin' )->ID;
-                if ( $custom_login_page_id ) {
-                    wp_redirect( get_permalink( $custom_login_page_id ) );
-                    exit;
-                }
-            } else {
-                // Log successful admin access (optional security measure)
-                $user_ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-                error_log("Admin wp-login.php access granted from IP: {$user_ip}");
-            }
-            // If admin_access=true, allow access to wp-login.php (do nothing, let it load normally)
+    if ( $page_viewed == 'wp-login.php' && $_SERVER['REQUEST_METHOD'] == 'GET' ) {
+        $custom_login_page_id = get_page_by_path( 'signin' )->ID;
+        if ( $custom_login_page_id ) {
+            wp_redirect( get_permalink( $custom_login_page_id ) );
+            exit;
         }
     }
 }
