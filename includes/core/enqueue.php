@@ -30,9 +30,7 @@ function bricks_child_enqueue_styles() {
         filemtime( get_stylesheet_directory() . '/css/favourites-button.css' )
     );
 
-    // Enqueue car search form styles
-    // Consider conditional loading (e.g., is_page('search-cars') || is_front_page()) if applicable.
-    wp_enqueue_style( 'bricks-child-car-search-css', get_stylesheet_directory_uri() . '/css/car-search-form.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/css/car-search-form.css' ), 'all' );
+
 
     // Enqueue car listings styles
     wp_enqueue_style( 'bricks-child-car-listings-css', get_stylesheet_directory_uri() . '/includes/car-listings/car-listings.css', array('bricks-child-theme-css', 'font-awesome'), filemtime( get_stylesheet_directory() . '/includes/car-listings/car-listings.css' ), 'all' );

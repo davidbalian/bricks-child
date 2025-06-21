@@ -36,7 +36,6 @@ require_once get_stylesheet_directory() . '/includes/email/test-sendgrid.php';
 require_once get_stylesheet_directory() . '/includes/email/email-verification-init.php';
 require_once get_stylesheet_directory() . '/includes/email/email-verification.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/favourites-button.php';
-require_once get_stylesheet_directory() . '/includes/shortcodes/car-search-form.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/single-car-template-gallery.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/forgot-password-form.php';
 
