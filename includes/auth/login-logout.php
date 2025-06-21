@@ -66,13 +66,18 @@ function redirect_login_page() {
         }
     }
     
-    // Second check: Redirect wp-login.php to custom signin page for non-logged-in users
+    // Second check: Redirect wp-login.php to custom signin page unless admin_access=true
     $page_viewed = isset($_SERVER['REQUEST_URI']) ? basename($_SERVER['REQUEST_URI']) : '';
-    if ( $page_viewed == 'wp-login.php' && $_SERVER['REQUEST_METHOD'] == 'GET' ) {
-        $custom_login_page_id = get_page_by_path( 'signin' )->ID;
-        if ( $custom_login_page_id ) {
-            wp_redirect( get_permalink( $custom_login_page_id ) );
-            exit;
+    $request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+    
+    if ( ($page_viewed == 'wp-login.php' || strpos($request_uri, 'wp-login.php') !== false) && $_SERVER['REQUEST_METHOD'] == 'GET' ) {
+        // Only allow access if admin_access=true is present
+        if ( !isset($_GET['admin_access']) || $_GET['admin_access'] !== 'true' ) {
+            $custom_login_page_id = get_page_by_path( 'signin' )->ID;
+            if ( $custom_login_page_id ) {
+                wp_redirect( get_permalink( $custom_login_page_id ) );
+                exit;
+            }
         }
     }
 }
