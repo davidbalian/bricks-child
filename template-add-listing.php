@@ -424,7 +424,7 @@ get_header(); ?>
                                     </div>
                                     <div class="form-half">
                                         <label for="numowners"><?php echo get_svg_icon('users'); ?> <?php esc_html_e( 'Number of Owners', 'bricks-child' ); ?></label>
-                                        <input type="number" id="numowners" name="numowners" class="form-control" min="1" max="99" required placeholder="E.g '2'">
+                                        <input type="number" id="numowners" name="numowners" class="form-control" min="1" max="99" placeholder="E.g '2'">
                                     </div>
                                 </div>
 
