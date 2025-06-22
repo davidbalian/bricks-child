@@ -25,7 +25,12 @@ function process_edit_listing_form($data, $car_id) {
     
     // Update only editable fields
     foreach ($editable_fields as $field_key => $field_label) {
-        update_field($field_key, sanitize_text_field($data[$field_key]), $car_id);
+        if ($field_key === 'description') {
+            // Handle description the same way as add listing - preserve whitespace and line breaks
+            update_field($field_key, wp_kses_post($data[$field_key]), $car_id);
+        } else {
+            update_field($field_key, sanitize_text_field($data[$field_key]), $car_id);
+        }
     }
     
     // Update location-related fields
