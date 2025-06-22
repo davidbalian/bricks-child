@@ -254,7 +254,16 @@ if (!defined('ABSPATH')) {
                                 <h2><?php esc_html_e('Description', 'bricks-child'); ?></h2>
                                 <div class="form-row">
                                     <label for="description"><i class="fas fa-align-left"></i> <?php esc_html_e('Description', 'bricks-child'); ?></label>
-                                    <textarea id="description" name="description" class="form-control" rows="6" required><?php echo esc_textarea($description); ?></textarea>
+                                    <textarea id="description" name="description" class="form-control" rows="6" required><?php 
+                                        // Convert HTML back to plain text with proper line breaks for textarea editing
+                                        $clean_description = $description;
+                                        $clean_description = str_replace('</p><p>', "\n\n", $clean_description);
+                                        $clean_description = str_replace('<p>', '', $clean_description);
+                                        $clean_description = str_replace('</p>', "\n", $clean_description);
+                                        $clean_description = wp_strip_all_tags($clean_description);
+                                        $clean_description = trim($clean_description);
+                                        echo esc_textarea($clean_description); 
+                                    ?></textarea>
                                 </div>
                             </div>
                         </div>
