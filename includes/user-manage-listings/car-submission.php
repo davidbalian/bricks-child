@@ -131,7 +131,7 @@ function handle_add_car_listing() {
     
     // Process ACF fields
     $hp = isset($_POST['hp']) ? intval($_POST['hp']) : '';
-    $numowners = isset($_POST['numowners']) ? intval($_POST['numowners']) : '';
+    $numowners = (isset($_POST['numowners']) && !empty(trim($_POST['numowners']))) ? intval($_POST['numowners']) : '';
     $isantique = isset($_POST['isantique']) ? 1 : 0;
     
     // Process vehicle history as an array of selected options

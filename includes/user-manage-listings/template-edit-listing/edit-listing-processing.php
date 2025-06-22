@@ -52,7 +52,8 @@ function process_edit_listing_form($data, $car_id) {
     
     // Update number of owners
     if (isset($data['numowners'])) {
-        update_field('numowners', intval($data['numowners']), $car_id);
+        $numowners_value = !empty(trim($data['numowners'])) ? intval($data['numowners']) : '';
+        update_field('numowners', $numowners_value, $car_id);
     }
     
     // Process vehicle history

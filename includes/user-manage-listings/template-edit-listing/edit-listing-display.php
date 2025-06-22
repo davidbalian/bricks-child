@@ -146,7 +146,7 @@ if (!defined('ABSPATH')) {
                                 <h2><?php esc_html_e('Registration & Background Info', 'bricks-child'); ?></h2>
                                 <div class="form-row">
                                     <label for="numowners"><i class="fas fa-users"></i> <?php esc_html_e('Number of Owners', 'bricks-child'); ?></label>
-                                    <input type="text" id="numowners" name="numowners" class="form-control" value="<?php echo esc_attr($num_owners); ?>" required>
+                                    <input type="text" id="numowners" name="numowners" class="form-control" value="<?php echo esc_attr($num_owners); ?>">
                                 </div>
 
                                 <div class="form-row">
