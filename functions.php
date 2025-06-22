@@ -101,7 +101,6 @@ function user_can_bulk_upload() {
     
     // Allow administrators, dealers, and dealership roles to bulk upload
     if (in_array('administrator', $user->roles) || 
-        in_array('dealer', $user->roles) || 
         in_array('dealership', $user->roles)) {
         return true;
     }
