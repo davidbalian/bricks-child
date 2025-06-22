@@ -44,6 +44,32 @@ function show_csv_upload_form() {
                     </td>
                 </tr>
                 <tr>
+                    <th scope="row">Post Author</th>
+                    <td>
+                        <select name="post_author" required>
+                            <option value="">Select who will be the author...</option>
+                            <option value="<?php echo get_current_user_id(); ?>">Me (<?php echo wp_get_current_user()->display_name; ?>)</option>
+                            <?php
+                            // Get all users who can publish posts
+                            $users = get_users([
+                                'capability' => 'publish_posts',
+                                'orderby' => 'display_name',
+                                'order' => 'ASC'
+                            ]);
+                            
+                            foreach ($users as $user) {
+                                if ($user->ID != get_current_user_id()) {
+                                    $role_names = array_map('ucfirst', $user->roles);
+                                    echo '<option value="' . $user->ID . '">' . 
+                                         esc_html($user->display_name) . ' (' . implode(', ', $role_names) . ')</option>';
+                                }
+                            }
+                            ?>
+                        </select>
+                        <p class="description">All imported cars will be assigned to this author</p>
+                    </td>
+                </tr>
+                <tr>
                     <th scope="row">Import Options</th>
                     <td>
                         <label>
@@ -97,6 +123,13 @@ function process_csv_import() {
     $csv_file = $_FILES['csv_file']['tmp_name'];
     $create_drafts = isset($_POST['create_drafts']);
     $skip_duplicates = isset($_POST['skip_duplicates']);
+    $post_author = intval($_POST['post_author']);
+    
+    // Validate author selection
+    if (empty($post_author)) {
+        echo '<div class="notice notice-error"><p>Please select a post author.</p></div>';
+        return;
+    }
     
     // Parse CSV
     $csv_data = parse_csv_file($csv_file);
@@ -107,7 +140,7 @@ function process_csv_import() {
     }
     
     // Process imports
-    $results = import_cars_from_csv($csv_data, $create_drafts, $skip_duplicates);
+    $results = import_cars_from_csv($csv_data, $create_drafts, $skip_duplicates, $post_author);
     
     // Show results
     show_import_results($results);
@@ -130,7 +163,7 @@ function parse_csv_file($file_path) {
     return $csv_data;
 }
 
-function import_cars_from_csv($csv_data, $create_drafts = true, $skip_duplicates = true) {
+function import_cars_from_csv($csv_data, $create_drafts = true, $skip_duplicates = true, $post_author = null) {
     $results = [
         'imported' => 0,
         'skipped' => 0,
@@ -148,7 +181,7 @@ function import_cars_from_csv($csv_data, $create_drafts = true, $skip_duplicates
             }
             
             // Create car post
-            $post_id = create_car_listing($row, $create_drafts);
+            $post_id = create_car_listing($row, $create_drafts, $post_author);
             
             if ($post_id) {
                 $results['imported']++;
@@ -200,14 +233,17 @@ function is_duplicate_car($row) {
     return !empty($existing);
 }
 
-function create_car_listing($row, $create_drafts = true) {
+function create_car_listing($row, $create_drafts = true, $post_author = null) {
+    // Use provided author or fallback to current user
+    $author_id = $post_author ? $post_author : get_current_user_id();
+    
     // Create the post
     $post_data = [
         'post_title' => trim($row['year'] . ' ' . $row['make'] . ' ' . $row['model']),
         'post_content' => sanitize_textarea_field($row['description']),
         'post_status' => $create_drafts ? 'draft' : 'publish',
         'post_type' => 'car',
-        'post_author' => get_current_user_id()
+        'post_author' => $author_id
     ];
     
     $post_id = wp_insert_post($post_data);
