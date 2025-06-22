@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Include the bulk import functionality
-require_once get_stylesheet_directory() . '/includes/user-manage-listings/bulk-fast-uploads/bulk-car-import.php';
+require_once get_stylesheet_directory() . '/includes/user-manage-listings/bulk-add-listings/bulk-car-import.php';
 
 get_header(); ?>
 

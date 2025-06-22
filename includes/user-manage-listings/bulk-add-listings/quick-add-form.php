@@ -19,9 +19,9 @@ if (!defined('WPINC')) {
 function enqueue_quick_add_scripts() {
     wp_enqueue_script(
         'quick-add-form-js',
-        get_stylesheet_directory_uri() . '/includes/user-manage-listings/bulk-fast-uploads/quick-add-form.js',
+        get_stylesheet_directory_uri() . '/includes/user-manage-listings/bulk-add-listings/quick-add-form.js',
         array('jquery'),
-        filemtime(get_stylesheet_directory() . '/includes/user-manage-listings/bulk-fast-uploads/quick-add-form.js'),
+        filemtime(get_stylesheet_directory() . '/includes/user-manage-listings/bulk-add-listings/quick-add-form.js'),
         true
     );
 
