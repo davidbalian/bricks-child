@@ -793,6 +793,9 @@ function manual_sync_car_taxonomy() {
 
 // =========================================================================
 
+// Include CSV Import functionality
+require_once get_template_directory() . '/includes/admin/csv-import-page.php';
+
 
 
 
