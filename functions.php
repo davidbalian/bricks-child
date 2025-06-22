@@ -55,68 +55,29 @@ require_once get_stylesheet_directory() . '/includes/views-counter/views-tracker
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-views-counter/car-views-counter.php';
 
 // =========================================================================
-// BULK UPLOADING FUNCTIONALITY - NEWLY ADDED
+// QUICK ADD FORM FUNCTIONALITY - ENHANCED SINGLE CAR ENTRY (DISABLED FOR NOW)
 // =========================================================================
-// Include bulk uploading features
-require_once get_stylesheet_directory() . '/includes/user-manage-listings/bulk-add-listings/bulk-car-import.php';
-require_once get_stylesheet_directory() . '/includes/user-manage-listings/bulk-add-listings/quick-add-form.php';
+// Include quick add form features (templates, form duplication, etc.)
+// require_once get_stylesheet_directory() . '/includes/user-manage-listings/bulk-add-listings/quick-add-form.php';
 
-// Enqueue bulk upload scripts when needed
+// Enqueue quick add form scripts when needed (DISABLED FOR NOW)
+/*
 add_action('wp_enqueue_scripts', function() {
     // Enqueue quick add form scripts on add listing pages
     if (is_page_template('template-add-listing.php') || is_page('add-listing')) {
         enqueue_quick_add_scripts();
     }
-    
-    // Enqueue bulk import styles on bulk import page
-    if (is_page_template('template-bulk-import.php') || is_page('bulk-import')) {
-        wp_enqueue_style('bulk-import-styles', get_stylesheet_directory_uri() . '/css/bulk-import.css', array(), filemtime(get_stylesheet_directory() . '/css/bulk-import.css'));
-    }
 });
+*/
 
 // =========================================================================
-// BULK UPLOAD AJAX HOOKS
+// QUICK ADD FORM AJAX HOOKS (DISABLED FOR NOW)
 // =========================================================================
 // Quick template functionality
+/*
 add_action('wp_ajax_save_quick_template', 'handle_save_quick_template');
 add_action('wp_ajax_load_quick_template', 'handle_load_quick_template');
-
-// Bulk import functionality hooks are already defined in bulk-car-import.php
-// - handle_bulk_car_import() is hooked to 'admin_post_bulk_car_import'
-// - generate_bulk_import_template() is hooked to 'admin_post_download_import_template'
-
-// =========================================================================
-// BULK UPLOAD HELPER FUNCTIONS
-// =========================================================================
-
-/**
- * Check if user has permission for bulk operations
- */
-function user_can_bulk_upload() {
-    if (!is_user_logged_in()) {
-        return false;
-    }
-    
-    $user = wp_get_current_user();
-    
-    // Allow administrators, dealers, and dealership roles to bulk upload
-    if (in_array('administrator', $user->roles) || 
-        in_array('dealership', $user->roles)) {
-        return true;
-    }
-    
-    // Check if user has appropriate capabilities
-    return current_user_can('publish_posts') || current_user_can('edit_posts');
-}
-
-/**
- * Add bulk import menu item to user account pages
- */
-function add_bulk_import_to_user_menu() {
-    if (user_can_bulk_upload()) {
-        echo '<li><a href="' . esc_url(home_url('/bulk-import/')) . '">Bulk Import Cars</a></li>';
-    }
-}
+*/
 
 /**
  * Register and enqueue custom scripts and styles.
