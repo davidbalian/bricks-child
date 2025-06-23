@@ -235,8 +235,8 @@ function convert_to_webp_with_fallback($attachment_id) {
 
     // Check if WordPress supports WebP (GD or ImageMagick)
     if (!wp_image_editor_supports(array('mime_type' => 'image/webp'))) {
-        error_log('WebP not supported by WordPress image editor');
-        return false;
+        error_log('WebP not supported by WordPress image editor - optimizing as JPEG instead');
+        return optimize_as_jpeg($attachment_id, $file_path, $original_mime);
     }
 
     $webp_path = $pathinfo['dirname'] . '/' . $pathinfo['filename'] . '.webp';
@@ -295,12 +295,28 @@ function convert_to_webp_with_fallback($attachment_id) {
 /**
  * Hook to convert car images to WebP after upload
  */
-function convert_car_images_to_webp($attachment_id) {
-    // Only convert car listing images
-    $parent_post = get_post_parent($attachment_id);
-    if ($parent_post && get_post_type($parent_post) === 'car') {
+function convert_car_images_to_webp($metadata, $attachment_id) {
+    // Check if this is a car listing upload session
+    if (is_car_listing_operation() || is_async_car_upload($attachment_id)) {
         convert_to_webp_with_fallback($attachment_id);
     }
+    return $metadata;
+}
+
+/**
+ * Check if this is an async upload for car listings
+ */
+function is_async_car_upload($attachment_id) {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'temp_uploads';
+    
+    // Check if this attachment is in our async uploads table
+    $upload_record = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM $table_name WHERE attachment_id = %d",
+        $attachment_id
+    ));
+    
+    return $upload_record !== null;
 }
 add_action('wp_generate_attachment_metadata', 'convert_car_images_to_webp', 20);
 
