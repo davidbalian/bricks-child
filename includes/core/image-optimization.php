@@ -217,106 +217,147 @@ function is_car_listing_operation() {
  * @return bool Success/failure
  */
 function convert_to_webp_with_fallback($attachment_id) {
-    $file_path = get_attached_file($attachment_id);
-    
-    if (!$file_path || !file_exists($file_path)) {
-        return false;
-    }
+    try {
+        $file_path = get_attached_file($attachment_id);
+        
+        if (!$file_path || !file_exists($file_path)) {
+            error_log("WebP conversion skipped - file not found for attachment {$attachment_id}");
+            return false;
+        }
 
-    // Get original file info
-    $original_mime = get_post_mime_type($attachment_id);
-    $pathinfo = pathinfo($file_path);
-    
-    // Skip if already WebP
-    if ($original_mime === 'image/webp') {
-        error_log("Attachment {$attachment_id} is already WebP, skipping conversion");
+        // Get original file info
+        $original_mime = get_post_mime_type($attachment_id);
+        $pathinfo = pathinfo($file_path);
+        
+        // Skip if already WebP
+        if ($original_mime === 'image/webp') {
+            error_log("Attachment {$attachment_id} is already WebP, skipping conversion");
+            return true;
+        }
+
+        // Check if WordPress supports WebP (GD or ImageMagick)
+        if (!function_exists('wp_image_editor_supports') || !wp_image_editor_supports(array('mime_type' => 'image/webp'))) {
+            error_log('WebP not supported by WordPress image editor - keeping original format');
+            return false;
+        }
+
+        $webp_path = $pathinfo['dirname'] . '/' . $pathinfo['filename'] . '.webp';
+
+        // Load the image editor
+        $image_editor = wp_get_image_editor($file_path);
+        
+        if (is_wp_error($image_editor)) {
+            error_log('Error loading image editor: ' . $image_editor->get_error_message());
+            return false;
+        }
+
+        // Optimize dimensions if needed (max 1920x1080 for car listings)
+        $current_size = $image_editor->get_size();
+        if ($current_size && isset($current_size['width']) && isset($current_size['height'])) {
+            if ($current_size['width'] > 1920 || $current_size['height'] > 1080) {
+                $resize_result = $image_editor->resize(1920, 1080, false);
+                if (is_wp_error($resize_result)) {
+                    error_log('Error resizing image: ' . $resize_result->get_error_message());
+                    return false;
+                }
+                error_log("Resized large image for attachment {$attachment_id}");
+            }
+        }
+
+        // Set quality based on original format
+        if ($original_mime === 'image/png') {
+            // PNG was lossless, use higher quality for WebP
+            $image_editor->set_quality(90);
+        } else {
+            // JPEG was already compressed, use standard quality
+            $image_editor->set_quality(85);
+        }
+
+        // Save as WebP
+        $saved = $image_editor->save($webp_path, 'image/webp');
+        
+        if (is_wp_error($saved)) {
+            error_log('Error saving WebP: ' . $saved->get_error_message());
+            return false;
+        }
+
+        // Update attachment to point to WebP file
+        update_attached_file($attachment_id, $webp_path);
+        
+        // Update attachment metadata
+        $attachment_data = array(
+            'ID' => $attachment_id,
+            'post_mime_type' => 'image/webp'
+        );
+        wp_update_post($attachment_data);
+
+        // Delete original file to save space (only if WebP was successfully created)
+        if (file_exists($webp_path) && file_exists($file_path) && $file_path !== $webp_path) {
+            unlink($file_path);
+        }
+
+        error_log("Successfully converted attachment {$attachment_id} from {$original_mime} to WebP");
         return true;
-    }
-
-    // Check if WordPress supports WebP (GD or ImageMagick)
-    if (!wp_image_editor_supports(array('mime_type' => 'image/webp'))) {
-        error_log('WebP not supported by WordPress image editor - optimizing as JPEG instead');
-        return optimize_as_jpeg($attachment_id, $file_path, $original_mime);
-    }
-
-    $webp_path = $pathinfo['dirname'] . '/' . $pathinfo['filename'] . '.webp';
-
-    // Load the image editor
-    $image_editor = wp_get_image_editor($file_path);
-    
-    if (is_wp_error($image_editor)) {
-        error_log('Error loading image editor: ' . $image_editor->get_error_message());
+        
+    } catch (Exception $e) {
+        error_log("WebP conversion failed for attachment {$attachment_id}: " . $e->getMessage());
+        return false;
+    } catch (Error $e) {
+        error_log("WebP conversion error for attachment {$attachment_id}: " . $e->getMessage());
         return false;
     }
-
-    // Optimize dimensions if needed (max 1920x1080 for car listings)
-    $current_size = $image_editor->get_size();
-    if ($current_size['width'] > 1920 || $current_size['height'] > 1080) {
-        $image_editor->resize(1920, 1080, false); // Maintain aspect ratio
-        error_log("Resized large image for attachment {$attachment_id}");
-    }
-
-    // Set quality based on original format
-    if ($original_mime === 'image/png') {
-        // PNG was lossless, use higher quality for WebP
-        $image_editor->set_quality(90);
-    } else {
-        // JPEG was already compressed, use standard quality
-        $image_editor->set_quality(85);
-    }
-
-    // Save as WebP
-    $saved = $image_editor->save($webp_path, 'image/webp');
-    
-    if (is_wp_error($saved)) {
-        error_log('Error saving WebP: ' . $saved->get_error_message());
-        return false;
-    }
-
-    // Update attachment to point to WebP file
-    update_attached_file($attachment_id, $webp_path);
-    
-    // Update attachment metadata
-    $attachment_data = array(
-        'ID' => $attachment_id,
-        'post_mime_type' => 'image/webp'
-    );
-    wp_update_post($attachment_data);
-
-    // Delete original file to save space
-    if (file_exists($file_path) && $file_path !== $webp_path) {
-        unlink($file_path);
-    }
-
-    error_log("Successfully converted attachment {$attachment_id} from {$original_mime} to WebP");
-    return true;
 }
 
 /**
- * Hook to convert car images to WebP after upload
+ * Hook to convert car images to WebP after upload (safe version)
  */
 function convert_car_images_to_webp($metadata, $attachment_id) {
-    // Check if this is a car listing upload session
-    if (is_car_listing_operation() || is_async_car_upload($attachment_id)) {
-        convert_to_webp_with_fallback($attachment_id);
+    // Only proceed if we have valid metadata and attachment ID
+    if (!$metadata || !$attachment_id) {
+        return $metadata;
     }
+    
+    try {
+        // Check if this could be a car listing image (safe check)
+        if (should_convert_to_webp($attachment_id)) {
+            convert_to_webp_with_fallback($attachment_id);
+        }
+    } catch (Exception $e) {
+        // Log error but don't break the upload process
+        error_log('WebP conversion failed for attachment ' . $attachment_id . ': ' . $e->getMessage());
+    }
+    
     return $metadata;
 }
 
 /**
- * Check if this is an async upload for car listings
+ * Safe check if image should be converted to WebP
  */
-function is_async_car_upload($attachment_id) {
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'temp_uploads';
+function should_convert_to_webp($attachment_id) {
+    // Method 1: Check if it's a direct car listing operation
+    if (is_car_listing_operation()) {
+        return true;
+    }
     
-    // Check if this attachment is in our async uploads table
-    $upload_record = $wpdb->get_row($wpdb->prepare(
-        "SELECT * FROM $table_name WHERE attachment_id = %d",
-        $attachment_id
-    ));
+    // Method 2: Check if it's an async upload (safe database check)
+    try {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'temp_uploads';
+        
+        // Only check if table exists
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") === $table_name) {
+            $upload_record = $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM $table_name WHERE attachment_id = %d",
+                $attachment_id
+            ));
+            return $upload_record > 0;
+        }
+    } catch (Exception $e) {
+        // If database check fails, don't convert (safer)
+        error_log('Database check failed for WebP conversion: ' . $e->getMessage());
+    }
     
-    return $upload_record !== null;
+    return false;
 }
 add_action('wp_generate_attachment_metadata', 'convert_car_images_to_webp', 20);
 
