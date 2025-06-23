@@ -189,6 +189,9 @@ function handle_async_upload_image() {
     // Get attachment URL for preview
     $attachment_url = wp_get_attachment_image_url($attachment_id, 'medium');
     
+    // Note: WebP conversion disabled during async upload to ensure reliable uploads
+    // Will add WebP conversion later if needed
+    
     wp_send_json_success(array(
         'attachment_id' => $attachment_id,
         'attachment_url' => $attachment_url,
@@ -357,6 +360,11 @@ function mark_upload_session_completed($session_id, $post_id) {
             'ID' => $upload->attachment_id,
             'post_parent' => $post_id
         ));
+        
+        // Convert to WebP now that the upload is finalized and attached to a car listing
+        if (function_exists('convert_to_webp_with_fallback')) {
+            convert_to_webp_with_fallback($upload->attachment_id);
+        }
     }
 }
 

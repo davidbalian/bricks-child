@@ -359,7 +359,20 @@ function should_convert_to_webp($attachment_id) {
     
     return false;
 }
-add_action('wp_generate_attachment_metadata', 'convert_car_images_to_webp', 20);
+// Only add WebP conversion hook if NOT during async uploads to prevent response interference
+if (!defined('DOING_AJAX') || !DOING_AJAX || !isset($_POST['action']) || $_POST['action'] !== 'async_upload_image') {
+    add_action('wp_generate_attachment_metadata', 'convert_car_images_to_webp', 20);
+}
+
+/**
+ * Scheduled WebP conversion for async uploaded images
+ */
+function handle_scheduled_webp_conversion($attachment_id) {
+    if (function_exists('convert_to_webp_with_fallback')) {
+        convert_to_webp_with_fallback($attachment_id);
+    }
+}
+add_action('convert_async_image_to_webp', 'handle_scheduled_webp_conversion');
 
 // Initialize optimizations when this file is loaded
 init_car_image_optimization(); 
