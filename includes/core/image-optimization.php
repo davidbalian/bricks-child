@@ -291,7 +291,24 @@ function convert_to_webp_with_fallback($attachment_id) {
         );
         wp_update_post($attachment_data);
 
-        // Delete original file to save space (only if WebP was successfully created)
+        // CRITICAL: Regenerate attachment metadata for WebP file
+        // This ensures WordPress generates WebP thumbnails and updates all URLs
+        
+        // Temporarily remove our WebP hook to prevent infinite loop
+        remove_action('wp_generate_attachment_metadata', 'convert_car_images_to_webp', 20);
+        
+        $new_metadata = wp_generate_attachment_metadata($attachment_id, $webp_path);
+        if ($new_metadata && !is_wp_error($new_metadata)) {
+            wp_update_attachment_metadata($attachment_id, $new_metadata);
+            error_log("Regenerated metadata for WebP attachment {$attachment_id}");
+        } else {
+            error_log("Failed to regenerate metadata for WebP attachment {$attachment_id}");
+        }
+        
+        // Re-add our WebP hook for future uploads
+        add_action('wp_generate_attachment_metadata', 'convert_car_images_to_webp', 20);
+
+        // Delete original file to save space (only if WebP was successfully created and metadata updated)
         if (file_exists($webp_path) && file_exists($file_path) && $file_path !== $webp_path) {
             unlink($file_path);
         }

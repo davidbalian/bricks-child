@@ -338,7 +338,7 @@ function handle_car_image_uploads($post_id) {
     car_submission_log('FILES structure: ' . print_r($_FILES, true));
     
     // Allowed file types
-    $allowed_types = array('image/jpeg', 'image/png', 'image/gif', 'image/webp');
+    $allowed_types = array('image/jpeg', 'image/jfif', 'image/pjpeg', 'image/png', 'image/gif', 'image/webp');
     
     // Setup return array for attachment IDs
     $attachment_ids = array();

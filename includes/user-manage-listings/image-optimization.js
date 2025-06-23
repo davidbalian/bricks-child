@@ -9,7 +9,7 @@ class ImageOptimizer {
         this.maxHeight = options.maxHeight || 1080;
         this.quality = options.quality || 0.8;
         this.maxFileSize = options.maxFileSize || 5120; // 5MB in KB - minimal client processing
-        this.allowedTypes = options.allowedTypes || ['image/jpeg', 'image/png', 'image/webp'];
+        this.allowedTypes = options.allowedTypes || ['image/jpeg', 'image/jfif', 'image/pjpeg', 'image/png', 'image/webp'];
         
         // Check browser compatibility
         this.isSupported = this.checkBrowserSupport();

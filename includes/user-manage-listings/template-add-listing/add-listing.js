@@ -375,7 +375,7 @@ jQuery(document).ready(function ($) {
     );
     const maxFiles = 25;
     const maxFileSize = 5 * 1024 * 1024; // 5MB
-    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+            const allowedTypes = ["image/jpeg", "image/jfif", "image/pjpeg", "image/png", "image/gif", "image/webp"];
 
     // Show processing indicator
     showImageProcessingIndicator(true);

@@ -105,7 +105,7 @@ function enqueue_async_upload_scripts() {
             'nonce' => wp_create_nonce('async_upload_nonce'),
             'userId' => get_current_user_id(),
             'maxFileSize' => 5 * 1024 * 1024, // 5MB
-            'allowedTypes' => array('image/jpeg', 'image/png', 'image/gif', 'image/webp')
+            'allowedTypes' => array('image/jpeg', 'image/jfif', 'image/pjpeg', 'image/png', 'image/gif', 'image/webp')
         ));
     }
 }
@@ -137,7 +137,7 @@ function handle_async_upload_image() {
     $form_type = sanitize_text_field($_POST['form_type']);
     
     // Validate file type
-    $allowed_types = array('image/jpeg', 'image/png', 'image/gif', 'image/webp');
+    $allowed_types = array('image/jpeg', 'image/jfif', 'image/pjpeg', 'image/png', 'image/gif', 'image/webp');
     if (!in_array($_FILES['image']['type'], $allowed_types)) {
         wp_send_json_error(array('message' => 'Invalid file type'));
         return;
