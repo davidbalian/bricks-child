@@ -294,8 +294,8 @@ function convert_to_webp_with_fallback($attachment_id) {
         // CRITICAL: Regenerate attachment metadata for WebP file
         // This ensures WordPress generates WebP thumbnails and updates all URLs
         
-        // Temporarily remove our WebP hook to prevent infinite loop
-        remove_action('wp_generate_attachment_metadata', 'convert_car_images_to_webp', 20);
+        // Mark this attachment as "being processed" to prevent infinite loops
+        update_post_meta($attachment_id, '_webp_conversion_in_progress', true);
         
         $new_metadata = wp_generate_attachment_metadata($attachment_id, $webp_path);
         if ($new_metadata && !is_wp_error($new_metadata)) {
@@ -305,8 +305,8 @@ function convert_to_webp_with_fallback($attachment_id) {
             error_log("Failed to regenerate metadata for WebP attachment {$attachment_id}");
         }
         
-        // Re-add our WebP hook for future uploads
-        add_action('wp_generate_attachment_metadata', 'convert_car_images_to_webp', 20);
+        // Remove the processing flag
+        delete_post_meta($attachment_id, '_webp_conversion_in_progress');
 
         // Delete original file to save space (only if WebP was successfully created and metadata updated)
         if (file_exists($webp_path) && file_exists($file_path) && $file_path !== $webp_path) {
@@ -334,6 +334,17 @@ function convert_car_images_to_webp($metadata, $attachment_id) {
         return $metadata;
     }
     
+    // ROBUST: Check if this attachment is already being processed to prevent infinite loops
+    if (get_post_meta($attachment_id, '_webp_conversion_in_progress', true)) {
+        error_log("WebP conversion skipped for attachment {$attachment_id} - already in progress");
+        return $metadata;
+    }
+    
+    // Check if already WebP to prevent unnecessary processing
+    if (get_post_mime_type($attachment_id) === 'image/webp') {
+        return $metadata;
+    }
+    
     try {
         // Check if this could be a car listing image (safe check)
         if (should_convert_to_webp($attachment_id)) {
@@ -342,6 +353,8 @@ function convert_car_images_to_webp($metadata, $attachment_id) {
     } catch (Exception $e) {
         // Log error but don't break the upload process
         error_log('WebP conversion failed for attachment ' . $attachment_id . ': ' . $e->getMessage());
+        // Clean up the processing flag if it exists
+        delete_post_meta($attachment_id, '_webp_conversion_in_progress');
     }
     
     return $metadata;
