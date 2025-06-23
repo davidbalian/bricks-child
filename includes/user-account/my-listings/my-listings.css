@@ -8,6 +8,30 @@
   margin-bottom: 2rem;
 }
 
+/* Success/Error notices */
+.notice {
+  padding: 1rem;
+  margin-bottom: 2rem;
+  border-radius: var(--border-radius-small);
+  border-left: 4px solid;
+}
+
+.notice-success {
+  background-color: #d4edda;
+  border-left-color: #28a745;
+  color: #155724;
+}
+
+.notice-error {
+  background-color: #f8d7da;
+  border-left-color: #dc3545;
+  color: #721c24;
+}
+
+.notice p {
+  margin: 0;
+}
+
 .listings-grid {
   display: flex;
   flex-direction: column;
