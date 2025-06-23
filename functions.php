@@ -704,6 +704,13 @@ add_action('wp_ajax_car_taxonomy_sync', function() {
 });
 
 // =========================================================================
+// CSV Import Functionality
+// =========================================================================
+
+// Include CSV car import functionality
+require_once get_template_directory() . '/includes/admin/csv-car-import.php';
+
+// =========================================================================
 // AJAX Handlers for Add Listing Form
 // =========================================================================
 
