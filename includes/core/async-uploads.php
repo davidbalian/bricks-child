@@ -136,11 +136,39 @@ function handle_async_upload_image() {
     $original_filename = sanitize_text_field($_POST['original_filename']);
     $form_type = sanitize_text_field($_POST['form_type']);
     
-    // Validate file type
-    $allowed_types = array('image/jpeg', 'image/jfif', 'image/pjpeg', 'image/png', 'image/gif', 'image/webp');
-    if (!in_array($_FILES['image']['type'], $allowed_types)) {
-        wp_send_json_error(array('message' => 'Invalid file type'));
+    // Validate file type - JFIF files might be reported as various MIME types
+    $allowed_types = array(
+        'image/jpeg', 
+        'image/jfif', 
+        'image/pjpeg', 
+        'image/jpg',           // Some browsers use this
+        'image/x-jfif',        // Alternative JFIF type
+        'image/pipeg',         // Progressive JPEG variation
+        'image/png', 
+        'image/gif', 
+        'image/webp'
+    );
+    
+    // DEBUG: Log the actual MIME type being sent
+    error_log('JFIF Debug - Uploaded file MIME type: ' . $_FILES['image']['type']);
+    error_log('JFIF Debug - Original filename: ' . $original_filename);
+    
+    // Check MIME type first
+    $is_valid_mime = in_array($_FILES['image']['type'], $allowed_types);
+    
+    // Fallback: Check file extension for JFIF files (browsers often report them as image/jpeg)
+    $file_extension = strtolower(pathinfo($original_filename, PATHINFO_EXTENSION));
+    $allowed_extensions = array('jpg', 'jpeg', 'jfif', 'jpe', 'png', 'gif', 'webp');
+    $is_valid_extension = in_array($file_extension, $allowed_extensions);
+    
+    if (!$is_valid_mime && !$is_valid_extension) {
+        error_log('JFIF Debug - File rejected - MIME: ' . $_FILES['image']['type'] . ', Extension: ' . $file_extension);
+        wp_send_json_error(array('message' => 'Invalid file type: ' . $_FILES['image']['type'] . ' (.' . $file_extension . ')'));
         return;
+    }
+    
+    if (!$is_valid_mime) {
+        error_log('JFIF Debug - File accepted by extension - MIME: ' . $_FILES['image']['type'] . ', Extension: ' . $file_extension);
     }
     
     // Validate file size (5MB max)

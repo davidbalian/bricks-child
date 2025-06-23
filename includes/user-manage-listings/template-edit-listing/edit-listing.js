@@ -146,7 +146,8 @@ jQuery(document).ready(function($) {
         console.log('[Edit Listing] Processing', candidateFiles.length, 'new candidate files.');
         const maxTotalFiles = 25;
         const maxFileSize = 5 * 1024 * 1024; // 5MB
-        const allowedTypes = ['image/jpeg', 'image/jfif', 'image/pjpeg', 'image/png', 'image/gif', 'image/webp'];
+        const allowedTypes = ['image/jpeg', 'image/jfif', 'image/pjpeg', 'image/jpg', 'image/x-jfif', 'image/pipeg', 'image/png', 'image/gif', 'image/webp'];
+        const allowedExtensions = ['jpg', 'jpeg', 'jfif', 'jpe', 'png', 'gif', 'webp'];
 
         const currentExistingImageDOMCount = imagePreviewContainer.find(existingImageSelector).length;
 
