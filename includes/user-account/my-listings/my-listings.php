@@ -353,159 +353,75 @@ function display_my_listings($atts) {
 }
 
 /**
- * Handle frontend car listing deletion - ROBUST VERSION
+ * Handle frontend car listing deletion
  */
 function handle_frontend_car_deletion() {
-    // Enable detailed error logging
-    error_log('=== CAR DELETION DEBUG START ===');
-    error_log('Raw GET data: ' . print_r($_GET, true));
-    error_log('Request URI: ' . $_SERVER['REQUEST_URI']);
-    error_log('User Agent: ' . ($_SERVER['HTTP_USER_AGENT'] ?? 'Not set'));
-    
     // Input validation and sanitization
     $car_id = isset($_GET['car_id']) ? intval($_GET['car_id']) : 0;
     $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field($_GET['_wpnonce']) : '';
     
-    error_log('Parsed car_id: ' . $car_id);
-    error_log('Parsed nonce: ' . $nonce);
-    
     // Early exit for invalid input
     if ($car_id <= 0) {
-        error_log('ERROR: Invalid car listing ID');
         wp_die('Invalid car listing ID.');
     }
     
     // Verify nonce
-    $nonce_action = 'delete_car_listing_' . $car_id;
-    error_log('Nonce action: ' . $nonce_action);
-    
-    if (!wp_verify_nonce($nonce, $nonce_action)) {
-        error_log('ERROR: Nonce verification failed for action: ' . $nonce_action);
+    if (!wp_verify_nonce($nonce, 'delete_car_listing_' . $car_id)) {
         wp_die('Security check failed. Please try again.');
     }
-    error_log('SUCCESS: Nonce verified');
     
     // Check if user is logged in
     if (!is_user_logged_in()) {
-        error_log('ERROR: User not logged in');
         wp_die('You must be logged in to delete listings.');
     }
     
     $current_user_id = get_current_user_id();
-    $current_user = wp_get_current_user();
-    error_log('Current user ID: ' . $current_user_id);
-    error_log('Current user roles: ' . print_r($current_user->roles, true));
     
-    // Check if car exists and get fresh data to avoid race conditions
+    // Check if car exists
     $car = get_post($car_id);
-    if (!$car) {
-        error_log('ERROR: Car post not found with ID: ' . $car_id);
-        wp_die('Car listing not found. It may have already been deleted.');
-    }
-    error_log('Car post found: ' . $car->post_title . ' (ID: ' . $car->ID . ')');
-    error_log('Car post type: ' . $car->post_type);
-    error_log('Car post status: ' . $car->post_status);
-    error_log('Car post author: ' . $car->post_author);
-    
-    if ($car->post_type !== 'car') {
-        error_log('ERROR: Invalid post type: ' . $car->post_type);
-        wp_die('Invalid post type. Only car listings can be deleted through this interface.');
+    if (!$car || $car->post_type !== 'car') {
+        wp_die('Car listing not found.');
     }
     
     // Check if post is already in trash
     if ($car->post_status === 'trash') {
-        error_log('ERROR: Car already in trash');
         wp_die('This car listing is already in the trash.');
     }
     
     // Check if user owns this car listing
     if ($car->post_author != $current_user_id) {
-        error_log('ERROR: User does not own this car. Owner: ' . $car->post_author . ', Current user: ' . $current_user_id);
         wp_die('Access denied. You can only delete your own listings.');
     }
-    error_log('SUCCESS: User owns the car listing');
     
     // Check if user has permission to delete posts
-    $can_delete = current_user_can('delete_post', $car_id);
-    error_log('User can delete post: ' . ($can_delete ? 'YES' : 'NO'));
+    // Use multiple capability checks for better compatibility with custom roles
+    $can_delete = current_user_can('delete_post', $car_id) || 
+                  current_user_can('delete_posts') || 
+                  current_user_can('delete_published_posts') || 
+                  current_user_can('administrator');
     
-    // Alternative capability checks for dealerships
-    $can_delete_posts = current_user_can('delete_posts');
-    $can_delete_published = current_user_can('delete_published_posts');
-    $is_admin = current_user_can('administrator');
-    
-    error_log('User can delete_posts: ' . ($can_delete_posts ? 'YES' : 'NO'));
-    error_log('User can delete_published_posts: ' . ($can_delete_published ? 'YES' : 'NO'));
-    error_log('User is admin: ' . ($is_admin ? 'YES' : 'NO'));
-    
-    // For dealerships, use a more permissive check since they should be able to delete their own posts
-    $can_delete_own = ($can_delete || $can_delete_posts || $can_delete_published || $is_admin);
-    
-    if (!$can_delete_own) {
-        error_log('ERROR: User lacks delete capabilities for car_id: ' . $car_id);
-        
-        // Let's also check what capabilities the user has
-        $user_caps = $current_user->get_role_caps();
-        error_log('User capabilities: ' . print_r($user_caps, true));
-        
+    if (!$can_delete) {
         wp_die('Permission denied. You do not have sufficient privileges to delete this listing.');
     }
-    error_log('SUCCESS: User has delete permissions');
     
-    // Log the deletion attempt for audit purposes
-    error_log(sprintf(
-        'Car listing deletion attempt: User %d attempting to delete car %d ("%s")',
-        $current_user_id,
-        $car_id,
-        $car->post_title
-    ));
+    // Clean any output buffers before redirect to prevent "headers already sent" errors
+    if (ob_get_length()) {
+        ob_clean();
+    }
     
-    // Attempt deletion with error handling
-    error_log('Attempting wp_delete_post...');
+    // Attempt deletion
     $deleted = wp_delete_post($car_id, true);
-    error_log('wp_delete_post result: ' . print_r($deleted, true));
     
     if ($deleted) {
-        // Log successful deletion
-        error_log(sprintf(
-            'Car listing deletion successful: User %d deleted car %d ("%s")',
-            $current_user_id,
-            $car_id,
-            $car->post_title
-        ));
-        
-        error_log('Redirecting to success page...');
         // Redirect back to my listings with success message
         wp_redirect(add_query_arg('deleted', 'success', home_url('/my-listings/')));
     } else {
-        // Log failed deletion
-        error_log(sprintf(
-            'Car listing deletion failed: User %d failed to delete car %d ("%s") - wp_delete_post returned false',
-            $current_user_id,
-            $car_id,
-            $car->post_title
-        ));
-        
-        error_log('Redirecting to error page...');
         // Redirect back with error message
         wp_redirect(add_query_arg('deleted', 'error', home_url('/my-listings/')));
     }
-    
-    error_log('=== CAR DELETION DEBUG END ===');
     exit;
 }
 
 // Add the delete handler for both logged in and non-logged in users
 add_action('admin_post_delete_car_listing', 'handle_frontend_car_deletion');
 add_action('admin_post_nopriv_delete_car_listing', 'handle_frontend_car_deletion');
-
-// Temporary debug handler to test if admin_post hooks are working
-function debug_admin_post_action() {
-    error_log('DEBUG: admin_post hook triggered for action: ' . ($_GET['action'] ?? 'none'));
-    error_log('DEBUG: All GET parameters: ' . print_r($_GET, true));
-    wp_die('DEBUG: admin_post action received. Action: ' . ($_GET['action'] ?? 'none'));
-}
-
-// Add debug handler for testing (remove after debugging)
-add_action('admin_post_test_debug', 'debug_admin_post_action');
-add_action('admin_post_nopriv_test_debug', 'debug_admin_post_action');
