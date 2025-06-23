@@ -169,10 +169,10 @@ get_header(); ?>
                                     <p class="small"><?php esc_html_e( 'or click to select files', 'bricks-child' ); ?></p>
                                 </div>
                             </div>
-                            <input type="file" id="car_images" name="car_images[]" multiple accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;">
+                            <input type="file" id="car_images" name="car_images[]" multiple accept="image/jpeg,image/jfif,image/jpg,image/png,image/gif,image/webp,.jfif,.jpe" style="display: none;">
                             <div id="image-preview" class="image-preview"></div>
                         </div>
-                        <p class="image-upload-info"><?php esc_html_e( 'Hold CTRL to choose several photos. Minimum 5 images per listing. Maximum 25 images per listing. Maximum file size is 5MB, the formats are .jpg, .jpeg, .png, .gif, .webp. Images are automatically optimized and converted to WebP for faster loading.', 'bricks-child' ); ?></p>
+                        <p class="image-upload-info"><?php esc_html_e( 'Hold CTRL to choose several photos. Minimum 5 images per listing. Maximum 25 images per listing. Maximum file size is 5MB, the formats are .jpg, .jpeg, .jfif, .png, .gif, .webp. Images are automatically optimized and converted to WebP for faster loading.', 'bricks-child' ); ?></p>
                     </div>
 
                     <div class="add-listing-main-row">

@@ -271,7 +271,7 @@ if (!defined('ABSPATH')) {
                         <div class="add-listing-image-column">
                             <div class="add-listing-images-section">
                                 <h2><?php esc_html_e('Upload Images', 'bricks-child'); ?></h2>
-                                <p class="image-upload-info"><?php esc_html_e('Hold CTRL to choose several photos. Maximum 25 images per listing. Maximum file size is 5MB, the formats are .jpg, .jpeg, .png, .gif, .webp', 'bricks-child'); ?></p>
+                                <p class="image-upload-info"><?php esc_html_e('Hold CTRL to choose several photos. Maximum 25 images per listing. Maximum file size is 5MB, the formats are .jpg, .jpeg, .jfif, .png, .gif, .webp', 'bricks-child'); ?></p>
                                 <p class="image-upload-note"><?php esc_html_e('Note: ads with good photos get more attention', 'bricks-child'); ?></p>
                                 <div class="image-upload-container">
                                     <div class="file-upload-area" id="file-upload-area" role="button" tabindex="0">
@@ -281,7 +281,7 @@ if (!defined('ABSPATH')) {
                                             <p class="small"><?php esc_html_e('or click to select files', 'bricks-child'); ?></p>
                                         </div>
                                     </div>
-                                    <input type="file" id="car_images" name="car_images[]" multiple accept="image/jpeg,image/png,image/gif,image/webp" style="display: none;">
+                                    <input type="file" id="car_images" name="car_images[]" multiple accept="image/jpeg,image/jfif,image/jpg,image/png,image/gif,image/webp,.jfif,.jpe" style="display: none;">
                                     <div id="image-preview" class="image-preview">
                                         <?php
                                         if (!empty($all_images)) {

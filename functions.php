@@ -55,6 +55,48 @@ require_once get_stylesheet_directory() . '/includes/views-counter/views-tracker
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-views-counter/car-views-counter.php';
 
 // =========================================================================
+// WordPress File Upload Configuration
+// =========================================================================
+
+/**
+ * Allow JFIF file uploads for car images
+ * WordPress by default doesn't recognize JFIF as a valid file type
+ */
+function allow_car_image_file_types($mimes) {
+    // Add JFIF support with multiple MIME type variations
+    $mimes['jfif'] = 'image/jpeg';
+    $mimes['jpe'] = 'image/jpeg';
+    
+    // Ensure all standard car image formats are allowed
+    $mimes['jpg'] = 'image/jpeg';
+    $mimes['jpeg'] = 'image/jpeg';
+    $mimes['png'] = 'image/png';
+    $mimes['gif'] = 'image/gif';
+    $mimes['webp'] = 'image/webp';
+    
+    return $mimes;
+}
+add_filter('upload_mimes', 'allow_car_image_file_types');
+
+/**
+ * Additional file type checking for JFIF files
+ * Some browsers report JFIF files with non-standard MIME types
+ */
+function check_jfif_file_type($data, $file, $filename, $mimes) {
+    $file_extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    
+    // If it's a JFIF file, force the correct MIME type
+    if ($file_extension === 'jfif' || $file_extension === 'jpe') {
+        $data['ext'] = 'jpeg';
+        $data['type'] = 'image/jpeg';
+        $data['proper_filename'] = false;
+    }
+    
+    return $data;
+}
+add_filter('wp_check_filetype_and_ext', 'check_jfif_file_type', 10, 4);
+
+// =========================================================================
 // QUICK ADD FORM FUNCTIONALITY - ENHANCED SINGLE CAR ENTRY (DISABLED FOR NOW)
 // =========================================================================
 // Include quick add form features (templates, form duplication, etc.)
