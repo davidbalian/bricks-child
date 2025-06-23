@@ -380,12 +380,12 @@ jQuery(document).ready(function ($) {
     // Show processing indicator
     showImageProcessingIndicator(true);
 
-    // Initialize the image optimizer
+    // Initialize the image optimizer (minimal processing - server handles WebP)
     const optimizer = new ImageOptimizer({
       maxWidth: 1920,
       maxHeight: 1080,
       quality: 0.8,
-      maxFileSize: 2048, // 2MB in KB
+      maxFileSize: 5120, // 5MB in KB - only process very large files
       allowedTypes: allowedTypes,
     });
 

@@ -210,5 +210,99 @@ function is_car_listing_operation() {
            ($_POST['action'] === 'add_new_car_listing' || $_POST['action'] === 'edit_car_listing');
 }
 
+/**
+ * Convert uploaded images to WebP format - handles any input format optimally
+ * 
+ * @param int $attachment_id The attachment ID
+ * @return bool Success/failure
+ */
+function convert_to_webp_with_fallback($attachment_id) {
+    $file_path = get_attached_file($attachment_id);
+    
+    if (!$file_path || !file_exists($file_path)) {
+        return false;
+    }
+
+    // Get original file info
+    $original_mime = get_post_mime_type($attachment_id);
+    $pathinfo = pathinfo($file_path);
+    
+    // Skip if already WebP
+    if ($original_mime === 'image/webp') {
+        error_log("Attachment {$attachment_id} is already WebP, skipping conversion");
+        return true;
+    }
+
+    // Check if WordPress supports WebP (GD or ImageMagick)
+    if (!wp_image_editor_supports(array('mime_type' => 'image/webp'))) {
+        error_log('WebP not supported by WordPress image editor');
+        return false;
+    }
+
+    $webp_path = $pathinfo['dirname'] . '/' . $pathinfo['filename'] . '.webp';
+
+    // Load the image editor
+    $image_editor = wp_get_image_editor($file_path);
+    
+    if (is_wp_error($image_editor)) {
+        error_log('Error loading image editor: ' . $image_editor->get_error_message());
+        return false;
+    }
+
+    // Optimize dimensions if needed (max 1920x1080 for car listings)
+    $current_size = $image_editor->get_size();
+    if ($current_size['width'] > 1920 || $current_size['height'] > 1080) {
+        $image_editor->resize(1920, 1080, false); // Maintain aspect ratio
+        error_log("Resized large image for attachment {$attachment_id}");
+    }
+
+    // Set quality based on original format
+    if ($original_mime === 'image/png') {
+        // PNG was lossless, use higher quality for WebP
+        $image_editor->set_quality(90);
+    } else {
+        // JPEG was already compressed, use standard quality
+        $image_editor->set_quality(85);
+    }
+
+    // Save as WebP
+    $saved = $image_editor->save($webp_path, 'image/webp');
+    
+    if (is_wp_error($saved)) {
+        error_log('Error saving WebP: ' . $saved->get_error_message());
+        return false;
+    }
+
+    // Update attachment to point to WebP file
+    update_attached_file($attachment_id, $webp_path);
+    
+    // Update attachment metadata
+    $attachment_data = array(
+        'ID' => $attachment_id,
+        'post_mime_type' => 'image/webp'
+    );
+    wp_update_post($attachment_data);
+
+    // Delete original file to save space
+    if (file_exists($file_path) && $file_path !== $webp_path) {
+        unlink($file_path);
+    }
+
+    error_log("Successfully converted attachment {$attachment_id} from {$original_mime} to WebP");
+    return true;
+}
+
+/**
+ * Hook to convert car images to WebP after upload
+ */
+function convert_car_images_to_webp($attachment_id) {
+    // Only convert car listing images
+    $parent_post = get_post_parent($attachment_id);
+    if ($parent_post && get_post_type($parent_post) === 'car') {
+        convert_to_webp_with_fallback($attachment_id);
+    }
+}
+add_action('wp_generate_attachment_metadata', 'convert_car_images_to_webp', 20);
+
 // Initialize optimizations when this file is loaded
 init_car_image_optimization(); 

@@ -300,7 +300,7 @@ if (!defined('ABSPATH')) {
                                         ?>
                                     </div>
                                 </div>
-                                <p class="image-upload-info"><?php esc_html_e('Hold CTRL to choose several photos. Minimum 5 images per listing. Maximum 25 images per listing. Maximum file size is 5MB, the formats are .jpg, .jpeg, .png, .gif, .webp. Images larger than 2MB are automatically compressed.', 'bricks-child'); ?></p>
+                                <p class="image-upload-info"><?php esc_html_e('Hold CTRL to choose several photos. Minimum 5 images per listing. Maximum 25 images per listing. Maximum file size is 5MB, the formats are .jpg, .jpeg, .png, .gif, .webp. Images are automatically optimized and converted to WebP for faster loading.', 'bricks-child'); ?></p>
                             </div>
                         </div>
                     </div>

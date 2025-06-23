@@ -8,7 +8,7 @@ class ImageOptimizer {
         this.maxWidth = options.maxWidth || 1920;
         this.maxHeight = options.maxHeight || 1080;
         this.quality = options.quality || 0.8;
-        this.maxFileSize = options.maxFileSize || 2048; // 2MB in KB
+        this.maxFileSize = options.maxFileSize || 5120; // 5MB in KB - minimal client processing
         this.allowedTypes = options.allowedTypes || ['image/jpeg', 'image/png', 'image/webp'];
         
         // Check browser compatibility
@@ -50,9 +50,10 @@ class ImageOptimizer {
                 return;
             }
 
-            // If file is already small enough, don't optimize
-            if (file.size <= (this.maxFileSize * 1024)) {
-                console.log(`[ImageOptimizer] File ${file.name} is already optimized (${(file.size / 1024).toFixed(1)}KB)`);
+            // For car listings, skip client-side processing for best quality
+            // Only resize very large files to reduce upload time (keeping original format)
+            if (file.size <= (5 * 1024 * 1024)) { // 5MB threshold
+                console.log(`[ImageOptimizer] File ${file.name} will be processed on server for best quality`);
                 resolve(file);
                 return;
             }
@@ -82,33 +83,37 @@ class ImageOptimizer {
                     ctx.fillRect(0, 0, width, height);
                     ctx.drawImage(img, 0, 0, width, height);
 
+                    // Keep original format when resizing to preserve quality
+                    const outputFormat = file.type;
+                    const quality = outputFormat === 'image/png' ? 1.0 : this.quality; // PNG is lossless
+                    
                     canvas.toBlob(
                         (blob) => {
                             if (blob && blob.size > 0) {
-                                // Create a new file from the blob
+                                // Create a new file maintaining original format
                                 const optimizedFile = new File([blob], file.name, {
-                                    type: 'image/jpeg', // Always output as JPEG for better compression
+                                    type: outputFormat, // Keep original format for best quality
                                     lastModified: Date.now()
                                 });
 
                                 // Only use optimized version if it's actually smaller
                                 if (optimizedFile.size < file.size) {
-                                    console.log(`[ImageOptimizer] Image optimized: ${file.name}`);
+                                    console.log(`[ImageOptimizer] Image resized: ${file.name} (kept as ${outputFormat})`);
                                     console.log(`[ImageOptimizer] Original size: ${(file.size / 1024).toFixed(2)} KB`);
-                                    console.log(`[ImageOptimizer] Optimized size: ${(optimizedFile.size / 1024).toFixed(2)} KB`);
-                                    console.log(`[ImageOptimizer] Compression ratio: ${((1 - optimizedFile.size / file.size) * 100).toFixed(1)}%`);
+                                    console.log(`[ImageOptimizer] Resized size: ${(optimizedFile.size / 1024).toFixed(2)} KB`);
+                                    console.log(`[ImageOptimizer] Size reduction: ${((1 - optimizedFile.size / file.size) * 100).toFixed(1)}%`);
                                     resolve(optimizedFile);
                                 } else {
-                                    console.log(`[ImageOptimizer] Optimization didn't reduce size for ${file.name}, using original`);
+                                    console.log(`[ImageOptimizer] Resize didn't reduce size for ${file.name}, using original`);
                                     resolve(file);
                                 }
                             } else {
-                                console.warn(`[ImageOptimizer] Failed to compress ${file.name}, using original`);
+                                console.warn(`[ImageOptimizer] Failed to resize ${file.name}, using original`);
                                 resolve(file);
                             }
                         },
-                        'image/jpeg', // Always output as JPEG for better compression
-                        this.quality
+                        outputFormat, // Keep original format to preserve quality
+                        quality
                     );
                 } catch (error) {
                     clearTimeout(timeout);
