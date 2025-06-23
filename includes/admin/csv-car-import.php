@@ -9,6 +9,11 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Only load if we have admin access and the function exists
+if (!function_exists('add_management_page')) {
+    return;
+}
+
 /**
  * Add CSV Car Import menu item to WordPress admin
  */
@@ -324,23 +329,45 @@ function import_car($car, $author) {
             return array('success' => false, 'error' => $post_id->get_error_message());
         }
         
-        // Update ACF fields
-        $fields = array('make', 'model', 'year', 'price', 'mileage', 'fuel_type', 'transmission', 
-                       'body_type', 'engine_capacity', 'hp', 'drive_type', 'exterior_color', 
-                       'interior_color', 'number_of_doors', 'number_of_seats', 'motuntil', 'description');
-        
-        foreach ($fields as $field) {
-            if (isset($car[$field]) && $car[$field] !== '') {
-                $value = $car[$field];
-                
-                if (in_array($field, array('year', 'price', 'mileage', 'hp', 'number_of_doors', 'number_of_seats'))) {
-                    $value = intval(str_replace(',', '', $value));
+        // Update ACF fields (only if ACF is available)
+        if (function_exists('update_field')) {
+            $fields = array('make', 'model', 'year', 'price', 'mileage', 'fuel_type', 'transmission', 
+                           'body_type', 'engine_capacity', 'hp', 'drive_type', 'exterior_color', 
+                           'interior_color', 'number_of_doors', 'number_of_seats', 'motuntil', 'description');
+            
+            foreach ($fields as $field) {
+                if (isset($car[$field]) && $car[$field] !== '') {
+                    $value = $car[$field];
+                    
+                    if (in_array($field, array('year', 'price', 'mileage', 'hp', 'number_of_doors', 'number_of_seats'))) {
+                        $value = intval(str_replace(',', '', $value));
+                    }
+                    if ($field === 'engine_capacity') {
+                        $value = floatval($value);
+                    }
+                    
+                    update_field($field, $value, $post_id);
                 }
-                if ($field === 'engine_capacity') {
-                    $value = floatval($value);
+            }
+        } else {
+            // Fallback: store as post meta if ACF is not available
+            $fields = array('make', 'model', 'year', 'price', 'mileage', 'fuel_type', 'transmission', 
+                           'body_type', 'engine_capacity', 'hp', 'drive_type', 'exterior_color', 
+                           'interior_color', 'number_of_doors', 'number_of_seats', 'motuntil', 'description');
+            
+            foreach ($fields as $field) {
+                if (isset($car[$field]) && $car[$field] !== '') {
+                    $value = $car[$field];
+                    
+                    if (in_array($field, array('year', 'price', 'mileage', 'hp', 'number_of_doors', 'number_of_seats'))) {
+                        $value = intval(str_replace(',', '', $value));
+                    }
+                    if ($field === 'engine_capacity') {
+                        $value = floatval($value);
+                    }
+                    
+                    update_post_meta($post_id, $field, $value);
                 }
-                
-                update_field($field, $value, $post_id);
             }
         }
         
@@ -354,22 +381,36 @@ function import_car($car, $author) {
             }
             
             if (is_array($extras)) {
-                update_field('extras', $extras, $post_id);
+                if (function_exists('update_field')) {
+                    update_field('extras', $extras, $post_id);
+                } else {
+                    update_post_meta($post_id, 'extras', $extras);
+                }
             }
         }
         
         // Additional fields
         if (!empty($car['num_owners'])) {
-            update_field('numowners', intval($car['num_owners']), $post_id);
+            if (function_exists('update_field')) {
+                update_field('numowners', intval($car['num_owners']), $post_id);
+            } else {
+                update_post_meta($post_id, 'numowners', intval($car['num_owners']));
+            }
         }
         
         if (!empty($car['is_antique'])) {
             $is_antique = ($car['is_antique'] === 'True' || $car['is_antique'] === '1');
-            update_field('isantique', $is_antique ? 1 : 0, $post_id);
+            if (function_exists('update_field')) {
+                update_field('isantique', $is_antique ? 1 : 0, $post_id);
+            } else {
+                update_post_meta($post_id, 'isantique', $is_antique ? 1 : 0);
+            }
         }
         
-        // Auto-assign taxonomy
-        do_action('acf/save_post', $post_id);
+        // Auto-assign taxonomy (only if function exists)
+        if (function_exists('do_action')) {
+            do_action('acf/save_post', $post_id);
+        }
         
         return array('success' => true, 'post_id' => $post_id);
         
