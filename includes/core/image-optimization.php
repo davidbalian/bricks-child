@@ -398,8 +398,35 @@ if (!defined('DOING_AJAX') || !DOING_AJAX || !isset($_POST['action']) || $_POST[
  * Scheduled WebP conversion for async uploaded images
  */
 function handle_scheduled_webp_conversion($attachment_id) {
+    // ROBUST: Add same safety checks as the main hook
+    if (!$attachment_id) {
+        error_log('Scheduled WebP conversion called with invalid attachment ID');
+        return;
+    }
+    
+    // Check if already being processed
+    if (get_post_meta($attachment_id, '_webp_conversion_in_progress', true)) {
+        error_log("Scheduled WebP conversion skipped for attachment {$attachment_id} - already in progress");
+        return;
+    }
+    
+    // Check if already WebP
+    if (get_post_mime_type($attachment_id) === 'image/webp') {
+        error_log("Scheduled WebP conversion skipped for attachment {$attachment_id} - already WebP");
+        return;
+    }
+    
+    // Check if attachment still exists
+    if (!get_attached_file($attachment_id)) {
+        error_log("Scheduled WebP conversion skipped for attachment {$attachment_id} - file not found");
+        return;
+    }
+    
     if (function_exists('convert_to_webp_with_fallback')) {
+        error_log("Starting scheduled WebP conversion for attachment {$attachment_id}");
         convert_to_webp_with_fallback($attachment_id);
+    } else {
+        error_log('Scheduled WebP conversion failed - convert_to_webp_with_fallback function not available');
     }
 }
 add_action('convert_async_image_to_webp', 'handle_scheduled_webp_conversion');
