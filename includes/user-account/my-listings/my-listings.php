@@ -202,7 +202,7 @@ function display_my_listings($atts) {
                                             <i class="<?php echo esc_attr($icon_class); ?>"></i><?php echo esc_html($button_text); ?>
                                         </button>
                                     <?php } ?>
-                                    <a href="<?php echo get_delete_post_link(); ?>" class="button delete-button" onclick="return confirm('Are you sure you want to delete this listing?');"><i class="fas fa-trash-alt"></i> Delete</a>
+                                    <a href="<?php echo get_delete_post_link($post_id); ?>" class="button delete-button" onclick="return confirm('Are you sure you want to delete this listing?');"><i class="fas fa-trash-alt"></i> Delete</a>
                                 </div>
                             </div>
                         </div>
