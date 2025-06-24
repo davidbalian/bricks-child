@@ -1,5 +1,10 @@
 jQuery(document).ready(function($) {
-    console.log('[Quick Add] Form enhancement loaded');
+    // PRODUCTION SAFETY: Only log in development environments
+const isDevelopment = window.location.hostname === 'localhost' || 
+                     window.location.hostname.includes('staging') ||
+                     window.location.search.includes('debug=true');
+
+if (isDevelopment) console.log('[Quick Add] Form enhancement loaded');
     
     // Add quick action buttons to the add listing form
     if ($('#add-car-listing-form').length) {
@@ -272,7 +277,7 @@ jQuery(document).ready(function($) {
             engineCapacitySelect.find('option[value="0.0"]').remove();
         }
         
-        console.log('[Quick Add] Form cleared');
+        if (isDevelopment) console.log('[Quick Add] Form cleared');
     }
     
     // Auto-populate form from URL parameters (for duplication)
@@ -294,7 +299,7 @@ jQuery(document).ready(function($) {
             // Small delay to ensure form is fully loaded
             setTimeout(function() {
                 populateForm(formData);
-                console.log('[Quick Add] Form populated from URL parameters');
+                if (isDevelopment) console.log('[Quick Add] Form populated from URL parameters');
             }, 500);
         }
     }

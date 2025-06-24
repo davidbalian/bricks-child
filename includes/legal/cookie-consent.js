@@ -5,6 +5,11 @@
  * @since 1.0.0
  */
 
+// PRODUCTION SAFETY: Only log in development environments
+const isDevelopment = window.location.hostname === 'localhost' || 
+                     window.location.hostname.includes('staging') ||
+                     window.location.search.includes('debug=true');
+
 jQuery(document).ready(function($) {
     'use strict';
     
@@ -99,7 +104,7 @@ jQuery(document).ready(function($) {
             data: data,
             success: function(response) {
                 if (response.success) {
-                    console.log('Cookie preferences saved:', response.data.preferences);
+                    if (isDevelopment) console.log('Cookie preferences saved:', response.data.preferences);
                     
                     // Trigger custom event for other scripts to listen to
                     $(document).trigger('cookieConsentUpdated', [response.data.preferences]);
@@ -107,11 +112,11 @@ jQuery(document).ready(function($) {
                     // Show success message (optional)
                     showSuccessMessage();
                 } else {
-                    console.error('Failed to save cookie preferences');
+                    if (isDevelopment) console.error('Failed to save cookie preferences');
                 }
             },
             error: function(xhr, status, error) {
-                console.error('AJAX error:', error);
+                if (isDevelopment) console.error('AJAX error:', error);
             }
         });
     }
@@ -206,12 +211,12 @@ jQuery(document).ready(function($) {
                 const decodedCookie = decodeURIComponent(cookie);
                 return JSON.parse(decodedCookie);
             } catch (e) {
-                console.error('Error parsing cookie preferences:', e);
+                if (isDevelopment) console.error('Error parsing cookie preferences:', e);
                 // Try parsing without decoding in case it's not URL encoded
                 try {
                     return JSON.parse(cookie);
                 } catch (e2) {
-                    console.error('Error parsing cookie preferences (second attempt):', e2);
+                    if (isDevelopment) console.error('Error parsing cookie preferences (second attempt):', e2);
                     return null;
                 }
             }

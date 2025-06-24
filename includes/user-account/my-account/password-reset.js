@@ -6,7 +6,12 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Password reset functionality loaded');
+    // PRODUCTION SAFETY: Only log in development environments
+    const isDevelopment = window.location.hostname === 'localhost' || 
+                         window.location.hostname.includes('staging') ||
+                         window.location.search.includes('debug=true');
+    
+    if (isDevelopment) console.log('Password reset functionality loaded');
     
     // Only run password reset scripts if we're on a password reset step
     if (!window.location.search.includes('password_reset_step')) {
@@ -27,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
      * Initialize verification form functionality
      */
     function initializeVerificationForm() {
-        console.log('Initializing verification form');
+        if (isDevelopment) console.log('Initializing verification form');
         
         const verificationInput = document.getElementById('verification-code');
         const verifyBtn = document.querySelector('.verify-code-btn');
@@ -35,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const resendBtn = document.querySelector('.resend-code-btn');
 
         if (!verificationInput || !verifyBtn) {
-            console.log('Verification form elements not found');
+            if (isDevelopment) console.log('Verification form elements not found');
             return;
         }
 
@@ -86,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
      * Initialize password form functionality
      */
     function initializePasswordForm() {
-        console.log('Initializing password form');
+        if (isDevelopment) console.log('Initializing password form');
         
         const newPasswordInput = document.getElementById('new-password');
         const confirmPasswordInput = document.getElementById('confirm-password');
@@ -96,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const requirementsDiv = document.getElementById('password-remaining-reqs');
 
         if (!newPasswordInput || !confirmPasswordInput || !updateBtn) {
-            console.log('Password form elements not found');
+            if (isDevelopment) console.log('Password form elements not found');
             return;
         }
 
@@ -302,7 +307,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            if (isDevelopment) console.error('Error:', error);
             alert('Error verifying code. Please try again.');
         });
     }
@@ -329,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            if (isDevelopment) console.error('Error:', error);
             alert('Error resending code. Please try again.');
         });
     }
@@ -367,7 +372,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            if (isDevelopment) console.error('Error:', error);
             alert('Error updating password. Please try again.');
             if (updateBtn) {
                 updateBtn.disabled = false;

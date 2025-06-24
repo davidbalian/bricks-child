@@ -12,7 +12,12 @@ jQuery(document).ready(function($) {
         const button = $(this);
         const email = button.data('email');
         
-        console.log('Notification: Send verification clicked, email:', email);
+        // PRODUCTION SAFETY: Only log in development environments
+        const isDevelopment = window.location.hostname === 'localhost' || 
+                             window.location.hostname.includes('staging') ||
+                             window.location.search.includes('debug=true');
+        
+        if (isDevelopment) console.log('Notification: Send verification clicked, email:', email);
         
         // Basic validation
         if (!email) {
@@ -39,7 +44,7 @@ jQuery(document).ready(function($) {
                 nonce: EmailNotificationAjax.email_verification_nonce
             },
             success: function(response) {
-                console.log('Notification AJAX Success:', response);
+                if (isDevelopment) console.log('Notification AJAX Success:', response);
                 
                 if (response.success) {
                     // Show success state
@@ -57,7 +62,7 @@ jQuery(document).ready(function($) {
                     }, 10000);
                     
                 } else {
-                    console.log('Notification AJAX Error:', response.data);
+                    if (isDevelopment) console.log('Notification AJAX Error:', response.data);
                     alert('❌ Error: ' + response.data + '\n\nPlease try again.');
                     
                     // Re-enable button
@@ -65,7 +70,7 @@ jQuery(document).ready(function($) {
                 }
             },
             error: function(xhr, status, error) {
-                console.log('Notification AJAX Failed:', {xhr, status, error});
+                if (isDevelopment) console.log('Notification AJAX Failed:', {xhr, status, error});
                 
                 alert('❌ Connection error occurred. Please try again.');
                 
@@ -96,10 +101,10 @@ jQuery(document).ready(function($) {
                 nonce: EmailNotificationAjax.dismiss_notification_nonce
             },
             success: function(response) {
-                console.log('Notification dismissed:', response);
+                if (isDevelopment) console.log('Notification dismissed:', response);
             },
             error: function(xhr, status, error) {
-                console.log('Dismiss notification failed:', {xhr, status, error});
+                if (isDevelopment) console.log('Dismiss notification failed:', {xhr, status, error});
             }
         });
         

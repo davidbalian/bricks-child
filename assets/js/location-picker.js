@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                         
                         // Log accuracy and timestamp for debugging
-                        console.log(`Fresh location found at ${timestamp} with accuracy: ${accuracy.toFixed(1)} meters`);
+                        if (isDevelopment) console.log(`Fresh location found at ${timestamp} with accuracy: ${accuracy.toFixed(1)} meters`);
                         
                         // The map's 'moveend' event will handle marker update and reverse geocode
                         button.classList.remove('mapboxgl-ctrl-geolocate-active');
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     (error) => {
                         navigator.geolocation.clearWatch(watchId);
                         alert(`Error getting location: ${error.message}`);
-                        console.error('Geolocation error:', error);
+                        if (isDevelopment) console.error('Geolocation error:', error);
                         button.classList.remove('mapboxgl-ctrl-geolocate-active');
                     },
                     {
@@ -154,8 +154,8 @@ document.addEventListener('DOMContentLoaded', function() {
             location.district = location.city;
         }
 
-        console.log('Parsed location details:', location);
-        console.log('District value:', location.district);
+            if (isDevelopment) console.log('Parsed location details:', location);
+    if (isDevelopment) console.log('District value:', location.district);
         return location;
     }
 
@@ -178,9 +178,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const continueBtn = document.querySelector('.location-picker-modal .choose-location-btn');
         if (continueBtn) {
             continueBtn.disabled = false;
-            console.log('Continue button enabled');
+            if (isDevelopment) console.log('Continue button enabled');
         } else {
-            console.warn('Continue button not found');
+            if (isDevelopment) console.warn('Continue button not found');
         }
     }
 
@@ -188,18 +188,18 @@ document.addEventListener('DOMContentLoaded', function() {
     function showLocationPicker() {
         // Check if modal already exists and is still in the document
         if (locationModal && document.body.contains(locationModal)) {
-            console.log('Reusing existing modal');
+            if (isDevelopment) console.log('Reusing existing modal');
             locationModal.style.display = 'flex';
             return;
         }
         
         // If modal exists but is not in document, reset it
         if (locationModal) {
-            console.log('Modal exists but not in document, resetting');
+            if (isDevelopment) console.log('Modal exists but not in document, resetting');
             locationModal = null;
         }
         
-        console.log('Creating new modal for first time');
+        if (isDevelopment) console.log('Creating new modal for first time');
         
         // Reset global variables
         map = null;
@@ -212,12 +212,12 @@ document.addEventListener('DOMContentLoaded', function() {
         let initialZoom = mapboxConfig.defaultZoom;
         
         if (savedLocationForSession) {
-            console.log('Using saved location from previous selection:', savedLocationForSession);
+            if (isDevelopment) console.log('Using saved location from previous selection:', savedLocationForSession);
             initialCenter = [savedLocationForSession.longitude, savedLocationForSession.latitude];
             initialZoom = 15; // Zoom in closer to the saved location
             selectedLocation = { ...savedLocationForSession }; // Copy the saved location
         } else {
-            console.log('No saved location found, using default map center');
+            if (isDevelopment) console.log('No saved location found, using default map center');
             selectedLocation = {
                 city: '',
                 district: '',
@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Wait for map to load before adding geocoder
             map.on('load', () => {
-                console.log('Map loaded, initializing geocoder...');
+                if (isDevelopment) console.log('Map loaded, initializing geocoder...');
                 
                 // Initialize geocoder with analytics disabled
                 geocoder = new MapboxGeocoder({
@@ -335,30 +335,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 const geocoderContainer = document.getElementById('geocoder');
                 if (geocoderContainer) {
                     geocoderContainer.appendChild(geocoder.onAdd(map));
-                    console.log('Geocoder added to container');
+                    if (isDevelopment) console.log('Geocoder added to container');
                     
                     // If we have a saved location, populate the geocoder with the saved address
                     if (savedLocationForSession && savedLocationForSession.address) {
                         const geocoderInput = geocoderContainer.querySelector('.mapboxgl-ctrl-geocoder input');
                         if (geocoderInput) {
                             geocoderInput.value = savedLocationForSession.address;
-                            console.log('Populated geocoder with saved address:', savedLocationForSession.address);
+                            if (isDevelopment) console.log('Populated geocoder with saved address:', savedLocationForSession.address);
                         }
                         
                         // Enable continue button since we have a saved location
                         const continueBtn = locationModal.querySelector('.choose-location-btn');
                         if (continueBtn) {
                             continueBtn.disabled = false;
-                            console.log('Continue button enabled with saved location');
+                            if (isDevelopment) console.log('Continue button enabled with saved location');
                         }
                     }
                 } else {
-                    console.error('Geocoder container not found');
+                    if (isDevelopment) console.error('Geocoder container not found');
                 }
 
                 // Handle geocoder results
                 geocoder.on('result', (event) => {
-                    console.log('Geocoder result:', event.result);
+                    if (isDevelopment) console.log('Geocoder result:', event.result);
                     const result = event.result;
                     selectedCoordinates = result.center;
                     selectedLocation = parseLocationDetails(result);
@@ -370,20 +370,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     const continueBtn = locationModal.querySelector('.choose-location-btn');
                     if (continueBtn) {
                         continueBtn.disabled = false;
-                        console.log('Continue button enabled after search');
+                        if (isDevelopment) console.log('Continue button enabled after search');
                     }
                 });
 
                 // Handle geocoder clear
                 geocoder.on('clear', () => {
-                    console.log('Geocoder cleared');
+                    if (isDevelopment) console.log('Geocoder cleared');
                     // Keep the current center as selected coordinates
                     const currentCenter = map.getCenter();
                     selectedCoordinates = [currentCenter.lng, currentCenter.lat];
                     
                     // Preserve the selectedLocation data, but update coordinates if needed
                     if (selectedLocation.latitude && selectedLocation.longitude) {
-                        console.log('Preserving selected location data:', selectedLocation);
+                        if (isDevelopment) console.log('Preserving selected location data:', selectedLocation);
                     } else {
                         selectedLocation = {
                             city: '',
@@ -394,13 +394,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         };
                     }
                     // Don't disable the continue button since we still have valid coordinates
-                    console.log('Geocoder cleared but keeping continue button enabled');
+                    if (isDevelopment) console.log('Geocoder cleared but keeping continue button enabled');
                 });
             });
 
             // Handle map click
             map.on('click', (e) => {
-                console.log('Map clicked at:', e.lngLat);
+                if (isDevelopment) console.log('Map clicked at:', e.lngLat);
                 const clickedCoords = [e.lngLat.lng, e.lngLat.lat];
                 selectedCoordinates = clickedCoords;
                 
@@ -433,7 +433,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const continueBtn = locationModal.querySelector('.choose-location-btn');
                     if (continueBtn) {
                         continueBtn.disabled = false;
-                        console.log('Continue button enabled after map movement');
+                        if (isDevelopment) console.log('Continue button enabled after map movement');
                     }
                     
                     // Reverse geocode the new center position
@@ -441,8 +441,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 150); // Wait 150ms after movement stops
             });
 
-        } catch (error) {
-            console.error('Error initializing map:', error);
+                  } catch (error) {
+              if (isDevelopment) console.error('Error initializing map:', error);
         }
 
         // Close button functionality
@@ -471,8 +471,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Continue button functionality
         const continueBtn = locationModal.querySelector('.choose-location-btn');
         continueBtn.addEventListener('click', () => {
-            console.log('Continue button clicked');
-            console.log('Selected location:', selectedLocation);
+                    if (isDevelopment) console.log('Continue button clicked');
+        if (isDevelopment) console.log('Selected location:', selectedLocation);
             handleContinue(locationModal);
         });
     }
@@ -502,13 +502,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to reverse geocode coordinates
     function reverseGeocode(lngLat) {
-        console.log('Reverse geocoding:', lngLat);
+        if (isDevelopment) console.log('Reverse geocoding:', lngLat);
         const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${mapboxConfig.accessToken}&types=place,neighborhood,address&country=cy&language=en`;
         
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                console.log('Reverse geocode result:', data);
+                if (isDevelopment) console.log('Reverse geocode result:', data);
                 if (data.features && data.features.length > 0) {
                     const result = data.features[0];
                     selectedLocation = parseLocationDetails(result);
@@ -517,12 +517,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     const geocoderInput = document.querySelector('.mapboxgl-ctrl-geocoder input');
                     if (geocoderInput) {
                         geocoderInput.value = result.place_name;
-                        console.log('Updated geocoder input with:', result.place_name);
+                        if (isDevelopment) console.log('Updated geocoder input with:', result.place_name);
                     }
                 }
             })
             .catch(error => {
-                console.error('Error reverse geocoding:', error);
+                if (isDevelopment) console.error('Error reverse geocoding:', error);
             });
     }
 
@@ -533,9 +533,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function handleContinue(locationModal) {
-        console.log('Handling continue...');
+        if (isDevelopment) console.log('Handling continue...');
         if (selectedLocation.latitude && selectedLocation.longitude) {
-            console.log('Location selected:', selectedLocation);
+            if (isDevelopment) console.log('Location selected:', selectedLocation);
             
             // Get the current search input value
             const geocoderInput = document.querySelector('.mapboxgl-ctrl-geocoder input');
@@ -547,7 +547,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Use the search value if available, otherwise use the selected location address
                 const finalAddress = searchValue || selectedLocation.address;
                 locationField.value = finalAddress;
-                console.log('Updated location field with:', finalAddress);
+                if (isDevelopment) console.log('Updated location field with:', finalAddress);
                 
                 // Save the location for the page session
                 savedLocationForSession = {
@@ -557,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     latitude: selectedLocation.latitude,
                     longitude: selectedLocation.longitude
                 };
-                console.log('Saved location for session:', savedLocationForSession);
+                if (isDevelopment) console.log('Saved location for session:', savedLocationForSession);
                 
                 // Add hidden fields for location components
                 const form = locationField.closest('form');
@@ -577,7 +577,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         'car_address': finalAddress
                     };
                     
-                    console.log('Adding hidden fields with values:', fields);
+                    if (isDevelopment) console.log('Adding hidden fields with values:', fields);
                     
                     Object.entries(fields).forEach(([name, value]) => {
                         const input = document.createElement('input');
@@ -585,19 +585,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         input.name = name;
                         input.value = value;
                         form.appendChild(input);
-                        console.log(`Added hidden field ${name} with value:`, value);
+                        if (isDevelopment) console.log(`Added hidden field ${name} with value:`, value);
                     });
                     
-                    console.log('Added hidden fields for location components');
+                    if (isDevelopment) console.log('Added hidden fields for location components');
                 }
             } else {
-                console.warn('Location field not found');
+                if (isDevelopment) console.warn('Location field not found');
             }
             
             // Hide modal instead of removing it
             locationModal.style.display = 'none';
         } else {
-            console.log('No location selected');
+            if (isDevelopment) console.log('No location selected');
         }
     }
 }); 

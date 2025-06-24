@@ -29,21 +29,21 @@ jQuery(document).ready(function ($) {
   const phoneInput = document.querySelector("#forgot-phone-number-display");
   let iti = null; // Variable to store the instance
   if (phoneInput) {
-    console.log("Initializing intl-tel-input");
+          if (isDevelopment) console.log("Initializing intl-tel-input");
     iti = window.intlTelInput(phoneInput, {
       initialCountry: "auto",
       geoIpLookup: function (callback) {
-        console.log("Looking up country from IP");
+        if (isDevelopment) console.log("Looking up country from IP");
         fetch("https://ipinfo.io/json", {
           headers: { Accept: "application/json" },
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log("IP lookup result:", data.country);
+            if (isDevelopment) console.log("IP lookup result:", data.country);
             callback(data.country);
           })
           .catch((error) => {
-            console.error("IP lookup error:", error);
+            if (isDevelopment) console.error("IP lookup error:", error);
             callback("cy"); // Default to Cyprus on error
           });
       },
@@ -52,7 +52,7 @@ jQuery(document).ready(function ($) {
         "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js",
     });
   } else {
-    console.error(
+    if (isDevelopment) console.error(
       "Forgot password form: Phone input #forgot-phone-number-display not found."
     );
   }
@@ -100,30 +100,30 @@ jQuery(document).ready(function ($) {
   // --- Step 1: Send OTP to Phone Number ---
   $("#send-forgot-otp-button").on("click", function () {
     const button = $(this);
-    console.log("Send OTP button clicked");
+    if (isDevelopment) console.log("Send OTP button clicked");
 
     messagesDiv.hide();
     button.prop("disabled", true).text("Sending...");
 
     // Get number from intl-tel-input instance
     if (!iti) {
-      console.error("Phone input not initialized");
+      if (isDevelopment) console.error("Phone input not initialized");
       showMessage("Phone input failed to initialize.", true);
       button.prop("disabled", false).text("Send Verification Code");
       return;
     }
     const fullPhoneNumber = iti.getNumber(); // Includes country code
-    console.log("Phone number to verify:", fullPhoneNumber);
+    if (isDevelopment) console.log("Phone number to verify:", fullPhoneNumber);
 
     // Basic validation from library
     if (!iti.isValidNumber()) {
-      console.error("Invalid phone number");
+      if (isDevelopment) console.error("Invalid phone number");
       showMessage("Please enter a valid phone number.", true);
       button.prop("disabled", false).text("Send Verification Code");
       return;
     }
 
-    console.log("Sending AJAX request to send OTP");
+            if (isDevelopment) console.log("Sending AJAX request to send OTP");
     $.ajax({
       url: ForgotPasswordAjax.ajax_url,
       type: "POST",
@@ -133,14 +133,14 @@ jQuery(document).ready(function ($) {
         nonce: ForgotPasswordAjax.send_otp_nonce,
       },
       success: function (response) {
-        console.log("Send OTP response:", response);
+                    if (isDevelopment) console.log("Send OTP response:", response);
         if (response.success) {
           showMessage(response.data.message);
           verifiedPhoneNumber = fullPhoneNumber;
           hideAllSteps();
           stepOtp.show();
         } else {
-          console.error("Send OTP failed:", response.data.message);
+                      if (isDevelopment) console.error("Send OTP failed:", response.data.message);
           showMessage(
             response.data.message || "Failed to send verification code.",
             true
@@ -149,7 +149,7 @@ jQuery(document).ready(function ($) {
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.error("Send OTP AJAX error:", {
+        if (isDevelopment) console.error("Send OTP AJAX error:", {
           status: textStatus,
           error: errorThrown,
           response: jqXHR.responseText,
@@ -164,7 +164,7 @@ jQuery(document).ready(function ($) {
   $("#verify-forgot-otp-button").on("click", function () {
     const button = $(this);
     const otp = $("#forgot-verification-code").val().trim();
-    console.log("Verify OTP button clicked");
+    if (isDevelopment) console.log("Verify OTP button clicked");
 
     messagesDiv.hide();
     button.prop("disabled", true).text("Verifying...");
@@ -174,7 +174,7 @@ jQuery(document).ready(function ($) {
     );
 
     if (!otp || otp.length !== 6) {
-      console.error("Invalid OTP format");
+      if (isDevelopment) console.error("Invalid OTP format");
       showMessage("Please enter a valid 6-digit verification code.", true);
       button.prop("disabled", false).text("Verify Code");
       $("#change-forgot-phone-button, #resend-forgot-otp-button").prop(
@@ -184,7 +184,7 @@ jQuery(document).ready(function ($) {
       return;
     }
 
-    console.log("Sending AJAX request to verify OTP");
+    if (isDevelopment) console.log("Sending AJAX request to verify OTP");
     $.ajax({
       url: ForgotPasswordAjax.ajax_url,
       type: "POST",
@@ -195,7 +195,7 @@ jQuery(document).ready(function ($) {
         nonce: ForgotPasswordAjax.verify_otp_nonce,
       },
       success: function (response) {
-        console.log("Verify OTP response:", response);
+        if (isDevelopment) console.log("Verify OTP response:", response);
         if (response.success) {
           showMessage(response.data.message);
           userIdForReset = response.data.user_id;
@@ -208,7 +208,7 @@ jQuery(document).ready(function ($) {
           hideAllSteps();
           stepPassword.show();
         } else {
-          console.error("Verify OTP failed:", response.data.message);
+          if (isDevelopment) console.error("Verify OTP failed:", response.data.message);
           showMessage(
             response.data.message || "Invalid verification code.",
             true
@@ -221,7 +221,7 @@ jQuery(document).ready(function ($) {
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.error("Verify OTP AJAX error:", {
+        if (isDevelopment) console.error("Verify OTP AJAX error:", {
           status: textStatus,
           error: errorThrown,
           response: jqXHR.responseText,
@@ -260,12 +260,12 @@ jQuery(document).ready(function ($) {
   // --- Resend OTP ---
   $("#resend-forgot-otp-button").on("click", function () {
     const button = $(this);
-    console.log("Resend OTP button clicked");
+    if (isDevelopment) console.log("Resend OTP button clicked");
 
     messagesDiv.hide();
     button.prop("disabled", true).text("Resending...");
 
-    console.log("Sending AJAX request to resend OTP");
+    if (isDevelopment) console.log("Sending AJAX request to resend OTP");
     $.ajax({
       url: ForgotPasswordAjax.ajax_url,
       type: "POST",
@@ -275,17 +275,17 @@ jQuery(document).ready(function ($) {
         nonce: ForgotPasswordAjax.send_otp_nonce,
       },
       success: function (response) {
-        console.log("Resend OTP response:", response);
+        if (isDevelopment) console.log("Resend OTP response:", response);
         if (response.success) {
           showMessage("Verification code sent again to your phone number.");
         } else {
-          console.error("Resend OTP failed:", response.data.message);
+          if (isDevelopment) console.error("Resend OTP failed:", response.data.message);
           showMessage(response.data.message || "Failed to resend code.", true);
         }
         button.prop("disabled", false).text("Resend Code");
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.error("Resend OTP AJAX error:", {
+        if (isDevelopment) console.error("Resend OTP AJAX error:", {
           status: textStatus,
           error: errorThrown,
           response: jqXHR.responseText,

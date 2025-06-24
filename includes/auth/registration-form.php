@@ -85,7 +85,7 @@
                 utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js" 
             });
         } else {
-            console.error("Registration form: Phone input #reg_phone_number_display not found.");
+            if (isDevelopment) console.error("Registration form: Phone input #reg_phone_number_display not found.");
         }
 
         // Function to display messages

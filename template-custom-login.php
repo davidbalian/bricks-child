@@ -105,7 +105,7 @@ jQuery(document).ready(function($) {
             utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js"
         });
     } else {
-        console.error("Login form: Phone input #login_phone_display not found.");
+        if (isDevelopment) console.error("Login form: Phone input #login_phone_display not found.");
     }
 
     // --- Populate hidden 'log' field on submit --- 

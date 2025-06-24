@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
             navigator.clipboard.writeText(text).then(() => {
                 alert('Link copied to clipboard!');
             }).catch(err => {
-                console.error('Failed to copy: ', err);
+                if (isDevelopment) console.error('Failed to copy: ', err);
                 fallbackCopyTextToClipboard(text);
             });
         } else {
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Unable to copy link. Please copy manually: ' + text);
             }
         } catch (err) {
-            console.error('Fallback: Oops, unable to copy', err);
+            if (isDevelopment) console.error('Fallback: Oops, unable to copy', err);
             alert('Unable to copy link. Please copy manually: ' + text);
         }
         document.body.removeChild(textArea);

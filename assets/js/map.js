@@ -5,13 +5,18 @@
  * @since 1.0.0
  */
 
+// PRODUCTION SAFETY: Only log in development environments
+const isDevelopment = window.location.hostname === 'localhost' || 
+                     window.location.hostname.includes('staging') ||
+                     window.location.search.includes('debug=true');
+
 (function($) {
     'use strict';
 
     // Initialize map when document is ready
     $(document).ready(function() {
         if (typeof mapboxgl === 'undefined') {
-            console.error('Mapbox GL JS is not loaded');
+            if (isDevelopment) console.error('Mapbox GL JS is not loaded');
             return;
         }
 

@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             heartIcon.classList.remove('fas');
                             heartIcon.classList.add('far');
                         }
-                        console.error('Favorite toggle failed:', data);
+                        if (isDevelopment) console.error('Favorite toggle failed:', data);
                         alert('Failed to update favorites. Please try again.');
                     } else {
                         // If we're on the favorites page and removing a favorite, remove the card
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         heartIcon.classList.remove('fas');
                         heartIcon.classList.add('far');
                     }
-                    console.error('Error:', error);
+                    if (isDevelopment) console.error('Error:', error);
                     alert('Failed to update favorites. An error occurred.');
                 });
             });

@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             // Revert the visual changes on error
             revertFavoriteUI(favoriteBtn, isActive, heartIcon);
-            console.error('Error:', error);
+            if (isDevelopment) console.error('Error:', error);
             alert('Failed to update favorites. An error occurred.');
         });
     }
