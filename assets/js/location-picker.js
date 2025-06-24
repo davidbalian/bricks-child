@@ -18,7 +18,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let locationModal = null;
 
     // Debug: Check if mapboxConfig is available
-    console.log('Mapbox Config:', mapboxConfig);
+    // PRODUCTION SAFETY: Only log in development environments
+    const isDevelopment = window.location.hostname === 'localhost' || 
+                         window.location.hostname.includes('staging') ||
+                         window.location.search.includes('debug=true');
+    
+    if (isDevelopment) console.log('Mapbox Config:', mapboxConfig);
 
     // --- Locate Me Control for Mapbox ---
     class LocateMeControl {

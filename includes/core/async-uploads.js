@@ -13,7 +13,12 @@ class AsyncUploadManager {
         this.currentUploads = 0;
         
         this.initializeEventListeners();
-        console.log('[AsyncUpload] Manager initialized with session:', this.session.id);
+        // PRODUCTION SAFETY: Only log in development environments
+        const isDevelopment = window.location.hostname === 'localhost' || 
+                             window.location.hostname.includes('staging') ||
+                             window.location.search.includes('debug=true');
+        
+        if (isDevelopment) console.log('[AsyncUpload] Manager initialized with session:', this.session.id);
     }
     
     /**
