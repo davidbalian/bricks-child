@@ -4,9 +4,9 @@
  */
 
 // PRODUCTION SAFETY: Only log in development environments
-const isDevelopment = window.location.hostname === 'localhost' || 
-                     window.location.hostname.includes('staging') ||
-                     window.location.search.includes('debug=true');
+window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' || 
+                                               window.location.hostname.includes('staging') ||
+                                               window.location.search.includes('debug=true'));
 
 class AsyncUploadManager {
     constructor() {
@@ -18,12 +18,8 @@ class AsyncUploadManager {
         this.currentUploads = 0;
         
         this.initializeEventListeners();
-        // PRODUCTION SAFETY: Only log in development environments
-        const isDevelopment = window.location.hostname === 'localhost' || 
-                             window.location.hostname.includes('staging') ||
-                             window.location.search.includes('debug=true');
         
-        if (isDevelopment) console.log('[AsyncUpload] Manager initialized with session:', this.session.id);
+        if (window.isDevelopment) console.log('[AsyncUpload] Manager initialized with session:', this.session.id);
     }
     
     /**
@@ -69,7 +65,7 @@ class AsyncUploadManager {
         
         // Check for duplicates
         if (this.uploadedImages.has(fileKey)) {
-            if (isDevelopment) console.log('[AsyncUpload] Duplicate file detected:', file.name);
+            if (window.isDevelopment) console.log('[AsyncUpload] Duplicate file detected:', file.name);
             throw new Error('Duplicate file: ' + file.name);
         }
         
@@ -110,7 +106,7 @@ class AsyncUploadManager {
         const imageData = this.uploadedImages.get(fileKey);
         
         try {
-            if (isDevelopment) console.log('[AsyncUpload] Starting upload for:', file.name);
+            if (window.isDevelopment) console.log('[AsyncUpload] Starting upload for:', file.name);
             
             // Update status
             imageData.status = 'uploading';
@@ -139,7 +135,7 @@ class AsyncUploadManager {
                 this.session.attachmentIds.push(response.data.attachment_id);
                 this.updateSessionStorage();
                 
-                if (isDevelopment) console.log('[AsyncUpload] Upload completed:', file.name, 'Attachment ID:', response.data.attachment_id);
+                if (window.isDevelopment) console.log('[AsyncUpload] Upload completed:', file.name, 'Attachment ID:', response.data.attachment_id);
                 
                 // Trigger success callback
                 this.onUploadSuccess(fileKey, response.data);
@@ -149,7 +145,7 @@ class AsyncUploadManager {
             }
             
         } catch (error) {
-            if (isDevelopment) console.error('[AsyncUpload] Upload failed:', file.name, error);
+            if (window.isDevelopment) console.error('[AsyncUpload] Upload failed:', file.name, error);
             
             // Update status
             imageData.status = 'failed';
@@ -236,7 +232,7 @@ class AsyncUploadManager {
                     this.updateSessionStorage();
                 }
                 
-                if (isDevelopment) console.log('[AsyncUpload] Image removed:', imageData.attachmentId);
+                if (window.isDevelopment) console.log('[AsyncUpload] Image removed:', imageData.attachmentId);
                 this.onImageRemoved(fileKey);
                 
             } else {
@@ -244,7 +240,7 @@ class AsyncUploadManager {
             }
             
         } catch (error) {
-            if (isDevelopment) console.error('[AsyncUpload] Remove failed:', error);
+            if (window.isDevelopment) console.error('[AsyncUpload] Remove failed:', error);
             throw error;
         }
     }
@@ -262,7 +258,7 @@ class AsyncUploadManager {
     markSessionCompleted() {
         this.session.status = 'completed';
         this.updateSessionStorage();
-        if (isDevelopment) console.log('[AsyncUpload] Session marked as completed');
+        if (window.isDevelopment) console.log('[AsyncUpload] Session marked as completed');
     }
     
     /**
@@ -287,11 +283,11 @@ class AsyncUploadManager {
             const result = await response.json();
             
             if (result.success) {
-                if (isDevelopment) console.log('[AsyncUpload] Session cleaned up:', result.data.deleted_count, 'files');
+                if (window.isDevelopment) console.log('[AsyncUpload] Session cleaned up:', result.data.deleted_count, 'files');
             }
             
         } catch (error) {
-            if (isDevelopment) console.error('[AsyncUpload] Cleanup failed:', error);
+            if (window.isDevelopment) console.error('[AsyncUpload] Cleanup failed:', error);
         } finally {
             // Clear local data
             this.uploadedImages.clear();
@@ -317,7 +313,7 @@ class AsyncUploadManager {
         // Use sendBeacon for reliable delivery
         navigator.sendBeacon(asyncUploads.ajaxUrl, data);
         
-        if (isDevelopment) console.log('[AsyncUpload] Session cleanup beacon sent');
+        if (window.isDevelopment) console.log('[AsyncUpload] Session cleanup beacon sent');
     }
     
     /**
@@ -343,7 +339,7 @@ class AsyncUploadManager {
      * Update upload progress (override in implementation)
      */
     updateUploadProgress(fileKey, progress) {
-        if (isDevelopment) console.log('[AsyncUpload] Progress for', fileKey, ':', progress + '%');
+        if (window.isDevelopment) console.log('[AsyncUpload] Progress for', fileKey, ':', progress + '%');
         // Override this method to update UI
     }
     
@@ -351,7 +347,7 @@ class AsyncUploadManager {
      * Callback for successful upload (override in implementation)
      */
     onUploadSuccess(fileKey, data) {
-        if (isDevelopment) console.log('[AsyncUpload] Upload success callback for:', fileKey);
+        if (window.isDevelopment) console.log('[AsyncUpload] Upload success callback for:', fileKey);
         // Override this method to update UI
     }
     
@@ -359,7 +355,7 @@ class AsyncUploadManager {
      * Callback for upload error (override in implementation)
      */
     onUploadError(fileKey, error) {
-        if (isDevelopment) console.log('[AsyncUpload] Upload error callback for:', fileKey, error);
+        if (window.isDevelopment) console.log('[AsyncUpload] Upload error callback for:', fileKey, error);
         // Override this method to update UI
     }
     
@@ -367,7 +363,7 @@ class AsyncUploadManager {
      * Callback for image removal (override in implementation)
      */
     onImageRemoved(fileKey) {
-        if (isDevelopment) console.log('[AsyncUpload] Image removed callback for:', fileKey);
+        if (window.isDevelopment) console.log('[AsyncUpload] Image removed callback for:', fileKey);
         // Override this method to update UI
     }
 }

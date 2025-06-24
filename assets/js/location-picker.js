@@ -19,9 +19,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Debug: Check if mapboxConfig is available
     // PRODUCTION SAFETY: Only log in development environments
-    const isDevelopment = window.location.hostname === 'localhost' || 
-                         window.location.hostname.includes('staging') ||
-                         window.location.search.includes('debug=true');
+window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' || 
+                                               window.location.hostname.includes('staging') ||
+                                               window.location.search.includes('debug=true'));
     
     if (isDevelopment) console.log('Mapbox Config:', mapboxConfig);
 

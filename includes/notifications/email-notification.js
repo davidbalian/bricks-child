@@ -13,9 +13,9 @@ jQuery(document).ready(function($) {
         const email = button.data('email');
         
         // PRODUCTION SAFETY: Only log in development environments
-        const isDevelopment = window.location.hostname === 'localhost' || 
-                             window.location.hostname.includes('staging') ||
-                             window.location.search.includes('debug=true');
+window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' || 
+                                               window.location.hostname.includes('staging') ||
+                                               window.location.search.includes('debug=true'));
         
         if (isDevelopment) console.log('Notification: Send verification clicked, email:', email);
         

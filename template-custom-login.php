@@ -89,6 +89,11 @@ get_header(); ?>
 
 <script type="text/javascript">
 jQuery(document).ready(function($) {
+    // PRODUCTION SAFETY: Only log in development environments
+    window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' || 
+                                                   window.location.hostname.includes('staging') ||
+                                                   window.location.search.includes('debug=true'));
+    
     // --- Initialize intl-tel-input for Login Form --- 
     const loginPhoneInput = document.querySelector("#login_phone_display");
     let loginIti = null;
@@ -105,7 +110,7 @@ jQuery(document).ready(function($) {
             utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js"
         });
     } else {
-        if (isDevelopment) console.error("Login form: Phone input #login_phone_display not found.");
+        if (window.isDevelopment) console.error("Login form: Phone input #login_phone_display not found.");
     }
 
     // --- Populate hidden 'log' field on submit --- 
