@@ -239,6 +239,11 @@ function display_my_listings($atts) {
     </div>
 
     <script>
+    // PRODUCTION SAFETY: Only log in development environments
+    const isDevelopment = window.location.hostname === 'localhost' || 
+                         window.location.hostname.includes('staging') ||
+                         window.location.search.includes('debug=true');
+    
     // Define myListingsData object with localized data
     const myListingsData = {
         ajaxurl: '<?php echo admin_url('admin-ajax.php'); ?>',
@@ -246,7 +251,7 @@ function display_my_listings($atts) {
     };
     
     function toggleCarStatus(carId, markAsSold) {
-        console.log('Toggle function called with:', { carId, markAsSold });
+        if (isDevelopment) console.log('Toggle function called with:', { carId, markAsSold });
         
         if (!confirm(markAsSold ? 'Are you sure you want to mark this car as sold?' : 'Are you sure you want to mark this car as available?')) {
             return;
@@ -259,17 +264,17 @@ function display_my_listings($atts) {
             nonce: myListingsData.nonce
         };
 
-        console.log('Sending AJAX request with data:', data);
+        if (isDevelopment) console.log('Sending AJAX request with data:', data);
 
         jQuery.post(myListingsData.ajaxurl, data, function(response) {
-            console.log('AJAX response:', response);
+            if (isDevelopment) console.log('AJAX response:', response);
             if (response.success) {
                 location.reload();
             } else {
                 alert('Error updating car status. Please try again.');
             }
         }).fail(function(jqXHR, textStatus, errorThrown) {
-            console.error('AJAX request failed:', { textStatus, errorThrown });
+            if (isDevelopment) console.error('AJAX request failed:', { textStatus, errorThrown });
             alert('Error updating car status. Please try again.');
         });
     }

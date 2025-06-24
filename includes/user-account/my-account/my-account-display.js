@@ -6,7 +6,12 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('My Account page loaded');
+    // PRODUCTION SAFETY: Only log in development environments
+    const isDevelopment = window.location.hostname === 'localhost' || 
+                         window.location.hostname.includes('staging') ||
+                         window.location.search.includes('debug=true');
+    
+    if (isDevelopment) console.log('My Account page loaded');
     
     // Only run if we're on the main account page (not password reset steps)
     if (window.location.search.includes('password_reset_step')) {
@@ -18,16 +23,16 @@ document.addEventListener('DOMContentLoaded', function() {
     var originalLastName = document.getElementById('last-name').value;
     var displayName = document.getElementById('display-name');
     
-    console.log('Initial values:', {originalFirstName, originalLastName});
+    if (isDevelopment) console.log('Initial values:', {originalFirstName, originalLastName});
 
     // Name editing functionality
     document.querySelector('.edit-name-btn').addEventListener('click', function(e) {
-        console.log('Edit button clicked');
+        if (isDevelopment) console.log('Edit button clicked');
         e.preventDefault();
         
         // Don't overwrite the original values here - we need them for comparison later
         // The input fields already have the correct values from the PHP variables
-        console.log('Original values for comparison:', {originalFirstName, originalLastName});
+        if (isDevelopment) console.log('Original values for comparison:', {originalFirstName, originalLastName});
         
         // Show edit fields
         document.querySelector('.name-row').style.display = 'none';
@@ -37,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.querySelector('.cancel-name-btn').addEventListener('click', function(e) {
-        console.log('Cancel button clicked');
+        if (isDevelopment) console.log('Cancel button clicked');
         e.preventDefault();
         
         // Restore original values
@@ -51,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.querySelector('.save-name-btn').addEventListener('click', function(e) {
-        console.log('Save button clicked');
+        if (isDevelopment) console.log('Save button clicked');
         e.preventDefault();
         
         var firstName = document.getElementById('first-name').value.trim();
@@ -64,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Check if anything actually changed
         if (firstName === originalFirstName && lastName === originalLastName) {
-            console.log('No changes detected, just hiding edit form');
+            if (isDevelopment) console.log('No changes detected, just hiding edit form');
             // No changes, just hide the edit form
             document.querySelector('.name-row').style.display = 'flex';
             document.querySelectorAll('.name-edit-row').forEach(function(row) {
@@ -73,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        console.log('Changes detected, sending to server');
+        if (isDevelopment) console.log('Changes detected, sending to server');
         
         // Create form data for AJAX request
         var formData = new FormData();
@@ -98,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            if (isDevelopment) console.error('Error:', error);
             alert('Error updating name. Please try again.');
         });
     });
@@ -116,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Password reset functionality
     document.querySelector('.reset-password-btn').addEventListener('click', function(e) {
         e.preventDefault();
-        console.log('Reset password clicked');
+        if (isDevelopment) console.log('Reset password clicked');
         
         if (confirm('Are you sure you want to reset your password? A verification code will be sent to your phone number.')) {
             initiatePasswordReset();
@@ -143,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            if (isDevelopment) console.error('Error:', error);
             alert('Error sending verification code. Please try again.');
         });
     }
@@ -180,12 +185,12 @@ jQuery(document).ready(function($) {
         const isEmailChange = email !== currentEmail;
         const isCurrentEmailVerified = $('.email-status.verified').length > 0;
         
-        console.log('Send verification clicked, email:', email);
-        console.log('Current email:', currentEmail);
-        console.log('Is email change:', isEmailChange);
-        console.log('Is current email verified:', isCurrentEmailVerified);
-        console.log('AJAX URL:', MyAccountAjax.ajax_url);
-        console.log('Nonce:', MyAccountAjax.email_verification_nonce);
+        if (isDevelopment) console.log('Send verification clicked, email:', email);
+        if (isDevelopment) console.log('Current email:', currentEmail);
+        if (isDevelopment) console.log('Is email change:', isEmailChange);
+        if (isDevelopment) console.log('Is current email verified:', isCurrentEmailVerified);
+        if (isDevelopment) console.log('AJAX URL:', MyAccountAjax.ajax_url);
+        if (isDevelopment) console.log('Nonce:', MyAccountAjax.email_verification_nonce);
         
         // Basic validation
         if (!email) {
@@ -231,7 +236,7 @@ jQuery(document).ready(function($) {
                 nonce: MyAccountAjax.email_verification_nonce
             },
             success: function(response) {
-                console.log('AJAX Success Response:', response);
+                if (isDevelopment) console.log('AJAX Success Response:', response);
                 
                 // Remove progress message
                 $('.email-progress-message').remove();
@@ -270,14 +275,14 @@ jQuery(document).ready(function($) {
                     }, 30000);
                     
                 } else {
-                    console.log('AJAX Error Response:', response.data);
+                    if (isDevelopment) console.log('AJAX Error Response:', response.data);
                     alert('❌ Error: ' + response.data + '\n\nPlease try again in a moment.');
                     // DON'T hide the edit form on error - let user try again
                 }
             },
             error: function(xhr, status, error) {
-                console.log('AJAX Request Failed:', {xhr, status, error});
-                console.log('Response Text:', xhr.responseText);
+                if (isDevelopment) console.log('AJAX Request Failed:', {xhr, status, error});
+                if (isDevelopment) console.log('Response Text:', xhr.responseText);
                 
                 // Remove progress message
                 $('.email-progress-message').remove();

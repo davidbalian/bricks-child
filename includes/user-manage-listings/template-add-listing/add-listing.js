@@ -1,5 +1,10 @@
 jQuery(document).ready(function ($) {
-  console.log("[Add Listing] jQuery ready");
+  // PRODUCTION SAFETY: Only log in development environments
+  const isDevelopment = window.location.hostname === 'localhost' || 
+                       window.location.hostname.includes('staging') ||
+                       window.location.search.includes('debug=true');
+  
+  if (isDevelopment) console.log("[Add Listing] jQuery ready");
 
   // Initialize async upload manager if available
   let asyncUploadManager = null;
@@ -26,7 +31,7 @@ jQuery(document).ready(function ($) {
       onAsyncImageRemoved(fileKey);
     };
 
-    console.log(
+    if (isDevelopment) console.log(
       "[Add Listing] Async upload manager initialized with session:",
       asyncUploadManager.session.id
     );
@@ -35,7 +40,7 @@ jQuery(document).ready(function ($) {
   // Handle make selection change
   $("#make").on("change", function () {
     const selectedMake = $(this).val();
-    console.log("[Add Listing] Selected make:", selectedMake);
+    if (isDevelopment) console.log("[Add Listing] Selected make:", selectedMake);
 
     const modelSelect = $("#model");
 
@@ -67,24 +72,24 @@ jQuery(document).ready(function ($) {
               modelSelect.append(`<option value="${model}">${model}</option>`);
             });
 
-            console.log(
+            if (isDevelopment) console.log(
               "[Add Listing] Loaded",
               response.data.length,
               "models for",
               selectedMake
             );
           } else {
-            console.error("[Add Listing] Error loading models:", response.data);
+            if (isDevelopment) console.error("[Add Listing] Error loading models:", response.data);
             modelSelect.find("option[disabled]").text("Error loading models");
           }
         },
         error: function (xhr, status, error) {
-          console.error("[Add Listing] AJAX error:", error);
+          if (isDevelopment) console.error("[Add Listing] AJAX error:", error);
           modelSelect.find("option[disabled]").text("Error loading models");
         },
       });
     } else {
-      console.log("[Add Listing] No make selected");
+      if (isDevelopment) console.log("[Add Listing] No make selected");
     }
   });
 
@@ -106,7 +111,7 @@ jQuery(document).ready(function ($) {
       engineCapacitySelect.val("0.0");
       engineCapacitySelect.prop("disabled", true);
       engineCapacitySelect.addClass("electric-locked");
-      console.log(
+      if (isDevelopment) console.log(
         "[Add Listing] Engine capacity locked to 0.0 for electric vehicle"
       );
     } else {
@@ -119,7 +124,7 @@ jQuery(document).ready(function ($) {
         engineCapacitySelect.val("");
       }
       engineCapacitySelect.find('option[value="0.0"]').remove();
-      console.log(
+      if (isDevelopment) console.log(
         "[Add Listing] Engine capacity unlocked for non-electric vehicle"
       );
     }
@@ -210,7 +215,7 @@ jQuery(document).ready(function ($) {
     const wasElectricLocked = engineCapacitySelect.hasClass("electric-locked");
     if (wasElectricLocked) {
       engineCapacitySelect.prop("disabled", false);
-      console.log(
+      if (isDevelopment) console.log(
         "[Add Listing] Temporarily re-enabled engine capacity field for form submission"
       );
     }
@@ -253,7 +258,7 @@ jQuery(document).ready(function ($) {
       }
 
       asyncUploadManager.markSessionCompleted();
-      console.log(
+      if (isDevelopment) console.log(
         "[Add Listing] Session marked as completed on form submission"
       );
 
@@ -261,7 +266,7 @@ jQuery(document).ready(function ($) {
       const fileInput = $("#car_images")[0];
       if (fileInput && fileInput.files && fileInput.files.length > 0) {
         fileInput.value = "";
-        console.log("[Add Listing] Cleared file input for async uploads");
+        if (isDevelopment) console.log("[Add Listing] Cleared file input for async uploads");
       }
     } else {
       // For traditional uploads, ensure fileInput has correct files
@@ -306,7 +311,7 @@ jQuery(document).ready(function ($) {
     priceInput.prop("disabled", true);
     $("#hp").prop("disabled", true);
 
-    console.log(
+    if (isDevelopment) console.log(
       "[Add Listing] Form validation passed, submitting with",
       totalImages,
       "images"
@@ -314,7 +319,7 @@ jQuery(document).ready(function ($) {
     return true;
   });
 
-  console.log("[Add Listing] Elements found:", {
+  if (isDevelopment) console.log("[Add Listing] Elements found:", {
     fileInput: fileInput.length,
     fileUploadArea: fileUploadArea.length,
     imagePreview: imagePreview.length,
@@ -324,7 +329,7 @@ jQuery(document).ready(function ($) {
   fileUploadArea.on("click", function (e) {
     e.preventDefault();
     e.stopPropagation();
-    console.log("[Add Listing] Upload area clicked");
+    if (isDevelopment) console.log("[Add Listing] Upload area clicked");
     fileInput.trigger("click");
   });
 
@@ -333,7 +338,7 @@ jQuery(document).ready(function ($) {
     e.preventDefault();
     e.stopPropagation();
     const newlySelectedThroughDialog = Array.from(this.files);
-    console.log(
+    if (isDevelopment) console.log(
       "[Add Listing] Files selected through file dialog:",
       newlySelectedThroughDialog.length
     );
@@ -363,12 +368,12 @@ jQuery(document).ready(function ($) {
     e.stopPropagation();
     $(this).removeClass("dragover");
     const droppedFiles = Array.from(e.originalEvent.dataTransfer.files);
-    console.log("[Add Listing] Files dropped:", droppedFiles.length);
+    if (isDevelopment) console.log("[Add Listing] Files dropped:", droppedFiles.length);
     processNewFiles(droppedFiles);
   });
 
   function processNewFiles(candidateFiles) {
-    console.log(
+    if (isDevelopment) console.log(
       "[Add Listing] Processing",
       candidateFiles.length,
       "new candidate files."
@@ -440,7 +445,7 @@ jQuery(document).ready(function ($) {
         });
 
         if (isDuplicate) {
-          console.log(
+          if (isDevelopment) console.log(
             "[Add Listing] Skipping duplicate file (already selected):",
             file.name
           );
@@ -488,7 +493,7 @@ jQuery(document).ready(function ($) {
           optimizedFile.originalSize = file.size;
           optimizedFile.originalType = file.type;
 
-          console.log(
+          if (isDevelopment) console.log(
             "[Add Listing] File optimized:",
             file.name,
             "Original:",
@@ -510,14 +515,14 @@ jQuery(document).ready(function ($) {
               optimizedFile.asyncFileKey = fileKey;
               optimizedFile.asyncUploadStatus = "uploading";
 
-              console.log(
+              if (isDevelopment) console.log(
                 "[Add Listing] Started async upload for:",
                 file.name,
                 "Key:",
                 fileKey
               );
             } catch (uploadError) {
-              console.error(
+              if (isDevelopment) console.error(
                 "[Add Listing] Async upload start failed:",
                 file.name,
                 uploadError
@@ -530,7 +535,7 @@ jQuery(document).ready(function ($) {
           createAndDisplayPreview(optimizedFile, originalSize, optimizedSize);
           filesAddedThisBatchCount++;
         } catch (error) {
-          console.error(
+          if (isDevelopment) console.error(
             "[Add Listing] Error optimizing image:",
             file.name,
             error
@@ -538,7 +543,7 @@ jQuery(document).ready(function ($) {
           optimizationErrors++;
 
           // Fall back to original file if optimization fails
-          console.log(
+          if (isDevelopment) console.log(
             "[Add Listing] Using original file as fallback for:",
             file.name
           );
@@ -555,7 +560,7 @@ jQuery(document).ready(function ($) {
               file.asyncFileKey = fileKey;
               file.asyncUploadStatus = "uploading";
             } catch (uploadError) {
-              console.error(
+              if (isDevelopment) console.error(
                 "[Add Listing] Async upload start failed for fallback:",
                 file.name,
                 uploadError
@@ -587,12 +592,12 @@ jQuery(document).ready(function ($) {
         }
       }
 
-      console.log(
+      if (isDevelopment) console.log(
         "[Add Listing] Processed batch. Accumulated files count:",
         accumulatedFilesList.length
       );
     } catch (error) {
-      console.error("[Add Listing] Error in batch processing:", error);
+      if (isDevelopment) console.error("[Add Listing] Error in batch processing:", error);
     } finally {
       // Hide processing indicator
       showImageProcessingIndicator(false);
@@ -660,7 +665,7 @@ jQuery(document).ready(function ($) {
   }
 
   function createAndDisplayPreview(file) {
-    console.log("[Add Listing] Creating preview for:", file.name);
+    if (isDevelopment) console.log("[Add Listing] Creating preview for:", file.name);
     const reader = new FileReader();
     reader.onload = function (e) {
       const previewItem = $("<div>").addClass("image-preview-item");
@@ -678,12 +683,12 @@ jQuery(document).ready(function ($) {
         .addClass("remove-image")
         .html('<i class="fas fa-times"></i>')
         .on("click", function () {
-          console.log("[Add Listing] Remove button clicked for:", file.name);
+          if (isDevelopment) console.log("[Add Listing] Remove button clicked for:", file.name);
 
           // Remove from async system if applicable
           if (file.asyncFileKey && asyncUploadManager) {
             asyncUploadManager.removeImage(file.asyncFileKey).catch((error) => {
-              console.error(
+              if (isDevelopment) console.error(
                 "[Add Listing] Failed to remove from async system:",
                 error
               );
@@ -704,10 +709,10 @@ jQuery(document).ready(function ($) {
       }
 
       imagePreview.append(previewItem);
-      console.log("[Add Listing] Preview added to DOM for:", file.name);
+      if (isDevelopment) console.log("[Add Listing] Preview added to DOM for:", file.name);
     };
     reader.onerror = function () {
-      console.error("[Add Listing] Error reading file for preview:", file.name);
+      if (isDevelopment) console.error("[Add Listing] Error reading file for preview:", file.name);
     };
     reader.readAsDataURL(file);
   }
@@ -717,7 +722,7 @@ jQuery(document).ready(function ($) {
     originalFile,
     stats
   ) {
-    console.log(
+    if (isDevelopment) console.log(
       "[Add Listing] Creating preview with stats for:",
       optimizedFile.name
     );
@@ -741,7 +746,7 @@ jQuery(document).ready(function ($) {
         .addClass("remove-image")
         .html('<i class="fas fa-times"></i>')
         .on("click", function () {
-          console.log(
+          if (isDevelopment) console.log(
             "[Add Listing] Remove button clicked for:",
             optimizedFile.name
           );
@@ -751,13 +756,13 @@ jQuery(document).ready(function ($) {
 
       previewItem.append(img).append(statsTooltip).append(removeBtn);
       imagePreview.append(previewItem);
-      console.log(
+      if (isDevelopment) console.log(
         "[Add Listing] Preview with stats added to DOM for:",
         optimizedFile.name
       );
     };
     reader.onerror = function () {
-      console.error(
+      if (isDevelopment) console.error(
         "[Add Listing] Error reading file for preview:",
         optimizedFile.name
       );
@@ -766,7 +771,7 @@ jQuery(document).ready(function ($) {
   }
 
   function removeFileFromSelection(fileNameToRemove) {
-    console.log(
+    if (isDevelopment) console.log(
       "[Add Listing] Attempting to remove file from selection:",
       fileNameToRemove
     );
@@ -774,7 +779,7 @@ jQuery(document).ready(function ($) {
       (file) => file.name !== fileNameToRemove
     );
     updateActualFileInput(); // Refresh the actual file input
-    console.log(
+    if (isDevelopment) console.log(
       "[Add Listing] File removed. Accumulated files count:",
       accumulatedFilesList.length
     );
@@ -786,7 +791,7 @@ jQuery(document).ready(function ($) {
       try {
         dataTransfer.items.add(file);
       } catch (error) {
-        console.error(
+        if (isDevelopment) console.error(
           "[Add Listing] Error adding file to DataTransfer:",
           file.name,
           error
@@ -796,12 +801,12 @@ jQuery(document).ready(function ($) {
     try {
       fileInput[0].files = dataTransfer.files;
     } catch (error) {
-      console.error(
+      if (isDevelopment) console.error(
         "[Add Listing] Error setting files on input element:",
         error
       );
     }
-    console.log(
+    if (isDevelopment) console.log(
       "[Add Listing] Actual file input updated. Count:",
       fileInput[0].files.length
     );
@@ -811,18 +816,18 @@ jQuery(document).ready(function ($) {
   function initializeImageOptimizer() {
     if (typeof ImageOptimizer !== "undefined") {
       const testOptimizer = new ImageOptimizer();
-      console.log(
+      if (isDevelopment) console.log(
         "[Add Listing] ✅ Image optimization ready! Browser support:",
         testOptimizer.isSupported
       );
-      console.log("[Add Listing] Optimization settings:", {
+      if (isDevelopment) console.log("[Add Listing] Optimization settings:", {
         maxWidth: testOptimizer.maxWidth,
         maxHeight: testOptimizer.maxHeight,
         quality: testOptimizer.quality,
         maxFileSize: testOptimizer.maxFileSize + "KB",
       });
     } else {
-      console.error(
+      if (isDevelopment) console.error(
         "[Add Listing] ❌ ImageOptimizer class not found! Image optimization will not work."
       );
     }
@@ -879,7 +884,7 @@ jQuery(document).ready(function ($) {
         });
       }, 3000);
 
-      console.log(
+      if (isDevelopment) console.log(
         "[Add Listing] Async upload completed for:",
         data.original_filename
       );
@@ -903,7 +908,7 @@ jQuery(document).ready(function ($) {
       // Show fallback message below upload area
       showAsyncUploadFallbackMessage();
 
-      console.error(
+      if (isDevelopment) console.error(
         "[Add Listing] Async upload failed for file key:",
         fileKey,
         error
@@ -941,6 +946,6 @@ jQuery(document).ready(function ($) {
       $(`.image-preview[data-async-key="${fileKey}"]`).remove();
     });
 
-    console.log("[Add Listing] Image removed from async system:", fileKey);
+    if (isDevelopment) console.log("[Add Listing] Image removed from async system:", fileKey);
   }
 });

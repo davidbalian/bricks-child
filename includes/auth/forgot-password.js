@@ -6,8 +6,13 @@
  */
 
 jQuery(document).ready(function ($) {
-  console.log("Forgot password functionality loaded");
-  console.log("ForgotPasswordAjax object:", ForgotPasswordAjax);
+  // PRODUCTION SAFETY: Only log in development environments
+  const isDevelopment = window.location.hostname === 'localhost' || 
+                       window.location.hostname.includes('staging') ||
+                       window.location.search.includes('debug=true');
+  
+  if (isDevelopment) console.log("Forgot password functionality loaded");
+  if (isDevelopment) console.log("ForgotPasswordAjax object:", ForgotPasswordAjax);
 
   // Variables to store state
   let verifiedPhoneNumber = "";

@@ -4,6 +4,10 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // PRODUCTION SAFETY: Only log in development environments
+    const isDevelopment = window.location.hostname === 'localhost' || 
+                         window.location.hostname.includes('staging') ||
+                         window.location.search.includes('debug=true');
     
     // === SHARE BUTTON FUNCTIONALITY ===
     // Handle clicks on any share button (supports multiple buttons on page)
@@ -28,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 title: document.title,
                 url: currentUrl
             }).catch(err => {
-                console.log('Error sharing:', err);
+                if (isDevelopment) console.log('Error sharing:', err);
                 // Fallback to copying URL
                 copyToClipboard(currentUrl);
             });

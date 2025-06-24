@@ -4,6 +4,10 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // PRODUCTION SAFETY: Only log in development environments
+    const isDevelopment = window.location.hostname === 'localhost' || 
+                         window.location.hostname.includes('staging') ||
+                         window.location.search.includes('debug=true');
     
     // === FAVORITE BUTTON FUNCTIONALITY ===
     // Handle clicks on any favorite button (supports multiple buttons on page)
@@ -73,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Show specific error message
                 const errorMessage = data.data || 'Unknown error occurred';
-                console.error('Favorite toggle failed:', errorMessage);
+                if (isDevelopment) console.error('Favorite toggle failed:', errorMessage);
                 alert('Failed to update favorites: ' + errorMessage);
             }
             // Success - UI already updated optimistically

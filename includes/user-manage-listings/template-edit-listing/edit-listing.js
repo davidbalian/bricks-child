@@ -1,4 +1,9 @@
 jQuery(document).ready(function($) {
+    // PRODUCTION SAFETY: Only log in development environments
+    const isDevelopment = window.location.hostname === 'localhost' || 
+                         window.location.hostname.includes('staging') ||
+                         window.location.search.includes('debug=true');
+    
     // Initialize Async Upload Manager (ADDED FROM ADD LISTING PAGE)
     let asyncUploadManager = null;
     if (typeof AsyncUploadManager !== 'undefined') {
@@ -24,9 +29,9 @@ jQuery(document).ready(function($) {
             onAsyncImageRemoved(fileKey);
         };
         
-        console.log('[Edit Listing] Async upload manager initialized with session:', asyncUploadManager.session.id);
+        if (isDevelopment) console.log('[Edit Listing] Async upload manager initialized with session:', asyncUploadManager.session.id);
     } else {
-        console.warn('[Edit Listing] AsyncUploadManager not available - async uploads disabled');
+        if (isDevelopment) console.warn('[Edit Listing] AsyncUploadManager not available - async uploads disabled');
     }
 
     // Store the makes data
@@ -43,7 +48,7 @@ jQuery(document).ready(function($) {
 
     // Initial count of existing images on page load
     const initialExistingImageCount = imagePreviewContainer.find(existingImageSelector).length;
-    console.log('[Edit Listing] Initial existing images on page load:', initialExistingImageCount);
+    if (isDevelopment) console.log('[Edit Listing] Initial existing images on page load:', initialExistingImageCount);
 
     // Set initial make value
     const selectedMake = editListingData.selectedMake;
@@ -137,13 +142,13 @@ jQuery(document).ready(function($) {
                 name: 'removed_images[]',
                 value: imageId
             }).appendTo('#edit-car-listing-form');
-            console.log('[Edit Listing] Marked existing image for removal, ID:', imageId);
+            if (isDevelopment) console.log('[Edit Listing] Marked existing image for removal, ID:', imageId);
         }
         $(this).closest('.image-preview-item').remove(); // Use closest to ensure the correct item is removed
     });
     
     function processNewFiles(candidateFiles) {
-        console.log('[Edit Listing] Processing', candidateFiles.length, 'new candidate files.');
+        if (isDevelopment) console.log('[Edit Listing] Processing', candidateFiles.length, 'new candidate files.');
         const maxTotalFiles = 25;
         const maxFileSize = 5 * 1024 * 1024; // 5MB
         const allowedTypes = ['image/jpeg', 'image/jfif', 'image/pjpeg', 'image/jpg', 'image/x-jfif', 'image/pipeg', 'image/png', 'image/gif', 'image/webp'];
@@ -151,8 +156,8 @@ jQuery(document).ready(function($) {
 
         const currentExistingImageDOMCount = imagePreviewContainer.find(existingImageSelector).length;
 
-        console.log('[Edit Listing] Current existing images in DOM (for processNewFiles):', currentExistingImageDOMCount);
-        console.log('[Edit Listing] Currently accumulated new files:', accumulatedFilesList.length);
+        if (isDevelopment) console.log('[Edit Listing] Current existing images in DOM (for processNewFiles):', currentExistingImageDOMCount);
+        if (isDevelopment) console.log('[Edit Listing] Currently accumulated new files:', accumulatedFilesList.length);
 
         // Show processing indicator
         showImageProcessingIndicator(true);
@@ -199,7 +204,7 @@ jQuery(document).ready(function($) {
                 );
                 
             if (isDuplicateInNew) {
-                console.log('[Edit Listing] Skipping duplicate new file (already in this edit session):', file.name);
+                if (isDevelopment) console.log('[Edit Listing] Skipping duplicate new file (already in this edit session):', file.name);
                     continue;
             }
 
@@ -230,7 +235,7 @@ jQuery(document).ready(function($) {
                     optimizedFile.originalSize = file.size;
                     optimizedFile.originalType = file.type;
 
-                    console.log('[Edit Listing] File optimized:', file.name, 'Original:', (originalSize/1024).toFixed(2) + 'KB', 'Optimized:', (optimizedSize/1024).toFixed(2) + 'KB');
+                    if (isDevelopment) console.log('[Edit Listing] File optimized:', file.name, 'Original:', (originalSize/1024).toFixed(2) + 'KB', 'Optimized:', (optimizedSize/1024).toFixed(2) + 'KB');
 
                     // ASYNC UPLOAD INTEGRATION - Start background upload
                     if (asyncUploadManager) {
@@ -242,9 +247,9 @@ jQuery(document).ready(function($) {
                             optimizedFile.asyncFileKey = fileKey;
                             optimizedFile.asyncUploadStatus = 'uploading';
                             
-                            console.log('[Edit Listing] Started async upload for optimized file:', file.name, 'FileKey:', fileKey);
+                            if (isDevelopment) console.log('[Edit Listing] Started async upload for optimized file:', file.name, 'FileKey:', fileKey);
                         } catch (error) {
-                            console.error('[Edit Listing] Failed to start async upload for optimized file:', file.name, error);
+                            if (isDevelopment) console.error('[Edit Listing] Failed to start async upload for optimized file:', file.name, error);
                         }
                     }
 
@@ -253,11 +258,11 @@ jQuery(document).ready(function($) {
                     createAndDisplayPreviewForNewFile(optimizedFile, originalSize, optimizedSize);
                     filesActuallyAddedInThisBatch++;
                 } catch (error) {
-                    console.error('[Edit Listing] Error optimizing image:', file.name, error);
+                    if (isDevelopment) console.error('[Edit Listing] Error optimizing image:', file.name, error);
                     optimizationErrors++;
                     
                     // Fall back to original file if optimization fails
-                    console.log('[Edit Listing] Using original file as fallback for:', file.name);
+                    if (isDevelopment) console.log('[Edit Listing] Using original file as fallback for:', file.name);
                     
                     // Even for fallback, store original properties for consistency
                     file.originalName = file.name;
@@ -270,9 +275,9 @@ jQuery(document).ready(function($) {
                             const fileKey = await asyncUploadManager.addFileToQueue(file);
                             file.asyncFileKey = fileKey;
                             file.asyncUploadStatus = 'uploading';
-                            console.log('[Edit Listing] Started async upload for fallback file:', file.name, 'FileKey:', fileKey);
+                            if (isDevelopment) console.log('[Edit Listing] Started async upload for fallback file:', file.name, 'FileKey:', fileKey);
                         } catch (error) {
-                            console.error('[Edit Listing] Failed to start async upload for fallback file:', file.name, error);
+                            if (isDevelopment) console.error('[Edit Listing] Failed to start async upload for fallback file:', file.name, error);
                         }
                     }
 
@@ -297,10 +302,10 @@ jQuery(document).ready(function($) {
                 }
             }
 
-        console.log('[Edit Listing] Processed batch. Total new files added in session:', accumulatedFilesList.length);
+        if (isDevelopment) console.log('[Edit Listing] Processed batch. Total new files added in session:', accumulatedFilesList.length);
 
         } catch (error) {
-            console.error('[Edit Listing] Error in batch processing:', error);
+            if (isDevelopment) console.error('[Edit Listing] Error in batch processing:', error);
         } finally {
             // Hide processing indicator
             showImageProcessingIndicator(false);
@@ -308,7 +313,7 @@ jQuery(document).ready(function($) {
     }
 
     function createAndDisplayPreviewForNewFile(file, originalSize = null, optimizedSize = null) {
-        console.log('[Edit Listing] Creating preview for new file:', file.name);
+        if (isDevelopment) console.log('[Edit Listing] Creating preview for new file:', file.name);
         const reader = new FileReader();
         reader.onload = function(e) {
             const previewItem = $('<div>').addClass('image-preview-item new-image');
@@ -324,12 +329,12 @@ jQuery(document).ready(function($) {
                 .html('<i class="fas fa-times"></i>')
                 .on('click', function(event) {
                     event.stopPropagation();
-                    console.log('[Edit Listing] Remove button clicked for new file:', file.name);
+                    if (isDevelopment) console.log('[Edit Listing] Remove button clicked for new file:', file.name);
                     
                     // Remove from async system if applicable (FIXED TO MATCH ADD LISTING)
                     if (file.asyncFileKey && asyncUploadManager) {
                         asyncUploadManager.removeImage(file.asyncFileKey).catch(error => {
-                            console.error('[Edit Listing] Failed to remove from async system:', error);
+                            if (isDevelopment) console.error('[Edit Listing] Failed to remove from async system:', error);
                         });
                     }
                     
@@ -359,19 +364,19 @@ jQuery(document).ready(function($) {
             imagePreviewContainer.append(previewItem);
         };
         reader.onerror = function() {
-            console.error('[Edit Listing] Error reading new file for preview:', file.name);
+            if (isDevelopment) console.error('[Edit Listing] Error reading new file for preview:', file.name);
         };
         reader.readAsDataURL(file);
     }
 
     function removeNewFileFromSelection(fileNameToRemove) {
-        console.log('[Edit Listing] Attempting to remove new file from selection:', fileNameToRemove);
+        if (isDevelopment) console.log('[Edit Listing] Attempting to remove new file from selection:', fileNameToRemove);
         
         accumulatedFilesList = accumulatedFilesList.filter(
             file => file.name !== fileNameToRemove
         );
         updateActualFileInput();
-        console.log('[Edit Listing] New file removed. Accumulated new files count:', accumulatedFilesList.length);
+        if (isDevelopment) console.log('[Edit Listing] New file removed. Accumulated new files count:', accumulatedFilesList.length);
     }
     
     function updateActualFileInput() {
@@ -380,15 +385,15 @@ jQuery(document).ready(function($) {
             try {
                 dataTransfer.items.add(file);
             } catch (error) {
-                console.error('[Edit Listing] Error adding new file to DataTransfer:', file.name, error);
+                if (isDevelopment) console.error('[Edit Listing] Error adding new file to DataTransfer:', file.name, error);
             }
         });
         try {
             fileInput[0].files = dataTransfer.files;
         } catch (error) {
-            console.error('[Edit Listing] Error setting new files on input element:', error);
+            if (isDevelopment) console.error('[Edit Listing] Error setting new files on input element:', error);
         }
-        console.log('[Edit Listing] Actual file input updated with new files. Count:', fileInput[0].files.length);
+        if (isDevelopment) console.log('[Edit Listing] Actual file input updated with new files. Count:', fileInput[0].files.length);
     }
     
     // Format numbers with commas
@@ -468,11 +473,11 @@ jQuery(document).ready(function($) {
             // Count async uploaded images + existing images
             const asyncUploadedCount = asyncUploadManager.getUploadedAttachmentIds().length;
             totalImages = existingImagesCount + asyncUploadedCount;
-            console.log('[Edit Listing] Async mode - Existing:', existingImagesCount, 'Async uploaded:', asyncUploadedCount, 'Total:', totalImages);
+            if (isDevelopment) console.log('[Edit Listing] Async mode - Existing:', existingImagesCount, 'Async uploaded:', asyncUploadedCount, 'Total:', totalImages);
         } else {
             // Count traditional uploaded files + existing images
             totalImages = existingImagesCount + accumulatedFilesList.length;
-            console.log('[Edit Listing] Traditional mode - Existing:', existingImagesCount, 'New files:', accumulatedFilesList.length, 'Total:', totalImages);
+            if (isDevelopment) console.log('[Edit Listing] Traditional mode - Existing:', existingImagesCount, 'New files:', accumulatedFilesList.length, 'Total:', totalImages);
         }
         
         if (totalImages < 5) {
@@ -500,20 +505,20 @@ jQuery(document).ready(function($) {
             }
             
             asyncUploadManager.markSessionCompleted();
-            console.log('[Edit Listing] Async upload session marked as completed');
+            if (isDevelopment) console.log('[Edit Listing] Async upload session marked as completed');
             
             // Clear file input to prevent duplicate uploads when using async system
             const fileInput = $('#car_images')[0];
             if (fileInput && fileInput.files && fileInput.files.length > 0) {
                 fileInput.value = '';
-                console.log('[Edit Listing] Cleared file input for async uploads');
+                if (isDevelopment) console.log('[Edit Listing] Cleared file input for async uploads');
             }
         } else {
             // For traditional uploads, ensure fileInput has correct files
             updateActualFileInput();
         }
         
-        console.log('🚀 [Edit Listing] All validations passed - form will now submit');
+        if (isDevelopment) console.log('🚀 [Edit Listing] All validations passed - form will now submit');
         // Form should submit normally after this point
     });
 
@@ -572,7 +577,7 @@ jQuery(document).ready(function($) {
                 $('#car_city').val(address.city || address.town || address.village || '');
                 $('#car_district').val(address.county || address.state || '');
             })
-            .catch(error => console.error('Error:', error));
+                                .catch(error => { if (isDevelopment) console.error('Error:', error); });
     }
 
     // Close modal when clicking outside
@@ -677,7 +682,7 @@ jQuery(document).ready(function($) {
                 });
             }, 3000);
             
-            console.log('[Edit Listing] Async upload completed for:', data.original_filename);
+            if (isDevelopment) console.log('[Edit Listing] Async upload completed for:', data.original_filename);
         }
     }
     
@@ -694,7 +699,7 @@ jQuery(document).ready(function($) {
             // Show fallback message below upload area
             showAsyncUploadFallbackMessage();
             
-            console.error('[Edit Listing] Async upload failed for file key:', fileKey, error);
+            if (isDevelopment) console.error('[Edit Listing] Async upload failed for file key:', fileKey, error);
         }
     }
     
@@ -726,6 +731,6 @@ jQuery(document).ready(function($) {
             $(`.image-preview[data-async-key="${fileKey}"]`).remove();
         });
         
-        console.log('[Edit Listing] Image removed from async system:', fileKey);
+        if (isDevelopment) console.log('[Edit Listing] Image removed from async system:', fileKey);
     }
 }); 

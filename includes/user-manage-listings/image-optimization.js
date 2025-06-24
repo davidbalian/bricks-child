@@ -5,6 +5,11 @@
 
 class ImageOptimizer {
     constructor(options = {}) {
+        // PRODUCTION SAFETY: Only log in development environments
+        this.isDevelopment = window.location.hostname === 'localhost' || 
+                            window.location.hostname.includes('staging') ||
+                            window.location.search.includes('debug=true');
+        
         this.maxWidth = options.maxWidth || 1920;
         this.maxHeight = options.maxHeight || 1080;
         this.quality = options.quality || 0.8;
@@ -25,7 +30,7 @@ class ImageOptimizer {
             const ctx = canvas.getContext('2d');
             return !!(canvas && ctx && canvas.toBlob && File && FileReader);
         } catch (error) {
-            console.warn('[ImageOptimizer] Browser compatibility check failed:', error);
+            if (this.isDevelopment) console.warn('[ImageOptimizer] Browser compatibility check failed:', error);
             return false;
         }
     }
@@ -39,7 +44,7 @@ class ImageOptimizer {
         return new Promise((resolve, reject) => {
             // Check browser support
             if (!this.isSupported) {
-                console.warn('[ImageOptimizer] Browser does not support optimization, using original file');
+                if (this.isDevelopment) console.warn('[ImageOptimizer] Browser does not support optimization, using original file');
                 resolve(file);
                 return;
             }
@@ -53,7 +58,7 @@ class ImageOptimizer {
             // For car listings, skip client-side processing for best quality
             // Only resize very large files to reduce upload time (keeping original format)
             if (file.size <= (5 * 1024 * 1024)) { // 5MB threshold
-                console.log(`[ImageOptimizer] File ${file.name} will be processed on server for best quality`);
+                if (this.isDevelopment) console.log(`[ImageOptimizer] File ${file.name} will be processed on server for best quality`);
                 resolve(file);
                 return;
             }
@@ -64,7 +69,7 @@ class ImageOptimizer {
 
             // Set up timeout
             const timeout = setTimeout(() => {
-                console.warn(`[ImageOptimizer] Optimization timeout for ${file.name}, using original`);
+                if (this.isDevelopment) console.warn(`[ImageOptimizer] Optimization timeout for ${file.name}, using original`);
                 resolve(file);
             }, 30000); // 30 second timeout
 
@@ -98,17 +103,17 @@ class ImageOptimizer {
 
                                 // Only use optimized version if it's actually smaller
                                 if (optimizedFile.size < file.size) {
-                                    console.log(`[ImageOptimizer] Image resized: ${file.name} (kept as ${outputFormat})`);
-                                    console.log(`[ImageOptimizer] Original size: ${(file.size / 1024).toFixed(2)} KB`);
-                                    console.log(`[ImageOptimizer] Resized size: ${(optimizedFile.size / 1024).toFixed(2)} KB`);
-                                    console.log(`[ImageOptimizer] Size reduction: ${((1 - optimizedFile.size / file.size) * 100).toFixed(1)}%`);
+                                    if (this.isDevelopment) console.log(`[ImageOptimizer] Image resized: ${file.name} (kept as ${outputFormat})`);
+                                    if (this.isDevelopment) console.log(`[ImageOptimizer] Original size: ${(file.size / 1024).toFixed(2)} KB`);
+                                    if (this.isDevelopment) console.log(`[ImageOptimizer] Resized size: ${(optimizedFile.size / 1024).toFixed(2)} KB`);
+                                    if (this.isDevelopment) console.log(`[ImageOptimizer] Size reduction: ${((1 - optimizedFile.size / file.size) * 100).toFixed(1)}%`);
                                     resolve(optimizedFile);
                                 } else {
-                                    console.log(`[ImageOptimizer] Resize didn't reduce size for ${file.name}, using original`);
+                                    if (this.isDevelopment) console.log(`[ImageOptimizer] Resize didn't reduce size for ${file.name}, using original`);
                                     resolve(file);
                                 }
                             } else {
-                                console.warn(`[ImageOptimizer] Failed to resize ${file.name}, using original`);
+                                if (this.isDevelopment) console.warn(`[ImageOptimizer] Failed to resize ${file.name}, using original`);
                                 resolve(file);
                             }
                         },
@@ -117,14 +122,14 @@ class ImageOptimizer {
                     );
                 } catch (error) {
                     clearTimeout(timeout);
-                    console.error(`[ImageOptimizer] Error during optimization of ${file.name}:`, error);
+                    if (this.isDevelopment) console.error(`[ImageOptimizer] Error during optimization of ${file.name}:`, error);
                     resolve(file); // Fallback to original file
                 }
             };
 
             img.onerror = () => {
                 clearTimeout(timeout);
-                console.error(`[ImageOptimizer] Failed to load image ${file.name}, using original`);
+                if (this.isDevelopment) console.error(`[ImageOptimizer] Failed to load image ${file.name}, using original`);
                 resolve(file); // Fallback to original file
             };
 
@@ -132,7 +137,7 @@ class ImageOptimizer {
                 img.src = URL.createObjectURL(file);
             } catch (error) {
                 clearTimeout(timeout);
-                console.error(`[ImageOptimizer] Failed to create object URL for ${file.name}:`, error);
+                if (this.isDevelopment) console.error(`[ImageOptimizer] Failed to create object URL for ${file.name}:`, error);
                 resolve(file); // Fallback to original file
             }
         });
@@ -190,7 +195,7 @@ class ImageOptimizer {
                     });
                 }
             } catch (error) {
-                console.error(`Failed to optimize image ${files[i].name}:`, error);
+                if (this.isDevelopment) console.error(`Failed to optimize image ${files[i].name}:`, error);
                 // Add original file if optimization fails
                 optimizedFiles.push(files[i]);
                 
