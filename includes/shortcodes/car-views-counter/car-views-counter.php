@@ -14,6 +14,36 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Helper function to extract car ID from URL slug for shortcode
+ * Expected format: /car/carname-####/
+ * Example: /car/2020-bmw-3-series-10137/ returns 10137
+ * 
+ * @return int|false Car ID or false if not found
+ */
+function extract_car_id_from_url_shortcode() {
+    // Get the current URL path
+    $request_uri = $_SERVER['REQUEST_URI'];
+    
+    // Remove query string if present
+    $url_path = strtok($request_uri, '?');
+    
+    // Remove trailing slash
+    $url_path = rtrim($url_path, '/');
+    
+    // Extract the slug after /car/
+    if (preg_match('/\/car\/(.+)$/', $url_path, $matches)) {
+        $slug = $matches[1];
+        
+        // Extract the number after the last dash
+        if (preg_match('/-(\d+)$/', $slug, $id_matches)) {
+            return intval($id_matches[1]);
+        }
+    }
+    
+    return false;
+}
+
+/**
  * Car Views Counter Shortcode Handler
  * 
  * Usage: [car_views_counter]
@@ -30,13 +60,11 @@ function car_views_counter_shortcode($atts) {
         'show_zero' => 'yes', // Show even if 0 views
     ), $atts, 'car_views_counter');
     
-    // Get the car ID (from URL parameter or shortcode attribute)
+    // Get the car ID (from URL slug or shortcode attribute)
     $car_id = 0;
     
-    // First try URL parameter (primary method)
-    if (isset($_GET['car_id']) && !empty($_GET['car_id'])) {
-        $car_id = intval($_GET['car_id']);
-    }
+    // First try extracting from URL slug (primary method)
+    $car_id = extract_car_id_from_url_shortcode();
     
     // Fallback to shortcode attribute
     if (!$car_id && $atts['car_id']) {

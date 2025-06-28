@@ -32,28 +32,25 @@ class CarViewsTracker {
      * Main function to determine if we should track a view
      * Called on every WordPress page load
      * 
-     * ONLY tracks on URLs matching EXACTLY: /car/carname/?car_id=####
-     * Example: /car/2010-acura-ilx-ilx/?car_id=2261
+     * ONLY tracks on URLs matching EXACTLY: /car/carname-####/
+     * Example: /car/2020-bmw-3-series-10137/
      * 
-     * NO OTHER DETECTION METHODS - ONLY THIS URL PATTERN
+     * Car ID is extracted from the end of the URL slug after the last dash
      */
     public function maybe_track_view() {
-        // STRICT CHECK: Must have ALL three conditions
+        // STRICT CHECK: Must have ALL conditions
         // 1. Must be a single car post page
-        // 2. Must have ?car_id=#### in URL 
+        // 2. Must extract car_id from URL slug
         // 3. car_id must match the actual post ID
         
         if (!is_singular('car')) {
             return; // Not a car post page - STOP
         }
         
-        if (!isset($_GET['car_id']) || empty($_GET['car_id'])) {
-            return; // No car_id parameter in URL - STOP
-        }
-        
-        $car_id = intval($_GET['car_id']);
+        // Extract car ID from URL slug
+        $car_id = $this->extract_car_id_from_url();
         if (!$car_id) {
-            return; // Invalid car_id - STOP
+            return; // No valid car_id found in URL - STOP
         }
         
         $current_post_id = get_the_ID();
@@ -63,6 +60,36 @@ class CarViewsTracker {
         
         // ALL checks passed - track the view
         $this->track_view($car_id);
+    }
+    
+    /**
+     * Extract car ID from URL slug
+     * Expected format: /car/carname-####/
+     * Example: /car/2020-bmw-3-series-10137/ returns 10137
+     * 
+     * @return int|false Car ID or false if not found
+     */
+    private function extract_car_id_from_url() {
+        // Get the current URL path
+        $request_uri = $_SERVER['REQUEST_URI'];
+        
+        // Remove query string if present
+        $url_path = strtok($request_uri, '?');
+        
+        // Remove trailing slash
+        $url_path = rtrim($url_path, '/');
+        
+        // Extract the slug after /car/
+        if (preg_match('/\/car\/(.+)$/', $url_path, $matches)) {
+            $slug = $matches[1];
+            
+            // Extract the number after the last dash
+            if (preg_match('/-(\d+)$/', $slug, $id_matches)) {
+                return intval($id_matches[1]);
+            }
+        }
+        
+        return false;
     }
     
 
