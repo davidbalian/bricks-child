@@ -5,77 +5,88 @@
 .seller-verification-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 8px;
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white;
-    font-size: 12px;
-    font-weight: 600;
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
-    margin-left: 8px;
+    gap: 4px;
+    padding: 3px 8px;
+    background: #f0fdf4;
+    color: #059669;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 1px solid #bbf7d0;
+    margin-left: 10px;
+    margin-right: 6px;
     vertical-align: middle;
     transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+    line-height: 1.2;
 }
 
 .seller-verification-badge:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+    background: #ecfdf5;
+    border-color: #86efac;
 }
 
 .verification-tick {
-    width: 14px;
-    height: 14px;
-    color: white;
+    width: 12px;
+    height: 12px;
+    color: #10b981;
     flex-shrink: 0;
 }
 
 .verification-text {
-    font-size: 11px;
-    line-height: 1;
+    font-size: 10px;
+    line-height: 1.2;
     white-space: nowrap;
     letter-spacing: 0.025em;
+    font-weight: 500;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .seller-verification-badge {
-        font-size: 11px;
-        padding: 3px 6px;
-        gap: 4px;
+        font-size: 10px;
+        padding: 2px 6px;
+        gap: 3px;
+        margin-left: 8px;
+        margin-right: 4px;
     }
     
     .verification-tick {
-        width: 12px;
-        height: 12px;
+        width: 10px;
+        height: 10px;
     }
     
     .verification-text {
-        font-size: 10px;
+        font-size: 9px;
     }
 }
 
-/* Alternative minimal style */
-.seller-verification-badge.minimal {
-    background: #f0fdf4;
-    color: #059669;
-    border: 1px solid #bbf7d0;
-    box-shadow: none;
-}
-
-.seller-verification-badge.minimal .verification-tick {
-    color: #059669;
+/* Display as block on very small screens if needed */
+@media (max-width: 480px) {
+    .seller-verification-badge {
+        display: block;
+        margin-left: 0;
+        margin-top: 4px;
+        margin-bottom: 4px;
+        width: fit-content;
+    }
 }
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
-    .seller-verification-badge.minimal {
+    .seller-verification-badge {
         background: rgba(16, 185, 129, 0.1);
         color: #34d399;
         border-color: rgba(16, 185, 129, 0.3);
     }
     
-    .seller-verification-badge.minimal .verification-tick {
-        color: #34d399;
+    .seller-verification-badge .verification-tick {
+        color: #10b981;
+    }
+    
+    .seller-verification-badge:hover {
+        background: rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.4);
     }
 } 
