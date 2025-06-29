@@ -17,27 +17,27 @@
 .seller-reviews-overlay.show {
     display: flex;
     opacity: 1;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    align-items: stretch;
+    justify-content: flex-end;
+    padding: 0;
 }
 
 /* Overlay Content Container */
 .seller-reviews-overlay-content {
     background: white;
-    border-radius: 12px;
+    border-radius: 0;
     width: 100%;
-    max-width: 700px;
-    max-height: 90vh;
+    max-width: 500px;
+    max-height: 100vh;
     overflow-y: auto;
     position: relative;
-    transform: scale(0.9);
+    transform: translateX(100%);
     transition: transform 0.3s ease;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
 }
 
 .seller-reviews-overlay.show .seller-reviews-overlay-content {
-    transform: scale(1);
+    transform: translateX(0);
 }
 
 /* Overlay Header */
@@ -48,7 +48,7 @@
     padding: 25px 30px;
     border-bottom: 1px solid #e5e5e5;
     background: #f8f9fa;
-    border-radius: 12px 12px 0 0;
+    border-radius: 0;
 }
 
 .overlay-header h3 {
@@ -143,7 +143,7 @@
     padding: 25px 30px;
     border-top: 1px solid #e5e5e5;
     background: #f8f9fa;
-    border-radius: 0 0 12px 12px;
+    border-radius: 0;
 }
 
 .overlay-review-form-section h4 {
@@ -303,17 +303,18 @@
 /* Responsive Design */
 @media (max-width: 768px) {
     .seller-reviews-overlay {
-        padding: 10px;
+        padding: 0;
     }
     
     .seller-reviews-overlay-content {
-        max-height: 95vh;
-        border-radius: 8px;
+        max-width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
     }
     
     .overlay-header {
         padding: 20px;
-        border-radius: 8px 8px 0 0;
+        border-radius: 0;
     }
     
     .overlay-header h3 {
