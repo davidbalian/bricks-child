@@ -1,0 +1,202 @@
+/* Seller Reviews Display Styles */
+
+.seller-reviews-container {
+    margin: 20px 0;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Rating Summary Section */
+.seller-rating-summary {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.rating-stars {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stars-container {
+    display: inline-flex;
+    align-items: center;
+}
+
+.star {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.star-full {
+    color: #ffa500; /* Orange/gold color */
+}
+
+.star-half {
+    color: #ffa500;
+    position: relative;
+}
+
+.star-half::after {
+    content: '☆';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    color: #ddd;
+    overflow: hidden;
+}
+
+.star-empty {
+    color: #ddd;
+}
+
+.rating-text {
+    font-size: 16px;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Reviews List */
+.seller-reviews-list {
+    margin: 20px 0;
+}
+
+.seller-reviews-list h4 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.review-item {
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.review-item:last-child {
+    border-bottom: none;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.review-stars .stars-container {
+    margin-bottom: 5px;
+}
+
+.review-stars .star {
+    font-size: 16px;
+}
+
+.review-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.reviewer-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.review-date {
+    color: #999;
+    font-size: 14px;
+}
+
+.contacted-badge {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.review-comment {
+    color: #555;
+    line-height: 1.5;
+    margin-top: 8px;
+    font-style: italic;
+}
+
+/* Review Form Section */
+.seller-review-form-container {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.review-form-toggle {
+    margin-bottom: 15px;
+}
+
+.btn-toggle-review-form {
+    background: #007acc;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.btn-toggle-review-form:hover {
+    background: #005a9e;
+}
+
+.review-notice {
+    color: #666;
+    font-style: italic;
+}
+
+.review-notice a {
+    color: #007acc;
+    text-decoration: none;
+}
+
+.review-notice a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .seller-reviews-container {
+        margin: 15px 0;
+        padding: 15px;
+    }
+    
+    .review-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .review-meta {
+        margin-top: 5px;
+    }
+    
+    .rating-stars {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .star {
+        font-size: 18px;
+    }
+    
+    .review-stars .star {
+        font-size: 14px;
+    }
+} 
