@@ -23,21 +23,22 @@
 .seller-reviews-overlay-content {
     background: white;
     border-radius: 0;
-    width: 100%;
-    max-width: 500px;
-    max-height: 100vh;
-    overflow-y: auto;
+    width: 500px;
+    height: 100vh;
+    overflow: hidden;
     position: fixed;
-    right: 0;
+    right: -500px; /* Start completely hidden off-screen */
     top: 0;
-    transform: translateX(100%);
-    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
-    z-index: 10000;
+    transition: right 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.4);
+    z-index: 10001;
+    border-left: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
 }
 
 .seller-reviews-overlay.show .seller-reviews-overlay-content {
-    transform: translateX(0);
+    right: 0; /* Slide in to position */
 }
 
 /* Overlay Header */
@@ -46,9 +47,12 @@
     justify-content: space-between;
     align-items: center;
     padding: 25px 30px;
-    border-bottom: 1px solid #e5e5e5;
-    background: #f8f9fa;
+    border-bottom: 2px solid #e5e5e5;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border-radius: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .overlay-header h3 {
@@ -59,32 +63,36 @@
 }
 
 .close-overlay {
-    background: none;
-    border: none;
-    font-size: 30px;
-    color: #666;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #dee2e6;
+    font-size: 24px;
+    color: #495057;
     cursor: pointer;
     padding: 0;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    font-weight: bold;
 }
 
 .close-overlay:hover {
-    background: #e9ecef;
-    color: #333;
+    background: #fff;
+    border-color: #007acc;
+    color: #007acc;
+    transform: scale(1.05);
 }
 
 /* Rating Summary in Overlay */
 .overlay-rating-summary {
-    padding: 25px 30px;
+    padding: 30px;
     text-align: center;
-    background: #f8f9fa;
-    border-bottom: 1px solid #e5e5e5;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-bottom: 2px solid #e5e5e5;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .rating-display {
@@ -106,9 +114,10 @@
 
 /* Reviews Section */
 .overlay-reviews-section {
-    padding: 25px 30px;
-    max-height: 400px;
+    padding: 30px;
+    flex: 1;
     overflow-y: auto;
+    background: #ffffff;
 }
 
 .overlay-reviews-section h4 {
@@ -140,10 +149,11 @@
 
 /* Review Form Section */
 .overlay-review-form-section {
-    padding: 25px 30px;
-    border-top: 1px solid #e5e5e5;
-    background: #f8f9fa;
+    padding: 30px;
+    border-top: 2px solid #e5e5e5;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border-radius: 0;
+    margin-top: auto;
 }
 
 .overlay-review-form-section h4 {
@@ -307,9 +317,14 @@
     }
     
     .seller-reviews-overlay-content {
-        max-width: 100%;
-        max-height: 100vh;
-        border-radius: 0;
+        width: 100%;
+        right: -100%; /* Start off-screen on mobile */
+        border-left: none;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    .seller-reviews-overlay.show .seller-reviews-overlay-content {
+        right: 0;
     }
     
     .overlay-header {
