@@ -11,15 +11,12 @@
     z-index: 9999;
     display: none;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.4s ease;
 }
 
 .seller-reviews-overlay.show {
-    display: flex;
+    display: block;
     opacity: 1;
-    align-items: stretch;
-    justify-content: flex-end;
-    padding: 0;
 }
 
 /* Overlay Content Container */
@@ -30,10 +27,13 @@
     max-width: 500px;
     max-height: 100vh;
     overflow-y: auto;
-    position: relative;
+    position: fixed;
+    right: 0;
+    top: 0;
     transform: translateX(100%);
-    transition: transform 0.3s ease;
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
 }
 
 .seller-reviews-overlay.show .seller-reviews-overlay-content {
