@@ -55,6 +55,9 @@ require_once get_stylesheet_directory() . '/includes/views-counter/views-databas
 require_once get_stylesheet_directory() . '/includes/views-counter/views-tracker.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-views-counter/car-views-counter.php';
 
+// Seller Reviews System
+require_once get_stylesheet_directory() . '/includes/reviews/seller-reviews-database.php';
+
 // =========================================================================
 // WordPress File Upload Configuration
 // =========================================================================

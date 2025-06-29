@@ -1,0 +1,339 @@
+<?php
+/**
+ * Seller Reviews Database Operations
+ * 
+ * Handles database table creation, cleanup, and core database operations
+ * for the seller reviews system. Users can review sellers (other users)
+ * with ratings and comments.
+ * 
+ * @package Bricks Child
+ * @since 1.0.0
+ */
+
+if (!defined('ABSPATH')) {
+    exit; // Exit if accessed directly.
+}
+
+class SellerReviewsDatabase {
+    
+    private $table_name;
+    
+    public function __construct() {
+        global $wpdb;
+        $this->table_name = $wpdb->prefix . 'seller_reviews';
+        
+        // Hook into user deletion for cleanup
+        add_action('delete_user', array($this, 'cleanup_reviews_on_user_delete'));
+        
+        // NOTE: Table creation handled manually like views counter
+        // No ongoing checks needed - table assumed to exist after manual setup
+    }
+    
+    /**
+     * Submit a new review for a seller
+     * 
+     * @param int $seller_id The user ID being reviewed
+     * @param int $reviewer_id The user ID leaving the review
+     * @param int $rating Rating from 1-5
+     * @param string $comment Review comment (optional)
+     * @param bool $contacted_seller Whether reviewer contacted the seller
+     * @param bool $revealed_contact Whether reviewer revealed contact info
+     * @return array Results with success boolean and message
+     */
+    public function submit_review($seller_id, $reviewer_id, $rating, $comment = '', $contacted_seller = false, $revealed_contact = false) {
+        global $wpdb;
+        
+        // Validate inputs
+        if (!$seller_id || !$reviewer_id || !$rating) {
+            return array('success' => false, 'message' => 'Missing required fields');
+        }
+        
+        if ($seller_id == $reviewer_id) {
+            return array('success' => false, 'message' => 'Cannot review yourself');
+        }
+        
+        if ($rating < 1 || $rating > 5) {
+            return array('success' => false, 'message' => 'Rating must be between 1 and 5');
+        }
+        
+        // Check for existing review
+        $existing_review = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM {$this->table_name} WHERE seller_id = %d AND reviewer_id = %d",
+            $seller_id, $reviewer_id
+        ));
+        
+        if ($existing_review) {
+            return array('success' => false, 'message' => 'You have already reviewed this seller');
+        }
+        
+        // Insert the review
+        $result = $wpdb->insert(
+            $this->table_name,
+            array(
+                'seller_id' => $seller_id,
+                'reviewer_id' => $reviewer_id,
+                'rating' => $rating,
+                'comment' => sanitize_textarea_field($comment),
+                'contacted_seller' => $contacted_seller ? 1 : 0,
+                'revealed_contact' => $revealed_contact ? 1 : 0,
+                'status' => 'pending', // All reviews start as pending
+                'created_at' => current_time('mysql')
+            ),
+            array('%d', '%d', '%d', '%s', '%d', '%d', '%s', '%s')
+        );
+        
+        if ($result === false) {
+            return array('success' => false, 'message' => 'Database error: ' . $wpdb->last_error);
+        }
+        
+        return array('success' => true, 'message' => 'Review submitted successfully. It will be visible after admin approval.');
+    }
+    
+    /**
+     * Get approved reviews for a seller
+     * 
+     * @param int $seller_id The seller's user ID
+     * @param int $limit Number of reviews to retrieve
+     * @param int $offset Offset for pagination
+     * @return array Array of review objects
+     */
+    public function get_seller_reviews($seller_id, $limit = 10, $offset = 0) {
+        global $wpdb;
+        
+        $reviews = $wpdb->get_results($wpdb->prepare(
+            "SELECT r.*, u.display_name as reviewer_name 
+             FROM {$this->table_name} r 
+             LEFT JOIN {$wpdb->users} u ON r.reviewer_id = u.ID 
+             WHERE r.seller_id = %d AND r.status = 'approved' 
+             ORDER BY r.created_at DESC 
+             LIMIT %d OFFSET %d",
+            $seller_id, $limit, $offset
+        ));
+        
+        return $reviews ?: array();
+    }
+    
+    /**
+     * Get seller's average rating and total review count
+     * 
+     * @param int $seller_id The seller's user ID
+     * @return array Array with 'average' and 'count'
+     */
+    public function get_seller_rating_summary($seller_id) {
+        // First try to get from cache (user meta)
+        $cached_average = get_user_meta($seller_id, 'seller_average_rating', true);
+        $cached_count = get_user_meta($seller_id, 'seller_review_count', true);
+        
+        if ($cached_average !== '' && $cached_count !== '') {
+            return array(
+                'average' => (float) $cached_average,
+                'count' => (int) $cached_count
+            );
+        }
+        
+        // If not cached, calculate and cache it
+        return $this->update_seller_rating_cache($seller_id);
+    }
+    
+    /**
+     * Update the cached rating summary for a seller
+     * 
+     * @param int $seller_id The seller's user ID
+     * @return array The updated rating summary
+     */
+    private function update_seller_rating_cache($seller_id) {
+        global $wpdb;
+        
+        $results = $wpdb->get_row($wpdb->prepare(
+            "SELECT AVG(rating) as average, COUNT(*) as count 
+             FROM {$this->table_name} 
+             WHERE seller_id = %d AND status = 'approved'",
+            $seller_id
+        ));
+        
+        $average = $results->average ? (float) $results->average : 0;
+        $count = (int) $results->count;
+        
+        update_user_meta($seller_id, 'seller_average_rating', $average);
+        update_user_meta($seller_id, 'seller_review_count', $count);
+        
+        return array(
+            'average' => $average,
+            'count' => $count
+        );
+    }
+    
+    /**
+     * Approve a review (admin action)
+     * 
+     * @param int $review_id The review ID
+     * @return bool Success status
+     */
+    public function approve_review($review_id) {
+        global $wpdb;
+        
+        $result = $wpdb->update(
+            $this->table_name,
+            array('status' => 'approved'),
+            array('id' => $review_id),
+            array('%s'),
+            array('%d')
+        );
+        
+        if ($result !== false) {
+            // Update the seller's rating cache
+            $review = $wpdb->get_row($wpdb->prepare(
+                "SELECT seller_id FROM {$this->table_name} WHERE id = %d",
+                $review_id
+            ));
+            
+            if ($review) {
+                $this->update_seller_rating_cache($review->seller_id);
+            }
+            
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Reject a review (admin action)
+     * 
+     * @param int $review_id The review ID
+     * @return bool Success status
+     */
+    public function reject_review($review_id) {
+        global $wpdb;
+        
+        $result = $wpdb->update(
+            $this->table_name,
+            array('status' => 'rejected'),
+            array('id' => $review_id),
+            array('%s'),
+            array('%d')
+        );
+        
+        return $result !== false;
+    }
+    
+    /**
+     * Get pending reviews for admin moderation
+     * 
+     * @param int $limit Number of reviews to retrieve
+     * @param int $offset Offset for pagination
+     * @return array Array of pending review objects
+     */
+    public function get_pending_reviews($limit = 20, $offset = 0) {
+        global $wpdb;
+        
+        $reviews = $wpdb->get_results($wpdb->prepare(
+            "SELECT r.*, 
+                    u1.display_name as seller_name, 
+                    u2.display_name as reviewer_name 
+             FROM {$this->table_name} r 
+             LEFT JOIN {$wpdb->users} u1 ON r.seller_id = u1.ID 
+             LEFT JOIN {$wpdb->users} u2 ON r.reviewer_id = u2.ID 
+             WHERE r.status = 'pending' 
+             ORDER BY r.created_at ASC 
+             LIMIT %d OFFSET %d",
+            $limit, $offset
+        ));
+        
+        return $reviews ?: array();
+    }
+    
+    /**
+     * Get total count of pending reviews
+     * 
+     * @return int Number of pending reviews
+     */
+    public function get_pending_reviews_count() {
+        global $wpdb;
+        
+        $count = $wpdb->get_var(
+            "SELECT COUNT(*) FROM {$this->table_name} WHERE status = 'pending'"
+        );
+        
+        return (int) $count;
+    }
+    
+    /**
+     * Clean up reviews when a user is deleted
+     * 
+     * @param int $user_id The user ID being deleted
+     */
+    public function cleanup_reviews_on_user_delete($user_id) {
+        global $wpdb;
+        
+        // Delete reviews where this user was the seller
+        $wpdb->delete(
+            $this->table_name,
+            array('seller_id' => $user_id),
+            array('%d')
+        );
+        
+        // Delete reviews where this user was the reviewer
+        $wpdb->delete(
+            $this->table_name,
+            array('reviewer_id' => $user_id),
+            array('%d')
+        );
+        
+        // Clean up cached rating data
+        delete_user_meta($user_id, 'seller_average_rating');
+        delete_user_meta($user_id, 'seller_review_count');
+    }
+    
+    /**
+     * Get review statistics for a seller (for admin/analytics)
+     * 
+     * @param int $seller_id The seller's user ID
+     * @return array Array of review statistics
+     */
+    public function get_seller_review_stats($seller_id) {
+        global $wpdb;
+        
+        $stats = array();
+        
+        // Current rating summary
+        $summary = $this->get_seller_rating_summary($seller_id);
+        $stats['average_rating'] = $summary['average'];
+        $stats['total_reviews'] = $summary['count'];
+        
+        // Pending reviews count
+        $stats['pending_reviews'] = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$this->table_name} 
+             WHERE seller_id = %d AND status = 'pending'",
+            $seller_id
+        ));
+        
+        // Recent activity (last 30 days)
+        $stats['recent_reviews'] = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$this->table_name} 
+             WHERE seller_id = %d AND status = 'approved' 
+             AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
+            $seller_id
+        ));
+        
+        // Rating breakdown
+        $rating_breakdown = $wpdb->get_results($wpdb->prepare(
+            "SELECT rating, COUNT(*) as count 
+             FROM {$this->table_name} 
+             WHERE seller_id = %d AND status = 'approved' 
+             GROUP BY rating 
+             ORDER BY rating DESC",
+            $seller_id
+        ));
+        
+        $stats['rating_breakdown'] = array();
+        foreach ($rating_breakdown as $breakdown) {
+            $stats['rating_breakdown'][$breakdown->rating] = (int) $breakdown->count;
+        }
+        
+        return $stats;
+    }
+}
+
+// Initialize the database class
+new SellerReviewsDatabase(); 
