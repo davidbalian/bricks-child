@@ -23,13 +23,15 @@
 .seller-reviews-overlay-content {
     background: white;
     border-radius: 0;
-    width: 500px;
+    width: 40vw; /* 40% of viewport width like AutoTrader */
+    min-width: 400px; /* Minimum width for smaller screens */
+    max-width: 600px; /* Maximum width for very large screens */
     height: 100vh;
     overflow: hidden;
     position: fixed;
-    right: -500px; /* Start completely hidden off-screen */
+    right: -100%; /* Start completely hidden off-screen */
     top: 0;
-    transition: right 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: right 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     box-shadow: -10px 0 30px rgba(0, 0, 0, 0.4);
     z-index: 10001;
     border-left: 1px solid #e0e0e0;
@@ -318,6 +320,8 @@
     
     .seller-reviews-overlay-content {
         width: 100%;
+        min-width: 100%;
+        max-width: 100%;
         right: -100%; /* Start off-screen on mobile */
         border-left: none;
         box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);

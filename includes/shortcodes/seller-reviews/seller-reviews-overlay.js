@@ -8,8 +8,15 @@ jQuery(document).ready(function($) {
     // Show overlay when "See all reviews" button is clicked
     $(document).on('click', '.btn-toggle-review-form', function(e) {
         e.preventDefault();
-        $('.seller-reviews-overlay').addClass('show');
-        $('body').addClass('overlay-open').css('overflow', 'hidden');
+        
+        // Show overlay background first
+        $('.seller-reviews-overlay').show();
+        
+        // Force browser reflow then add animation class
+        setTimeout(function() {
+            $('.seller-reviews-overlay').addClass('show');
+            $('body').addClass('overlay-open').css('overflow', 'hidden');
+        }, 10);
     });
     
     // Hide overlay when close button or background is clicked
@@ -17,6 +24,11 @@ jQuery(document).ready(function($) {
         if (e.target === this) {
             $('.seller-reviews-overlay').removeClass('show');
             $('body').removeClass('overlay-open').css('overflow', '');
+            
+            // Hide overlay completely after animation
+            setTimeout(function() {
+                $('.seller-reviews-overlay').hide();
+            }, 1000); // Match the CSS transition duration
         }
     });
     
@@ -30,6 +42,11 @@ jQuery(document).ready(function($) {
         if (e.keyCode === 27 && $('.seller-reviews-overlay').hasClass('show')) {
             $('.seller-reviews-overlay').removeClass('show');
             $('body').removeClass('overlay-open').css('overflow', '');
+            
+            // Hide overlay completely after animation
+            setTimeout(function() {
+                $('.seller-reviews-overlay').hide();
+            }, 1000); // Match the CSS transition duration
         }
     });
     
