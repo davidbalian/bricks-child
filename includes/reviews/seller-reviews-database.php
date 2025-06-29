@@ -37,10 +37,9 @@ class SellerReviewsDatabase {
      * @param int $rating Rating from 1-5
      * @param string $comment Review comment (optional)
      * @param bool $contacted_seller Whether reviewer contacted the seller
-     * @param bool $revealed_contact Whether reviewer revealed contact info
      * @return array Results with success boolean and message
      */
-    public function submit_review($seller_id, $reviewer_id, $rating, $comment = '', $contacted_seller = false, $revealed_contact = false) {
+    public function submit_review($seller_id, $reviewer_id, $rating, $comment = '', $contacted_seller = false) {
         global $wpdb;
         
         // Validate inputs
@@ -75,11 +74,10 @@ class SellerReviewsDatabase {
                 'rating' => $rating,
                 'comment' => sanitize_textarea_field($comment),
                 'contacted_seller' => $contacted_seller ? 1 : 0,
-                'revealed_contact' => $revealed_contact ? 1 : 0,
                 'status' => 'pending', // All reviews start as pending
-                'created_at' => current_time('mysql')
+                'review_date' => current_time('mysql')
             ),
-            array('%d', '%d', '%d', '%s', '%d', '%d', '%s', '%s')
+            array('%d', '%d', '%d', '%s', '%d', '%s', '%s')
         );
         
         if ($result === false) {
@@ -105,7 +103,7 @@ class SellerReviewsDatabase {
              FROM {$this->table_name} r 
              LEFT JOIN {$wpdb->users} u ON r.reviewer_id = u.ID 
              WHERE r.seller_id = %d AND r.status = 'approved' 
-             ORDER BY r.created_at DESC 
+             ORDER BY r.review_date DESC 
              LIMIT %d OFFSET %d",
             $seller_id, $limit, $offset
         ));
@@ -235,7 +233,7 @@ class SellerReviewsDatabase {
              LEFT JOIN {$wpdb->users} u1 ON r.seller_id = u1.ID 
              LEFT JOIN {$wpdb->users} u2 ON r.reviewer_id = u2.ID 
              WHERE r.status = 'pending' 
-             ORDER BY r.created_at ASC 
+             ORDER BY r.review_date ASC 
              LIMIT %d OFFSET %d",
             $limit, $offset
         ));
@@ -312,7 +310,7 @@ class SellerReviewsDatabase {
         $stats['recent_reviews'] = $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(*) FROM {$this->table_name} 
              WHERE seller_id = %d AND status = 'approved' 
-             AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
+             AND review_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
             $seller_id
         ));
         
