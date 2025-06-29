@@ -107,7 +107,7 @@ function seller_reviews_display_shortcode($atts) {
                 <?php if (get_current_user_id() != $seller_id): ?>
                     <div class="review-form-toggle">
                         <button type="button" class="btn-toggle-review-form">
-                            Leave a Review
+                            See all reviews
                         </button>
                     </div>
                     <div class="seller-review-form" style="display: none;">
