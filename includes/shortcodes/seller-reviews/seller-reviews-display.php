@@ -44,7 +44,7 @@ function seller_reviews_display_shortcode($atts) {
     
     // Get seller reviews data
     $reviews_db = new SellerReviewsDatabase();
-    $reviews_summary = $reviews_db->get_seller_reviews_summary($seller_id);
+    $reviews_summary = $reviews_db->get_seller_rating_summary($seller_id);
     $reviews_list = ($atts['show_reviews'] === 'true') ? $reviews_db->get_seller_reviews($seller_id, intval($atts['limit'])) : array();
     
     // Start output buffering
@@ -55,12 +55,12 @@ function seller_reviews_display_shortcode($atts) {
         <!-- Rating Summary Section -->
         <div class="seller-rating-summary">
             <div class="rating-stars">
-                <?php echo generate_star_rating($reviews_summary['average_rating']); ?>
+                <?php echo generate_star_rating($reviews_summary['average']); ?>
                 <span class="rating-text">
-                    <?php if ($reviews_summary['total_reviews'] > 0): ?>
-                        <?php echo number_format($reviews_summary['average_rating'], 1); ?> 
-                        (<?php echo $reviews_summary['total_reviews']; ?> 
-                        <?php echo _n('review', 'reviews', $reviews_summary['total_reviews'], 'bricks-child'); ?>)
+                    <?php if ($reviews_summary['count'] > 0): ?>
+                        <?php echo number_format($reviews_summary['average'], 1); ?> 
+                        (<?php echo $reviews_summary['count']; ?> 
+                        <?php echo _n('review', 'reviews', $reviews_summary['count'], 'bricks-child'); ?>)
                     <?php else: ?>
                         No reviews yet
                     <?php endif; ?>
@@ -76,23 +76,23 @@ function seller_reviews_display_shortcode($atts) {
                 <div class="review-item">
                     <div class="review-header">
                         <div class="review-stars">
-                            <?php echo generate_star_rating($review['rating']); ?>
+                            <?php echo generate_star_rating($review->rating); ?>
                         </div>
                         <div class="review-meta">
                             <span class="reviewer-name">
-                                <?php echo esc_html($review['reviewer_display_name']); ?>
+                                <?php echo esc_html($review->reviewer_name); ?>
                             </span>
                             <span class="review-date">
-                                <?php echo date('M j, Y', strtotime($review['review_date'])); ?>
+                                <?php echo date('M j, Y', strtotime($review->review_date)); ?>
                             </span>
-                            <?php if ($review['contacted_seller']): ?>
+                            <?php if ($review->contacted_seller): ?>
                                 <span class="contacted-badge">Contacted Seller</span>
                             <?php endif; ?>
                         </div>
                     </div>
-                    <?php if (!empty($review['comment'])): ?>
+                    <?php if (!empty($review->comment)): ?>
                         <div class="review-comment">
-                            <?php echo esc_html($review['comment']); ?>
+                            <?php echo esc_html($review->comment); ?>
                         </div>
                     <?php endif; ?>
                 </div>
