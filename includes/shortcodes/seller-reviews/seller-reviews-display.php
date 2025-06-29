@@ -17,13 +17,27 @@ if (!defined('ABSPATH')) {
  * @return string HTML output
  */
 function seller_reviews_display_shortcode($atts) {
-    // Enqueue CSS only when shortcode is actually used
+    // Enqueue CSS and JS only when shortcode is actually used
     if (!wp_style_is('seller-reviews-display', 'enqueued')) {
         $theme_dir = get_stylesheet_directory_uri();
         wp_enqueue_style('seller-reviews-display', 
             $theme_dir . '/includes/shortcodes/seller-reviews/seller-reviews-display.css',
             array(),
             filemtime(get_stylesheet_directory() . '/includes/shortcodes/seller-reviews/seller-reviews-display.css')
+        );
+        
+        // Also enqueue overlay CSS and JS since the button will open overlay
+        wp_enqueue_style('seller-reviews-overlay', 
+            $theme_dir . '/includes/shortcodes/seller-reviews/seller-reviews-overlay.css',
+            array(),
+            filemtime(get_stylesheet_directory() . '/includes/shortcodes/seller-reviews/seller-reviews-overlay.css')
+        );
+        
+        wp_enqueue_script('seller-reviews-overlay', 
+            $theme_dir . '/includes/shortcodes/seller-reviews/seller-reviews-overlay.js',
+            array('jquery'),
+            filemtime(get_stylesheet_directory() . '/includes/shortcodes/seller-reviews/seller-reviews-overlay.js'),
+            true
         );
     }
     

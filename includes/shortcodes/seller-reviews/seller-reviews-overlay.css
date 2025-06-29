@@ -1,0 +1,345 @@
+/* Seller Reviews Overlay Styles */
+
+/* Overlay Background */
+.seller-reviews-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.seller-reviews-overlay.show {
+    display: flex;
+    opacity: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Overlay Content Container */
+.seller-reviews-overlay-content {
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.seller-reviews-overlay.show .seller-reviews-overlay-content {
+    transform: scale(1);
+}
+
+/* Overlay Header */
+.overlay-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px;
+    border-bottom: 1px solid #e5e5e5;
+    background: #f8f9fa;
+    border-radius: 12px 12px 0 0;
+}
+
+.overlay-header h3 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+    font-weight: 600;
+}
+
+.close-overlay {
+    background: none;
+    border: none;
+    font-size: 30px;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.close-overlay:hover {
+    background: #e9ecef;
+    color: #333;
+}
+
+/* Rating Summary in Overlay */
+.overlay-rating-summary {
+    padding: 25px 30px;
+    text-align: center;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.rating-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.rating-display .stars-container {
+    font-size: 28px;
+}
+
+.rating-display .rating-text {
+    font-size: 18px;
+    color: #555;
+    font-weight: 500;
+}
+
+/* Reviews Section */
+.overlay-reviews-section {
+    padding: 25px 30px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.overlay-reviews-section h4 {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    color: #333;
+    font-weight: 600;
+}
+
+.reviews-list .review-item {
+    padding: 20px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.reviews-list .review-item:last-child {
+    border-bottom: none;
+}
+
+.no-reviews {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+.no-reviews p {
+    font-size: 16px;
+    margin: 0;
+}
+
+/* Review Form Section */
+.overlay-review-form-section {
+    padding: 25px 30px;
+    border-top: 1px solid #e5e5e5;
+    background: #f8f9fa;
+    border-radius: 0 0 12px 12px;
+}
+
+.overlay-review-form-section h4 {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    color: #333;
+    font-weight: 600;
+}
+
+/* Form Styles */
+.seller-review-form .form-group {
+    margin-bottom: 20px;
+}
+
+.seller-review-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Star Rating Input */
+.star-rating-input {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.star-rating-input input {
+    display: none;
+}
+
+.star-rating-input label {
+    font-size: 30px;
+    color: #ddd;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    margin: 0;
+    padding: 5px;
+}
+
+.star-rating-input label:hover,
+.star-rating-input label:hover ~ label,
+.star-rating-input input:checked ~ label {
+    color: #ffa500;
+}
+
+/* Textarea */
+.seller-review-form textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    border: 2px solid #e5e5e5;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    transition: border-color 0.2s ease;
+}
+
+.seller-review-form textarea:focus {
+    outline: none;
+    border-color: #007acc;
+}
+
+.seller-review-form small {
+    color: #666;
+    font-size: 12px;
+}
+
+/* Checkbox */
+.checkbox-label {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    font-weight: normal !important;
+    cursor: pointer;
+}
+
+.checkbox-label input {
+    margin: 0;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.btn-submit-review {
+    background: #007acc;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-submit-review:hover {
+    background: #005a9e;
+}
+
+.btn-submit-review:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.form-messages {
+    flex: 1;
+}
+
+.form-messages .success {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.form-messages .error {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+/* Login Prompt */
+.login-prompt {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.login-prompt p {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+.login-link {
+    color: #007acc;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-link:hover {
+    text-decoration: underline;
+}
+
+.review-notice {
+    text-align: center;
+    padding: 30px 20px;
+    color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .seller-reviews-overlay {
+        padding: 10px;
+    }
+    
+    .seller-reviews-overlay-content {
+        max-height: 95vh;
+        border-radius: 8px;
+    }
+    
+    .overlay-header {
+        padding: 20px;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .overlay-header h3 {
+        font-size: 20px;
+    }
+    
+    .overlay-rating-summary,
+    .overlay-reviews-section,
+    .overlay-review-form-section {
+        padding: 20px;
+    }
+    
+    .rating-display .stars-container {
+        font-size: 24px;
+    }
+    
+    .rating-display .rating-text {
+        font-size: 16px;
+    }
+    
+    .star-rating-input label {
+        font-size: 26px;
+        padding: 3px;
+    }
+    
+    .overlay-reviews-section {
+        max-height: 300px;
+    }
+} 
