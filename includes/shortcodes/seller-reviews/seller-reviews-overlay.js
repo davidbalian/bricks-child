@@ -28,7 +28,7 @@ jQuery(document).ready(function($) {
             // Hide overlay completely after animation
             setTimeout(function() {
                 $('.seller-reviews-overlay').hide();
-            }, 1000); // Match the CSS transition duration
+            }, 400); // Match the CSS transition duration
         }
     });
     
@@ -46,7 +46,7 @@ jQuery(document).ready(function($) {
             // Hide overlay completely after animation
             setTimeout(function() {
                 $('.seller-reviews-overlay').hide();
-            }, 1000); // Match the CSS transition duration
+            }, 400); // Match the CSS transition duration
         }
     });
     
