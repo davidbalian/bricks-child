@@ -244,6 +244,40 @@ class SellerReviewsDatabase {
     }
     
     /**
+     * Reset a review to pending status (admin action)
+     * 
+     * @param int $review_id The review ID
+     * @return bool Success status
+     */
+    public function reset_review_to_pending($review_id) {
+        global $wpdb;
+        
+        $result = $wpdb->update(
+            $this->table_name,
+            array('status' => 'pending'),
+            array('id' => $review_id),
+            array('%s'),
+            array('%d')
+        );
+        
+        if ($result !== false) {
+            // Update the seller's rating cache since this review is no longer approved
+            $review = $wpdb->get_row($wpdb->prepare(
+                "SELECT seller_id FROM {$this->table_name} WHERE id = %d",
+                $review_id
+            ));
+            
+            if ($review) {
+                $this->update_seller_rating_cache($review->seller_id);
+            }
+            
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
      * Get pending reviews for admin moderation
      * 
      * @param int $limit Number of reviews to retrieve

@@ -111,8 +111,14 @@ function display_reviews_table($status) {
                             <?php if ($review->status === 'pending'): ?>
                                 <button class="button button-primary" onclick="approveReview(<?php echo $review->id; ?>)">Approve</button>
                                 <button class="button" onclick="rejectReview(<?php echo $review->id; ?>)">Reject</button>
-                            <?php else: ?>
-                                <span><?php echo ucfirst($review->status); ?></span>
+                            <?php elseif ($review->status === 'approved'): ?>
+                                <button class="button" onclick="rejectReview(<?php echo $review->id; ?>)">Reject</button>
+                                <button class="button" onclick="resetToPending(<?php echo $review->id; ?>)">Reset to Pending</button>
+                                <button class="button button-link-delete" onclick="deleteReview(<?php echo $review->id; ?>)">Delete</button>
+                            <?php elseif ($review->status === 'rejected'): ?>
+                                <button class="button button-primary" onclick="approveReview(<?php echo $review->id; ?>)">Approve</button>
+                                <button class="button" onclick="resetToPending(<?php echo $review->id; ?>)">Reset to Pending</button>
+                                <button class="button button-link-delete" onclick="deleteReview(<?php echo $review->id; ?>)">Delete</button>
                             <?php endif; ?>
                         </td>
                     </tr>
@@ -142,6 +148,38 @@ function display_reviews_table($status) {
         if (confirm('Reject this review?')) {
             jQuery.post(ajaxurl, {
                 action: 'reject_seller_review',
+                review_id: reviewId,
+                nonce: '<?php echo wp_create_nonce('admin_review_action_nonce'); ?>'
+            }, function(response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + response.data.message);
+                }
+            });
+        }
+    }
+    
+    function resetToPending(reviewId) {
+        if (confirm('Reset this review to pending status?')) {
+            jQuery.post(ajaxurl, {
+                action: 'reset_seller_review_to_pending',
+                review_id: reviewId,
+                nonce: '<?php echo wp_create_nonce('admin_review_action_nonce'); ?>'
+            }, function(response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + response.data.message);
+                }
+            });
+        }
+    }
+    
+    function deleteReview(reviewId) {
+        if (confirm('Are you sure you want to permanently delete this review? This action cannot be undone.')) {
+            jQuery.post(ajaxurl, {
+                action: 'delete_seller_review',
                 review_id: reviewId,
                 nonce: '<?php echo wp_create_nonce('admin_review_action_nonce'); ?>'
             }, function(response) {

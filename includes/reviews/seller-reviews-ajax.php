@@ -18,4 +18,6 @@ add_action('wp_ajax_submit_seller_review', 'handle_submit_seller_review');
 
 // Register AJAX handlers for admin review management (logged-in users only)
 add_action('wp_ajax_approve_seller_review', 'handle_admin_approve_review');
-add_action('wp_ajax_reject_seller_review', 'handle_admin_reject_review'); 
+add_action('wp_ajax_reject_seller_review', 'handle_admin_reject_review');
+add_action('wp_ajax_reset_seller_review_to_pending', 'handle_admin_reset_review_to_pending');
+add_action('wp_ajax_delete_seller_review', 'handle_admin_delete_review'); 

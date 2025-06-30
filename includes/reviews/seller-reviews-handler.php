@@ -33,20 +33,9 @@ function can_user_leave_review($user_id) {
  * Follows existing AJAX patterns in core/ajax.php
  */
 function handle_submit_seller_review() {
-    // Debug logging
-    error_log('=== SELLER REVIEW DEBUG ===');
-    error_log('POST data: ' . print_r($_POST, true));
-    error_log('Nonce field isset: ' . (isset($_POST['seller_review_nonce']) ? 'YES' : 'NO'));
-    if (isset($_POST['seller_review_nonce'])) {
-        error_log('Nonce value: ' . $_POST['seller_review_nonce']);
-        $nonce_check = wp_verify_nonce($_POST['seller_review_nonce'], 'submit_seller_review_nonce');
-        error_log('Nonce verification result: ' . ($nonce_check ? 'VALID' : 'INVALID'));
-    }
-    error_log('=== END DEBUG ===');
-    
     // Verify nonce for security
     if (!isset($_POST['seller_review_nonce']) || !wp_verify_nonce($_POST['seller_review_nonce'], 'submit_seller_review_nonce')) {
-        wp_send_json_error(array('message' => 'Security check failed - check error log for details'));
+        wp_send_json_error(array('message' => 'Security check failed'));
         return;
     }
     
@@ -207,6 +196,84 @@ function handle_admin_reject_review() {
         wp_send_json_success(array('message' => 'Review rejected successfully'));
     } else {
         wp_send_json_error(array('message' => 'Failed to reject review'));
+    }
+}
+
+/**
+ * AJAX handler for resetting review to pending status
+ * For use in admin interface
+ */
+function handle_admin_reset_review_to_pending() {
+    // Check admin permissions
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(array('message' => 'Insufficient permissions'));
+        return;
+    }
+    
+    // Verify nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'admin_review_action_nonce')) {
+        wp_send_json_error(array('message' => 'Security check failed'));
+        return;
+    }
+    
+    $review_id = isset($_POST['review_id']) ? intval($_POST['review_id']) : 0;
+    
+    if (!$review_id) {
+        wp_send_json_error(array('message' => 'Review ID required'));
+        return;
+    }
+    
+    // Get database instance
+    global $seller_reviews_database;
+    if (!$seller_reviews_database) {
+        $seller_reviews_database = new SellerReviewsDatabase();
+    }
+    
+    $success = $seller_reviews_database->reset_review_to_pending($review_id);
+    
+    if ($success) {
+        wp_send_json_success(array('message' => 'Review reset to pending successfully'));
+    } else {
+        wp_send_json_error(array('message' => 'Failed to reset review to pending'));
+    }
+}
+
+/**
+ * AJAX handler for deleting a review
+ * For use in admin interface
+ */
+function handle_admin_delete_review() {
+    // Check admin permissions
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(array('message' => 'Insufficient permissions'));
+        return;
+    }
+    
+    // Verify nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'admin_review_action_nonce')) {
+        wp_send_json_error(array('message' => 'Security check failed'));
+        return;
+    }
+    
+    $review_id = isset($_POST['review_id']) ? intval($_POST['review_id']) : 0;
+    
+    if (!$review_id) {
+        wp_send_json_error(array('message' => 'Review ID required'));
+        return;
+    }
+    
+    // Get database instance
+    global $seller_reviews_database;
+    if (!$seller_reviews_database) {
+        $seller_reviews_database = new SellerReviewsDatabase();
+    }
+    
+    $success = $seller_reviews_database->delete_review($review_id);
+    
+    if ($success) {
+        wp_send_json_success(array('message' => 'Review deleted successfully'));
+    } else {
+        wp_send_json_error(array('message' => 'Failed to delete review'));
     }
 }
 
