@@ -65,16 +65,16 @@ jQuery(document).ready(function($) {
         var contactedSeller = $form.find('input[name="contacted_seller"]').is(':checked') ? 1 : 0;
         var nonce = $form.find('input[name="seller_review_nonce"]').val();
         
-        // Debug logging
-        console.log('=== AJAX DEBUG ===');
-        console.log('Form:', $form[0]);
-        console.log('Seller ID:', sellerId);
-        console.log('Rating:', rating);
-        console.log('Comment:', comment);
-        console.log('Contacted seller:', contactedSeller);
-        console.log('Nonce field found:', $form.find('input[name="seller_review_nonce"]').length);
-        console.log('Nonce value:', nonce);
-        console.log('=== END DEBUG ===');
+        // Development logging
+        if (isDevelopment) console.log('=== SELLER REVIEW AJAX DEBUG ===');
+        if (isDevelopment) console.log('Form:', $form[0]);
+        if (isDevelopment) console.log('Seller ID:', sellerId);
+        if (isDevelopment) console.log('Rating:', rating);
+        if (isDevelopment) console.log('Comment:', comment);
+        if (isDevelopment) console.log('Contacted seller:', contactedSeller);
+        if (isDevelopment) console.log('Nonce field found:', $form.find('input[name="seller_review_nonce"]').length);
+        if (isDevelopment) console.log('Nonce value:', nonce);
+        if (isDevelopment) console.log('=== END DEBUG ===');
         
         // Validate rating
         if (!rating) {

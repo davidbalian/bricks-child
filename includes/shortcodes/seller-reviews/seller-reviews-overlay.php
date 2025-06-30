@@ -45,6 +45,13 @@ function seller_reviews_overlay_shortcode($atts) {
     ?>
     <div class="seller-reviews-overlay-content" data-seller-id="<?php echo esc_attr($seller_id); ?>">
         
+        <script type="text/javascript">
+        // Development environment detection (matches pattern from other files)
+        window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' || 
+                                                       window.location.hostname.includes('staging') ||
+                                                       window.location.search.includes('debug=true'));
+        </script>
+        
         <!-- Overlay Header -->
         <div class="overlay-header">
             <h3>Reviews for <?php echo esc_html($seller_info->display_name); ?></h3>
