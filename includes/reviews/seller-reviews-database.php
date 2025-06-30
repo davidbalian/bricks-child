@@ -56,16 +56,44 @@ class SellerReviewsDatabase {
         }
         
         // Check for existing review
-        $existing_review = $wpdb->get_var($wpdb->prepare(
-            "SELECT id FROM {$this->table_name} WHERE seller_id = %d AND reviewer_id = %d",
+        $existing_review = $wpdb->get_row($wpdb->prepare(
+            "SELECT id, status FROM {$this->table_name} WHERE seller_id = %d AND reviewer_id = %d",
             $seller_id, $reviewer_id
         ));
         
         if ($existing_review) {
-            return array('success' => false, 'message' => 'You have already reviewed this seller');
+            // If existing review is approved or pending, don't allow new submission
+            if ($existing_review->status === 'approved' || $existing_review->status === 'pending') {
+                $status_text = $existing_review->status === 'approved' ? 'approved' : 'pending approval';
+                return array('success' => false, 'message' => "You have already reviewed this seller. Your review is {$status_text}.");
+            }
+            
+            // If existing review was rejected, update it with new data
+            if ($existing_review->status === 'rejected') {
+                $result = $wpdb->update(
+                    $this->table_name,
+                    array(
+                        'rating' => $rating,
+                        'comment' => sanitize_textarea_field($comment),
+                        'contacted_seller' => $contacted_seller ? 1 : 0,
+                        'status' => 'pending', // Reset to pending for re-approval
+                        'review_date' => current_time('mysql'), // Update submission time
+                        'admin_notes' => null // Clear any previous admin notes
+                    ),
+                    array('id' => $existing_review->id),
+                    array('%d', '%s', '%d', '%s', '%s', '%s'),
+                    array('%d')
+                );
+                
+                if ($result === false) {
+                    return array('success' => false, 'message' => 'Database error: ' . $wpdb->last_error);
+                }
+                
+                return array('success' => true, 'message' => 'Review resubmitted successfully. It will be visible after admin approval.');
+            }
         }
         
-        // Insert the review
+        // Insert new review (no existing review found)
         $result = $wpdb->insert(
             $this->table_name,
             array(
@@ -330,6 +358,127 @@ class SellerReviewsDatabase {
         }
         
         return $stats;
+    }
+    
+    /**
+     * Get reviews for admin dashboard
+     * 
+     * @param string $status Filter by status (pending, approved, rejected, or 'all')
+     * @param int $limit Number of reviews to retrieve
+     * @param int $offset Offset for pagination
+     * @return array Array of review objects with additional user info
+     */
+    public function get_reviews_for_admin($status = 'all', $limit = 20, $offset = 0) {
+        global $wpdb;
+        
+        if ($status === 'all') {
+            $reviews = $wpdb->get_results($wpdb->prepare(
+                "SELECT r.*, 
+                        u1.display_name as reviewer_name, 
+                        u1.user_email as reviewer_email,
+                        u2.display_name as seller_name,
+                        u2.user_email as seller_email
+                 FROM {$this->table_name} r 
+                 LEFT JOIN {$wpdb->users} u1 ON r.reviewer_id = u1.ID 
+                 LEFT JOIN {$wpdb->users} u2 ON r.seller_id = u2.ID
+                 ORDER BY r.review_date DESC 
+                 LIMIT %d OFFSET %d",
+                $limit, $offset
+            ));
+        } else {
+            $reviews = $wpdb->get_results($wpdb->prepare(
+                "SELECT r.*, 
+                        u1.display_name as reviewer_name, 
+                        u1.user_email as reviewer_email,
+                        u2.display_name as seller_name,
+                        u2.user_email as seller_email
+                 FROM {$this->table_name} r 
+                 LEFT JOIN {$wpdb->users} u1 ON r.reviewer_id = u1.ID 
+                 LEFT JOIN {$wpdb->users} u2 ON r.seller_id = u2.ID
+                 WHERE r.status = %s
+                 ORDER BY r.review_date DESC 
+                 LIMIT %d OFFSET %d",
+                $status, $limit, $offset
+            ));
+        }
+        
+        return $reviews ?: array();
+    }
+    
+    /**
+     * Get reviews count by status
+     * 
+     * @param string $status Status to count (pending, approved, rejected, or 'all')
+     * @return int Count of reviews
+     */
+    public function get_reviews_count($status = 'all') {
+        global $wpdb;
+        
+        if ($status === 'all') {
+            return (int) $wpdb->get_var("SELECT COUNT(*) FROM {$this->table_name}");
+        }
+        
+        return (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$this->table_name} WHERE status = %s",
+            $status
+        ));
+    }
+    
+    /**
+     * Get overall review statistics for admin dashboard
+     * 
+     * @return array Global statistics
+     */
+    public function get_review_statistics() {
+        global $wpdb;
+        
+        $stats = $wpdb->get_row(
+            "SELECT 
+                COUNT(*) as total,
+                COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending,
+                COUNT(CASE WHEN status = 'approved' THEN 1 END) as approved,
+                COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected,
+                AVG(CASE WHEN status = 'approved' THEN rating END) as average_rating
+             FROM {$this->table_name}",
+            ARRAY_A
+        );
+        
+        return array(
+            'total' => (int) $stats['total'],
+            'pending' => (int) $stats['pending'],
+            'approved' => (int) $stats['approved'],
+            'rejected' => (int) $stats['rejected'],
+            'average_rating' => $stats['average_rating'] ? (float) $stats['average_rating'] : 0
+        );
+    }
+    
+    /**
+     * Delete a review (admin action)
+     * 
+     * @param int $review_id The review ID
+     * @return bool Success status
+     */
+    public function delete_review($review_id) {
+        global $wpdb;
+        
+        // Get seller ID before deletion for cache update
+        $review = $wpdb->get_row($wpdb->prepare(
+            "SELECT seller_id FROM {$this->table_name} WHERE id = %d",
+            $review_id
+        ));
+        
+        $result = $wpdb->delete(
+            $this->table_name,
+            array('id' => $review_id),
+            array('%d')
+        );
+        
+        if ($result !== false && $review) {
+            $this->update_seller_rating_cache($review->seller_id);
+            return true;
+        }
+        
+        return false;
     }
 }
 

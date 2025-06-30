@@ -60,6 +60,7 @@ require_once get_stylesheet_directory() . '/includes/reviews/seller-reviews-data
 require_once get_stylesheet_directory() . '/includes/reviews/seller-reviews-ajax.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/seller-reviews/seller-reviews-display.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/seller-reviews/seller-reviews-overlay.php';
+require_once get_stylesheet_directory() . '/includes/admin/seller-reviews-admin.php';
 
 // =========================================================================
 // WordPress File Upload Configuration
