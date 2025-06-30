@@ -34,7 +34,7 @@ function can_user_leave_review($user_id) {
  */
 function handle_submit_seller_review() {
     // Verify nonce for security
-    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'submit_seller_review_nonce')) {
+    if (!isset($_POST['seller_review_nonce']) || !wp_verify_nonce($_POST['seller_review_nonce'], 'submit_seller_review_nonce')) {
         wp_send_json_error(array('message' => 'Security check failed'));
         return;
     }

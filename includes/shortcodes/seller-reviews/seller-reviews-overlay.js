@@ -77,7 +77,7 @@ jQuery(document).ready(function($) {
         
         // Submit via AJAX
         $.ajax({
-            url: ajaxurl || '/wp-admin/admin-ajax.php',
+            url: sellerReviewsData.ajaxurl,
             type: 'POST',
             data: {
                 action: 'submit_seller_review',
