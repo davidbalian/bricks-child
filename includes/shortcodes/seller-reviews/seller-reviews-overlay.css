@@ -192,31 +192,21 @@
 
 .star-rating-input label {
     font-size: 30px;
-    color: #ddd !important;
-    cursor: pointer !important;
+    color: #ddd;
+    cursor: pointer;
     transition: color 0.2s ease;
-    margin: 0 !important;
+    margin: 0;
     padding: 5px;
-    display: block !important;
     user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
 }
 
-.star-rating-input label:hover {
-    color: #ffa500 !important;
-}
-
+.star-rating-input label:hover,
 .star-rating-input label:hover ~ label {
-    color: #ffa500 !important;
+    color: #ffa500;
 }
 
 .star-rating-input input:checked ~ label {
-    color: #ffa500 !important;
-}
-
-.star-rating-input input:checked + label {
-    color: #ffa500 !important;
+    color: #ffa500;
 }
 
 /* Textarea */

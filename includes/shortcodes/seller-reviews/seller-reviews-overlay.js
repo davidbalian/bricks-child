@@ -127,45 +127,4 @@ jQuery(document).ready(function($) {
         }
     });
     
-    // Star rating interaction
-    $(document).on('click', '.star-rating-input label', function() {
-        var $label = $(this);
-        var $input = $('#' + $label.attr('for'));
-        var $allInputs = $label.closest('.star-rating-input').find('input[type="radio"]');
-        var $allLabels = $label.closest('.star-rating-input').find('label');
-        
-        // Check the clicked input
-        $input.prop('checked', true);
-        
-        // Update visual state
-        $allLabels.css('color', '#ddd');
-        $input.nextAll('label').addBack($label).css('color', '#ffa500');
-    });
-    
-    // Star rating hover effect
-    $(document).on('mouseenter', '.star-rating-input label', function() {
-        var $label = $(this);
-        var $allLabels = $label.closest('.star-rating-input').find('label');
-        
-        // Reset all stars
-        $allLabels.css('color', '#ddd');
-        
-        // Highlight hovered star and all following stars
-        $label.nextAll('label').addBack().css('color', '#ffa500');
-    });
-    
-    $(document).on('mouseleave', '.star-rating-input', function() {
-        var $container = $(this);
-        var $checkedInput = $container.find('input[type="radio"]:checked');
-        var $allLabels = $container.find('label');
-        
-        // Reset all stars
-        $allLabels.css('color', '#ddd');
-        
-        // Highlight checked stars
-        if ($checkedInput.length) {
-            $checkedInput.nextAll('label').addBack($checkedInput.next('label')).css('color', '#ffa500');
-        }
-    });
-    
 }); 
