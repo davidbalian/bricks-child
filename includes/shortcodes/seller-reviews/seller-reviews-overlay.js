@@ -130,40 +130,45 @@ jQuery(document).ready(function($) {
     // Simple star rating functionality
     $(document).on('click', '.star-rating-input label', function() {
         var $label = $(this);
-        var rating = parseInt($label.attr('for').replace('star', ''));
         var $container = $label.closest('.star-rating-input');
         var $input = $container.find('#' + $label.attr('for'));
+        var rating = parseInt($input.val()); // Get the VALUE, not the ID
         
         // Check the radio button
         $input.prop('checked', true);
         
-        // Clear all stars first
-        $container.find('label').removeClass('active').css('color', '#ddd');
+        console.log('Clicked star with value:', rating); // Debug
         
-        // Highlight stars from LEFT TO RIGHT (star1, star2, star3, etc.)
-        // If clicked star3, highlight star1, star2, star3
-        for (var i = 1; i <= rating; i++) {
-            $container.find('label[for="star' + i + '"]').addClass('active').css('color', '#ffa500');
-        }
+        // Reset all stars to gray
+        $container.find('label').css('color', '#ddd');
+        
+        // Get all labels in DOM order and highlight the first N
+        var $allLabels = $container.find('label');
+        $allLabels.each(function(index) {
+            if (index < rating) { // index is 0-based, so < rating gives us the first N stars
+                $(this).css('color', '#ffa500');
+                console.log('Highlighting star at index:', index); // Debug
+            }
+        });
     });
     
     // Hover effects
     $(document).on('mouseenter', '.star-rating-input label', function() {
         var $label = $(this);
-        var rating = parseInt($label.attr('for').replace('star', ''));
         var $container = $label.closest('.star-rating-input');
+        var $input = $container.find('#' + $label.attr('for'));
+        var rating = parseInt($input.val());
         
-        // Clear all hover effects
-        $container.find('label').removeClass('hover-active').css('color', '');
+        // Reset all stars to gray
+        $container.find('label').css('color', '#ddd');
         
-        // Show preview: highlight from LEFT TO RIGHT up to hovered star
-        for (var i = 1; i <= rating; i++) {
-            $container.find('label[for="star' + i + '"]').css('color', '#ffa500');
-        }
-        // Ensure stars after hovered one are gray
-        for (var i = rating + 1; i <= 5; i++) {
-            $container.find('label[for="star' + i + '"]').css('color', '#ddd');
-        }
+        // Highlight the first N stars based on hovered value
+        var $allLabels = $container.find('label');
+        $allLabels.each(function(index) {
+            if (index < rating) {
+                $(this).css('color', '#ffa500');
+            }
+        });
     });
     
     $(document).on('mouseleave', '.star-rating-input', function() {
@@ -175,10 +180,13 @@ jQuery(document).ready(function($) {
         
         // If there's a checked input, restore its selection
         if ($checkedInput.length > 0) {
-            var checkedRating = parseInt($checkedInput.attr('id').replace('star', ''));
-            for (var i = 1; i <= checkedRating; i++) {
-                $container.find('label[for="star' + i + '"]').css('color', '#ffa500');
-            }
+            var checkedRating = parseInt($checkedInput.val());
+            var $allLabels = $container.find('label');
+            $allLabels.each(function(index) {
+                if (index < checkedRating) {
+                    $(this).css('color', '#ffa500');
+                }
+            });
         }
     });
     
