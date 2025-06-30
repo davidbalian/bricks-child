@@ -102,7 +102,10 @@ function display_reviews_table($status) {
             <?php else: ?>
                 <?php foreach ($reviews as $review): ?>
                     <tr>
-                        <td><?php echo esc_html($review->reviewer_name ?: 'Unknown'); ?></td>
+                        <td>
+                            <strong><?php echo esc_html($review->reviewer_name ?: 'Unknown'); ?></strong><br>
+                            <small style="color: #666;">@<?php echo esc_html($review->reviewer_username ?: 'unknown'); ?></small>
+                        </td>
                         <td><?php echo esc_html($review->seller_name ?: 'Unknown'); ?></td>
                         <td><?php echo str_repeat('★', $review->rating); ?></td>
                         <td><?php echo esc_html($review->comment ?: 'No comment'); ?></td>
