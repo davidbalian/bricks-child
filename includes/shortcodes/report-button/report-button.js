@@ -15,12 +15,25 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     const closeReportModal = document.querySelector('.close-report-modal');
     const cancelReportBtn = document.querySelector('.cancel-report-btn');
     const reportForm = document.getElementById('report-listing-form');
+    
+    // Store original parent and position for restoration
+    let originalParent = null;
+    let originalNextSibling = null;
 
     // Open report modal
     if (reportBtn && reportModal) {
         reportBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
+            
+            // Store original position
+            originalParent = reportModal.parentNode;
+            originalNextSibling = reportModal.nextSibling;
+            
+            // Move modal to body to ensure highest stacking context
+            document.body.appendChild(reportModal);
+            
+            // Show modal
             reportModal.style.display = 'flex';
             document.body.style.overflow = 'hidden'; // Prevent background scrolling
         });
@@ -31,6 +44,16 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         if (reportModal) {
             reportModal.style.display = 'none';
             document.body.style.overflow = 'auto'; // Restore scrolling
+            
+            // Restore modal to original position
+            if (originalParent) {
+                if (originalNextSibling) {
+                    originalParent.insertBefore(reportModal, originalNextSibling);
+                } else {
+                    originalParent.appendChild(reportModal);
+                }
+            }
+            
             // Reset form
             if (reportForm) {
                 reportForm.reset();
