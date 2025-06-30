@@ -116,37 +116,59 @@ class SellerReviewsDatabase {
     }
     
     /**
-     * Get approved reviews for a seller
+     * Get user's display name using WordPress functions
      * 
-     * @param int $seller_id The seller's user ID
-     * @param int $limit Number of reviews to retrieve
-     * @param int $offset Offset for pagination
-     * @return array Array of review objects
+     * @param int $user_id User ID
+     * @return array Array with 'name' and 'username'
+     */
+    private function get_user_display_info($user_id) {
+        $user = get_userdata($user_id);
+        if (!$user) {
+            return array('name' => 'Unknown', 'username' => 'unknown');
+        }
+        
+        $first_name = get_user_meta($user_id, 'first_name', true);
+        $last_name = get_user_meta($user_id, 'last_name', true);
+        
+        // Build the display name
+        $display_name = '';
+        if (!empty($first_name) || !empty($last_name)) {
+            $display_name = trim($first_name . ' ' . $last_name);
+        }
+        
+        // If no first/last name, try display_name, then fall back to username
+        if (empty($display_name)) {
+            $display_name = !empty($user->display_name) && $user->display_name !== $user->user_login 
+                ? $user->display_name 
+                : $user->user_login;
+        }
+        
+        return array(
+            'name' => $display_name,
+            'username' => $user->user_login
+        );
+    }
+    
+    /**
+     * Get reviews for seller (simplified query)
      */
     public function get_seller_reviews($seller_id, $limit = 10, $offset = 0) {
         global $wpdb;
         
         $reviews = $wpdb->get_results($wpdb->prepare(
-            "SELECT r.*, 
-                    u.display_name, 
-                    u.user_login as reviewer_username,
-                    COALESCE(
-                        NULLIF(u.display_name, ''),
-                        CONCAT_WS(' ', 
-                            NULLIF(um_first.meta_value, ''), 
-                            NULLIF(um_last.meta_value, '')
-                        ),
-                        u.user_login
-                    ) as reviewer_name
-             FROM {$this->table_name} r 
-             LEFT JOIN {$wpdb->users} u ON r.reviewer_id = u.ID 
-             LEFT JOIN {$wpdb->usermeta} um_first ON u.ID = um_first.user_id AND um_first.meta_key = 'first_name'
-             LEFT JOIN {$wpdb->usermeta} um_last ON u.ID = um_last.user_id AND um_last.meta_key = 'last_name'
+            "SELECT r.* FROM {$this->table_name} r 
              WHERE r.seller_id = %d AND r.status = 'approved' 
              ORDER BY r.review_date DESC 
              LIMIT %d OFFSET %d",
             $seller_id, $limit, $offset
         ));
+        
+        // Add user info to each review
+        foreach ($reviews as $review) {
+            $user_info = $this->get_user_display_info($review->reviewer_id);
+            $review->reviewer_name = $user_info['name'];
+            $review->reviewer_username = $user_info['username'];
+        }
         
         return $reviews ?: array();
     }
@@ -314,27 +336,22 @@ class SellerReviewsDatabase {
         global $wpdb;
         
         $reviews = $wpdb->get_results($wpdb->prepare(
-            "SELECT r.*, 
-                    u1.display_name as seller_name,
-                    u2.user_login as reviewer_username,
-                    COALESCE(
-                        NULLIF(u2.display_name, ''),
-                        CONCAT_WS(' ', 
-                            NULLIF(um2_first.meta_value, ''), 
-                            NULLIF(um2_last.meta_value, '')
-                        ),
-                        u2.user_login
-                    ) as reviewer_name
-             FROM {$this->table_name} r 
-             LEFT JOIN {$wpdb->users} u1 ON r.seller_id = u1.ID 
-             LEFT JOIN {$wpdb->users} u2 ON r.reviewer_id = u2.ID 
-             LEFT JOIN {$wpdb->usermeta} um2_first ON u2.ID = um2_first.user_id AND um2_first.meta_key = 'first_name'
-             LEFT JOIN {$wpdb->usermeta} um2_last ON u2.ID = um2_last.user_id AND um2_last.meta_key = 'last_name'
+            "SELECT r.* FROM {$this->table_name} r 
              WHERE r.status = 'pending' 
              ORDER BY r.review_date ASC 
              LIMIT %d OFFSET %d",
             $limit, $offset
         ));
+        
+        // Add user info to each review
+        foreach ($reviews as $review) {
+            $seller_info = $this->get_user_display_info($review->seller_id);
+            $reviewer_info = $this->get_user_display_info($review->reviewer_id);
+            
+            $review->seller_name = $seller_info['name'];
+            $review->reviewer_name = $reviewer_info['name'];
+            $review->reviewer_username = $reviewer_info['username'];
+        }
         
         return $reviews ?: array();
     }
@@ -443,53 +460,36 @@ class SellerReviewsDatabase {
         
         if ($status === 'all') {
             $reviews = $wpdb->get_results($wpdb->prepare(
-                "SELECT r.*, 
-                        u1.user_login as reviewer_username,
-                        COALESCE(
-                            NULLIF(u1.display_name, ''),
-                            CONCAT_WS(' ', 
-                                NULLIF(um1_first.meta_value, ''), 
-                                NULLIF(um1_last.meta_value, '')
-                            ),
-                            u1.user_login
-                        ) as reviewer_name,
-                        u1.user_email as reviewer_email,
-                        u2.display_name as seller_name,
-                        u2.user_email as seller_email
-                 FROM {$this->table_name} r 
-                 LEFT JOIN {$wpdb->users} u1 ON r.reviewer_id = u1.ID 
-                 LEFT JOIN {$wpdb->users} u2 ON r.seller_id = u2.ID
-                 LEFT JOIN {$wpdb->usermeta} um1_first ON u1.ID = um1_first.user_id AND um1_first.meta_key = 'first_name'
-                 LEFT JOIN {$wpdb->usermeta} um1_last ON u1.ID = um1_last.user_id AND um1_last.meta_key = 'last_name'
+                "SELECT r.* FROM {$this->table_name} r 
                  ORDER BY r.review_date DESC 
                  LIMIT %d OFFSET %d",
                 $limit, $offset
             ));
         } else {
             $reviews = $wpdb->get_results($wpdb->prepare(
-                "SELECT r.*, 
-                        u1.user_login as reviewer_username,
-                        COALESCE(
-                            NULLIF(u1.display_name, ''),
-                            CONCAT_WS(' ', 
-                                NULLIF(um1_first.meta_value, ''), 
-                                NULLIF(um1_last.meta_value, '')
-                            ),
-                            u1.user_login
-                        ) as reviewer_name,
-                        u1.user_email as reviewer_email,
-                        u2.display_name as seller_name,
-                        u2.user_email as seller_email
-                 FROM {$this->table_name} r 
-                 LEFT JOIN {$wpdb->users} u1 ON r.reviewer_id = u1.ID 
-                 LEFT JOIN {$wpdb->users} u2 ON r.seller_id = u2.ID
-                 LEFT JOIN {$wpdb->usermeta} um1_first ON u1.ID = um1_first.user_id AND um1_first.meta_key = 'first_name'
-                 LEFT JOIN {$wpdb->usermeta} um1_last ON u1.ID = um1_last.user_id AND um1_last.meta_key = 'last_name'
+                "SELECT r.* FROM {$this->table_name} r 
                  WHERE r.status = %s
                  ORDER BY r.review_date DESC 
                  LIMIT %d OFFSET %d",
                 $status, $limit, $offset
             ));
+        }
+        
+        // Add user info to each review
+        foreach ($reviews as $review) {
+            $seller_info = $this->get_user_display_info($review->seller_id);
+            $reviewer_info = $this->get_user_display_info($review->reviewer_id);
+            
+            $review->seller_name = $seller_info['name'];
+            $review->reviewer_name = $reviewer_info['name'];
+            $review->reviewer_username = $reviewer_info['username'];
+            
+            // Get email addresses too
+            $seller_user = get_userdata($review->seller_id);
+            $reviewer_user = get_userdata($review->reviewer_id);
+            
+            $review->seller_email = $seller_user ? $seller_user->user_email : '';
+            $review->reviewer_email = $reviewer_user ? $reviewer_user->user_email : '';
         }
         
         return $reviews ?: array();
