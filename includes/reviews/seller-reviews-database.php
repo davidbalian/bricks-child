@@ -315,14 +315,7 @@ class SellerReviewsDatabase {
         
         $reviews = $wpdb->get_results($wpdb->prepare(
             "SELECT r.*, 
-                    COALESCE(
-                        NULLIF(u1.display_name, ''),
-                        CONCAT_WS(' ', 
-                            NULLIF(um1_first.meta_value, ''), 
-                            NULLIF(um1_last.meta_value, '')
-                        ),
-                        u1.user_login
-                    ) as seller_name,
+                    u1.display_name as seller_name,
                     u2.user_login as reviewer_username,
                     COALESCE(
                         NULLIF(u2.display_name, ''),
@@ -335,8 +328,6 @@ class SellerReviewsDatabase {
              FROM {$this->table_name} r 
              LEFT JOIN {$wpdb->users} u1 ON r.seller_id = u1.ID 
              LEFT JOIN {$wpdb->users} u2 ON r.reviewer_id = u2.ID 
-             LEFT JOIN {$wpdb->usermeta} um1_first ON u1.ID = um1_first.user_id AND um1_first.meta_key = 'first_name'
-             LEFT JOIN {$wpdb->usermeta} um1_last ON u1.ID = um1_last.user_id AND um1_last.meta_key = 'last_name'
              LEFT JOIN {$wpdb->usermeta} um2_first ON u2.ID = um2_first.user_id AND um2_first.meta_key = 'first_name'
              LEFT JOIN {$wpdb->usermeta} um2_last ON u2.ID = um2_last.user_id AND um2_last.meta_key = 'last_name'
              WHERE r.status = 'pending' 
@@ -463,22 +454,13 @@ class SellerReviewsDatabase {
                             u1.user_login
                         ) as reviewer_name,
                         u1.user_email as reviewer_email,
-                        COALESCE(
-                            NULLIF(u2.display_name, ''),
-                            CONCAT_WS(' ', 
-                                NULLIF(um2_first.meta_value, ''), 
-                                NULLIF(um2_last.meta_value, '')
-                            ),
-                            u2.user_login
-                        ) as seller_name,
+                        u2.display_name as seller_name,
                         u2.user_email as seller_email
                  FROM {$this->table_name} r 
                  LEFT JOIN {$wpdb->users} u1 ON r.reviewer_id = u1.ID 
                  LEFT JOIN {$wpdb->users} u2 ON r.seller_id = u2.ID
                  LEFT JOIN {$wpdb->usermeta} um1_first ON u1.ID = um1_first.user_id AND um1_first.meta_key = 'first_name'
                  LEFT JOIN {$wpdb->usermeta} um1_last ON u1.ID = um1_last.user_id AND um1_last.meta_key = 'last_name'
-                 LEFT JOIN {$wpdb->usermeta} um2_first ON u2.ID = um2_first.user_id AND um2_first.meta_key = 'first_name'
-                 LEFT JOIN {$wpdb->usermeta} um2_last ON u2.ID = um2_last.user_id AND um2_last.meta_key = 'last_name'
                  ORDER BY r.review_date DESC 
                  LIMIT %d OFFSET %d",
                 $limit, $offset
@@ -496,22 +478,13 @@ class SellerReviewsDatabase {
                             u1.user_login
                         ) as reviewer_name,
                         u1.user_email as reviewer_email,
-                        COALESCE(
-                            NULLIF(u2.display_name, ''),
-                            CONCAT_WS(' ', 
-                                NULLIF(um2_first.meta_value, ''), 
-                                NULLIF(um2_last.meta_value, '')
-                            ),
-                            u2.user_login
-                        ) as seller_name,
+                        u2.display_name as seller_name,
                         u2.user_email as seller_email
                  FROM {$this->table_name} r 
                  LEFT JOIN {$wpdb->users} u1 ON r.reviewer_id = u1.ID 
                  LEFT JOIN {$wpdb->users} u2 ON r.seller_id = u2.ID
                  LEFT JOIN {$wpdb->usermeta} um1_first ON u1.ID = um1_first.user_id AND um1_first.meta_key = 'first_name'
                  LEFT JOIN {$wpdb->usermeta} um1_last ON u1.ID = um1_last.user_id AND um1_last.meta_key = 'last_name'
-                 LEFT JOIN {$wpdb->usermeta} um2_first ON u2.ID = um2_first.user_id AND um2_first.meta_key = 'first_name'
-                 LEFT JOIN {$wpdb->usermeta} um2_last ON u2.ID = um2_last.user_id AND um2_last.meta_key = 'last_name'
                  WHERE r.status = %s
                  ORDER BY r.review_date DESC 
                  LIMIT %d OFFSET %d",
