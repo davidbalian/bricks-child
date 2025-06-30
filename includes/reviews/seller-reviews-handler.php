@@ -33,9 +33,20 @@ function can_user_leave_review($user_id) {
  * Follows existing AJAX patterns in core/ajax.php
  */
 function handle_submit_seller_review() {
+    // Debug logging
+    error_log('=== SELLER REVIEW DEBUG ===');
+    error_log('POST data: ' . print_r($_POST, true));
+    error_log('Nonce field isset: ' . (isset($_POST['seller_review_nonce']) ? 'YES' : 'NO'));
+    if (isset($_POST['seller_review_nonce'])) {
+        error_log('Nonce value: ' . $_POST['seller_review_nonce']);
+        $nonce_check = wp_verify_nonce($_POST['seller_review_nonce'], 'submit_seller_review_nonce');
+        error_log('Nonce verification result: ' . ($nonce_check ? 'VALID' : 'INVALID'));
+    }
+    error_log('=== END DEBUG ===');
+    
     // Verify nonce for security
     if (!isset($_POST['seller_review_nonce']) || !wp_verify_nonce($_POST['seller_review_nonce'], 'submit_seller_review_nonce')) {
-        wp_send_json_error(array('message' => 'Security check failed'));
+        wp_send_json_error(array('message' => 'Security check failed - check error log for details'));
         return;
     }
     

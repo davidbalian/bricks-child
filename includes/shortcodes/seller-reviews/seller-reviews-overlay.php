@@ -111,7 +111,7 @@ function seller_reviews_overlay_shortcode($atts) {
                 <?php if (get_current_user_id() != $seller_id): ?>
                     <h4>Leave a Review</h4>
                     <form class="seller-review-form" data-seller-id="<?php echo esc_attr($seller_id); ?>">
-                        <?php wp_nonce_field('submit_seller_review', 'seller_review_nonce'); ?>
+                        <?php wp_nonce_field('submit_seller_review_nonce', 'seller_review_nonce'); ?>
                         
                         <div class="form-group">
                             <label>Rating *</label>
