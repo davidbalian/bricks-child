@@ -6,7 +6,7 @@
 jQuery(document).ready(function($) {
     
     // Show overlay when "See all reviews" button is clicked
-    $(document).on('click', '.btn-show-reviews, .btn-toggle-review-form', function(e) {
+    $(document).on('click', '.btn-toggle-review-form', function(e) {
         e.preventDefault();
         
         // Show overlay background first
