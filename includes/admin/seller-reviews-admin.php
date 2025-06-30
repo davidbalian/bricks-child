@@ -127,71 +127,7 @@ function display_reviews_table($status) {
         </tbody>
     </table>
     
-    <script>
-    function approveReview(reviewId) {
-        if (confirm('Approve this review?')) {
-            jQuery.post(ajaxurl, {
-                action: 'approve_seller_review',
-                review_id: reviewId,
-                nonce: '<?php echo wp_create_nonce('admin_review_action_nonce'); ?>'
-            }, function(response) {
-                if (response.success) {
-                    location.reload();
-                } else {
-                    alert('Error: ' + response.data.message);
-                }
-            });
-        }
-    }
-    
-    function rejectReview(reviewId) {
-        if (confirm('Reject this review?')) {
-            jQuery.post(ajaxurl, {
-                action: 'reject_seller_review',
-                review_id: reviewId,
-                nonce: '<?php echo wp_create_nonce('admin_review_action_nonce'); ?>'
-            }, function(response) {
-                if (response.success) {
-                    location.reload();
-                } else {
-                    alert('Error: ' + response.data.message);
-                }
-            });
-        }
-    }
-    
-    function resetToPending(reviewId) {
-        if (confirm('Reset this review to pending status?')) {
-            jQuery.post(ajaxurl, {
-                action: 'reset_seller_review_to_pending',
-                review_id: reviewId,
-                nonce: '<?php echo wp_create_nonce('admin_review_action_nonce'); ?>'
-            }, function(response) {
-                if (response.success) {
-                    location.reload();
-                } else {
-                    alert('Error: ' + response.data.message);
-                }
-            });
-        }
-    }
-    
-    function deleteReview(reviewId) {
-        if (confirm('Are you sure you want to permanently delete this review? This action cannot be undone.')) {
-            jQuery.post(ajaxurl, {
-                action: 'delete_seller_review',
-                review_id: reviewId,
-                nonce: '<?php echo wp_create_nonce('admin_review_action_nonce'); ?>'
-            }, function(response) {
-                if (response.success) {
-                    location.reload();
-                } else {
-                    alert('Error: ' + response.data.message);
-                }
-            });
-        }
-    }
-    </script>
+
     <?php
 }
 
@@ -287,6 +223,20 @@ function enqueue_seller_reviews_admin_assets($hook) {
     
     // Enqueue WordPress admin scripts
     wp_enqueue_script('jquery');
+    
+    // Enqueue the admin JavaScript file
+    wp_enqueue_script(
+        'seller-reviews-admin',
+        get_stylesheet_directory_uri() . '/includes/admin/seller-reviews-admin.js',
+        array('jquery'),
+        '1.0.0',
+        true
+    );
+    
+    // Localize script data (pass nonce to JavaScript)
+    wp_localize_script('seller-reviews-admin', 'sellerReviewsAdmin', array(
+        'nonce' => wp_create_nonce('admin_review_action_nonce')
+    ));
     
     // Add custom admin styles
     wp_add_inline_style('wp-admin', '
