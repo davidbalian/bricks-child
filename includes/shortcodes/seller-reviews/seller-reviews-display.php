@@ -141,9 +141,6 @@ function seller_reviews_display_shortcode($atts) {
                             See all reviews
                         </button>
                     </div>
-                    <div class="seller-review-form" style="display: none;">
-                        <!-- Review form will be loaded here via JavaScript -->
-                    </div>
                 <?php else: ?>
                     <p class="review-notice">You cannot review yourself.</p>
                 <?php endif; ?>

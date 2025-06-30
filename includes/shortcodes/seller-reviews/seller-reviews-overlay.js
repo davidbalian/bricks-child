@@ -19,8 +19,6 @@ jQuery(document).ready(function($) {
         }, 10);
     });
     
-
-    
     // Hide overlay when close button or background is clicked
     $(document).on('click', '.close-overlay, .seller-reviews-overlay', function(e) {
         if (e.target === this) {
