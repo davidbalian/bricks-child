@@ -5,16 +5,29 @@
 
 jQuery(document).ready(function($) {
     
+    // Store original parent and position for restoration
+    var originalParent = null;
+    var originalNextSibling = null;
+    
     // Show overlay when "See all reviews" button is clicked (built-in overlay)
     $(document).on('click', '.btn-toggle-review-form', function(e) {
         e.preventDefault();
         
+        var $overlay = $('.seller-reviews-overlay');
+        
+        // Store original position
+        originalParent = $overlay.parent();
+        originalNextSibling = $overlay.next();
+        
+        // Move overlay to body to ensure highest stacking context
+        $('body').append($overlay);
+        
         // Show overlay background first
-        $('.seller-reviews-overlay').show();
+        $overlay.show();
         
         // Force browser reflow then add animation class
         setTimeout(function() {
-            $('.seller-reviews-overlay').addClass('show');
+            $overlay.addClass('show');
             $('body').addClass('overlay-open').css('overflow', 'hidden');
         }, 10);
     });
@@ -22,12 +35,22 @@ jQuery(document).ready(function($) {
     // Hide overlay when close button or background is clicked
     $(document).on('click', '.close-overlay, .seller-reviews-overlay', function(e) {
         if (e.target === this) {
-            $('.seller-reviews-overlay').removeClass('show');
+            var $overlay = $('.seller-reviews-overlay');
+            $overlay.removeClass('show');
             $('body').removeClass('overlay-open').css('overflow', '');
             
-            // Hide overlay completely after animation
+            // Hide overlay completely after animation and restore position
             setTimeout(function() {
-                $('.seller-reviews-overlay').hide();
+                $overlay.hide();
+                
+                // Restore overlay to original position
+                if (originalParent && originalParent.length) {
+                    if (originalNextSibling && originalNextSibling.length) {
+                        originalNextSibling.before($overlay);
+                    } else {
+                        originalParent.append($overlay);
+                    }
+                }
             }, 400); // Match the CSS transition duration
         }
     });
@@ -40,12 +63,22 @@ jQuery(document).ready(function($) {
     // Close overlay with Escape key
     $(document).on('keydown', function(e) {
         if (e.keyCode === 27 && $('.seller-reviews-overlay').hasClass('show')) {
-            $('.seller-reviews-overlay').removeClass('show');
+            var $overlay = $('.seller-reviews-overlay');
+            $overlay.removeClass('show');
             $('body').removeClass('overlay-open').css('overflow', '');
             
-            // Hide overlay completely after animation
+            // Hide overlay completely after animation and restore position
             setTimeout(function() {
-                $('.seller-reviews-overlay').hide();
+                $overlay.hide();
+                
+                // Restore overlay to original position
+                if (originalParent && originalParent.length) {
+                    if (originalNextSibling && originalNextSibling.length) {
+                        originalNextSibling.before($overlay);
+                    } else {
+                        originalParent.append($overlay);
+                    }
+                }
             }, 400); // Match the CSS transition duration
         }
     });
