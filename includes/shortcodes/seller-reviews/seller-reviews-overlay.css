@@ -195,8 +195,9 @@
     cursor: pointer;
     transition: color 0.2s ease;
     margin: 0;
-    padding: 3px;
+    padding: 1px;
     user-select: none;
+    line-height: 1;
 }
 
 .star-rating-input label:hover {

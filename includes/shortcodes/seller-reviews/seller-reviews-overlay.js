@@ -130,14 +130,14 @@ jQuery(document).ready(function($) {
     // Simple star rating functionality
     $(document).on('click', '.star-rating-input label', function() {
         var $label = $(this);
-        var rating = $label.attr('for').replace('star', '');
+        var rating = parseInt($label.attr('for').replace('star', ''));
         var $container = $label.closest('.star-rating-input');
         var $input = $container.find('#' + $label.attr('for'));
         
         // Check the radio button
         $input.prop('checked', true);
         
-        // Update visual state
+        // Update visual state - highlight from 1 to clicked rating
         $container.find('label').removeClass('active');
         for (var i = 1; i <= rating; i++) {
             $container.find('label[for="star' + i + '"]').addClass('active');
@@ -147,13 +147,17 @@ jQuery(document).ready(function($) {
     // Hover effects
     $(document).on('mouseenter', '.star-rating-input label', function() {
         var $label = $(this);
-        var rating = $label.attr('for').replace('star', '');
+        var rating = parseInt($label.attr('for').replace('star', ''));
         var $container = $label.closest('.star-rating-input');
         
-        // Temporarily highlight up to hovered star
-        $container.find('label').removeClass('hover-active');
+        // Temporarily highlight from 1 to hovered star
+        $container.find('label').removeClass('hover-active').css('color', '');
         for (var i = 1; i <= rating; i++) {
             $container.find('label[for="star' + i + '"]').addClass('hover-active').css('color', '#ffa500');
+        }
+        // Reset stars after hovered one
+        for (var i = rating + 1; i <= 5; i++) {
+            $container.find('label[for="star' + i + '"]').css('color', '#ddd');
         }
     });
     
