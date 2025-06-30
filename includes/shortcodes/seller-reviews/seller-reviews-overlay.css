@@ -365,4 +365,44 @@
     .overlay-reviews-section {
         max-height: 300px;
     }
+}
+
+/* Disabled form elements */
+.seller-review-form .star-rating-input.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.seller-review-form input:disabled,
+.seller-review-form textarea:disabled,
+.seller-review-form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #f5f5f5;
+}
+
+.seller-review-form .star-rating-input.disabled label {
+    cursor: not-allowed;
+    color: #ddd !important;
+}
+
+/* Email verification notice */
+.email-verification-notice {
+    margin: 10px 0 0 0;
+    padding: 8px 12px;
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 4px;
+    color: #856404;
+    font-size: 14px;
+}
+
+.email-verification-notice .verify-email-link {
+    color: #0073aa;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.email-verification-notice .verify-email-link:hover {
+    text-decoration: underline;
 } 

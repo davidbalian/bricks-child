@@ -16,14 +16,20 @@ if (!defined('ABSPATH')) {
 
 /**
  * Check if user can leave reviews
- * Since registration requires phone verification, logged in = verified
+ * Requires both login and verified email
  * 
  * @param int $user_id The user ID to check
  * @return bool Whether user can leave reviews
  */
 function can_user_leave_review($user_id) {
-    // If user is logged in, they already have verified phone number
-    return $user_id && is_user_logged_in();
+    // User must be logged in
+    if (!$user_id || !is_user_logged_in()) {
+        return false;
+    }
+    
+    // User must have verified email
+    $email_verified = get_user_meta($user_id, 'email_verified', true);
+    return $email_verified === '1';
 }
 
 

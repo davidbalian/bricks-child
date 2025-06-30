@@ -109,36 +109,49 @@ function seller_reviews_overlay_shortcode($atts) {
         <div class="overlay-review-form-section">
             <?php if (is_user_logged_in()): ?>
                 <?php if (get_current_user_id() != $seller_id): ?>
+                    <?php 
+                    $current_user_id = get_current_user_id();
+                    $email_verified = get_user_meta($current_user_id, 'email_verified', true);
+                    $can_review = ($email_verified === '1');
+                    ?>
+                    
                     <h4>Leave a Review</h4>
                     <form class="seller-review-form" data-seller-id="<?php echo esc_attr($seller_id); ?>">
                         <?php wp_nonce_field('submit_seller_review_nonce', 'seller_review_nonce'); ?>
                         
                         <div class="form-group">
                             <label>Rating *</label>
-                            <div class="star-rating-input">
-                                <input type="radio" name="rating" value="1" id="star1"><label for="star1">★</label>
-                                <input type="radio" name="rating" value="2" id="star2"><label for="star2">★</label>
-                                <input type="radio" name="rating" value="3" id="star3"><label for="star3">★</label>
-                                <input type="radio" name="rating" value="4" id="star4"><label for="star4">★</label>
-                                <input type="radio" name="rating" value="5" id="star5"><label for="star5">★</label>
+                            <div class="star-rating-input <?php echo !$can_review ? 'disabled' : ''; ?>">
+                                <input type="radio" name="rating" value="1" id="star1" <?php echo !$can_review ? 'disabled' : ''; ?>><label for="star1">★</label>
+                                <input type="radio" name="rating" value="2" id="star2" <?php echo !$can_review ? 'disabled' : ''; ?>><label for="star2">★</label>
+                                <input type="radio" name="rating" value="3" id="star3" <?php echo !$can_review ? 'disabled' : ''; ?>><label for="star3">★</label>
+                                <input type="radio" name="rating" value="4" id="star4" <?php echo !$can_review ? 'disabled' : ''; ?>><label for="star4">★</label>
+                                <input type="radio" name="rating" value="5" id="star5" <?php echo !$can_review ? 'disabled' : ''; ?>><label for="star5">★</label>
                             </div>
                         </div>
                         
                         <div class="form-group">
                             <label for="review-comment">Your Review (optional)</label>
-                            <textarea id="review-comment" name="comment" placeholder="Share your experience with this seller..." maxlength="140"></textarea>
+                            <textarea id="review-comment" name="comment" placeholder="Share your experience with this seller..." maxlength="140" <?php echo !$can_review ? 'disabled' : ''; ?>></textarea>
                             <small>140 characters maximum</small>
                         </div>
                         
                         <div class="form-group">
                             <label class="checkbox-label">
-                                <input type="checkbox" name="contacted_seller" value="1">
+                                <input type="checkbox" name="contacted_seller" value="1" <?php echo !$can_review ? 'disabled' : ''; ?>>
                                 I contacted this seller
                             </label>
                         </div>
                         
                         <div class="form-actions">
-                            <button type="submit" class="btn-submit-review">Submit Review</button>
+                            <button type="submit" class="btn-submit-review" <?php echo !$can_review ? 'disabled' : ''; ?>>Submit Review</button>
+                            
+                            <?php if (!$can_review): ?>
+                                <p class="email-verification-notice">
+                                    <a href="<?php echo home_url('/my-account'); ?>" class="verify-email-link">Verify your email</a> to leave a review.
+                                </p>
+                            <?php endif; ?>
+                            
                             <div class="form-messages"></div>
                         </div>
                     </form>

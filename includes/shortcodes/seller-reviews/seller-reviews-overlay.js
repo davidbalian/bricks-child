@@ -50,7 +50,7 @@ jQuery(document).ready(function($) {
         }
     });
     
-    // Handle review form submission
+        // Handle review form submission
     $(document).on('submit', '.seller-review-form', function(e) {
         e.preventDefault();
         
@@ -58,14 +58,20 @@ jQuery(document).ready(function($) {
         var $button = $form.find('.btn-submit-review');
         var $messages = $form.find('.form-messages');
         
+        // Check if form is disabled (user email not verified)
+        if ($button.is(':disabled')) {
+            $messages.html('<div class="error">Please verify your email before leaving a review.</div>');
+            return;
+        }
+        
         // Get form data
         var sellerId = $form.data('seller-id');
         var rating = $form.find('input[name="rating"]:checked').val();
         var comment = $form.find('textarea[name="comment"]').val();
         var contactedSeller = $form.find('input[name="contacted_seller"]').is(':checked') ? 1 : 0;
         var nonce = $form.find('input[name="seller_review_nonce"]').val();
-        
 
+        
         
         // Validate rating
         if (!rating) {
