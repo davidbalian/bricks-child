@@ -127,4 +127,40 @@ jQuery(document).ready(function($) {
         }
     });
     
+    // Simple star rating functionality
+    $(document).on('click', '.star-rating-input label', function() {
+        var $label = $(this);
+        var rating = $label.attr('for').replace('star', '');
+        var $container = $label.closest('.star-rating-input');
+        var $input = $container.find('#' + $label.attr('for'));
+        
+        // Check the radio button
+        $input.prop('checked', true);
+        
+        // Update visual state
+        $container.find('label').removeClass('active');
+        for (var i = 1; i <= rating; i++) {
+            $container.find('label[for="star' + i + '"]').addClass('active');
+        }
+    });
+    
+    // Hover effects
+    $(document).on('mouseenter', '.star-rating-input label', function() {
+        var $label = $(this);
+        var rating = $label.attr('for').replace('star', '');
+        var $container = $label.closest('.star-rating-input');
+        
+        // Temporarily highlight up to hovered star
+        $container.find('label').removeClass('hover-active');
+        for (var i = 1; i <= rating; i++) {
+            $container.find('label[for="star' + i + '"]').addClass('hover-active').css('color', '#ffa500');
+        }
+    });
+    
+    $(document).on('mouseleave', '.star-rating-input', function() {
+        var $container = $(this);
+        // Remove hover effect and restore active state
+        $container.find('label').removeClass('hover-active').css('color', '');
+    });
+    
 }); 

@@ -180,9 +180,8 @@
 /* Star Rating Input */
 .star-rating-input {
     display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-end;
-    gap: 5px;
+    flex-direction: row;
+    gap: 3px;
     margin-bottom: 10px;
 }
 
@@ -196,16 +195,15 @@
     cursor: pointer;
     transition: color 0.2s ease;
     margin: 0;
-    padding: 5px;
+    padding: 3px;
     user-select: none;
 }
 
-.star-rating-input label:hover,
-.star-rating-input label:hover ~ label {
+.star-rating-input label:hover {
     color: #ffa500;
 }
 
-.star-rating-input input:checked ~ label {
+.star-rating-input label.active {
     color: #ffa500;
 }
 
