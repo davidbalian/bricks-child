@@ -240,7 +240,21 @@ class SellerReviewsDatabase {
             array('%d')
         );
         
-        return $result !== false;
+        if ($result !== false) {
+            // Update the seller's rating cache since this review is no longer approved
+            $review = $wpdb->get_row($wpdb->prepare(
+                "SELECT seller_id FROM {$this->table_name} WHERE id = %d",
+                $review_id
+            ));
+            
+            if ($review) {
+                $this->update_seller_rating_cache($review->seller_id);
+            }
+            
+            return true;
+        }
+        
+        return false;
     }
     
     /**
