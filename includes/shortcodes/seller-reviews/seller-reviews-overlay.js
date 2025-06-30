@@ -137,10 +137,13 @@ jQuery(document).ready(function($) {
         // Check the radio button
         $input.prop('checked', true);
         
-        // Update visual state - highlight from 1 to clicked rating
-        $container.find('label').removeClass('active');
+        // Clear all stars first
+        $container.find('label').removeClass('active').css('color', '#ddd');
+        
+        // Highlight stars from LEFT TO RIGHT (star1, star2, star3, etc.)
+        // If clicked star3, highlight star1, star2, star3
         for (var i = 1; i <= rating; i++) {
-            $container.find('label[for="star' + i + '"]').addClass('active');
+            $container.find('label[for="star' + i + '"]').addClass('active').css('color', '#ffa500');
         }
     });
     
@@ -150,12 +153,14 @@ jQuery(document).ready(function($) {
         var rating = parseInt($label.attr('for').replace('star', ''));
         var $container = $label.closest('.star-rating-input');
         
-        // Temporarily highlight from 1 to hovered star
+        // Clear all hover effects
         $container.find('label').removeClass('hover-active').css('color', '');
+        
+        // Show preview: highlight from LEFT TO RIGHT up to hovered star
         for (var i = 1; i <= rating; i++) {
-            $container.find('label[for="star' + i + '"]').addClass('hover-active').css('color', '#ffa500');
+            $container.find('label[for="star' + i + '"]').css('color', '#ffa500');
         }
-        // Reset stars after hovered one
+        // Ensure stars after hovered one are gray
         for (var i = rating + 1; i <= 5; i++) {
             $container.find('label[for="star' + i + '"]').css('color', '#ddd');
         }
@@ -163,8 +168,18 @@ jQuery(document).ready(function($) {
     
     $(document).on('mouseleave', '.star-rating-input', function() {
         var $container = $(this);
-        // Remove hover effect and restore active state
-        $container.find('label').removeClass('hover-active').css('color', '');
+        var $checkedInput = $container.find('input[type="radio"]:checked');
+        
+        // Reset all colors first
+        $container.find('label').css('color', '#ddd');
+        
+        // If there's a checked input, restore its selection
+        if ($checkedInput.length > 0) {
+            var checkedRating = parseInt($checkedInput.attr('id').replace('star', ''));
+            for (var i = 1; i <= checkedRating; i++) {
+                $container.find('label[for="star' + i + '"]').css('color', '#ffa500');
+            }
+        }
     });
     
 }); 
