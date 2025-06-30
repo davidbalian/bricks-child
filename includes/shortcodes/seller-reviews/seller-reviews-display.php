@@ -53,6 +53,7 @@ function seller_reviews_display_shortcode($atts) {
         'show_reviews' => 'true', // Show individual reviews or just stars
         'limit' => '5', // Number of reviews to show
         'show_form' => 'true', // Show review submission form
+        'show_overlay' => 'true', // Show built-in overlay (set to false when using standalone overlay)
     ), $atts, 'seller_reviews');
     
     // Get seller ID from attributes or current post author
@@ -157,6 +158,7 @@ function seller_reviews_display_shortcode($atts) {
         
     </div>
     
+    <?php if ($atts['show_overlay'] === 'true'): ?>
     <!-- Seller Reviews Overlay (hidden by default) -->
     <div class="seller-reviews-overlay" style="display: none;">
         <div class="seller-reviews-overlay-content" data-seller-id="<?php echo esc_attr($seller_id); ?>">
@@ -277,6 +279,7 @@ function seller_reviews_display_shortcode($atts) {
             
         </div>
     </div>
+    <?php endif; ?>
     
     <?php
     return ob_get_clean();
