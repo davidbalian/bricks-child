@@ -137,8 +137,6 @@ jQuery(document).ready(function($) {
         // Check the radio button
         $input.prop('checked', true);
         
-        console.log('Clicked star with value:', rating); // Debug
-        
         // Reset all stars to gray
         $container.find('label').css('color', '#ddd');
         
@@ -147,7 +145,6 @@ jQuery(document).ready(function($) {
         $allLabels.each(function(index) {
             if (index < rating) { // index is 0-based, so < rating gives us the first N stars
                 $(this).css('color', '#ffa500');
-                console.log('Highlighting star at index:', index); // Debug
             }
         });
     });
