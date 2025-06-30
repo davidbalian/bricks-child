@@ -17,6 +17,30 @@ if (!defined('ABSPATH')) {
  * @return string HTML output
  */
 function seller_reviews_overlay_shortcode($atts) {
+    // Enqueue standalone overlay assets
+    if (!wp_style_is('seller-reviews-standalone-overlay', 'enqueued')) {
+        $theme_dir = get_stylesheet_directory_uri();
+        
+        wp_enqueue_style('seller-reviews-standalone-overlay', 
+            $theme_dir . '/includes/shortcodes/seller-reviews/seller-reviews-overlay.css',
+            array(),
+            filemtime(get_stylesheet_directory() . '/includes/shortcodes/seller-reviews/seller-reviews-overlay.css')
+        );
+        
+        wp_enqueue_script('seller-reviews-standalone-overlay', 
+            $theme_dir . '/includes/shortcodes/seller-reviews/seller-reviews-overlay.js',
+            array('jquery'),
+            filemtime(get_stylesheet_directory() . '/includes/shortcodes/seller-reviews/seller-reviews-overlay.js'),
+            true
+        );
+        
+        // Localize script with AJAX URL and nonce
+        wp_localize_script('seller-reviews-standalone-overlay', 'sellerReviewsData', array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('submit_seller_review_nonce'),
+        ));
+    }
+    
     // Parse shortcode attributes
     $atts = shortcode_atts(array(
         'seller_id' => '',
@@ -54,7 +78,9 @@ function seller_reviews_overlay_shortcode($atts) {
     // Start output buffering
     ob_start();
     ?>
-    <div class="seller-reviews-overlay-content" data-seller-id="<?php echo esc_attr($seller_id); ?>">
+    <!-- Standalone Seller Reviews Overlay (hidden by default) -->
+    <div class="seller-reviews-standalone-overlay" style="display: none;">
+        <div class="seller-reviews-overlay-content" data-seller-id="<?php echo esc_attr($seller_id); ?>">
         
         <!-- Overlay Header -->
         <div class="overlay-header">
@@ -182,10 +208,11 @@ function seller_reviews_overlay_shortcode($atts) {
         </div>
         
     </div>
+    </div>
     
     <?php
     return ob_get_clean();
 }
 
-// Register the shortcode
-add_shortcode('seller_reviews_overlay', 'seller_reviews_overlay_shortcode'); 
+// DISABLED: This shortcode is no longer used - functionality integrated into seller_reviews shortcode
+// add_shortcode('seller_reviews_overlay', 'seller_reviews_overlay_shortcode'); 

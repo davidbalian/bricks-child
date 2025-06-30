@@ -17,16 +17,24 @@ if (!defined('ABSPATH')) {
  * @return string HTML output
  */
 function seller_reviews_display_shortcode($atts) {
-    // Enqueue CSS and JS only when shortcode is actually used
+    // Parse shortcode attributes first
+    $atts = shortcode_atts(array(
+        'seller_id' => '',
+        'show_reviews' => 'true', // Show individual reviews or just stars
+        'limit' => '5', // Number of reviews to show
+        'show_form' => 'true', // Show review submission form
+    ), $atts, 'seller_reviews');
+    
+    // Enqueue CSS and JS for seller reviews
     if (!wp_style_is('seller-reviews-display', 'enqueued')) {
         $theme_dir = get_stylesheet_directory_uri();
+        
         wp_enqueue_style('seller-reviews-display', 
             $theme_dir . '/includes/shortcodes/seller-reviews/seller-reviews-display.css',
             array(),
             filemtime(get_stylesheet_directory() . '/includes/shortcodes/seller-reviews/seller-reviews-display.css')
         );
         
-        // Also enqueue overlay CSS and JS since the button will open overlay
         wp_enqueue_style('seller-reviews-overlay', 
             $theme_dir . '/includes/shortcodes/seller-reviews/seller-reviews-overlay.css',
             array(),
@@ -46,15 +54,6 @@ function seller_reviews_display_shortcode($atts) {
             'nonce' => wp_create_nonce('submit_seller_review_nonce'),
         ));
     }
-    
-    // Parse shortcode attributes
-    $atts = shortcode_atts(array(
-        'seller_id' => '',
-        'show_reviews' => 'true', // Show individual reviews or just stars
-        'limit' => '5', // Number of reviews to show
-        'show_form' => 'true', // Show review submission form
-        'show_overlay' => 'true', // Show built-in overlay (set to false when using standalone overlay)
-    ), $atts, 'seller_reviews');
     
     // Get seller ID from attributes or current post author
     if (!empty($atts['seller_id'])) {
@@ -158,7 +157,6 @@ function seller_reviews_display_shortcode($atts) {
         
     </div>
     
-    <?php if ($atts['show_overlay'] === 'true'): ?>
     <!-- Seller Reviews Overlay (hidden by default) -->
     <div class="seller-reviews-overlay" style="display: none;">
         <div class="seller-reviews-overlay-content" data-seller-id="<?php echo esc_attr($seller_id); ?>">
@@ -229,36 +227,49 @@ function seller_reviews_display_shortcode($atts) {
             <div class="overlay-review-form-section">
                 <?php if (is_user_logged_in()): ?>
                     <?php if (get_current_user_id() != $seller_id): ?>
+                        <?php 
+                        $current_user_id = get_current_user_id();
+                        $email_verified = get_user_meta($current_user_id, 'email_verified', true);
+                        $can_review = ($email_verified === '1');
+                        ?>
+                        
                         <h4>Leave a Review</h4>
                         <form class="seller-review-form" data-seller-id="<?php echo esc_attr($seller_id); ?>">
-                            <?php wp_nonce_field('submit_seller_review', 'seller_review_nonce'); ?>
+                            <?php wp_nonce_field('submit_seller_review_nonce', 'seller_review_nonce'); ?>
                             
                             <div class="form-group">
                                 <label>Rating *</label>
-                                <div class="star-rating-input">
-                                    <input type="radio" name="rating" value="1" id="star1"><label for="star1">★</label>
-                                    <input type="radio" name="rating" value="2" id="star2"><label for="star2">★</label>
-                                    <input type="radio" name="rating" value="3" id="star3"><label for="star3">★</label>
-                                    <input type="radio" name="rating" value="4" id="star4"><label for="star4">★</label>
-                                    <input type="radio" name="rating" value="5" id="star5"><label for="star5">★</label>
+                                <div class="star-rating-input <?php echo !$can_review ? 'disabled' : ''; ?>">
+                                    <input type="radio" name="rating" value="1" id="star1" <?php echo !$can_review ? 'disabled' : ''; ?>><label for="star1">★</label>
+                                    <input type="radio" name="rating" value="2" id="star2" <?php echo !$can_review ? 'disabled' : ''; ?>><label for="star2">★</label>
+                                    <input type="radio" name="rating" value="3" id="star3" <?php echo !$can_review ? 'disabled' : ''; ?>><label for="star3">★</label>
+                                    <input type="radio" name="rating" value="4" id="star4" <?php echo !$can_review ? 'disabled' : ''; ?>><label for="star4">★</label>
+                                    <input type="radio" name="rating" value="5" id="star5" <?php echo !$can_review ? 'disabled' : ''; ?>><label for="star5">★</label>
                                 </div>
                             </div>
                             
                             <div class="form-group">
                                 <label for="review-comment">Your Review (optional)</label>
-                                <textarea id="review-comment" name="comment" placeholder="Share your experience with this seller..." maxlength="140"></textarea>
-                                <small>140 characters remaining</small>
+                                <textarea id="review-comment" name="comment" placeholder="Share your experience with this seller..." maxlength="140" <?php echo !$can_review ? 'disabled' : ''; ?>></textarea>
+                                <small>140 characters maximum</small>
                             </div>
                             
                             <div class="form-group">
                                 <label class="checkbox-label">
-                                    <input type="checkbox" name="contacted_seller" value="1">
+                                    <input type="checkbox" name="contacted_seller" value="1" <?php echo !$can_review ? 'disabled' : ''; ?>>
                                     I contacted this seller
                                 </label>
                             </div>
                             
                             <div class="form-actions">
-                                <button type="submit" class="btn-submit-review">Submit Review</button>
+                                <button type="submit" class="btn-submit-review" <?php echo !$can_review ? 'disabled' : ''; ?>>Submit Review</button>
+                                
+                                <?php if (!$can_review): ?>
+                                    <p class="email-verification-notice">
+                                        <a href="<?php echo home_url('/my-account'); ?>" class="verify-email-link">Verify your email</a> to leave a review.
+                                    </p>
+                                <?php endif; ?>
+                                
                                 <div class="form-messages"></div>
                             </div>
                         </form>
@@ -279,7 +290,6 @@ function seller_reviews_display_shortcode($atts) {
             
         </div>
     </div>
-    <?php endif; ?>
     
     <?php
     return ob_get_clean();
