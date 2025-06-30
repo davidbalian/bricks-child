@@ -23,7 +23,18 @@ function seller_reviews_overlay_shortcode($atts) {
     ), $atts, 'seller_reviews_overlay');
     
     // Get seller ID from attributes or current post author
-    $seller_id = !empty($atts['seller_id']) ? intval($atts['seller_id']) : get_the_author_meta('ID');
+    if (!empty($atts['seller_id'])) {
+        $seller_id = intval($atts['seller_id']);
+    } else {
+        // Try to get the post author (seller) from the current post
+        global $post;
+        if ($post && $post->post_author) {
+            $seller_id = intval($post->post_author);
+        } else {
+            // Fallback to get_the_author_meta if global $post is not available
+            $seller_id = get_the_author_meta('ID');
+        }
+    }
     
     if (empty($seller_id)) {
         return '<p>No seller specified.</p>';
