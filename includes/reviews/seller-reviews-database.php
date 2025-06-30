@@ -349,6 +349,7 @@ class SellerReviewsDatabase {
             $reviewer_info = $this->get_user_display_info($review->reviewer_id);
             
             $review->seller_name = $seller_info['name'];
+            $review->seller_username = $seller_info['username'];
             $review->reviewer_name = $reviewer_info['name'];
             $review->reviewer_username = $reviewer_info['username'];
         }
@@ -481,6 +482,7 @@ class SellerReviewsDatabase {
             $reviewer_info = $this->get_user_display_info($review->reviewer_id);
             
             $review->seller_name = $seller_info['name'];
+            $review->seller_username = $seller_info['username'];
             $review->reviewer_name = $reviewer_info['name'];
             $review->reviewer_username = $reviewer_info['username'];
             
