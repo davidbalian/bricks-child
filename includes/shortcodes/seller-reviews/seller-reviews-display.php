@@ -134,21 +134,12 @@ function seller_reviews_display_shortcode($atts) {
         <?php if ($atts['show_form'] === 'true'): ?>
         <!-- Review Submission Form Section -->
         <div class="seller-review-form-container">
-            <?php if (is_user_logged_in()): ?>
-                <?php if (get_current_user_id() != $seller_id): ?>
-                    <div class="review-form-toggle">
-                        <button type="button" class="btn-toggle-review-form">
-                            See all reviews
-                        </button>
-                    </div>
-                <?php else: ?>
-                    <p class="review-notice">You cannot review yourself.</p>
-                <?php endif; ?>
-            <?php else: ?>
-                <p class="review-notice">
-                    <a href="<?php echo wp_login_url(get_permalink()); ?>">Login</a> to leave a review.
-                </p>
-            <?php endif; ?>
+            <!-- Always show "See all reviews" button to everyone -->
+            <div class="review-form-toggle">
+                <button type="button" class="btn-toggle-review-form">
+                    See all reviews
+                </button>
+            </div>
         </div>
         <?php endif; ?>
         
