@@ -337,16 +337,16 @@
     .overlay-header {
         padding: 20px;
         border-radius: 0;
+        flex-shrink: 0; /* Don't let header shrink */
     }
     
     .overlay-header h3 {
         font-size: 20px;
     }
     
-    .overlay-rating-summary,
-    .overlay-reviews-section,
-    .overlay-review-form-section {
-        padding: 20px;
+    .overlay-rating-summary {
+        padding: 15px 20px;
+        flex-shrink: 0; /* Don't let rating summary shrink */
     }
     
     .rating-display .stars-container {
@@ -357,13 +357,42 @@
         font-size: 16px;
     }
     
+    /* Give reviews section most of the available space */
+    .overlay-reviews-section {
+        padding: 20px;
+        flex: 1; /* Take up available space */
+        min-height: 0; /* Allow flexbox to shrink if needed */
+        max-height: none; /* Remove height restriction! */
+    }
+    
+    /* Limit form section to reasonable height */
+    .overlay-review-form-section {
+        padding: 20px;
+        flex-shrink: 0; /* Don't let form shrink */
+        max-height: 40vh; /* Maximum 40% of viewport height */
+        overflow-y: auto; /* Allow scrolling if form is too tall */
+        margin-top: 0; /* Remove auto margin */
+    }
+    
     .star-rating-input label {
         font-size: 26px;
         padding: 3px;
     }
     
-    .overlay-reviews-section {
-        max-height: 300px;
+    /* Make form elements more compact on mobile */
+    .seller-review-form textarea {
+        min-height: 80px; /* Smaller textarea on mobile */
+    }
+    
+    .form-actions {
+        margin-top: 20px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn-submit-review {
+        width: 100%;
+        padding: 14px 24px;
     }
 }
 
