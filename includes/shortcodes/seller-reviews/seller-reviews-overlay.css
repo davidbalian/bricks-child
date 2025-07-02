@@ -216,7 +216,7 @@
     border: 2px solid #e5e5e5;
     border-radius: 8px;
     font-family: inherit;
-    font-size: 14px;
+    font-size: 16px; /* Prevent mobile zoom - must be 16px or larger */
     resize: vertical;
     transition: border-color 0.2s ease;
 }
@@ -393,6 +393,42 @@
     .btn-submit-review {
         width: 100%;
         padding: 14px 24px;
+    }
+}
+
+/* Additional mobile optimizations to prevent zoom and improve keyboard handling */
+@media (max-width: 768px) {
+    /* Ensure all form inputs have 16px+ font-size to prevent iOS zoom */
+    .seller-review-form input,
+    .seller-review-form textarea,
+    .seller-review-form select {
+        font-size: 16px !important;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+    
+    /* Better mobile focus handling */
+    .seller-review-form textarea:focus {
+        /* Prevent the form from jumping around on focus */
+        transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+    }
+    
+    /* Ensure overlay stays properly positioned when keyboard opens */
+    .seller-reviews-overlay-content {
+        /* Use fixed positioning that adapts to keyboard */
+        position: fixed;
+        height: 100vh;
+        height: 100dvh; /* Use dynamic viewport height if supported */
+    }
+    
+    /* When keyboard is open, allow scrolling within the overlay */
+    @supports (height: 100dvh) {
+        .seller-reviews-overlay-content {
+            height: 100dvh;
+        }
     }
 }
 
