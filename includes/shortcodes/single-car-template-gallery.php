@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Generates single car template gallery shortcode.
- * Uses Slick slider with main slider and thumbnail navigation.
+ * Uses Swiper slider with main slider and thumbnail navigation.
  *
  * @param array $atts Shortcode attributes
  * @return string HTML for the gallery
