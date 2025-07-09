@@ -107,8 +107,9 @@ function report_button_shortcode( $atts ) {
  * Enqueue the report button scripts and styles
  */
 function enqueue_report_button_assets() {
-    // Only enqueue on pages that might have the shortcode
-    if (is_singular('car') || is_page() || is_archive() || has_shortcode(get_post()->post_content ?? '', 'report_button')) {
+    // Load conditionally only when shortcode is present
+    global $post;
+    if (is_singular() && is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'report_button')) {
         
         // Enqueue the JavaScript
         wp_enqueue_script(
@@ -119,7 +120,7 @@ function enqueue_report_button_assets() {
             true
         );
         
-        // Removed CSS enqueue for report-button.css (file does not exist)
+        // Note: No CSS file exists for report button
         
         // Localize script with AJAX data for report submission
         wp_localize_script('report-button-js', 'reportButtonData', array(

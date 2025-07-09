@@ -56,9 +56,9 @@ function bricks_child_enqueue_styles() {
     }
 
     // Enqueue account dropdown script for logged-in users
-    if ( is_user_logged_in() ) {
-        wp_enqueue_script( 'bricks-child-account-dropdown-js', get_stylesheet_directory_uri() . '/includes/user-account/account-dropdown.js', array(), filemtime( get_stylesheet_directory() . '/includes/user-account/account-dropdown.js' ), true ); // true for loading in footer
-    }
+    // if ( is_user_logged_in() ) {
+    //     wp_enqueue_script( 'bricks-child-account-dropdown-js', get_stylesheet_directory_uri() . '/includes/user-account/account-dropdown.js', array(), filemtime( get_stylesheet_directory() . '/includes/user-account/account-dropdown.js' ), true ); // true for loading in footer
+    // }
 
     // Enqueue Car Listings script and localize data if relevant shortcodes might be present
     global $post;

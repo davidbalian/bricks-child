@@ -45,8 +45,9 @@ function share_button_shortcode( $atts ) {
  * Enqueue the share button scripts and styles
  */
 function enqueue_share_button_assets() {
-    // Only enqueue on pages that might have the shortcode
-    if (is_singular('car') || is_page() || is_archive() || has_shortcode(get_post()->post_content ?? '', 'share_button')) {
+    // Load conditionally only when shortcode is present
+    global $post;
+    if (is_singular() && is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'share_button')) {
         
         // Enqueue the JavaScript
         wp_enqueue_script(
@@ -57,7 +58,7 @@ function enqueue_share_button_assets() {
             true
         );
         
-        // Removed CSS enqueue for share-button.css (file does not exist)
+        // Note: No CSS file exists for share button
     }
 }
 add_action('wp_enqueue_scripts', 'enqueue_share_button_assets'); 
