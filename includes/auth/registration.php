@@ -88,8 +88,11 @@ function custom_handle_registration() {
         if ( empty( $phone ) ) { // Should not happen if flow is correct, but check anyway
             $errors->add( 'required', esc_html__( 'Phone number is missing.', 'bricks-child' ) );
         }
-        if ( strlen( $password ) < 6 ) {
-            $errors->add( 'password_length', esc_html__( 'Password must be at least 6 characters long.', 'bricks-child' ) );
+        if ( strlen( $password ) < 8 ) {
+            $errors->add( 'password_length', esc_html__( 'Password must be at least 8 characters long.', 'bricks-child' ) );
+        }
+        if ( strlen( $password ) > 25 ) {
+            $errors->add( 'password_length', esc_html__( 'Password must be no more than 25 characters long.', 'bricks-child' ) );
         }
         // Add password confirmation check
         if ( $password !== $password_confirm ) {

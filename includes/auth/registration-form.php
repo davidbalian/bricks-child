@@ -91,6 +91,13 @@
         // Function to display messages
         function showMessage(message, isError = false) {
             messagesDiv.html('<p class="' + (isError ? 'error' : 'success') + '">' + message + '</p>').show();
+            
+            // Scroll to top when there's an error so user can see the message
+            if (isError) {
+                $('html, body').animate({
+                    scrollTop: 0
+                }, 500); // Smooth scroll animation over 500ms
+            }
         }
 
         // --- Step 1: Send OTP --- 
@@ -232,11 +239,11 @@
         const requirementsDiv = $('#password-remaining-reqs'); // Target the div
 
         const requirements = {
-            length: { text: '<?php esc_html_e( "8-16 characters", "bricks-child" ); ?>', regex: /.{8,16}/ },
+            length: { text: '<?php esc_html_e( "8-25 characters", "bricks-child" ); ?>', regex: /.{8,25}/ },
             lowercase: { text: '<?php esc_html_e( "At least one lowercase letter", "bricks-child" ); ?>', regex: /[a-z]/ },
             uppercase: { text: '<?php esc_html_e( "At least one uppercase letter", "bricks-child" ); ?>', regex: /[A-Z]/ },
             number: { text: '<?php esc_html_e( "At least one number", "bricks-child" ); ?>', regex: /[0-9]/ },
-            symbol: { text: '<?php esc_html_e( "At least one symbol (e.g., !@#$%^&*)", "bricks-child" ); ?>', regex: /[!@#$%^&*(),.?":{}|<>\-_=+;\[\]~`]/ }
+            symbol: { text: '<?php esc_html_e( "At least one symbol (iOS: hyphen, Regular: !@#$%^&*)", "bricks-child" ); ?>', regex: /[!@#$%^&*(),.?":{}|<>\-_=+;\[\]~`]/ }
         };
 
         // Function to update password strength UI
@@ -315,9 +322,9 @@
                 const lastName = $('#reg_last_name').val();
                 let errors = []; // Array to hold validation errors
 
-                // Password Length Check (8-16 characters)
-                if (password.length < 8 || password.length > 16) {
-                    errors.push('Password must be between 8 and 16 characters long.');
+                // Password Length Check (8-25 characters to support iOS generated passwords)
+                if (password.length < 8 || password.length > 25) {
+                    errors.push('Password must be between 8 and 25 characters long.');
                 }
 
                 // Password Complexity Checks
@@ -339,7 +346,7 @@
                 }
 
                 // Password match check (only if length/complexity seem okay, otherwise redundant)
-                if (password.length >= 8 && password.length <= 16 && password !== confirmPassword) {
+                if (password.length >= 8 && password.length <= 25 && password !== confirmPassword) {
                     errors.push('Passwords do not match. Please re-enter.');
                 }
 
