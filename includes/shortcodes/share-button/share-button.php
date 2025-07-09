@@ -45,9 +45,8 @@ function share_button_shortcode( $atts ) {
  * Enqueue the share button scripts and styles
  */
 function enqueue_share_button_assets() {
-    // Load conditionally only when shortcode is present
-    global $post;
-    if (is_singular() && is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'share_button')) {
+    // Load on pages where share buttons are likely to be used (Bricks compatible)
+    if (is_singular('car') || is_page()) {
         
         // Enqueue the JavaScript
         wp_enqueue_script(

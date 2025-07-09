@@ -63,9 +63,8 @@ function favorite_button_shortcode( $atts ) {
  * Enqueue the shared favorite button scripts and styles
  */
 function enqueue_favorite_button_assets() {
-    // Load conditionally only when shortcode is present
-    global $post;
-    if (is_singular() && is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'favorite_button')) {
+    // Load on pages where favorite buttons are likely to be used (Bricks compatible)
+    if (is_singular('car') || is_page() || is_archive()) {
         
         // Enqueue the CSS
         wp_enqueue_style(
