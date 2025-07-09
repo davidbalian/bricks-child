@@ -50,8 +50,10 @@ function bricks_child_enqueue_styles() {
         wp_enqueue_style( 'bricks-child-my-listings-css', get_stylesheet_directory_uri() . '/includes/user-account/my-listings/my-listings.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/includes/user-account/my-listings/my-listings.css' ), 'all' );
     }
 
-    // Enqueue my-account styles
-    wp_enqueue_style( 'bricks-child-my-account-css', get_stylesheet_directory_uri() . '/includes/user-account/my-account/my-account.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/includes/user-account/my-account/my-account.css' ), 'all' );
+    // Enqueue my-account styles only on my-account page
+    if (is_page('my-account')) {
+        wp_enqueue_style( 'bricks-child-my-account-css', get_stylesheet_directory_uri() . '/includes/user-account/my-account/my-account.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/includes/user-account/my-account/my-account.css' ), 'all' );
+    }
 
     // Enqueue account dropdown script for logged-in users
     if ( is_user_logged_in() ) {
