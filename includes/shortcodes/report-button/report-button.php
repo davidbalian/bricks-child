@@ -119,13 +119,7 @@ function enqueue_report_button_assets() {
             true
         );
         
-        // Enqueue the CSS
-        wp_enqueue_style(
-            'report-button-css',
-            get_stylesheet_directory_uri() . '/includes/shortcodes/report-button/report-button.css',
-            array(),
-            '1.0.0'
-        );
+        // Removed CSS enqueue for report-button.css (file does not exist)
         
         // Localize script with AJAX data for report submission
         wp_localize_script('report-button-js', 'reportButtonData', array(
