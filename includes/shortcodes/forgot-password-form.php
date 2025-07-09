@@ -14,54 +14,68 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Enqueue forgot password assets
  */
 function enqueue_forgot_password_assets() {
-    // Enqueue forgot password CSS
-    wp_enqueue_style(
-        'forgot-password-css',
-        get_stylesheet_directory_uri() . '/includes/auth/forgot-password.css',
-        array(),
-        '1.0.0'
-    );
+    global $post;
+    $load_assets = false;
 
-    // Enqueue forgot password JS
-    wp_enqueue_script(
-        'forgot-password-js',
-        get_stylesheet_directory_uri() . '/includes/auth/forgot-password.js',
-        array('jquery'),
-        '1.0.0',
-        true
-    );
-
-    // Enqueue intl-tel-input if not already loaded
-    if (!wp_script_is('intl-tel-input', 'enqueued')) {
-        wp_enqueue_style(
-            'intl-tel-input-css',
-            'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/css/intlTelInput.css',
-            array(),
-            '17.0.13'
-        );
-        wp_enqueue_script(
-            'intl-tel-input-js',
-            'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput.min.js',
-            array('jquery'),
-            '17.0.13',
-            true
-        );
-        wp_enqueue_script(
-            'intl-tel-input-utils',
-            'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js',
-            array('intl-tel-input-js'),
-            '17.0.13',
-            true
-        );
+    // Check if on the forgot-password page (slug 'forgot-password')
+    if (is_page('forgot-password')) {
+        $load_assets = true;
+    }
+    // Check if on a page/post containing the forgot_password_form shortcode
+    elseif (is_singular() && is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'forgot_password_form')) {
+        $load_assets = true;
     }
 
-    // Localize script for AJAX
-    wp_localize_script('forgot-password-js', 'ForgotPasswordAjax', array(
-        'ajax_url' => admin_url('admin-ajax.php'),
-        'send_otp_nonce' => wp_create_nonce('send_forgot_password_otp_nonce'),
-        'verify_otp_nonce' => wp_create_nonce('verify_forgot_password_otp_nonce'),
-        'update_password_nonce' => wp_create_nonce('update_forgot_password_nonce')
-    ));
+    if ($load_assets) {
+        // Enqueue forgot password CSS
+        wp_enqueue_style(
+            'forgot-password-css',
+            get_stylesheet_directory_uri() . '/includes/auth/forgot-password.css',
+            array(),
+            '1.0.0'
+        );
+
+        // Enqueue forgot password JS
+        wp_enqueue_script(
+            'forgot-password-js',
+            get_stylesheet_directory_uri() . '/includes/auth/forgot-password.js',
+            array('jquery'),
+            '1.0.0',
+            true
+        );
+
+        // Enqueue intl-tel-input if not already loaded
+        if (!wp_script_is('intl-tel-input', 'enqueued')) {
+            wp_enqueue_style(
+                'intl-tel-input-css',
+                'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/css/intlTelInput.css',
+                array(),
+                '17.0.13'
+            );
+            wp_enqueue_script(
+                'intl-tel-input-js',
+                'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput.min.js',
+                array('jquery'),
+                '17.0.13',
+                true
+            );
+            wp_enqueue_script(
+                'intl-tel-input-utils',
+                'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js',
+                array('intl-tel-input-js'),
+                '17.0.13',
+                true
+            );
+        }
+
+        // Localize script for AJAX
+        wp_localize_script('forgot-password-js', 'ForgotPasswordAjax', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'send_otp_nonce' => wp_create_nonce('send_forgot_password_otp_nonce'),
+            'verify_otp_nonce' => wp_create_nonce('verify_forgot_password_otp_nonce'),
+            'update_password_nonce' => wp_create_nonce('update_forgot_password_nonce')
+        ));
+    }
 }
 add_action('wp_enqueue_scripts', 'enqueue_forgot_password_assets');
 
