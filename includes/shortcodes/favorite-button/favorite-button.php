@@ -78,7 +78,7 @@ function enqueue_favorite_button_assets() {
         // Enqueue the CSS
         wp_enqueue_style(
             'favorite-button-css',
-            get_stylesheet_directory_uri() . '/includes/shortcodes/favorite-button/favorite-button.css',
+            get_stylesheet_directory_uri() . '/css/favourites-button.css',
             array(),
             '1.0.0'
         );
