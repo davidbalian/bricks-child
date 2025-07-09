@@ -193,6 +193,10 @@ function enqueue_intl_tel_input_assets() {
     if ( is_page('signin') ) {
         $load_assets = true;
     }
+    // Check if on the registration page (slug 'register')
+    elseif ( is_page('register') ) {
+        $load_assets = true;
+    }
     // Check if on a page/post containing the registration shortcode
     elseif ( is_singular() && is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'custom_registration' ) ) {
         $load_assets = true;
@@ -207,7 +211,7 @@ function enqueue_intl_tel_input_assets() {
         wp_enqueue_style( 'intl-tel-input-css', 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/css/intlTelInput.css', array(), '17.0.13' );
 
         // Enqueue registration-specific styles
-        if ( is_singular() && is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'custom_registration' ) ) {
+        if ( is_page('register') || ( is_singular() && is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'custom_registration' ) ) ) {
              wp_enqueue_style( 'bricks-child-register-css', get_stylesheet_directory_uri() . '/includes/auth/register.css', array(), filemtime( get_stylesheet_directory() . '/includes/auth/register.css' ), 'all' );
         }
 
