@@ -57,13 +57,7 @@ function enqueue_share_button_assets() {
             true
         );
         
-        // Enqueue the CSS
-        wp_enqueue_style(
-            'share-button-css',
-            get_stylesheet_directory_uri() . '/includes/shortcodes/share-button/share-button.css',
-            array(),
-            '1.0.0'
-        );
+        // Removed CSS enqueue for share-button.css (file does not exist)
     }
 }
 add_action('wp_enqueue_scripts', 'enqueue_share_button_assets'); 
