@@ -159,8 +159,6 @@ add_action( 'wp_enqueue_scripts', function() {
         $theme_dir = get_stylesheet_directory_uri();
         
         // Enqueue gallery styles and scripts (no slider dependencies needed)
-        wp_enqueue_style( 'single-car-main-gallery', $theme_dir . '/includes/single-car/single-car-main-gallery.css', array(), filemtime( get_stylesheet_directory() . '/includes/single-car/single-car-main-gallery.css' ) );
-        wp_enqueue_script( 'single-car-main-gallery', $theme_dir . '/includes/single-car/single-car-main-gallery.js', array( 'jquery' ), filemtime( get_stylesheet_directory() . '/includes/single-car/single-car-main-gallery.js' ), true );
     }
 } );
 
