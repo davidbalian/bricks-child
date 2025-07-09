@@ -119,12 +119,7 @@ add_shortcode('car_views_counter', 'car_views_counter_shortcode');
  */
 function car_views_counter_enqueue_styles() {
     if (is_singular('car')) {
-        wp_enqueue_style(
-            'car-views-counter-css',
-            get_stylesheet_directory_uri() . '/includes/shortcodes/car-views-counter/car-views-counter.css',
-            array(),
-            '1.0.0'
-        );
+        // Removed CSS enqueue for car-views-counter.css (file does not exist)
     }
 }
 add_action('wp_enqueue_scripts', 'car_views_counter_enqueue_styles'); 
