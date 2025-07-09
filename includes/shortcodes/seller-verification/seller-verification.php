@@ -72,11 +72,16 @@ function get_verification_badge_html() {
  * Enqueue styles for the verification badge
  */
 function enqueue_seller_verification_styles() {
-    wp_enqueue_style(
-        'seller-verification-styles',
-        get_stylesheet_directory_uri() . '/includes/shortcodes/seller-verification/seller-verification.css',
-        array(),
-        '1.0.0'
-    );
+    global $post;
+    
+    // Only load when the dealership_verified shortcode is present
+    if (is_singular() && is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'dealership_verified')) {
+        wp_enqueue_style(
+            'seller-verification-styles',
+            get_stylesheet_directory_uri() . '/includes/shortcodes/seller-verification/seller-verification.css',
+            array(),
+            '1.0.0'
+        );
+    }
 }
 add_action('wp_enqueue_scripts', 'enqueue_seller_verification_styles'); 
