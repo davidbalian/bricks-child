@@ -63,24 +63,33 @@ function favorite_button_shortcode( $atts ) {
  * Enqueue the shared favorite button scripts and styles
  */
 function enqueue_favorite_button_assets() {
-    // Load on ALL pages (matches favourites-button CSS loading pattern)
-    
-    // Enqueue the JavaScript
-    wp_enqueue_script(
-        'favorite-button-js',
-        get_stylesheet_directory_uri() . '/includes/shortcodes/favorite-button/favorite-button.js',
-        array('jquery'),
-        '1.0.0',
-        true
-    );
-    
-    // Note: CSS is loaded in main enqueue file unconditionally
-    
-    // Localize script with AJAX data
-    wp_localize_script('favorite-button-js', 'favoriteButtonData', array(
-        'ajaxurl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('toggle_favorite_car'),
-        'is_user_logged_in' => is_user_logged_in(),
-    ));
+    // Load conditionally only when shortcode is present
+    global $post;
+    if (is_singular() && is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'favorite_button')) {
+        
+        // Enqueue the CSS
+        wp_enqueue_style(
+            'favorite-button-css',
+            get_stylesheet_directory_uri() . '/css/favourites-button.css',
+            array('font-awesome'),
+            filemtime( get_stylesheet_directory() . '/css/favourites-button.css' )
+        );
+        
+        // Enqueue the JavaScript
+        wp_enqueue_script(
+            'favorite-button-js',
+            get_stylesheet_directory_uri() . '/includes/shortcodes/favorite-button/favorite-button.js',
+            array('jquery'),
+            '1.0.0',
+            true
+        );
+        
+        // Localize script with AJAX data
+        wp_localize_script('favorite-button-js', 'favoriteButtonData', array(
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('toggle_favorite_car'),
+            'is_user_logged_in' => is_user_logged_in(),
+        ));
+    }
 }
 add_action('wp_enqueue_scripts', 'enqueue_favorite_button_assets'); 

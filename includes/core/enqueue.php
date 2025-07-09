@@ -22,13 +22,7 @@ function bricks_child_enqueue_styles() {
     
     wp_enqueue_style( 'bricks-child-theme-css', get_stylesheet_directory_uri() . '/style.css', array('bricks-frontend', 'font-awesome'), filemtime( get_stylesheet_directory() . '/style.css' ), 'all' );
 
-    // Enqueue Favourites Button CSS
-    wp_enqueue_style(
-        'favourites-button',
-        get_stylesheet_directory_uri() . '/css/favourites-button.css',
-        array('font-awesome'),
-        filemtime( get_stylesheet_directory() . '/css/favourites-button.css' )
-    );
+    // Favourites Button CSS moved to conditional loading in favorite-button.php
 
 
 
