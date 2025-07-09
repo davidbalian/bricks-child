@@ -44,8 +44,11 @@ function bricks_child_enqueue_styles() {
         wp_enqueue_style( 'bricks-child-edit-listing-css', get_stylesheet_directory_uri() . '/includes/user-manage-listings/template-add-listing/add-listing.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/includes/user-manage-listings/template-add-listing/add-listing.css' ), 'all' );
     }
 
-    // Enqueue my-listings styles
-    wp_enqueue_style( 'bricks-child-my-listings-css', get_stylesheet_directory_uri() . '/includes/user-account/my-listings/my-listings.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/includes/user-account/my-listings/my-listings.css' ), 'all' );
+    // Enqueue my-listings styles conditionally
+    global $post;
+    if (is_page('my-listings') || (is_singular() && is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'my_listings'))) {
+        wp_enqueue_style( 'bricks-child-my-listings-css', get_stylesheet_directory_uri() . '/includes/user-account/my-listings/my-listings.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/includes/user-account/my-listings/my-listings.css' ), 'all' );
+    }
 
     // Enqueue my-account styles
     wp_enqueue_style( 'bricks-child-my-account-css', get_stylesheet_directory_uri() . '/includes/user-account/my-account/my-account.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/includes/user-account/my-account/my-account.css' ), 'all' );
