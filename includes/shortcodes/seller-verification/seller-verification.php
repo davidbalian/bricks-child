@@ -74,7 +74,7 @@ function get_verification_badge_html() {
 function enqueue_seller_verification_styles() {
     wp_enqueue_style(
         'seller-verification-styles',
-        get_template_directory_uri() . '/includes/shortcodes/seller-verification/seller-verification.css',
+        get_stylesheet_directory_uri() . '/includes/shortcodes/seller-verification/seller-verification.css',
         array(),
         '1.0.0'
     );
