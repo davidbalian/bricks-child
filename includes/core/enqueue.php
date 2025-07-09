@@ -33,7 +33,6 @@ function bricks_child_enqueue_styles() {
 
 
     // Enqueue car listings styles
-    wp_enqueue_style( 'bricks-child-car-listings-css', get_stylesheet_directory_uri() . '/includes/car-listings/car-listings.css', array('bricks-child-theme-css', 'font-awesome'), filemtime( get_stylesheet_directory() . '/includes/car-listings/car-listings.css' ), 'all' );
 
     // Enqueue add listing page styles
     if (is_page_template('template-add-listing.php')) {
