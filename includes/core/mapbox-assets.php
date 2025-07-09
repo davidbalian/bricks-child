@@ -26,8 +26,8 @@ function autoagora_enqueue_mapbox_assets() {
         error_log('Token length: ' . strlen(MAPBOX_ACCESS_TOKEN));
     }
 
-    // Only load on single car pages or add-listing page
-    if (is_singular('car') || is_page('add-listing') || is_page('edit-listing')) {
+    // Only load on add-listing and edit-listing pages
+    if (is_page('add-listing') || is_page('edit-listing')) {
         // Enqueue Mapbox GL JS
         wp_enqueue_style(
             'mapbox-gl-css',

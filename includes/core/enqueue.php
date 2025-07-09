@@ -227,23 +227,8 @@ add_action( 'wp_enqueue_scripts', 'enqueue_intl_tel_input_assets' );
  * Enqueue Car Listings Map Filter JS and dependencies for all users when needed
  */
 function autoagora_enqueue_car_listings_map_filter_assets() {
-    global $post;
-    $should_enqueue = false;
-
-    // Check if the current page has the car_listings shortcode
-    if (is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'car_listings')) {
-        $should_enqueue = true;
-    }
-    // Also load on car archive pages or specific templates if needed
-    if (is_post_type_archive('car') || is_tax('car_make') || is_tax('car_model')) {
-        $should_enqueue = true;
-    }
-    // Add any other conditions as needed (e.g., specific templates)
-    if (is_page() && (is_page_template('template-car-listings.php') || is_page_template('template-car-search.php'))) {
-        $should_enqueue = true;
-    }
-
-    if ($should_enqueue) {
+    // Only load on add-listing and edit-listing pages
+    if (is_page('add-listing') || is_page('edit-listing')) {
         // Enqueue dependencies
         wp_enqueue_style('mapbox-gl-css', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css', array(), '2.15.0');
         wp_enqueue_script('mapbox-gl-js', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js', array(), '2.15.0', true);
