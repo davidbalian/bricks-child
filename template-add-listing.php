@@ -173,7 +173,7 @@ get_header(); ?>
                             <div id="image-preview" class="image-preview"></div>
                         </div>
                         <p class="image-upload-info"><?php esc_html_e( 'Hold CTRL to choose several photos. Minimum 5 images per listing. Maximum 25 images per listing. Maximum file size is 5MB, the formats are .jpg, .jpeg, .jfif, .png, .gif, .webp. Images are automatically optimized and converted to WebP for faster loading.', 'bricks-child' ); ?></p>
-                    </div>
+                    </div>  
 
                     <div class="add-listing-main-row">
                         <div class="add-listing-main-info-column">
@@ -398,7 +398,7 @@ get_header(); ?>
                                 <h2><?php echo get_svg_icon('clipboard-list'); ?> <?php esc_html_e( 'Registration & Background Info', 'bricks-child' ); ?></h2>
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
-                                        <label for="motuntil"><?php echo get_svg_icon('clipboard-check'); ?> <?php esc_html_e( 'MOT Status', 'bricks-child' ); ?></label>
+                                        <label for="motuntil"><?php echo get_svg_icon('clipboard-check'); ?> <?php esc_html_e( 'MOT Status (Optional)', 'bricks-child' ); ?></label>
                                         <select id="motuntil" name="motuntil" class="form-control">
                                             <option value=""><?php esc_html_e( 'Select MOT Status', 'bricks-child' ); ?></option>
                                             <option value="Expired"><?php esc_html_e( 'Expired', 'bricks-child' ); ?></option>
@@ -423,7 +423,7 @@ get_header(); ?>
                                         </select>
                                     </div>
                                     <div class="form-half">
-                                        <label for="numowners"><?php echo get_svg_icon('users'); ?> <?php esc_html_e( 'Number of Owners', 'bricks-child' ); ?></label>
+                                        <label for="numowners"><?php echo get_svg_icon('users'); ?> <?php esc_html_e( 'Number of Owners (Optional)', 'bricks-child' ); ?></label>
                                         <input type="number" id="numowners" name="numowners" class="form-control" min="1" max="99" placeholder="E.g '2'">
                                     </div>
                                 </div>
@@ -436,7 +436,7 @@ get_header(); ?>
                                 </div>
 
                                 <div class="form-row" id="vehicle-history-row">
-                                    <label><?php echo get_svg_icon('clock-rotate-left'); ?> <?php esc_html_e( 'Vehicle History', 'bricks-child' ); ?></label>
+                                    <label><?php echo get_svg_icon('clock-rotate-left'); ?> <?php esc_html_e( 'Vehicle History (Optional)', 'bricks-child' ); ?></label>
                                     <div class="vehicle-history-grid">
                                         <?php
                                         $vehicle_history_options = array(
