@@ -48,7 +48,8 @@ require_once get_stylesheet_directory() . '/includes/admin/dealership-accounts.p
 // NEWLY ADDED FROM ASTRA CHILD (SECOND FILE)
 require_once get_stylesheet_directory() . '/includes/notifications/email-verification-notification.php';
 require_once get_stylesheet_directory() . '/includes/legal/legal-pages.php';
-require_once get_stylesheet_directory() . '/includes/legal/cookie-consent.php';
+// Cookie consent functionality disabled
+// require_once get_stylesheet_directory() . '/includes/legal/cookie-consent.php';
 
 // Car Views Counter System
 require_once get_stylesheet_directory() . '/includes/views-counter/views-database.php';

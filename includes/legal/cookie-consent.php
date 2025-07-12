@@ -16,10 +16,11 @@ if (!defined('ABSPATH')) {
 class AutoAgora_Cookie_Consent {
     
     public function __construct() {
-        add_action('wp_footer', array($this, 'display_cookie_banner'));
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
-        add_action('wp_ajax_set_cookie_consent', array($this, 'handle_consent_ajax'));
-        add_action('wp_ajax_nopriv_set_cookie_consent', array($this, 'handle_consent_ajax'));
+        // Cookie consent functionality disabled
+        // add_action('wp_footer', array($this, 'display_cookie_banner'));
+        // add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
+        // add_action('wp_ajax_set_cookie_consent', array($this, 'handle_consent_ajax'));
+        // add_action('wp_ajax_nopriv_set_cookie_consent', array($this, 'handle_consent_ajax'));
     }
     
     /**
