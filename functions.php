@@ -327,6 +327,7 @@ add_action('wp_trash_post', 'delete_car_listing_images', 10, 1);
 require_once get_stylesheet_directory() . '/includes/shortcodes/favorite-button/favorite-button.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/share-button/share-button.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/report-button/report-button.php';
+require_once get_stylesheet_directory() . '/includes/shortcodes/car-single-call-button/car-single-call-button.php';
 
 
 // =========================================================================
