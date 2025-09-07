@@ -115,6 +115,26 @@ function car_views_counter_shortcode($atts) {
 add_shortcode('car_views_counter', 'car_views_counter_shortcode');
 
 /**
+ * Car Views Counter Single Shortcode Handler
+ * 
+ * Usage: [car_views_counter_single]
+ * Output: "123 views" (shows only total views, no unique visitors)
+ * 
+ * This is a simple wrapper that calls the main shortcode with format="total"
+ * 
+ * @param array $atts Shortcode attributes
+ * @return string The formatted view count (total views only)
+ */
+function car_views_counter_single_shortcode($atts) {
+    // Add format="total" to the attributes and call the main shortcode
+    $atts['format'] = 'total';
+    return car_views_counter_shortcode($atts);
+}
+
+// Register the single shortcode
+add_shortcode('car_views_counter_single', 'car_views_counter_single_shortcode');
+
+/**
  * Enqueue CSS for car views counter
  */
 function car_views_counter_enqueue_styles() {
