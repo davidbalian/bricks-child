@@ -123,6 +123,14 @@ function car_whatsapp_button_enqueue_scripts() {
         // Add inline script for click tracking
         $script = "
         jQuery(document).ready(function($) {
+
+        // --- Define environment flag ---
+        window.isDevelopment = window.isDevelopment || (
+        window.location.hostname === 'localhost' ||
+        window.location.hostname.includes('staging') ||
+        window.location.search.includes('debug=true')
+        );
+
             $('.car-whatsapp-button').on('click', function(e) {
                 var button = $(this);
                 var postId = button.data('post-id');
@@ -138,9 +146,11 @@ function car_whatsapp_button_enqueue_scripts() {
                         nonce: nonce
                     },
                     success: function(response) {
+                    if (window.isDevelopment)
                         console.log('WhatsApp button click tracked:', response);
                     },
                     error: function(xhr, status, error) {
+                    if (window.isDevelopment)
                         console.log('Error tracking WhatsApp button click:', error);
                     }
                 });
