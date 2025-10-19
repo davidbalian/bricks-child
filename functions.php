@@ -62,6 +62,9 @@ require_once get_stylesheet_directory() . '/includes/reviews/seller-reviews-ajax
 require_once get_stylesheet_directory() . '/includes/shortcodes/seller-reviews/seller-reviews-display.php';
 require_once get_stylesheet_directory() . '/includes/admin/seller-reviews-admin.php';
 
+// Refresh Listing System
+require_once get_stylesheet_directory() . '/includes/user-manage-listings/refresh-listing/init.php';
+
 // =========================================================================
 // WordPress File Upload Configuration
 // =========================================================================

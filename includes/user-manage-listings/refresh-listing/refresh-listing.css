@@ -1,0 +1,229 @@
+/**
+ * Refresh Listing Styles
+ * 
+ * Styles for listing refresh functionality
+ * 
+ * @package Bricks Child
+ * @since 1.0.0
+ */
+
+/* Refresh Button */
+.refresh-button {
+  background-color: #28a745 !important;
+  color: var(--white) !important;
+  border: none;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.refresh-button:hover:not(.disabled) {
+  background-color: #218838 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.refresh-button.disabled {
+  background-color: #6c757d !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.refresh-button.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.refresh-button.loading {
+  background-color: #007bff !important;
+  cursor: wait;
+}
+
+.refresh-button i {
+  margin-right: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.refresh-button:hover:not(.disabled) i {
+  transform: rotate(180deg);
+}
+
+.refresh-button.loading i {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Refresh Info */
+.refresh-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+.refresh-info i {
+  font-size: 0.75rem;
+}
+
+/* Refresh Status Badge */
+.refresh-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  border-radius: var(--border-radius-small);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.refresh-status i {
+  font-size: 0.75rem;
+}
+
+/* Refresh Info Tooltip */
+.refresh-info-tooltip {
+  position: relative;
+  display: inline-block;
+  margin-left: 0.5rem;
+  cursor: help;
+}
+
+.refresh-info-tooltip i {
+  color: var(--dark-blue);
+  font-size: 1rem;
+}
+
+.refresh-info-tooltip .tooltip-content {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  padding: 1rem;
+  background-color: var(--white);
+  border: var(--border);
+  border-radius: var(--border-radius-medium);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.refresh-info-tooltip:hover .tooltip-content {
+  visibility: visible;
+  opacity: 1;
+}
+
+.refresh-info-tooltip .tooltip-content::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--white);
+}
+
+.refresh-info-tooltip .tooltip-content h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.refresh-info-tooltip .tooltip-content p {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.875rem;
+  color: var(--text-color);
+  line-height: 1.5;
+}
+
+.refresh-info-tooltip .tooltip-content ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.875rem;
+  color: var(--text-color);
+}
+
+.refresh-info-tooltip .tooltip-content li {
+  margin-bottom: 0.25rem;
+}
+
+/* Refresh Listing Message */
+.refresh-listing-message {
+  margin-bottom: 1.5rem;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Listing Meta - Add refresh status */
+.listing-meta .refresh-status {
+  margin-top: 0.25rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 799.98px) {
+  .refresh-info {
+    display: block;
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+  
+  .refresh-info-tooltip .tooltip-content {
+    width: 250px;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .refresh-button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .refresh-info {
+    text-align: center;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .refresh-info-tooltip .tooltip-content {
+    width: calc(100vw - 40px);
+    max-width: 300px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* Additional Listing Actions Spacing */
+.listing-actions {
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* Ensure button alignment */
+.listing-actions .refresh-button {
+  flex-shrink: 0;
+}
+

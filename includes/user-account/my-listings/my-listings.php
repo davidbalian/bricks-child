@@ -18,11 +18,41 @@ function display_my_listings($atts) {
     // Get current user
     $current_user = wp_get_current_user();
     
+    // Initialize refresh listing components
+    require_once get_stylesheet_directory() . '/includes/user-manage-listings/refresh-listing/RefreshListingManager.php';
+    require_once get_stylesheet_directory() . '/includes/user-manage-listings/refresh-listing/RefreshListingUI.php';
+    require_once get_stylesheet_directory() . '/includes/user-manage-listings/refresh-listing/RefreshListingAjaxHandler.php';
+    
+    $refresh_manager = new RefreshListingManager();
+    $refresh_ui = new RefreshListingUI($refresh_manager);
+    
     // Enqueue jQuery
     wp_enqueue_script('jquery');
     
+    // Enqueue refresh listing assets
+    wp_enqueue_style(
+        'refresh-listing-css',
+        get_stylesheet_directory_uri() . '/includes/user-manage-listings/refresh-listing/refresh-listing.css',
+        array(),
+        '1.0.0'
+    );
+    
+    wp_enqueue_script(
+        'refresh-listing-js',
+        get_stylesheet_directory_uri() . '/includes/user-manage-listings/refresh-listing/refresh-listing.js',
+        array('jquery'),
+        '1.0.0',
+        true
+    );
+    
     // Prepare localized data
     $ajax_nonce = wp_create_nonce('toggle_car_status_nonce');
+    
+    wp_localize_script('refresh-listing-js', 'refreshListingData', array(
+        'ajaxUrl' => admin_url('admin-ajax.php'),
+        'ajaxAction' => RefreshListingAjaxHandler::get_ajax_action(),
+        'nonce' => RefreshListingAjaxHandler::create_nonce()
+    ));
     
     // Start output buffering
     ob_start();
@@ -198,9 +228,21 @@ function display_my_listings($atts) {
                                             echo get_post_status() === 'publish' ? 'Published' : ucfirst(get_post_status());
                                         }
                                     ?></span>
+                                    <?php 
+                                    // Show refresh status for published listings
+                                    if (get_post_status() === 'publish') {
+                                        echo $refresh_ui->render_refresh_status($post_id);
+                                    }
+                                    ?>
                                 </div>
                                 <div class="listing-actions">
                                     <a href="<?php echo esc_url(add_query_arg('car_id', $post_id, home_url('/edit-listing/'))); ?>" class="button"><i class="fas fa-pencil-alt"></i> Edit</a>
+                                    <?php 
+                                    // Show refresh button for published, unsold listings
+                                    if (get_post_status() === 'publish' && !get_field('is_sold', $post_id)) {
+                                        echo $refresh_ui->render_refresh_button($post_id);
+                                    }
+                                    ?>
                                     <?php 
                                     if (get_post_status() === 'publish') {
                                         $is_sold = get_field('is_sold', $post_id);
