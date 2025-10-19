@@ -55,8 +55,8 @@ function car_single_whatsapp_button_shortcode($atts) {
             text-decoration: none;
             color: #ffffff;
         ">
-            <i class="fab fa-whatsapp" style="color: #ffffff; font-size: 1rem;"></i>
-            <span style="color: #ffffff;">WhatsApp</span>
+            <i class="fab fa-whatsapp" style="color: #000000; font-size: 1rem;"></i>
+            <span style="color: #000000;">WhatsApp</span>
         </a>
         <?php
     }
