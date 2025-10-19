@@ -109,9 +109,6 @@ get_header(); ?>
     <h2>🚗 Sell Your Car in 2 Minutes — Free!</h2>
     <p>Reach thousands of buyers in Cyprus. No commission, no waiting — buyers call or WhatsApp you directly.</p>
     <p class="sell-benefits"><span>✅ New listings every week</span> <span>📞 Direct calls</span> <span>💬 WhatsApp inquiries</span></p>
-    <a href="#upload-images" class="btn-primary" style="
-      background:#0066ff;color:#fff;padding:10px 18px;border-radius:8px;
-      display:inline-block;margin-top:10px;font-weight:600;">Post My Car Now</a>
 </div>
 
 <div class="bricks-container">
