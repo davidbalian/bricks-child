@@ -35,7 +35,7 @@ function car_single_call_button_shortcode($atts) {
         $author_username = $user_object->user_login;
         $tel_link_number = preg_replace('/[^0-9+]/', '', $author_username);
         $tel_link_number = preg_replace('/^(.{3})(.+)/', '$1 $2', $tel_link_number);
-        $tel_link = '+' . $tel_link_number;
+        $tel_link = 'tel:+' . $tel_link_number;
         $button_display_text = $tel_link;
         ?>
         <a href="<?php echo esc_attr($tel_link); ?>" 
