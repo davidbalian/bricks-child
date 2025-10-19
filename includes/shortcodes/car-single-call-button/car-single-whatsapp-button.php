@@ -44,6 +44,7 @@ function car_single_whatsapp_button_shortcode($atts) {
            class="brx-button car-whatsapp-button" 
            id="single-car-whatsapp-button" 
            data-post-id="<?php echo esc_attr($post_id); ?>"
+           data-nonce="<?php echo wp_create_nonce('car_whatsapp_button_click'); ?>"
            style="
             padding: .75rem 1.5rem;
             background-color: #25D366;
