@@ -21,22 +21,27 @@ if (!defined('ABSPATH')) {
  * @return string The WhatsApp button HTML
  */
 function car_single_whatsapp_button_shortcode($atts) {
-    // Parse shortcode attributes
     $atts = shortcode_atts(array(), $atts, 'car_single_whatsapp_button');
-    
-    // Start output buffering
     ob_start();
-    
-    $post_author_id = get_the_author_meta('ID');
+
+    $post_id = get_the_ID();
+    if (!$post_id) return '';
+
+    $post_author_id = get_post_field('post_author', $post_id);
     $user_object = get_user_by('ID', $post_author_id);
-    $post_id = get_the_ID(); // Get current post ID for tracking
 
     if ($user_object) {
-        $author_username = $user_object->user_login;
-        $tel_link_number = preg_replace('/[^0-9+]/', '', $author_username);
-        $car_year = get_field('year', $post_id); // Assumes ACF fields for car details
-        $car_make = get_field('make', $post_id);
-        $car_model = get_field('model', $post_id);
+        // Try to get phone from user_meta instead of username
+        $tel_link_number = get_user_meta($post_author_id, 'phone_number', true);
+        if (!$tel_link_number) {
+            $tel_link_number = preg_replace('/[^0-9]/', '', $user_object->user_login);
+        }
+
+        // ACF-safe fields
+        $car_year = function_exists('get_field') ? get_field('year', $post_id) : '';
+        $car_make = function_exists('get_field') ? get_field('make', $post_id) : '';
+        $car_model = function_exists('get_field') ? get_field('model', $post_id) : '';
+
         $message_text = urlencode("Hi, I'm interested in your $car_year $car_make $car_model on AutoAgora.cy.");
         $wa_link = "https://wa.me/" . $tel_link_number . "?text=" . $message_text;
         ?>
@@ -60,10 +65,7 @@ function car_single_whatsapp_button_shortcode($atts) {
         </a>
         <?php
     }
-    
-    // Return the buffered content
+
     return ob_get_clean();
 }
-
-// Register the shortcode
 add_shortcode('car_single_whatsapp_button', 'car_single_whatsapp_button_shortcode');
