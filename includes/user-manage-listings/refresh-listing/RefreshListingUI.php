@@ -54,6 +54,7 @@ class RefreshListingUI {
         $button_class = $can_refresh ? 'button refresh-button' : 'button refresh-button disabled';
         $button_disabled = $can_refresh ? '' : ' disabled';
         $icon_class = 'fas fa-sync-alt';
+        $button_text = $can_refresh ? 'Refresh Listing' : 'Available in ' . $time_remaining;
         
         ob_start();
         ?>
@@ -62,11 +63,7 @@ class RefreshListingUI {
                 data-can-refresh="<?php echo $can_refresh ? '1' : '0'; ?>"
                 <?php echo $button_disabled; ?>>
             <i class="<?php echo esc_attr($icon_class); ?>"></i>
-            <?php if ($can_refresh): ?>
-                Refresh Listing
-            <?php else: ?>
-                Available in <?php echo esc_html($time_remaining); ?>
-            <?php endif; ?>
+            <span class="refresh-button-text"><?php echo esc_html($button_text); ?></span>
         </button>
         <?php if ($refresh_count > 0): ?>
             <span class="refresh-info" title="Total refreshes: <?php echo esc_attr($refresh_count); ?>">

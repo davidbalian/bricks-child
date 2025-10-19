@@ -14,6 +14,10 @@
   border: none;
   position: relative;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
 }
 
 .refresh-button:hover:not(.disabled) {
@@ -39,8 +43,12 @@
 }
 
 .refresh-button i {
-  margin-right: 0.5rem;
   transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.refresh-button-text {
+  display: inline-block;
 }
 
 .refresh-button:hover:not(.disabled) i {
@@ -64,11 +72,14 @@
 .refresh-info {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.35rem;
   margin-left: 0.75rem;
-  font-size: 0.875rem;
-  color: var(--text-color);
-  opacity: 0.8;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.813rem;
+  color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
+  border-radius: var(--border-radius-small);
+  white-space: nowrap;
 }
 
 .refresh-info i {

@@ -161,32 +161,19 @@
          * @param {boolean} loading Whether button is loading
          */
         setButtonLoading: function($button, loading) {
+            const $icon = $button.find('i');
+            const $text = $button.find('.refresh-button-text');
+            
             if (loading) {
-                $button.prop('disabled', true)
-                       .addClass('loading')
-                       .find('i')
-                       .removeClass('fa-sync-alt')
-                       .addClass('fa-spinner fa-spin');
-                
-                const originalText = $button.contents().filter(function() {
-                    return this.nodeType === 3;
-                }).text().trim();
-                
-                $button.data('original-text', originalText)
-                       .contents().filter(function() {
-                           return this.nodeType === 3;
-                       }).replaceWith(' Refreshing...');
+                $button.prop('disabled', true).addClass('loading');
+                $icon.removeClass('fa-sync-alt').addClass('fa-spinner fa-spin');
+                $button.data('original-text', $text.text());
+                $text.text('Refreshing...');
             } else {
-                $button.prop('disabled', false)
-                       .removeClass('loading')
-                       .find('i')
-                       .removeClass('fa-spinner fa-spin')
-                       .addClass('fa-sync-alt');
-                
+                $button.prop('disabled', false).removeClass('loading');
+                $icon.removeClass('fa-spinner fa-spin').addClass('fa-sync-alt');
                 const originalText = $button.data('original-text') || 'Refresh Listing';
-                $button.contents().filter(function() {
-                    return this.nodeType === 3;
-                }).replaceWith(' ' + originalText);
+                $text.text(originalText);
             }
         },
         
@@ -197,18 +184,18 @@
          * @param {Object} data Response data
          */
         updateButtonState: function($button, data) {
+            const $icon = $button.find('i');
+            const $text = $button.find('.refresh-button-text');
+            
+            // Update button state
             $button.prop('disabled', true)
                    .addClass('disabled')
                    .removeClass('loading')
-                   .data('can-refresh', '0')
-                   .find('i')
-                   .removeClass('fa-spinner fa-spin')
-                   .addClass('fa-sync-alt');
+                   .data('can-refresh', '0');
             
-            // Update button text with time remaining
-            $button.contents().filter(function() {
-                return this.nodeType === 3;
-            }).replaceWith(' Available in 7 days');
+            // Update icon and text
+            $icon.removeClass('fa-spinner fa-spin').addClass('fa-sync-alt');
+            $text.text('Available in 7 days');
             
             // Update refresh count if element exists
             const $listingItem = $button.closest('.listing-item');
