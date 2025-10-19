@@ -552,14 +552,6 @@ get_header(); ?>
                         <div class="form-row">
                             <textarea id="description" name="description" class="form-control" rows="5" required placeholder="Enter your description here..."></textarea>
                         </div>
-                        <div class="description-guidelines-avoid-wrapper">
-                            <p class="description-guidelines-avoid"><strong><?php esc_html_e( 'Avoid:', 'bricks-child' ); ?></strong></p>
-                            <ul class="description-guidelines-list">
-                                <li><?php esc_html_e( 'Contact info', 'bricks-child' ); ?></li>
-                                <li><?php esc_html_e( 'Specs already filled in fields', 'bricks-child' ); ?></li>
-                                <li><?php esc_html_e( 'Repetitive or irrelevant details', 'bricks-child' ); ?></li>
-                            </ul>
-                        </div>
                     </div>
 
                     <div class="form-row">
