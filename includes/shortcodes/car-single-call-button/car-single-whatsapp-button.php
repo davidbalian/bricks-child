@@ -135,6 +135,7 @@ function car_whatsapp_button_enqueue_scripts() {
                 var button = $(this);
                 var postId = button.data('post-id');
                 var nonce = button.data('nonce');
+                var waLink = button.attr('href'); // get the WhatsApp link
                 
                 // Track the click via AJAX
                 $.ajax({
@@ -151,9 +152,16 @@ function car_whatsapp_button_enqueue_scripts() {
                     },
                     error: function(xhr, status, error) {
                     if (window.isDevelopment)
-                        console.log('Error tracking WhatsApp button click:', error);
+                        console.error('Error tracking WhatsApp button click:', error);
                     }
                 });
+                // --- Handle open behavior ---
+                var isMobile = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+                if (!isMobile) {
+                    e.preventDefault(); // prevent default same-tab behavior
+                    window.open(waLink, '_blank'); // open in new tab on desktop
+                }
             });
         });
         ";

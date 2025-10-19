@@ -148,7 +148,7 @@ function car_call_button_enqueue_scripts() {
                     },
                     error: function(xhr, status, error) {
                     if (window.isDevelopment)
-                        console.log('Error tracking call button click:', error);
+                        console.error('Error tracking call button click:', error);
                     }
                 });
                 
