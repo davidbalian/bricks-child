@@ -75,8 +75,27 @@ wp_localize_script('astra-child-add-listing-js', 'addListingData', array(
 
 get_header(); ?>
 
-<div style="background-color: #f9fafb; padding: 20px; text-align: center;">
-    <p style="font-weight: bold;">🚗 Sell Your Car in 2 Minutes — Free!</p>
+<style>
+    .sell-header {
+        background: #f9fafb;
+        padding: 20px 25px;
+        border-radius: 10px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        text-align: center;
+        margin-bottom: 25px;
+    }
+    .sell-header h2 {
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
+    .sell-header p {
+        color: #444;
+        font-size: 16px;
+    }
+</style>
+
+<div class="sell-header">
+    <h2>🚗 Sell Your Car in 2 Minutes — Free!</h2>
     <p>Reach thousands of buyers in Cyprus. No commission, no waiting — buyers call or WhatsApp you directly.</p>
     <p><span style="font-size: smaller">✅ New listings every week · 📞 Direct calls · 💬 WhatsApp inquiries</span></p>
 </div>
