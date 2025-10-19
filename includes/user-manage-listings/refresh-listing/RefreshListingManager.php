@@ -118,17 +118,29 @@ class RefreshListingManager {
      */
     private function perform_refresh($post_id) {
         $current_time = current_time('mysql');
+        $current_time_gmt = get_gmt_from_date($current_time);
         
-        // Update post modified date
+        // Update BOTH post_date and post_modified to bump listing to top
+        // This ensures it works with orderby='date' queries
         $update_result = wp_update_post(array(
             'ID' => $post_id,
+            'post_date' => $current_time,
+            'post_date_gmt' => $current_time_gmt,
             'post_modified' => $current_time,
-            'post_modified_gmt' => get_gmt_from_date($current_time)
+            'post_modified_gmt' => $current_time_gmt
         ), true);
         
         if (is_wp_error($update_result)) {
             $this->log_error('Failed to update post: ' . $update_result->get_error_message());
             return false;
+        }
+        
+        // IMPORTANT: Update publication_date field (used for display)
+        update_post_meta($post_id, 'publication_date', $current_time);
+        
+        // Also update ACF field if ACF is active
+        if (function_exists('update_field')) {
+            update_field('publication_date', $current_time, $post_id);
         }
         
         // Update last refresh meta
