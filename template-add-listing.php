@@ -92,12 +92,26 @@ get_header(); ?>
         color: #444;
         font-size: 16px;
     }
+
+    @media (max-width: 768px) {
+      .sell-header { padding: 14px 12px; }
+      .sell-header h2 { font-size: 1.2rem; margin-bottom: 4px; }
+      .sell-header p { font-size: 0.9rem; line-height: 1.3; }
+    }
+
+    @media (max-width: 600px) {
+      .sell-benefits { display: block; text-align: center; }
+      .sell-benefits span { display: block; margin: 3px 0; }
+    }
 </style>
 
 <div class="sell-header">
     <h2>🚗 Sell Your Car in 2 Minutes — Free!</h2>
     <p>Reach thousands of buyers in Cyprus. No commission, no waiting — buyers call or WhatsApp you directly.</p>
-    <p><span style="font-size: smaller">✅ New listings every week · 📞 Direct calls · 💬 WhatsApp inquiries</span></p>
+    <p class="sell-benefits"><span>✅ New listings every week</span> <span>📞 Direct calls</span> <span>💬 WhatsApp inquiries</span></p>
+    <a href="#upload-images" class="btn-primary" style="
+      background:#0066ff;color:#fff;padding:10px 18px;border-radius:8px;
+      display:inline-block;margin-top:10px;font-weight:600;">Post My Car Now</a>
 </div>
 
 <div class="bricks-container">
