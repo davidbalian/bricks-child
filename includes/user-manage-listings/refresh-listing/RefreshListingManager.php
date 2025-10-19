@@ -138,10 +138,7 @@ class RefreshListingManager {
         // IMPORTANT: Update publication_date field (used for display)
         update_post_meta($post_id, 'publication_date', $current_time);
         
-        // Also update ACF field if ACF is active
-        if (function_exists('update_field')) {
-            update_field('publication_date', $current_time, $post_id);
-        }
+
         
         // Update last refresh meta
         update_post_meta($post_id, self::META_KEY_LAST_REFRESH, $current_time);
