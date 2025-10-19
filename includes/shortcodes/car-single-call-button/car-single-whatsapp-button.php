@@ -46,7 +46,7 @@ function car_single_whatsapp_button_shortcode($atts) {
            data-post-id="<?php echo esc_attr($post_id); ?>"
            style="
             padding: .75rem 1.5rem;
-            background-color: var(--bricks-color-iztoge);
+            background-color: #25D366;
             border-radius: var(--radius-sm);
             display: flex;
             justify-content: center;
