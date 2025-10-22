@@ -1,58 +1,67 @@
 /**
- * Mapbox Integration
- * 
+ * Google Maps Integration
+ *
  * @package Astra Child
  * @since 1.0.0
  */
 
 // PRODUCTION SAFETY: Only log in development environments
-window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' || 
-                                               window.location.hostname.includes('staging') ||
-                                               window.location.search.includes('debug=true'));
+window.isDevelopment = window.isDevelopment || (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname.includes('staging') ||
+    window.location.search.includes('debug=true')
+);
 
 (function($) {
     'use strict';
 
-    // Initialize map when document is ready
     $(document).ready(function() {
-        if (typeof mapboxgl === 'undefined') {
-            if (isDevelopment) console.error('Mapbox GL JS is not loaded');
+        // Safety check
+        if (typeof google === 'undefined' || !google.maps) {
+            if (isDevelopment) console.error('Google Maps JS API not loaded');
             return;
         }
 
-        // Set the access token
-        mapboxgl.accessToken = mapboxConfig.accessToken;
+        // Map options (from localized PHP data)
+        const mapOptions = {
+            center: { lat: parseFloat(mapConfig.defaultLat), lng: parseFloat(mapConfig.defaultLng) },
+            zoom: parseInt(mapConfig.zoom),
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: true
+        };
 
-        // Initialize the map
-        const map = new mapboxgl.Map({
-            container: 'car-location-map',
-            style: mapboxConfig.styleUrl,
-            center: [mapboxConfig.defaultCenter.lng, mapboxConfig.defaultCenter.lat],
-            zoom: mapboxConfig.defaultZoom
-        });
+        // Initialize map
+        const map = new google.maps.Map(document.getElementById('car-location-map'), mapOptions);
 
-        // Add navigation controls
-        map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        // Add marker variable
+        let marker = null;
 
-        // Add marker when map loads
-        map.on('load', function() {
-            // Get car location from ACF fields
-            const latitude = $('#acf-field_car_latitude').val();
-            const longitude = $('#acf-field_car_longitude').val();
+        // Load car location from ACF fields if available
+        const latitude = parseFloat($('#acf-field_car_latitude').val());
+        const longitude = parseFloat($('#acf-field_car_longitude').val());
 
-            if (latitude && longitude) {
-                // Add marker at car location
-                new mapboxgl.Marker()
-                    .setLngLat([longitude, latitude])
-                    .addTo(map);
+        if (!isNaN(latitude) && !isNaN(longitude)) {
+            const carPosition = { lat: latitude, lng: longitude };
+            marker = new google.maps.Marker({
+                position: carPosition,
+                map: map
+            });
 
-                // Center map on car location
-                map.flyTo({
-                    center: [longitude, latitude],
-                    zoom: 15
-                });
-            }
-        });
+            map.setCenter(carPosition);
+            map.setZoom(15);
+
+            if (isDevelopment) console.log('Marker added at', carPosition);
+        }
+
+        // Optional: Add map controls (zoom, pan)
+        const zoomControlDiv = document.createElement('div');
+        map.controls[google.maps.ControlPosition.RIGHT_TOP].push(zoomControlDiv);
+
+        // Optional logging for debugging
+        if (isDevelopment) {
+            console.log('Google Map initialized');
+        }
     });
 
-})(jQuery); 
+})(jQuery);
