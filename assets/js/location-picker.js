@@ -23,7 +23,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                                                window.location.hostname.includes('staging') ||
                                                window.location.search.includes('debug=true'));
     
-    if (isDevelopment) console.log('Mapbox Config:', mapboxConfig);
+    if (isDevelopment) console.log('Map Config:', mapboxConfig);
 
     // --- Locate Me Control for Mapbox ---
     class LocateMeControl {
@@ -55,11 +55,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                         // Immediately clear the watch to stop continuous tracking
                         navigator.geolocation.clearWatch(watchId);
                         
-                        const newCoords = [
-                            position.coords.longitude,
-                            position.coords.latitude,
-                        ];
-                        selectedCoordinates = newCoords;
+                        const newLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                        selectedCoordinates = [newLatLng.lng(), newLatLng.lat()];
 
                         // Check accuracy and zoom level accordingly
                         const accuracy = position.coords.accuracy;
@@ -74,10 +71,10 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                             zoomLevel = 17; // Closer zoom for good accuracy
                         }
 
-                        this._map.flyTo({
-                            center: newCoords,
-                            zoom: zoomLevel,
-                        });
+                        if (this._map && typeof this._map.setZoom === 'function') {
+                            this._map.panTo(newLatLng);
+                            this._map.setZoom(zoomLevel);
+                        }
                         
                         // Log accuracy and timestamp for debugging
                         if (isDevelopment) console.log(`Fresh location found at ${timestamp} with accuracy: ${accuracy.toFixed(1)} meters`);
@@ -162,16 +159,13 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     // Function to update marker position
     function updateMarkerPosition(lngLat) {
         if (!marker) {
-            // Create marker only if it doesn't exist
-            marker = new mapboxgl.Marker({
-                draggable: false,
-                color: '#FF0000' // Make it more visible
-            })
-                .setLngLat(lngLat)
-                .addTo(map);
+            marker = new google.maps.Marker({
+                position: lngLat,
+                map: map,
+                draggable: false
+            });
         } else {
-            // Just update position if marker exists
-            marker.setLngLat(lngLat);
+            marker.setPosition(lngLat);
         }
 
         // Enable continue button
@@ -209,11 +203,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         
         // Check if we have a saved location from previous selection
         let initialCenter = mapboxConfig.center;
+        let initialCenterArr = initialCenter; // [lng, lat]
         let initialZoom = mapboxConfig.defaultZoom;
         
         if (savedLocationForSession) {
             if (isDevelopment) console.log('Using saved location from previous selection:', savedLocationForSession);
-            initialCenter = [savedLocationForSession.longitude, savedLocationForSession.latitude];
+            initialCenterArr = [savedLocationForSession.longitude, savedLocationForSession.latitude];
             initialZoom = 15; // Zoom in closer to the saved location
             selectedLocation = { ...savedLocationForSession }; // Copy the saved location
         } else {
@@ -261,6 +256,122 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         const mapContainer = locationModal.querySelector('.location-map');
         mapContainer.classList.add('visible');
 
+        // Prefer Google Maps if available (non-breaking: keep Mapbox as fallback)
+        if (typeof google !== 'undefined' && google.maps) {
+            try {
+                // Prepare initial center
+                const initialCenterArr = Array.isArray(initialCenter) ? initialCenter : [33.3823, 35.1856];
+                const initialLatLng = new google.maps.LatLng(initialCenterArr[1], initialCenterArr[0]);
+
+                // Initialize Google Map
+                map = new google.maps.Map(mapContainer, {
+                    center: initialLatLng,
+                    zoom: initialZoom,
+                    mapTypeControl: true,
+                    streetViewControl: true,
+                    fullscreenControl: true
+                });
+
+                // Add Locate Me control (keep existing CSS classes for minimal UI change)
+                const locateCtrl = new LocateMeControl();
+                const locateNode = locateCtrl.onAdd(map);
+                if (map.controls && google.maps.ControlPosition) {
+                    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(locateNode);
+                } else {
+                    mapContainer.parentNode.appendChild(locateNode);
+                }
+
+                // Initial marker at center
+                const mapCenter = map.getCenter();
+                updateMarkerPosition(mapCenter);
+                selectedCoordinates = [mapCenter.lng(), mapCenter.lat()];
+
+                // Geocoder + Places Autocomplete
+                geocoder = new google.maps.Geocoder();
+                const geocoderContainer = document.getElementById('geocoder');
+                if (geocoderContainer) {
+                    // Wrap input to keep existing selector '.mapboxgl-ctrl-geocoder input'
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'mapboxgl-ctrl-geocoder';
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.placeholder = 'Search for a location in Cyprus...';
+                    input.autocomplete = 'off';
+                    wrapper.appendChild(input);
+                    geocoderContainer.appendChild(wrapper);
+
+                    const autocomplete = new google.maps.places.Autocomplete(input, {
+                        componentRestrictions: { country: 'cy' },
+                        fields: ['geometry', 'formatted_address', 'address_components'],
+                        types: ['geocode']
+                    });
+
+                    if (savedLocationForSession && savedLocationForSession.address) {
+                        input.value = savedLocationForSession.address;
+                        const continueBtn = locationModal.querySelector('.choose-location-btn');
+                        if (continueBtn) continueBtn.disabled = false;
+                    }
+
+                    autocomplete.addListener('place_changed', () => {
+                        const place = autocomplete.getPlace();
+                        if (!place || !place.geometry || !place.geometry.location) return;
+                        const loc = place.geometry.location;
+                        map.panTo(loc);
+                        map.setZoom(15);
+                        selectedCoordinates = [loc.lng(), loc.lat()];
+
+                        const comps = place.address_components || [];
+                        const getComp = (type) => {
+                            const comp = comps.find(c => c.types.includes(type));
+                            return comp ? comp.long_name : '';
+                        };
+                        const city = getComp('locality') || getComp('administrative_area_level_3') || getComp('postal_town') || '';
+                        const district = getComp('neighborhood') || getComp('sublocality') || getComp('locality') || city || '';
+                        selectedLocation = {
+                            city: city,
+                            district: district,
+                            address: place.formatted_address || '',
+                            latitude: loc.lat(),
+                            longitude: loc.lng()
+                        };
+
+                        const continueBtn = locationModal.querySelector('.choose-location-btn');
+                        if (continueBtn) continueBtn.disabled = false;
+                    });
+                }
+
+                // Click to pan
+                map.addListener('click', (e) => {
+                    const clicked = e.latLng;
+                    selectedCoordinates = [clicked.lng(), clicked.lat()];
+                    map.panTo(clicked);
+                });
+
+                // Keep marker centered during movement
+                map.addListener('center_changed', () => {
+                    if (marker) {
+                        marker.setPosition(map.getCenter());
+                    }
+                });
+
+                // After movement ends, update + reverse geocode
+                let moveTimeout;
+                map.addListener('idle', () => {
+                    if (moveTimeout) clearTimeout(moveTimeout);
+                    moveTimeout = setTimeout(() => {
+                        const center = map.getCenter();
+                        selectedCoordinates = [center.lng(), center.lat()];
+                        const continueBtn = locationModal.querySelector('.choose-location-btn');
+                        if (continueBtn) continueBtn.disabled = false;
+                        reverseGeocode(center);
+                    }, 150);
+                });
+            } catch (error) {
+                if (isDevelopment) console.error('Error initializing Google Maps:', error);
+            }
+        }
+
+        if (typeof google === 'undefined' || !google.maps) {
         try {
             // Initialize map with analytics disabled
             map = new mapboxgl.Map({
@@ -444,6 +555,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                   } catch (error) {
               if (isDevelopment) console.error('Error initializing map:', error);
         }
+        }
 
         // Close button functionality
         const closeBtn = locationModal.querySelector('.close-modal');
@@ -501,29 +613,48 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     }
 
     // Function to reverse geocode coordinates
-    function reverseGeocode(lngLat) {
-        if (isDevelopment) console.log('Reverse geocoding:', lngLat);
-        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${mapboxConfig.accessToken}&types=place,neighborhood,address&country=cy&language=en`;
-        
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (isDevelopment) console.log('Reverse geocode result:', data);
-                if (data.features && data.features.length > 0) {
-                    const result = data.features[0];
-                    selectedLocation = parseLocationDetails(result);
-                    
-                    // Update the geocoder input with the new address
+    function reverseGeocode(centerLatLng) {
+        if (isDevelopment) console.log('Reverse geocoding:', centerLatLng);
+        if (typeof google !== 'undefined' && google.maps && geocoder) {
+            geocoder.geocode({ location: centerLatLng, region: 'CY' }, (results, status) => {
+                if (status === 'OK' && results && results.length) {
+                    const result = results[0];
+                    const comps = result.address_components || [];
+                    const getComp = (type) => {
+                        const comp = comps.find(c => c.types.includes(type));
+                        return comp ? comp.long_name : '';
+                    };
+                    const city = getComp('locality') || getComp('administrative_area_level_3') || getComp('postal_town') || '';
+                    const district = getComp('neighborhood') || getComp('sublocality') || getComp('locality') || city || '';
+                    selectedLocation = {
+                        city: city,
+                        district: district,
+                        address: result.formatted_address || '',
+                        latitude: centerLatLng.lat(),
+                        longitude: centerLatLng.lng()
+                    };
+
                     const geocoderInput = document.querySelector('.mapboxgl-ctrl-geocoder input');
-                    if (geocoderInput) {
-                        geocoderInput.value = result.place_name;
-                        if (isDevelopment) console.log('Updated geocoder input with:', result.place_name);
-                    }
+                    if (geocoderInput) geocoderInput.value = selectedLocation.address;
+                } else if (isDevelopment) {
+                    console.warn('Geocoder failed due to:', status);
                 }
-            })
-            .catch(error => {
-                if (isDevelopment) console.error('Error reverse geocoding:', error);
             });
+        } else {
+            // Fallback to Mapbox reverse geocoding if Google is unavailable
+            const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${centerLatLng.lng},${centerLatLng.lat}.json?access_token=${mapboxConfig.accessToken}&types=place,neighborhood,address&country=cy&language=en`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.features && data.features.length > 0) {
+                        const result = data.features[0];
+                        selectedLocation = parseLocationDetails(result);
+                        const geocoderInput = document.querySelector('.mapboxgl-ctrl-geocoder input');
+                        if (geocoderInput) geocoderInput.value = result.place_name;
+                    }
+                })
+                .catch(error => { if (isDevelopment) console.error('Error reverse geocoding:', error); });
+        }
     }
 
     // Add click handler to the button
