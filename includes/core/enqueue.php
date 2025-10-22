@@ -224,60 +224,61 @@ add_action( 'wp_enqueue_scripts', 'enqueue_intl_tel_input_assets' );
 
 /**
  * Enqueue Car Listings Map Filter JS and dependencies for all users when needed
+ * DISABLED: Files don't exist, functionality moved to mapbox-assets.php
  */
-function autoagora_enqueue_car_listings_map_filter_assets() {
-    // Only load on add-listing and edit-listing pages
-    if (is_page('add-listing') || is_page('edit-listing')) {
-        // Enqueue dependencies
-        wp_enqueue_style('mapbox-gl-css', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css', array(), '2.15.0');
-        wp_enqueue_script('mapbox-gl-js', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js', array(), '2.15.0', true);
-        wp_enqueue_style('mapbox-geocoder-css', 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css', array('mapbox-gl-css'), '5.0.0');
-        wp_enqueue_script('mapbox-geocoder-js', 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js', array('mapbox-gl-js'), '5.0.0', true);
-        wp_enqueue_script('turf-js', 'https://npmcdn.com/@turf/turf/turf.min.js', array(), '6.5.0', true);
-
-        // Enqueue your custom scripts/styles
-        wp_enqueue_style(
-            'car-listings-map-filter-style',
-            get_stylesheet_directory_uri() . '/includes/car-listings/car-listings-map-filter.css',
-            array('mapbox-gl-css', 'mapbox-geocoder-css'),
-            filemtime(get_stylesheet_directory() . '/includes/car-listings/car-listings-map-filter.css')
-        );
-        wp_enqueue_script(
-            'car-specs-filter-js',
-            get_stylesheet_directory_uri() . '/includes/car-listings/car-specs-filter.js',
-            array('jquery'),
-            filemtime(get_stylesheet_directory() . '/includes/car-listings/car-specs-filter.js'),
-            true
-        );
-        wp_enqueue_script(
-            'car-listings-map-filter-js',
-            get_stylesheet_directory_uri() . '/includes/car-listings/car-listings-map-filter.js',
-            array('jquery', 'mapbox-gl-js', 'mapbox-geocoder-js', 'turf-js', 'car-specs-filter-js'),
-            filemtime(get_stylesheet_directory() . '/includes/car-listings/car-listings-map-filter.js'),
-            true
-        );
-
-        // Localize the script
-        wp_localize_script('car-listings-map-filter-js', 'carListingsMapFilterData', array(
-            'ajaxurl' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('filter_listings_by_location_nonce'),
-            'mapboxConfig' => array(
-                'accessToken' => defined('MAPBOX_ACCESS_TOKEN') ? MAPBOX_ACCESS_TOKEN : '',
-                'style' => 'mapbox://styles/mapbox/streets-v12',
-                'defaultZoom' => 8,
-                'cyprusCenter' => [33.3823, 35.1856]
-            ),
-            'initialFilter' => array(
-                'lat' => 35.1856,  // Cyprus center latitude
-                'lng' => 33.3823,  // Cyprus center longitude  
-                'radius' => 150,   // 150km radius to cover all of Cyprus
-                'text' => 'All of Cyprus'
-            ),
-            'perPage' => 12
-        ));
-    }
-}
-add_action('wp_enqueue_scripts', 'autoagora_enqueue_car_listings_map_filter_assets', 21);
+// function autoagora_enqueue_car_listings_map_filter_assets() {
+//     // Only load on add-listing and edit-listing pages
+//     if (is_page('add-listing') || is_page('edit-listing')) {
+//         // Enqueue dependencies
+//         wp_enqueue_style('mapbox-gl-css', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css', array(), '2.15.0');
+//         wp_enqueue_script('mapbox-gl-js', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js', array(), '2.15.0', true);
+//         wp_enqueue_style('mapbox-geocoder-css', 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css', array('mapbox-gl-css'), '5.0.0');
+//         wp_enqueue_script('mapbox-geocoder-js', 'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js', array('mapbox-gl-js'), '5.0.0', true);
+//         wp_enqueue_script('turf-js', 'https://npmcdn.com/@turf/turf/turf.min.js', array(), '6.5.0', true);
+//
+//         // Enqueue your custom scripts/styles
+//         wp_enqueue_style(
+//             'car-listings-map-filter-style',
+//             get_stylesheet_directory_uri() . '/includes/car-listings/car-listings-map-filter.css',
+//             array('mapbox-gl-css', 'mapbox-geocoder-css'),
+//             filemtime(get_stylesheet_directory() . '/includes/car-listings/car-listings-map-filter.css')
+//         );
+//         wp_enqueue_script(
+//             'car-specs-filter-js',
+//             get_stylesheet_directory_uri() . '/includes/car-listings/car-specs-filter.js',
+//             array('jquery'),
+//             filemtime(get_stylesheet_directory() . '/includes/car-listings/car-specs-filter.js'),
+//             true
+//         );
+//         wp_enqueue_script(
+//             'car-listings-map-filter-js',
+//             get_stylesheet_directory_uri() . '/includes/car-listings/car-listings-map-filter.js',
+//             array('jquery', 'mapbox-gl-js', 'mapbox-geocoder-js', 'turf-js', 'car-specs-filter-js'),
+//             filemtime(get_stylesheet_directory() . '/includes/car-listings/car-listings-map-filter.js'),
+//             true
+//         );
+//
+//         // Localize the script
+//         wp_localize_script('car-listings-map-filter-js', 'carListingsMapFilterData', array(
+//             'ajaxurl' => admin_url('admin-ajax.php'),
+//             'nonce' => wp_create_nonce('filter_listings_by_location_nonce'),
+//             'mapboxConfig' => array(
+//                 'accessToken' => defined('MAPBOX_ACCESS_TOKEN') ? MAPBOX_ACCESS_TOKEN : '',
+//                 'style' => 'mapbox://styles/mapbox/streets-v12',
+//                 'defaultZoom' => 8,
+//                 'cyprusCenter' => [33.3823, 35.1856]
+//             ),
+//             'initialFilter' => array(
+//                 'lat' => 35.1856,  // Cyprus center latitude
+//                 'lng' => 33.3823,  // Cyprus center longitude  
+//                 'radius' => 150,   // 150km radius to cover all of Cyprus
+//                 'text' => 'All of Cyprus'
+//             ),
+//             'perPage' => 12
+//         ));
+//     }
+// }
+// add_action('wp_enqueue_scripts', 'autoagora_enqueue_car_listings_map_filter_assets', 21);
 
 function enqueue_theme_scripts() {
     $theme_dir = get_stylesheet_directory_uri();

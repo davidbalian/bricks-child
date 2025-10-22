@@ -259,14 +259,15 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         // Prefer Google Maps if available (non-breaking: keep Mapbox as fallback)
         if (typeof google !== 'undefined' && google.maps) {
             try {
-                // Prepare initial center
-                const initialCenterArr = Array.isArray(initialCenter) ? initialCenter : [33.3823, 35.1856];
-                const initialLatLng = new google.maps.LatLng(initialCenterArr[1], initialCenterArr[0]);
+                // Prepare initial center and ensure zoom is a number
+                const centerArr = Array.isArray(initialCenterArr) ? initialCenterArr : [33.3823, 35.1856];
+                const initialLatLng = new google.maps.LatLng(centerArr[1], centerArr[0]);
+                const zoom = typeof initialZoom === 'number' ? initialZoom : 8;
 
                 // Initialize Google Map
                 map = new google.maps.Map(mapContainer, {
                     center: initialLatLng,
-                    zoom: initialZoom,
+                    zoom: zoom,
                     mapTypeControl: true,
                     streetViewControl: true,
                     fullscreenControl: true
