@@ -309,43 +309,68 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function reverseGeocode(centerLatLng) {
+        if (isDevelopment) console.log('Reverse geocoding:', centerLatLng);
         if (typeof google !== 'undefined' && google.maps && geocoder) {
             geocoder.geocode({ location: centerLatLng, region: 'CY' }, (results, status) => {
-                if (status === 'OK' && results?.length) {
-                    const result = results[0];
-                    const comps = result.address_components || [];
-                    const getComp = (type) => {
-                        const comp = comps.find((c) => c.types.includes(type));
-                        return comp ? comp.long_name : '';
-                    };
-                    const city =
-                        getComp('locality') ||
-                        getComp('administrative_area_level_3') ||
-                        getComp('postal_town') ||
-                        '';
-                    const district =
-                        getComp('neighborhood') ||
-                        getComp('sublocality') ||
-                        getComp('locality') ||
-                        city ||
-                        '';
-                    selectedLocation = {
-                        city,
-                        district,
-                        address: result.formatted_address || '',
-                        latitude: centerLatLng.lat(),
-                        longitude: centerLatLng.lng()
-                    };
-
-                    const geocoderInput = document.querySelector(
-                        '.mapboxgl-ctrl-geocoder input'
+                if (status === 'OK' && results && results.length) {
+                    // Filter out plus code results
+                    let result = results.find(r =>
+                        r.formatted_address && !r.formatted_address.match(/^\w{4,}\+/)
                     );
-                    if (geocoderInput)
-                        geocoderInput.value = selectedLocation.address;
+    
+                    if (!result) {
+                        // fallback to first if all are plus codes
+                        result = results[0];
+                        if (isDevelopment) console.warn('Only Plus Code results found, retrying for place_id:', result.place_id);
+    
+                        // Try getting more details for this place_id (might have street address)
+                        if (result.place_id) {
+                            geocoder.geocode({ placeId: result.place_id }, (res, st) => {
+                                if (st === 'OK' && res && res.length) {
+                                    const proper = res.find(r =>
+                                        r.formatted_address && !r.formatted_address.match(/^\w{4,}\+/)
+                                    ) || res[0];
+                                    applyReverseGeocodeResult(proper, centerLatLng);
+                                } else {
+                                    applyReverseGeocodeResult(result, centerLatLng);
+                                }
+                            });
+                            return;
+                        }
+                    }
+    
+                    applyReverseGeocodeResult(result, centerLatLng);
+                } else if (isDevelopment) {
+                    console.warn('Geocoder failed due to:', status);
                 }
             });
         }
     }
+    
+    // Helper function to apply the chosen result
+    function applyReverseGeocodeResult(result, centerLatLng) {
+        const comps = result.address_components || [];
+        const getComp = (type) => {
+            const comp = comps.find(c => c.types.includes(type));
+            return comp ? comp.long_name : '';
+        };
+        const city = getComp('locality') || getComp('administrative_area_level_3') || getComp('postal_town') || '';
+        const district = getComp('neighborhood') || getComp('sublocality') || getComp('locality') || city || '';
+    
+        selectedLocation = {
+            city,
+            district,
+            address: result.formatted_address || '',
+            latitude: centerLatLng.lat(),
+            longitude: centerLatLng.lng()
+        };
+    
+        const geocoderInput = document.querySelector('.mapboxgl-ctrl-geocoder input');
+        if (geocoderInput) geocoderInput.value = selectedLocation.address;
+    
+        if (isDevelopment) console.log('Final address:', selectedLocation.address);
+    }
+    
 
     function handleContinue(locationModal) {
         if (!selectedLocation.latitude || !selectedLocation.longitude) return;
