@@ -299,17 +299,39 @@ document.addEventListener('DOMContentLoaded', function () {
 
         
 
+        let isZooming = false;
         let moveTimeout;
+
+        // Detect zoom start/end
+        map.addListener('zoom_changed', () => {
+            isZooming = true;
+        });
+        
+        map.addListener('center_changed', () => {
+            if (!isZooming && marker) {
+                marker.setPosition(map.getCenter());
+            }
+        });
+        
         map.addListener('idle', () => {
-        if (moveTimeout) clearTimeout(moveTimeout);
-        moveTimeout = setTimeout(() => {
-            if (!marker) return;
-            const pos = marker.getPosition();
-            selectedCoordinates = [pos.lng(), pos.lat()];
-            const continueBtn = locationModal.querySelector('.choose-location-btn');
-            if (continueBtn) continueBtn.disabled = false;
-            reverseGeocode(pos);
-        }, 150);
+            if (isZooming) {
+                // Finished zooming — reset flag, no reverse geocode
+                isZooming = false;
+                return;
+            }
+
+            // Only run when map was moved, not zoomed
+            if (moveTimeout) clearTimeout(moveTimeout);
+            moveTimeout = setTimeout(() => {
+                const center = map.getCenter();
+                if (marker) marker.setPosition(center); // keep pin centered
+
+                selectedCoordinates = [center.lng(), center.lat()];
+                const continueBtn = locationModal.querySelector('.choose-location-btn');
+                if (continueBtn) continueBtn.disabled = false;
+
+                reverseGeocode(center); // update address after movement stops
+            }, 200);
         });
 
 
