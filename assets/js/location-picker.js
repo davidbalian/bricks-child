@@ -223,7 +223,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                     zoom: zoom,
                     mapTypeControl: true,
                     streetViewControl: true,
-                    fullscreenControl: true
+                    fullscreenControl: true,
+                    gestureHandling: 'greedy',
+                    zoomControl: true,
                 });
 
                 // Add Locate Me control (keep existing CSS classes for minimal UI change)
@@ -259,6 +261,21 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                         fields: ['geometry', 'formatted_address', 'address_components'],
                         types: ['geocode']
                     });
+
+                    google.maps.event.addListener(autocomplete, 'place_changed', function() {
+                        const place = autocomplete.getPlace();
+                        if (!place.geometry) return;
+                        const loc = place.geometry.location;
+                        map.panTo(loc);
+                        map.setZoom(15);
+                    
+                        selectedCoordinates = [loc.lng(), loc.lat()];
+                        updateMarkerPosition(loc);
+                    
+                        // Fix: visually indicate found address
+                        input.value = place.formatted_address || '';
+                    });
+                    
 
                     if (savedLocationForSession && savedLocationForSession.address) {
                         input.value = savedLocationForSession.address;
