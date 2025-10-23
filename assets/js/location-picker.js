@@ -297,9 +297,27 @@ document.addEventListener('DOMContentLoaded', function () {
             map.panTo(clicked);
         });
 
-        map.addListener('center_changed', () => {
-            if (marker) marker.setPosition(map.getCenter());
+        let isZooming = false;
+
+        // Keep the pin fixed in the visual center
+        map.addListener('zoom_changed', () => {
+            isZooming = true;
+            if (marker && map) {
+                const center = map.getCenter();
+                marker.setPosition(center);
+            }
         });
+
+        map.addListener('center_changed', () => {
+            if (!isZooming && marker && map) {
+                marker.setPosition(map.getCenter());
+            }
+        });
+
+        map.addListener('idle', () => {
+            isZooming = false;
+        });
+
 
         let moveTimeout;
         map.addListener('idle', () => {
