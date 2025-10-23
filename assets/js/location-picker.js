@@ -162,6 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.appendChild(locationModal);
 
         const mapContainer = locationModal.querySelector('.location-map');
+        mapContainer.classList.add('visible');
         const initialLatLng = new google.maps.LatLng(
             initialCenter[1],
             initialCenter[0]
