@@ -306,12 +306,28 @@ document.addEventListener('DOMContentLoaded', function () {
         map.addListener('zoom_changed', () => {
             isZooming = true;
         });
-        
+
+        let lastCenter = null;
+
         map.addListener('center_changed', () => {
-            if (!isZooming && marker) {
-                marker.setPosition(map.getCenter());
+            // Prevent marker repositioning while zooming or if center didn't really change
+            if (isZooming || !marker) return;
+
+            const currentCenter = map.getCenter();
+
+            // Avoid micro-movements caused by projection changes
+            if (
+                lastCenter &&
+                Math.abs(currentCenter.lat() - lastCenter.lat()) < 0.000001 &&
+                Math.abs(currentCenter.lng() - lastCenter.lng()) < 0.000001
+            ) {
+                return;
             }
+
+            marker.setPosition(currentCenter);
+            lastCenter = currentCenter;
         });
+
         
         map.addListener('idle', () => {
             if (isZooming) {
