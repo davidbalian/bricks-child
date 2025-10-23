@@ -237,20 +237,42 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const comps = place.address_components || [];
                 const getComp = (type) => {
-                    const comp = comps.find((c) => c.types.includes(type));
+                    const comp = comps.find(c => c.types.includes(type));
                     return comp ? comp.long_name : '';
                 };
-                const city =
-                    getComp('locality') ||
-                    getComp('administrative_area_level_3') ||
-                    getComp('postal_town') ||
-                    '';
-                const district =
-                    getComp('neighborhood') ||
+
+                // Extract sublocality / municipality
+                const sublocality =
                     getComp('sublocality') ||
-                    getComp('locality') ||
-                    city ||
+                    getComp('sublocality_level_1') ||
+                    getComp('neighborhood') ||
                     '';
+
+                // Extract broader region names
+                const municipality =
+                    getComp('locality') ||
+                    getComp('administrative_area_level_2') ||
+                    '';
+
+                const districtName =
+                    getComp('administrative_area_level_1') ||
+                    getComp('administrative_area_level_2') ||
+                    '';
+
+                // Convert Greek district names to English
+                const districtMap = {
+                    'Lemesos': 'Limassol',
+                    'Lefkosia': 'Nicosia',
+                    'Larnaka': 'Larnaca',
+                    'Ammochostos': 'Famagusta',
+                    'Pafos': 'Paphos'
+                };
+
+                // City = district (Limassol), District = municipality (Mesa Geitonia)
+                const city = districtMap[districtName] || districtName || municipality;
+                const district = sublocality || municipality || '';
+
+
                 selectedLocation = {
                     city,
                     district,
@@ -355,8 +377,34 @@ document.addEventListener('DOMContentLoaded', function () {
             const comp = comps.find(c => c.types.includes(type));
             return comp ? comp.long_name : '';
         };
-        const city = getComp('locality') || getComp('administrative_area_level_3') || getComp('postal_town') || '';
-        const district = getComp('neighborhood') || getComp('sublocality') || getComp('locality') || city || '';
+
+        const sublocality =
+            getComp('sublocality') ||
+            getComp('sublocality_level_1') ||
+            getComp('neighborhood') ||
+            '';
+
+        const municipality =
+            getComp('locality') ||
+            getComp('administrative_area_level_2') ||
+            '';
+
+        const districtName =
+            getComp('administrative_area_level_1') ||
+            getComp('administrative_area_level_2') ||
+            '';
+
+        const districtMap = {
+            'Lemesos': 'Limassol',
+            'Lefkosia': 'Nicosia',
+            'Larnaka': 'Larnaca',
+            'Ammochostos': 'Famagusta',
+            'Pafos': 'Paphos'
+        };
+
+        const city = districtMap[districtName] || districtName || municipality;
+        const district = sublocality || municipality || '';
+
     
         selectedLocation = {
             city,
@@ -397,11 +445,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (existing) existing.remove();
                 });
 
+                const roundCoord = (num) => parseFloat(Number(num).toFixed(6));
+
                 const fields = {
                     car_city: selectedLocation.city,
                     car_district: selectedLocation.district || selectedLocation.city,
-                    car_latitude: selectedLocation.latitude,
-                    car_longitude: selectedLocation.longitude,
+                    car_latitude: roundCoord(selectedLocation.latitude),
+                    car_longitude: roundCoord(selectedLocation.longitude),
                     car_address: finalAddress
                 };
 
