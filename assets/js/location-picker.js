@@ -297,40 +297,21 @@ document.addEventListener('DOMContentLoaded', function () {
             map.panTo(clicked);
         });
 
-        let isZooming = false;
-
-        // Keep the pin fixed in the visual center
-        map.addListener('zoom_changed', () => {
-            isZooming = true;
-            if (marker && map) {
-                const center = map.getCenter();
-                marker.setPosition(center);
-            }
-        });
-
-        map.addListener('center_changed', () => {
-            if (!isZooming && marker && map) {
-                marker.setPosition(map.getCenter());
-            }
-        });
-
-        map.addListener('idle', () => {
-            isZooming = false;
-        });
-
+        
 
         let moveTimeout;
         map.addListener('idle', () => {
-            if (moveTimeout) clearTimeout(moveTimeout);
-            moveTimeout = setTimeout(() => {
-                const center = map.getCenter();
-                selectedCoordinates = [center.lng(), center.lat()];
-                const continueBtn =
-                    locationModal.querySelector('.choose-location-btn');
-                if (continueBtn) continueBtn.disabled = false;
-                reverseGeocode(center);
-            }, 150);
+        if (moveTimeout) clearTimeout(moveTimeout);
+        moveTimeout = setTimeout(() => {
+            if (!marker) return;
+            const pos = marker.getPosition();
+            selectedCoordinates = [pos.lng(), pos.lat()];
+            const continueBtn = locationModal.querySelector('.choose-location-btn');
+            if (continueBtn) continueBtn.disabled = false;
+            reverseGeocode(pos);
+        }, 150);
         });
+
 
         // --- Close modal ---
         const closeBtn = locationModal.querySelector('.close-modal');
