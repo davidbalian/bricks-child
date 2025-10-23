@@ -11,6 +11,36 @@ document.addEventListener('DOMContentLoaded', function () {
         longitude: null
     };
 
+    // --- Helper: consistent Cyprus location extraction ---
+    function extractCyprusLocation(comps) {
+        const get = (type) => {
+            const c = comps.find(c => c.types.includes(type));
+            return c ? c.long_name : '';
+        };
+
+        const locality = get('locality'); // Mesa Geitonia, Agios Athanasios
+        const sublocality = get('sublocality') || get('sublocality_level_1') || get('neighborhood');
+        const admin1 = get('administrative_area_level_1'); // Lemesos, Lefkosia …
+        const admin2 = get('administrative_area_level_2'); // Dimos Amathountas …
+
+        const districtMap = {
+            'Lemesos': 'Limassol',
+            'Lefkosia': 'Nicosia',
+            'Larnaka': 'Larnaca',
+            'Ammochostos': 'Famagusta',
+            'Pafos': 'Paphos'
+        };
+        const city = districtMap[admin1] || admin1 || '';
+
+        let municipality = '';
+        if (locality) municipality = locality;
+        else if (!locality && sublocality) municipality = sublocality;
+        else if (!locality && !sublocality && admin2) municipality = admin2;
+
+        return { city, district: municipality };
+    }
+
+
     let savedLocationForSession = null;
     let locationModal = null;
 
@@ -241,36 +271,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     return comp ? comp.long_name : '';
                 };
 
-                // Extract sublocality / municipality
-                const sublocality =
-                    getComp('sublocality') ||
-                    getComp('sublocality_level_1') ||
-                    getComp('neighborhood') ||
-                    '';
 
-                // Extract broader region names
-                const municipality =
-                    getComp('locality') ||
-                    getComp('administrative_area_level_2') ||
-                    '';
+                const { city, district } = extractCyprusLocation(comps);
 
-                const districtName =
-                    getComp('administrative_area_level_1') ||
-                    getComp('administrative_area_level_2') ||
-                    '';
-
-                // Convert Greek district names to English
-                const districtMap = {
-                    'Lemesos': 'Limassol',
-                    'Lefkosia': 'Nicosia',
-                    'Larnaka': 'Larnaca',
-                    'Ammochostos': 'Famagusta',
-                    'Pafos': 'Paphos'
-                };
-
-                // City = district (Limassol), District = municipality (Mesa Geitonia)
-                const city = districtMap[districtName] || districtName || municipality;
-                const district = sublocality || municipality || '';
 
 
                 selectedLocation = {
@@ -378,32 +381,8 @@ document.addEventListener('DOMContentLoaded', function () {
             return comp ? comp.long_name : '';
         };
 
-        const sublocality =
-            getComp('sublocality') ||
-            getComp('sublocality_level_1') ||
-            getComp('neighborhood') ||
-            '';
+        const { city, district } = extractCyprusLocation(comps);
 
-        const municipality =
-            getComp('locality') ||
-            getComp('administrative_area_level_2') ||
-            '';
-
-        const districtName =
-            getComp('administrative_area_level_1') ||
-            getComp('administrative_area_level_2') ||
-            '';
-
-        const districtMap = {
-            'Lemesos': 'Limassol',
-            'Lefkosia': 'Nicosia',
-            'Larnaka': 'Larnaca',
-            'Ammochostos': 'Famagusta',
-            'Pafos': 'Paphos'
-        };
-
-        const city = districtMap[districtName] || districtName || municipality;
-        const district = sublocality || municipality || '';
 
     
         selectedLocation = {
