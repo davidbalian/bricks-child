@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     let map = null;
-    let marker = null;
+    // let marker = null;
     let selectedCoordinates = null;
     let geocoder = null;
     let selectedLocation = {
@@ -127,22 +127,22 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     // --- End Locate Me Control ---
 
-    function updateMarkerPosition(lngLat) {
-        if (!marker) {
-            marker = new google.maps.Marker({
-                position: lngLat,
-                map: map,
-                draggable: false
-            });
-        } else {
-            marker.setPosition(lngLat);
-        }
+    // function updateMarkerPosition(lngLat) {
+    //     if (!marker) {
+    //         marker = new google.maps.Marker({
+    //             position: lngLat,
+    //             map: map,
+    //             draggable: false
+    //         });
+    //     } else {
+    //         marker.setPosition(lngLat);
+    //     }
 
-        const continueBtn = document.querySelector(
-            '.location-picker-modal .choose-location-btn'
-        );
-        if (continueBtn) continueBtn.disabled = false;
-    }
+    //     const continueBtn = document.querySelector(
+    //         '.location-picker-modal .choose-location-btn'
+    //     );
+    //     if (continueBtn) continueBtn.disabled = false;
+    // }
 
     function showLocationPicker() {
         if (locationModal && document.body.contains(locationModal)) {
@@ -208,12 +208,31 @@ document.addEventListener('DOMContentLoaded', function () {
             zoomControl: true
         });
 
+        // --- Add a fixed center pin overlay (HTML) ---
+        const pin = document.createElement('div');
+        pin.className = 'center-pin';
+        pin.innerHTML = `
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="red" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"></path>
+            <circle cx="12" cy="9" r="2.5"></circle>
+        </svg>
+        `;
+        pin.style.position = 'absolute';
+        pin.style.top = '50%';
+        pin.style.left = '50%';
+        pin.style.transform = 'translate(-50%, -100%)';
+        pin.style.zIndex = '2';            // above the map canvas
+        pin.style.pointerEvents = 'none';  // let map interactions pass through
+        mapContainer.style.position = 'relative'; // ensure positioning context
+        mapContainer.appendChild(pin);
+
+
         const locateCtrl = new LocateMeControl();
         const locateNode = locateCtrl.onAdd(map);
         map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(locateNode);
 
         const mapCenter = map.getCenter();
-        updateMarkerPosition(mapCenter);
+        // updateMarkerPosition(mapCenter);
         selectedCoordinates = [mapCenter.lng(), mapCenter.lat()];
 
         // --- Geocoder + Places Autocomplete ---
@@ -261,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const loc = place.geometry.location;
                 map.panTo(loc);
                 map.setZoom(15);
-                updateMarkerPosition(loc);
+                // updateMarkerPosition(loc);
                 selectedCoordinates = [loc.lng(), loc.lat()];
                 input.value = place.formatted_address || '';
 
@@ -300,53 +319,49 @@ document.addEventListener('DOMContentLoaded', function () {
         
 
         let isZooming = false;
-        let moveTimeout;
+        
 
         // Detect zoom start/end
         map.addListener('zoom_changed', () => {
             isZooming = true;
         });
 
-        let lastCenter = null;
+        // let lastCenter = null;
 
-        map.addListener('center_changed', () => {
-            // Prevent marker repositioning while zooming or if center didn't really change
-            if (isZooming || !marker) return;
+        // map.addListener('center_changed', () => {
+        //     // Prevent marker repositioning while zooming or if center didn't really change
+        //     if (isZooming || !marker) return;
 
-            const currentCenter = map.getCenter();
+        //     const currentCenter = map.getCenter();
 
-            // Avoid micro-movements caused by projection changes
-            if (
-                lastCenter &&
-                Math.abs(currentCenter.lat() - lastCenter.lat()) < 0.000001 &&
-                Math.abs(currentCenter.lng() - lastCenter.lng()) < 0.000001
-            ) {
-                return;
-            }
+        //     // Avoid micro-movements caused by projection changes
+        //     if (
+        //         lastCenter &&
+        //         Math.abs(currentCenter.lat() - lastCenter.lat()) < 0.000001 &&
+        //         Math.abs(currentCenter.lng() - lastCenter.lng()) < 0.000001
+        //     ) {
+        //         return;
+        //     }
 
-            marker.setPosition(currentCenter);
-            lastCenter = currentCenter;
-        });
+        //     marker.setPosition(currentCenter);
+        //     lastCenter = currentCenter;
+        // });
 
         
+        let moveTimeout;
         map.addListener('idle', () => {
-            if (isZooming) {
-                // Finished zooming — reset flag, no reverse geocode
-                isZooming = false;
-                return;
-            }
+            // if just finished zooming, skip reverse geocode to avoid jitter
+            if (isZooming) { isZooming = false; return; }
 
-            // Only run when map was moved, not zoomed
             if (moveTimeout) clearTimeout(moveTimeout);
             moveTimeout = setTimeout(() => {
                 const center = map.getCenter();
-                if (marker) marker.setPosition(center); // keep pin centered
-
                 selectedCoordinates = [center.lng(), center.lat()];
+
                 const continueBtn = locationModal.querySelector('.choose-location-btn');
                 if (continueBtn) continueBtn.disabled = false;
 
-                reverseGeocode(center); // update address after movement stops
+                reverseGeocode(center);
             }, 200);
         });
 
