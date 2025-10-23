@@ -310,3 +310,15 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+
+/* Force Google Autocomplete dropdown to appear on top of modals */
+.pac-container {
+  z-index: 999999 !important;
+  position: absolute !important;
+}
+
+/* Make sure the modal doesn't clip it */
+.location-picker-modal {
+  overflow: visible !important;
+}
