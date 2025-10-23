@@ -203,7 +203,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const autocomplete = new google.maps.places.Autocomplete(input, {
                 componentRestrictions: { country: 'cy' },
                 fields: ['geometry', 'formatted_address', 'address_components'],
-                types: ['geocode']
+                types: ['geocode'],
+                language: 'en'
             });
 
             // Ensure dropdown appears correctly
@@ -311,7 +312,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function reverseGeocode(centerLatLng) {
         if (isDevelopment) console.log('Reverse geocoding:', centerLatLng);
         if (typeof google !== 'undefined' && google.maps && geocoder) {
-            geocoder.geocode({ location: centerLatLng, region: 'CY' }, (results, status) => {
+            geocoder.geocode({ location: centerLatLng, region: 'CY', language: 'en' }, (results, status) => {
                 if (status === 'OK' && results && results.length) {
                     // Filter out plus code results
                     let result = results.find(r =>
@@ -325,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
                         // Try getting more details for this place_id (might have street address)
                         if (result.place_id) {
-                            geocoder.geocode({ placeId: result.place_id }, (res, st) => {
+                            geocoder.geocode({ placeId: result.place_id, language: 'en' }, (res, st) => {
                                 if (st === 'OK' && res && res.length) {
                                     const proper = res.find(r =>
                                         r.formatted_address && !r.formatted_address.match(/^\w{4,}\+/)

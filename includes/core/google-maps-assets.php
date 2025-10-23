@@ -16,7 +16,7 @@ function autoagora_enqueue_google_maps_assets() {
     if (is_page('add-listing') || is_page('edit-listing')) {
 
         // ✅ Google Maps with Places Library
-        $google_maps_url = 'https://maps.googleapis.com/maps/api/js?key=' . urlencode(GOOGLE_MAPS_API_KEY) . '&libraries=places';
+        $google_maps_url = 'https://maps.googleapis.com/maps/api/js?key=' . urlencode(GOOGLE_MAPS_API_KEY) . '&libraries=places&language=en';
         wp_enqueue_script('google-maps', $google_maps_url, [], null, true);
 
         // ✅ Location Picker CSS
