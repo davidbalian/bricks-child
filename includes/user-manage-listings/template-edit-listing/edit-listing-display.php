@@ -271,7 +271,7 @@ if (!defined('ABSPATH')) {
                         <div class="add-listing-image-column">
                             <div class="add-listing-images-section">
                                 <h2><?php esc_html_e('Upload Images', 'bricks-child'); ?></h2>
-                                <p class="image-upload-info"><?php esc_html_e('Hold CTRL to choose several photos. Maximum 25 images per listing. Maximum file size is 5MB, the formats are .jpg, .jpeg, .jfif, .png, .gif, .webp', 'bricks-child'); ?></p>
+                                <p class="image-upload-info"><?php esc_html_e('Hold CTRL to choose several photos. Minimum 2 images per listing. Maximum 25 images per listing. Maximum file size is 5MB, the formats are .jpg, .jpeg, .png, .gif, .webp. Images are automatically optimized and converted to WebP for faster loading.', 'bricks-child'); ?></p>
                                 <p class="image-upload-note"><?php esc_html_e('Note: ads with good photos get more attention', 'bricks-child'); ?></p>
                                 <div class="image-upload-container">
                                     <div class="file-upload-area" id="file-upload-area" role="button" tabindex="0">
@@ -300,7 +300,6 @@ if (!defined('ABSPATH')) {
                                         ?>
                                     </div>
                                 </div>
-                                <p class="image-upload-info"><?php esc_html_e('Hold CTRL to choose several photos. Minimum 5 images per listing. Maximum 25 images per listing. Maximum file size is 5MB, the formats are .jpg, .jpeg, .png, .gif, .webp. Images are automatically optimized and converted to WebP for faster loading.', 'bricks-child'); ?></p>
                             </div>
                         </div>
                     </div>

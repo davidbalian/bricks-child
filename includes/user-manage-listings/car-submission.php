@@ -691,7 +691,7 @@ function handle_edit_car_listing() {
     $new_images_count = !empty($async_images) ? count($async_images) : (isset($_FILES['car_images']) && !empty($_FILES['car_images']['name'][0]) ? count($_FILES['car_images']['name']) : 0);
     $total_images = $remaining_existing + $new_images_count;
     
-    if ($total_images < 5) {
+    if ($total_images < 2) {
         wp_redirect(add_query_arg('error', 'insufficient_images', wp_get_referer()));
         exit;
     }
