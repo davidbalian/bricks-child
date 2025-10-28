@@ -231,9 +231,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       totalImages = accumulatedFilesList.length;
     }
 
-    if (totalImages < 5) {
+    if (totalImages < 2) {
       e.preventDefault();
-      alert("Please upload at least 5 images before submitting the form");
+      alert("Please upload at least 2 images before submitting the form");
       return;
     }
     if (totalImages > 25) {

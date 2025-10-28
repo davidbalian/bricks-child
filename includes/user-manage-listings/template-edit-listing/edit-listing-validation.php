@@ -106,10 +106,10 @@ function validate_image_requirements($existing_images, $removed_images, $new_ima
     // FIXED: Simple count - no featured image adjustment needed
     $final_count = count($remaining_existing) + $new_image_count;
     
-    if ($final_count < 5) {
+    if ($final_count < 2) {
         return array(
             'valid' => false,
-            'message' => 'At least 5 images are required. Current count: ' . $final_count
+            'message' => 'At least 2 images are required. Current count: ' . $final_count
         );
     }
     

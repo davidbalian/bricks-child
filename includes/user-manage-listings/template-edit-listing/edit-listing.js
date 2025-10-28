@@ -480,9 +480,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             if (isDevelopment) console.log('[Edit Listing] Traditional mode - Existing:', existingImagesCount, 'New files:', accumulatedFilesList.length, 'Total:', totalImages);
         }
         
-        if (totalImages < 5) {
+        if (totalImages < 2) {
             e.preventDefault();
-            alert('Please ensure there are at least 5 images for your car listing (including existing and newly added).');
+            alert('Please ensure there are at least 2 images for your car listing (including existing and newly added).');
             return false;
         }
         if (totalImages > 25) {
