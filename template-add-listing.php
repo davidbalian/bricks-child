@@ -189,9 +189,19 @@ get_header(); ?>
                 // Display the add listing form
                 ?>
                 <p class="listing-note-button">
-                    <a href="https://carvaluecy.com/" class="button gradient-button" target="_blank" rel="noopener">
-                        <?php esc_html_e( 'Get a Free Car Valuation', 'bricks-child' ); ?>
-                    </a>
+                <a href="https://carvaluecy.com/" 
+                    class="inline-flex items-center justify-center gap-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-10 btn-primary group relative overflow-hidden text-sm px-8 py-3 rounded-2xl font-bold shadow-glow-green hover:shadow-xl transition-all duration-300 hover:scale-105 whitespace-nowrap"
+                    target="_blank" 
+                    rel="noopener">
+                    <span class="relative z-10 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-euro w-4 h-4 group-hover:rotate-12 transition-transform duration-300 flex-shrink-0">
+                        <path d="M4 10h12"></path>
+                        <path d="M4 14h9"></path>
+                        <path d="M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12c0 4.4 3.5 8 7.8 8 2 0 3.8-.8 5.2-2"></path>
+                    </svg>
+                    <span class="truncate leading-none">Get Valuation</span>
+                    </span>
+                </a>
                 </p>
 
                 <form id="add-car-listing-form" class="car-listing-form" method="post" enctype="multipart/form-data" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
