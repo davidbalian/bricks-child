@@ -132,11 +132,6 @@ get_header(); ?>
                 </div>
                 <h1><?php esc_html_e( 'Add New Car Listing', 'bricks-child' ); ?></h1>
                 <p class="listing-note"><?php esc_html_e( 'Note: Duplicate listings will be flagged and removed. You can find all your ads in "My Listings" on the top of the site.', 'bricks-child' ); ?></p>
-                <p class="listing-note-button">
-                    <a href="https://carvaluecy.com/" class="button gradient-button" target="_blank" rel="noopener">
-                        <?php esc_html_e( 'Get a Free Car Valuation', 'bricks-child' ); ?>
-                    </a>
-                </p>
                 <?php
             } elseif ( isset( $_GET['listing_errors'] ) ) {
                 ?>
@@ -193,6 +188,12 @@ get_header(); ?>
                 
                 // Display the add listing form
                 ?>
+                <p class="listing-note-button">
+                    <a href="https://carvaluecy.com/" class="button gradient-button" target="_blank" rel="noopener">
+                        <?php esc_html_e( 'Get a Free Car Valuation', 'bricks-child' ); ?>
+                    </a>
+                </p>
+
                 <form id="add-car-listing-form" class="car-listing-form" method="post" enctype="multipart/form-data" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
                     <?php wp_nonce_field( 'add_car_listing_nonce', 'add_car_listing_nonce' ); ?>
                     <input type="hidden" name="action" value="add_new_car_listing">
