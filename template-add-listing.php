@@ -132,6 +132,11 @@ get_header(); ?>
                 </div>
                 <h1><?php esc_html_e( 'Add New Car Listing', 'bricks-child' ); ?></h1>
                 <p class="listing-note"><?php esc_html_e( 'Note: Duplicate listings will be flagged and removed. You can find all your ads in "My Listings" on the top of the site.', 'bricks-child' ); ?></p>
+                <p class="listing-note-button">
+                    <a href="https://carvaluecy.com/" class="button gradient-button" target="_blank" rel="noopener">
+                        <?php esc_html_e( 'Get a Free Car Valuation', 'bricks-child' ); ?>
+                    </a>
+                </p>
                 <?php
             } elseif ( isset( $_GET['listing_errors'] ) ) {
                 ?>
