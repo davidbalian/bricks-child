@@ -1,3 +1,31 @@
+/* Page Edit Listing Container */
+.page-edit-listing {
+  padding: 3rem 1rem;
+  max-width: var(--max-width);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.page-edit-listing h1 {
+  margin-bottom: 2rem;
+}
+
+.page-edit-listing label {
+  color: #363636;
+}
+
+/* Remove bottom margin from labels in checkbox grids */
+.page-edit-listing .vehicle-history-grid label,
+.page-edit-listing .vehicle-history-option label {
+  margin-bottom: 0;
+}
+
+/* Remove top padding and margin from form-row */
+.page-edit-listing .form-row {
+  margin-top: 0;
+  padding-top: 0;
+}
+
 input[readonly],
 input[readonly]:hover,
 input[readonly]:focus {
