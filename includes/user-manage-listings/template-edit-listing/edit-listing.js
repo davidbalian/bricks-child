@@ -63,6 +63,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
      * - The order of accumulatedFilesList for traditional uploads
      */
     let dragSourceItem = null;
+    let touchDragActive = false;
 
     // Attach identity metadata to existing items (their attachment IDs)
     imagePreviewContainer.find('.image-preview-item').each(function () {
@@ -70,13 +71,13 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         if (imageId) {
             $(this).data('imageId', parseInt(imageId, 10));
         }
-        $(this).attr('draggable', 'true');
+        $(this).attr('draggable', 'true').css('cursor', 'grab');
     });
 
     function enableImageReordering() {
         imagePreviewContainer.on('dragstart', '.image-preview-item', function (e) {
             dragSourceItem = this;
-            $(this).addClass('dragging');
+            $(this).addClass('dragging').css('cursor', 'grabbing');
             if (e.originalEvent && e.originalEvent.dataTransfer) {
                 e.originalEvent.dataTransfer.effectAllowed = 'move';
                 e.originalEvent.dataTransfer.setData('text/plain', 'drag');
@@ -113,9 +114,62 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         });
 
         imagePreviewContainer.on('dragend', '.image-preview-item', function () {
-            imagePreviewContainer.find('.image-preview-item').removeClass('dragging');
+            imagePreviewContainer
+                .find('.image-preview-item')
+                .removeClass('dragging')
+                .css('cursor', 'grab');
             dragSourceItem = null;
         });
+
+        /**
+         * Touch support (mobile) – emulate drag & drop using touch events.
+         */
+        imagePreviewContainer.on('touchstart', '.image-preview-item', function (e) {
+            const touches = e.originalEvent.touches;
+            if (!touches || touches.length !== 1) return;
+            dragSourceItem = this;
+            touchDragActive = true;
+            $(this).addClass('dragging').css('cursor', 'grabbing');
+        });
+
+        imagePreviewContainer.on('touchmove', '.image-preview-item', function (e) {
+            if (!touchDragActive || !dragSourceItem) return;
+            const touches = e.originalEvent.touches;
+            if (!touches || touches.length !== 1) return;
+
+            const touch = touches[0];
+            const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
+            const $targetItem = $(targetElement).closest('.image-preview-item');
+
+            if ($targetItem.length && $targetItem[0] !== dragSourceItem) {
+                const $dragSource = $(dragSourceItem);
+                if ($targetItem.index() < $dragSource.index()) {
+                    $targetItem.before($dragSource);
+                } else {
+                    $targetItem.after($dragSource);
+                }
+            }
+
+            // Prevent the page from scrolling while dragging
+            e.preventDefault();
+        });
+
+        imagePreviewContainer.on(
+            'touchend touchcancel',
+            '.image-preview-item',
+            function () {
+                if (!touchDragActive) return;
+                imagePreviewContainer
+                    .find('.image-preview-item')
+                    .removeClass('dragging')
+                    .css('cursor', 'grab');
+                dragSourceItem = null;
+                touchDragActive = false;
+
+                syncNewFilesWithDomOrder();
+                updateImageOrderField();
+            }
+        );
     }
 
     function syncNewFilesWithDomOrder() {
