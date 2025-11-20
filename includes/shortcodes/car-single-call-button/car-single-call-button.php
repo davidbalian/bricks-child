@@ -55,7 +55,7 @@ function car_single_call_button_shortcode($atts) {
             color: #ffffff;
         ">
             <i class="fas fa-phone" style="color: #ffffff; font-size: 1rem;"></i>
-            <span style="color: #ffffff;"><?php echo esc_html($button_display_text); ?></span>
+            <?php echo esc_html($button_display_text); ?>
         </a>
         <?php
     }
