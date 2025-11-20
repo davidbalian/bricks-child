@@ -63,21 +63,22 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
      * - The order of accumulatedFilesList for traditional uploads
      */
     let dragSourceItem = null;
-    let touchDragActive = false;
 
     // Attach identity metadata to existing items (their attachment IDs)
     imagePreviewContainer.find('.image-preview-item').each(function () {
-        const imageId = $(this).find('.remove-image[data-image-id]').data('image-id');
+        const $item = $(this);
+        const imageId = $item.find('.remove-image[data-image-id]').data('image-id');
         if (imageId) {
-            $(this).data('imageId', parseInt(imageId, 10));
+            $item.data('imageId', parseInt(imageId, 10));
         }
-        $(this).attr('draggable', 'true').css('cursor', 'grab');
+        $item.attr('draggable', 'true');
+        attachSwapHandle($item);
     });
 
     function enableImageReordering() {
         imagePreviewContainer.on('dragstart', '.image-preview-item', function (e) {
             dragSourceItem = this;
-            $(this).addClass('dragging').css('cursor', 'grabbing');
+            $(this).addClass('dragging');
             if (e.originalEvent && e.originalEvent.dataTransfer) {
                 e.originalEvent.dataTransfer.effectAllowed = 'move';
                 e.originalEvent.dataTransfer.setData('text/plain', 'drag');
@@ -114,62 +115,52 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         });
 
         imagePreviewContainer.on('dragend', '.image-preview-item', function () {
-            imagePreviewContainer
-                .find('.image-preview-item')
-                .removeClass('dragging')
-                .css('cursor', 'grab');
+            imagePreviewContainer.find('.image-preview-item').removeClass('dragging');
             dragSourceItem = null;
         });
+    }
 
-        /**
-         * Touch support (mobile) – emulate drag & drop using touch events.
-         */
-        imagePreviewContainer.on('touchstart', '.image-preview-item', function (e) {
-            const touches = e.originalEvent.touches;
-            if (!touches || touches.length !== 1) return;
-            dragSourceItem = this;
-            touchDragActive = true;
-            $(this).addClass('dragging').css('cursor', 'grabbing');
-        });
+    function swapPreviewWithNeighbour($item) {
+        if (!$item || !$item.length) return;
 
-        imagePreviewContainer.on('touchmove', '.image-preview-item', function (e) {
-            if (!touchDragActive || !dragSourceItem) return;
-            const touches = e.originalEvent.touches;
-            if (!touches || touches.length !== 1) return;
+        let swapped = false;
+        const $next = $item.next('.image-preview-item');
 
-            const touch = touches[0];
-            const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
-            const $targetItem = $(targetElement).closest('.image-preview-item');
-
-            if ($targetItem.length && $targetItem[0] !== dragSourceItem) {
-                const $dragSource = $(dragSourceItem);
-                if ($targetItem.index() < $dragSource.index()) {
-                    $targetItem.before($dragSource);
-                } else {
-                    $targetItem.after($dragSource);
-                }
+        if ($next.length) {
+            $next.after($item);
+            swapped = true;
+        } else {
+            const $prev = $item.prev('.image-preview-item');
+            if ($prev.length) {
+                $prev.before($item);
+                swapped = true;
             }
+        }
 
-            // Prevent the page from scrolling while dragging
-            e.preventDefault();
-        });
+        if (swapped) {
+            syncNewFilesWithDomOrder();
+            updateImageOrderField();
+        }
+    }
 
-        imagePreviewContainer.on(
-            'touchend touchcancel',
-            '.image-preview-item',
-            function () {
-                if (!touchDragActive) return;
-                imagePreviewContainer
-                    .find('.image-preview-item')
-                    .removeClass('dragging')
-                    .css('cursor', 'grab');
-                dragSourceItem = null;
-                touchDragActive = false;
+    function attachSwapHandle($item) {
+        const $element = $item instanceof jQuery ? $item : $($item);
+        if ($element.find('.image-swap-handle').length) return;
 
-                syncNewFilesWithDomOrder();
-                updateImageOrderField();
-            }
-        );
+        const handle = $('<button>')
+            .attr({
+                type: 'button',
+                class: 'image-swap-handle',
+                'aria-label': 'Move image'
+            })
+            .html('<i class="fas fa-arrows-up-down-left-right"></i>')
+            .on('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                swapPreviewWithNeighbour($element);
+            });
+
+        $element.append(handle);
     }
 
     function syncNewFilesWithDomOrder() {
@@ -546,8 +537,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             
             imagePreviewContainer.append(previewItem);
 
-            // Ensure new items are draggable and part of the order calculations
+            // Ensure new items are draggable, have swap handle and are part of the order calculations
             previewItem.attr('draggable', 'true');
+            attachSwapHandle(previewItem);
             updateImageOrderField();
         };
         reader.onerror = function() {
