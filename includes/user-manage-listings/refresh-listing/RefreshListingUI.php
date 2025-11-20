@@ -51,7 +51,7 @@ class RefreshListingUI {
         $time_remaining = $this->manager->get_time_until_refresh($post_id);
         $refresh_count = $this->manager->get_refresh_count($post_id);
         
-        $button_class = $can_refresh ? 'button refresh-button' : 'button refresh-button disabled';
+        $button_class = $can_refresh ? 'btn btn-success refresh-button' : 'btn btn-success refresh-button';
         $button_disabled = $can_refresh ? '' : ' disabled';
         $icon_class = 'fas fa-sync-alt';
         $button_text = $can_refresh ? 'Refresh Listing' : 'Available in ' . $time_remaining;

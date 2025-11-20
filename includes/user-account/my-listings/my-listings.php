@@ -249,7 +249,7 @@ function display_my_listings($atts) {
                                         $button_text = $is_sold ? ' Mark as Available' : ' Mark as Sold';
                                         $button_class = $is_sold
                                             ? 'btn btn-primary available-button'
-                                            : 'btn btn-primary sold-button';
+                                            : 'btn btn-success sold-button';
                                         $icon_class = $is_sold ? 'fas fa-undo-alt' : 'fas fa-check-circle';
                                         ?>
                                         <button class="<?php echo esc_attr($button_class); ?>" 
@@ -265,7 +265,7 @@ function display_my_listings($atts) {
                                         '_wpnonce' => wp_create_nonce('delete_car_listing_' . $post_id)
                                     ), admin_url('admin-post.php'));
                                     ?>
-                                    <a href="<?php echo esc_url($delete_url); ?>" class="btn btn-secondary delete-button" onclick="return confirm('Are you sure you want to delete this listing? This action cannot be undone.');"><i class="fas fa-trash-alt"></i> Delete</a>
+                                    <a href="<?php echo esc_url($delete_url); ?>" class="btn btn-danger delete-button" onclick="return confirm('Are you sure you want to delete this listing? This action cannot be undone.');"><i class="fas fa-trash-alt"></i> Delete</a>
                                 </div>
                             </div>
                         </div>

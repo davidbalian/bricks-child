@@ -108,6 +108,24 @@
   background-color: #444;
 }
 
+.btn-success {
+  background-color: var(--success-green);
+  color: var(--white);
+}
+
+.btn-success:hover:not(:disabled) {
+  opacity: var(--opacity);
+}
+
+.btn-danger {
+  background-color: #e63e32;
+  color: var(--white);
+}
+
+.btn-danger:hover:not(:disabled) {
+  opacity: var(--opacity);
+}
+
 .btn-link {
   background: transparent;
   color: var(--dark-blue);

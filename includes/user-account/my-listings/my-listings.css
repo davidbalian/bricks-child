@@ -171,14 +171,7 @@
 }
 
 .delete-button {
-  background-color: red !important;
-  color: var(--white);
   margin-left: auto !important;
-}
-
-.sold-button {
-  background-color: green !important;
-  color: var(--white);
 }
 
 .listings-area {

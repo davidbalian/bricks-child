@@ -9,9 +9,6 @@
 
 /* Refresh Button */
 .refresh-button {
-  background-color: #28a745 !important;
-  color: var(--white) !important;
-  border: none;
   position: relative;
   transition: all 0.2s ease;
   display: inline-flex;
@@ -20,25 +17,12 @@
   white-space: nowrap;
 }
 
-.refresh-button:hover:not(.disabled) {
-  background-color: #218838 !important;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.refresh-button.disabled {
-  background-color: #6c757d !important;
+.refresh-button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.refresh-button.disabled:hover {
-  transform: none;
-  box-shadow: none;
-}
-
 .refresh-button.loading {
-  background-color: #007bff !important;
   cursor: wait;
 }
 
@@ -139,7 +123,7 @@
 }
 
 .refresh-info-tooltip .tooltip-content::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 100%;
   left: 50%;
@@ -201,7 +185,7 @@
     margin-left: 0;
     margin-top: 0.5rem;
   }
-  
+
   .refresh-info-tooltip .tooltip-content {
     width: 250px;
   }
@@ -212,13 +196,13 @@
     width: 100%;
     justify-content: center;
   }
-  
+
   .refresh-info {
     text-align: center;
     justify-content: center;
     width: 100%;
   }
-  
+
   .refresh-info-tooltip .tooltip-content {
     width: calc(100vw - 40px);
     max-width: 300px;
@@ -237,4 +221,3 @@
 .listing-actions .refresh-button {
   flex-shrink: 0;
 }
-
