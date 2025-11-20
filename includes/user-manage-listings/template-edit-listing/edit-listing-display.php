@@ -11,29 +11,28 @@ if (!defined('ABSPATH')) {
 ?>
 
 <div class="page-edit-listing">
-    <div class="ast-container">
-        <div class="ast-row">
-            <div class="ast-col-md-12">
-                <?php
-                if (isset($_GET['listing_error'])) {
-                    ?>
-                    <div class="listing-error-message">
-                        <h2><?php esc_html_e('Submission Error', 'bricks-child'); ?></h2>
-                        <p><?php esc_html_e('There was a problem with your submission. Please check all fields and try again.', 'bricks-child'); ?></p>
-                    </div>
-                    <?php
-                }
+    <div class="bricks-container">
+        <div class="bricks-content">
+            <?php
+            if (isset($_GET['listing_error'])) {
                 ?>
-                <h1><?php esc_html_e('Edit Car Listing', 'bricks-child'); ?></h1>
-                
-                <form id="edit-car-listing-form" class="car-listing-form" method="post" enctype="multipart/form-data" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-                    <?php wp_nonce_field('edit_car_listing_nonce', 'edit_car_listing_nonce'); ?>
-                    <input type="hidden" name="action" value="edit_car_listing">
-                    <input type="hidden" name="car_id" value="<?php echo esc_attr($car_id); ?>">
-                    <input type="hidden" id="async_session_id" name="async_session_id" value="">
+                <div class="listing-error-message">
+                    <h2><?php esc_html_e('Submission Error', 'bricks-child'); ?></h2>
+                    <p><?php esc_html_e('There was a problem with your submission. Please check all fields and try again.', 'bricks-child'); ?></p>
+                </div>
+                <?php
+            }
+            ?>
+            <h1><?php esc_html_e('Edit Car Listing', 'bricks-child'); ?></h1>
+            
+            <form id="edit-car-listing-form" class="car-listing-form" method="post" enctype="multipart/form-data" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                <?php wp_nonce_field('edit_car_listing_nonce', 'edit_car_listing_nonce'); ?>
+                <input type="hidden" name="action" value="edit_car_listing">
+                <input type="hidden" name="car_id" value="<?php echo esc_attr($car_id); ?>">
+                <input type="hidden" id="async_session_id" name="async_session_id" value="">
 
-                    <div class="add-listing-main-row">
-                        <div class="add-listing-main-info-column">
+                <div class="add-listing-main-row">
+                    <div class="add-listing-main-info-column">
                             <div class="form-section basic-details-section">
                                 <h2><?php esc_html_e('Basic Details', 'bricks-child'); ?></h2>
                                 <div class="form-row form-row-thirds">
@@ -303,12 +302,12 @@ if (!defined('ABSPATH')) {
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="form-row">
-                        <button type="submit" class="submit-button gradient-button"><?php esc_html_e('Update Listing', 'bricks-child'); ?></button>
-                    </div>
-                </form>
-            </div>
+                <div class="form-row">
+                    <button type="submit" class="submit-button gradient-button"><?php esc_html_e('Update Listing', 'bricks-child'); ?></button>
+                </div>
+            </form>
         </div>
     </div>
 </div> 
