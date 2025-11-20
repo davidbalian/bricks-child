@@ -86,8 +86,10 @@ function display_my_account_main($current_user) {
                         echo '<span class="email-status verified">✅ Verified</span>';
                         echo '<button class="btn btn-primary edit-email-btn">Change Email</button>';
                     } else {
+                        echo '<div class="email-status-actions">';
                         echo '<span class="email-status not-verified">❌ Not Verified</span>';
                         echo '<button class="btn btn-primary edit-email-btn">Edit & Verify</button>';
+                        echo '</div>';
                     }
                     ?>
                 </div>

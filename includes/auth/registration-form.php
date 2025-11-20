@@ -9,8 +9,8 @@
             <label for="reg_phone_number_display"><?php _e( 'Phone Number', 'bricks-child' ); ?>:</label>
             <input type="tel" name="reg_phone_number_display" id="reg_phone_number_display" required> <!-- Input for intl-tel-input -->
         </p>
-        <p>
-            <button type="button" id="send-otp-button"><?php esc_html_e( 'Send Verification Code', 'bricks-child' ); ?></button>
+        <p class="button-stack">
+            <button type="button" id="send-otp-button" class="btn btn-primary"><?php esc_html_e( 'Send Verification Code', 'bricks-child' ); ?></button>
         </p>
     </div>
 
@@ -22,9 +22,9 @@
             <label for="verification_code"><?php _e( 'Verification Code', 'bricks-child' ); ?>:</label>
             <input type="text" name="verification_code" id="verification_code" required>
         </p>
-        <p>
-            <button type="button" id="verify-otp-button"><?php esc_html_e( 'Verify Code & Continue', 'bricks-child' ); ?></button>
-            <button type="button" id="change-phone-button" style="margin-left: 10px;"><?php esc_html_e( 'Change Phone Number', 'bricks-child' ); ?></button>
+        <p class="button-stack">
+            <button type="button" id="verify-otp-button" class="btn btn-primary"><?php esc_html_e( 'Verify Code & Continue', 'bricks-child' ); ?></button>
+            <button type="button" id="change-phone-button" class="btn btn-secondary"><?php esc_html_e( 'Change Phone Number', 'bricks-child' ); ?></button>
         </p>
     </div>
 
@@ -51,12 +51,12 @@
             <label for="reg_password_confirm"><?php _e( 'Confirm Password', 'bricks-child' ); ?>:</label>
             <input type="password" name="reg_password_confirm" id="reg_password_confirm" required>
         </p>
-        <p>
+        <p class="button-stack">
             <input type="hidden" name="action" value="custom_register_user">
             <input type="hidden" name="reg_phone" id="reg_phone" value=""> <!-- Populated by JS -->
             <?php wp_nonce_field( 'custom_registration_nonce', 'custom_registration_nonce' ); ?>
-            <input type="submit" id="complete-registration-button" value="<?php esc_attr_e( 'Complete Registration', 'bricks-child' ); ?>">
-            </p>
+            <button type="submit" id="complete-registration-button" class="btn btn-primary"><?php esc_attr_e( 'Complete Registration', 'bricks-child' ); ?></button>
+        </p>
         </div>
 
 </form>

@@ -48,15 +48,17 @@
   width: 100%;
 }
 
-/* Submit buttons */
-#send-otp-button,
-#verify-otp-button,
-#complete-registration-button,
-#change-phone-button {
-  margin: 0;
-  border: none;
+/* Button groups */
+.button-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+#custom-registration-form .btn {
   width: 100%;
   text-align: center;
+  margin: 0;
 }
 
 /* Step headings */
@@ -126,19 +128,7 @@
   box-shadow: 0 0 0 1px var(--dark-blue, #007cba);
 }
 
-/* Button hover states */
-#send-otp-button:hover,
-#verify-otp-button:hover,
-#complete-registration-button:hover,
-#change-phone-button:hover {
-  opacity: 0.9;
-}
-
-/* Disabled button states */
-#send-otp-button:disabled,
-#verify-otp-button:disabled,
-#complete-registration-button:disabled,
-#change-phone-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* Maintain spacing for stacked buttons on small screens */
+.button-stack .btn + .btn {
+  margin-top: 0;
 }

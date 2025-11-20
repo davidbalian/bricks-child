@@ -142,6 +142,13 @@
   border: 1px solid #f5c6cb;
 }
 
+.email-status-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 10px;
+}
+
 /* Edit email button styling */
 .edit-email-btn {
   margin-left: 10px;
