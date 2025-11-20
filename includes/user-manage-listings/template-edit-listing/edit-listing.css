@@ -85,10 +85,10 @@ input[readonly]:hover {
   /* flex: 2; */ /* Removed to allow theme's grid to control width */
   max-height: calc(100vh - 280px);
   overflow-y: auto;
-  padding-right: 15px;
+  padding-right: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 4rem;
 }
 
 /* Basic scrollbar styling for webkit browsers (Chrome, Safari, Edge) */
@@ -424,32 +424,35 @@ input[readonly]:hover {
   border-top: 1px solid #eee;
 }
 
-#edit-car-listing-form .submit-button.gradient-button {
-  background: var(--dark-blue);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: var(--border-radius-small);
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: auto;
-  margin: 0;
+#edit-car-listing-form .submit-button.gradient-button,
+#edit-car-listing-form button.submit-button.gradient-button {
+  background: var(--dark-blue) !important;
+  color: white !important;
+  border: none !important;
+  padding: 12px 24px !important;
+  border-radius: var(--border-radius-small) !important;
+  cursor: pointer !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  width: auto !important;
+  margin: 0 !important;
 }
 
-#edit-car-listing-form .submit-button.gradient-button:hover {
-  opacity: var(--opacity);
+#edit-car-listing-form .submit-button.gradient-button:hover,
+#edit-car-listing-form button.submit-button.gradient-button:hover {
+  opacity: var(--opacity) !important;
 }
 
-#edit-car-listing-form .submit-button.gradient-button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-  transform: none;
-  opacity: 0.6;
+#edit-car-listing-form .submit-button.gradient-button:disabled,
+#edit-car-listing-form button.submit-button.gradient-button:disabled {
+  background: #ccc !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  opacity: 0.6 !important;
 }
 
 /* Mobile Responsive Styles */
