@@ -154,15 +154,56 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
    */
   let dragSourceItem = null;
 
+  function applyGrabCursor($item) {
+    if ($item && $item.length) {
+      $item.css("cursor", "grab");
+    }
+  }
+
+  function attachSwapHandle($item) {
+    if (!$item || !$item.length || $item.find(".image-swap-handle").length) return;
+
+    const handle = $("<button>")
+      .attr({
+        type: "button",
+        "aria-label": "Swap image position",
+      })
+      .addClass("image-swap-handle")
+      .html("&larr;&rarr;")
+      .css({
+        position: "absolute",
+        bottom: "8px",
+        right: "8px",
+        border: "none",
+        borderRadius: "999px",
+        padding: "4px 8px",
+        fontSize: "0.75rem",
+        lineHeight: "1",
+        background: "rgba(0,0,0,0.65)",
+        color: "#fff",
+        cursor: "pointer",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+      })
+      .on("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        swapPreviewWithNeighbour($item);
+      });
+
+    $item.append(handle);
+  }
+
   function enableImageReordering() {
     // Mark items as draggable whenever they are (re)created
     imagePreview.on("mouseenter", ".image-preview-item", function () {
       $(this).attr("draggable", "true");
+      applyGrabCursor($(this));
     });
 
     imagePreview.on("dragstart", ".image-preview-item", function (e) {
       dragSourceItem = this;
       $(this).addClass("dragging");
+      $(this).css("cursor", "grabbing");
       if (e.originalEvent && e.originalEvent.dataTransfer) {
         e.originalEvent.dataTransfer.effectAllowed = "move";
         // Some browsers require data to be set to enable drag
@@ -194,6 +235,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       }
 
       imagePreview.find(".image-preview-item").removeClass("dragging");
+      imagePreview.find(".image-preview-item").css("cursor", "grab");
       dragSourceItem = null;
 
       // Sync our in-memory list and file input with new DOM order
@@ -203,6 +245,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
     imagePreview.on("dragend", ".image-preview-item", function () {
       imagePreview.find(".image-preview-item").removeClass("dragging");
+      imagePreview.find(".image-preview-item").css("cursor", "grab");
       dragSourceItem = null;
     });
   }
@@ -845,20 +888,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
           previewItem.remove();
         });
 
-      const swapHandle = $("<button>")
-        .attr({
-          type: "button",
-          class: "image-swap-handle",
-          "aria-label": "Move image",
-        })
-        .html('<i class="fas fa-arrows-up-down-left-right"></i>')
-        .on("click", function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          swapPreviewWithNeighbour(previewItem);
-        });
-
-      previewItem.append(img).append(removeBtn).append(swapHandle);
+      previewItem.append(img).append(removeBtn);
+      attachSwapHandle(previewItem);
 
       // Add initial upload status if async upload is starting
       if (file.asyncFileKey) {
@@ -872,6 +903,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
       // Ensure the reorder drag behaviour applies to this new item
       previewItem.attr("draggable", "true");
+      applyGrabCursor(previewItem);
+      attachSwapHandle(previewItem);
 
       // Whenever we add a new async-uploaded image, refresh the order field
       updateAsyncImageOrderField();
@@ -894,6 +927,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     const reader = new FileReader();
     reader.onload = function (e) {
       const previewItem = $("<div>").addClass("image-preview-item");
+      previewItem.data("fileObj", optimizedFile);
       const img = $("<img>").attr({
         src: e.target.result,
         alt: optimizedFile.name,
@@ -919,21 +953,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
           previewItem.remove();
         });
 
-      const swapHandle = $("<button>")
-        .attr({
-          type: "button",
-          class: "image-swap-handle",
-          "aria-label": "Move image",
-        })
-        .html('<i class="fas fa-arrows-up-down-left-right"></i>')
-        .on("click", function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-          swapPreviewWithNeighbour(previewItem);
-        });
-
-      previewItem.append(img).append(statsTooltip).append(removeBtn).append(swapHandle);
+      previewItem.append(img).append(statsTooltip).append(removeBtn);
       imagePreview.append(previewItem);
+      previewItem.attr("draggable", "true");
+      applyGrabCursor(previewItem);
+      attachSwapHandle(previewItem);
+      updateAsyncImageOrderField();
       if (isDevelopment) console.log(
         "[Add Listing] Preview with stats added to DOM for:",
         optimizedFile.name
@@ -1066,6 +1091,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         "[Add Listing] Async upload completed for:",
         data.original_filename
       );
+
+      updateAsyncImageOrderField();
     }
   }
 

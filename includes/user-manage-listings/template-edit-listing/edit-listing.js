@@ -64,6 +64,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
      */
     let dragSourceItem = null;
 
+    function applyGrabCursor($item) {
+        if ($item && $item.length) {
+            $item.css('cursor', 'grab');
+        }
+    }
+
     // Attach identity metadata to existing items (their attachment IDs)
     imagePreviewContainer.find('.image-preview-item').each(function () {
         const $item = $(this);
@@ -72,6 +78,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             $item.data('imageId', parseInt(imageId, 10));
         }
         $item.attr('draggable', 'true');
+        applyGrabCursor($item);
         attachSwapHandle($item);
     });
 
@@ -79,6 +86,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         imagePreviewContainer.on('dragstart', '.image-preview-item', function (e) {
             dragSourceItem = this;
             $(this).addClass('dragging');
+            $(this).css('cursor', 'grabbing');
             if (e.originalEvent && e.originalEvent.dataTransfer) {
                 e.originalEvent.dataTransfer.effectAllowed = 'move';
                 e.originalEvent.dataTransfer.setData('text/plain', 'drag');
@@ -108,6 +116,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             }
 
             imagePreviewContainer.find('.image-preview-item').removeClass('dragging');
+            imagePreviewContainer.find('.image-preview-item').css('cursor', 'grab');
             dragSourceItem = null;
 
             syncNewFilesWithDomOrder();
@@ -116,6 +125,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
         imagePreviewContainer.on('dragend', '.image-preview-item', function () {
             imagePreviewContainer.find('.image-preview-item').removeClass('dragging');
+            imagePreviewContainer.find('.image-preview-item').css('cursor', 'grab');
             dragSourceItem = null;
         });
     }
@@ -144,23 +154,30 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     }
 
     function attachSwapHandle($item) {
-        const $element = $item instanceof jQuery ? $item : $($item);
-        if ($element.find('.image-swap-handle').length) return;
+        if ($item.find('.image-swap-handle').length) return;
 
-        const handle = $('<button>')
-            .attr({
-                type: 'button',
-                class: 'image-swap-handle',
-                'aria-label': 'Move image'
+        const handle = $('<button type="button" class="image-swap-handle" aria-label="Swap image position">&larr;&rarr;</button>')
+            .css({
+                position: 'absolute',
+                bottom: '8px',
+                right: '8px',
+                border: 'none',
+                borderRadius: '999px',
+                padding: '4px 8px',
+                fontSize: '0.75rem',
+                lineHeight: '1',
+                background: 'rgba(0,0,0,0.65)',
+                color: '#fff',
+                cursor: 'pointer',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
             })
-            .html('<i class="fas fa-arrows-up-down-left-right"></i>')
             .on('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                swapPreviewWithNeighbour($element);
+                swapPreviewWithNeighbour($item);
             });
 
-        $element.append(handle);
+        $item.append(handle);
     }
 
     function syncNewFilesWithDomOrder() {
@@ -539,6 +556,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
             // Ensure new items are draggable, have swap handle and are part of the order calculations
             previewItem.attr('draggable', 'true');
+            applyGrabCursor(previewItem);
             attachSwapHandle(previewItem);
             updateImageOrderField();
         };
@@ -862,6 +880,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             }, 3000);
             
             if (isDevelopment) console.log('[Edit Listing] Async upload completed for:', data.original_filename);
+
+            updateImageOrderField();
         }
     }
     

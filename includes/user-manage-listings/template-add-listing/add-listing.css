@@ -319,16 +319,6 @@
   position: relative;
   aspect-ratio: 1;
   width: 100%;
-  cursor: grab;
-}
-
-.image-preview-item:active {
-  cursor: grabbing;
-}
-
-.image-preview-item.dragging {
-  opacity: 0.9;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .image-preview-item img {
@@ -351,34 +341,6 @@
   justify-content: center;
   cursor: pointer;
   color: #dc3545;
-}
-
-.image-swap-handle {
-  position: absolute;
-  bottom: 6px;
-  right: 6px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(33, 37, 41, 0.8);
-  color: #fff;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: transform 0.2s ease, background 0.2s ease;
-}
-
-.image-swap-handle:hover,
-.image-swap-handle:focus {
-  transform: scale(1.05);
-  background: rgba(25, 135, 84, 0.85);
-}
-
-.image-swap-handle i {
-  pointer-events: none;
 }
 
 .add-listing-images-section {
