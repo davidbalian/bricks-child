@@ -70,7 +70,7 @@
   margin-left: 10px;
 }
 
-.info-row .btn-sm:first-of-type {
+.info-row > .btn {
   margin-left: auto;
 }
 
@@ -82,11 +82,11 @@
   font-size: 14px;
 }
 
-.name-edit-row .btn-sm {
+.name-edit-row .btn {
   margin-left: 0;
 }
 
-.name-edit-row .btn-sm + .btn-sm {
+.name-edit-row .btn + .btn {
   margin-left: 10px;
 }
 
@@ -158,10 +158,10 @@
   font-size: 14px;
 }
 
-.email-edit-row .btn-sm {
+.email-edit-row .btn {
   margin-left: 0;
 }
 
-.email-edit-row .btn-sm + .btn-sm {
+.email-edit-row .btn + .btn {
   margin-left: 10px;
 }

@@ -136,7 +136,7 @@ function seller_reviews_display_shortcode($atts) {
         <div class="seller-review-form-container">
             <!-- Always show "See all reviews" button to everyone -->
             <div class="review-form-toggle">
-                <button type="button" class="btn btn-primary btn-sm btn-toggle-review-form">
+                <button type="button" class="btn btn-primary btn-toggle-review-form">
                     See all reviews
                 </button>
             </div>
@@ -250,7 +250,7 @@ function seller_reviews_display_shortcode($atts) {
                             </div>
                             
                             <div class="form-actions">
-                                <button type="submit" class="btn btn-primary btn-md btn-submit-review" <?php echo !$can_review ? 'disabled' : ''; ?>>Submit Review</button>
+                                <button type="submit" class="btn btn-primary btn-submit-review" <?php echo !$can_review ? 'disabled' : ''; ?>>Submit Review</button>
                                 
                                 <?php if (!$can_review): ?>
                                     <p class="email-verification-notice">

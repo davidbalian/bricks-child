@@ -33,11 +33,11 @@ function display_password_reset_verify() {
                     <input type="text" id="verification-code" maxlength="6" placeholder="000000" class="verification-input">
                 </div>
                 <div class="info-row">
-                    <button class="btn btn-primary btn-md verify-code-btn">Verify Code</button>
-                    <button class="btn btn-secondary btn-md cancel-reset-btn">Cancel</button>
+                    <button class="btn btn-primary verify-code-btn">Verify Code</button>
+                    <button class="btn btn-secondary cancel-reset-btn">Cancel</button>
                 </div>
                 <div class="info-row">
-                    <button class="btn btn-link btn-sm resend-code-btn">Resend Code</button>
+                    <button class="btn btn-link resend-code-btn">Resend Code</button>
                 </div>
             </div>
         </div>
@@ -91,8 +91,8 @@ function display_password_reset_form() {
                     </div>
                 </div>
                 <div class="info-row">
-                    <button class="btn btn-primary btn-md update-password-btn">Update Password</button>
-                    <button class="btn btn-secondary btn-md cancel-reset-btn">Cancel</button>
+                    <button class="btn btn-primary update-password-btn">Update Password</button>
+                    <button class="btn btn-secondary cancel-reset-btn">Cancel</button>
                 </div>
             </div>
         </div>
@@ -118,8 +118,8 @@ function display_password_reset_success() {
             <p>You may now return to the website and use your new password to log in.</p>
             
             <div class="success-actions">
-                <a href="<?php echo strtok($_SERVER["REQUEST_URI"], '?'); ?>" class="btn btn-primary btn-lg">Return to My Account</a>
-                <a href="<?php echo home_url(); ?>" class="btn btn-secondary btn-lg">Go to Homepage</a>
+                <a href="<?php echo strtok($_SERVER["REQUEST_URI"], '?'); ?>" class="btn btn-primary">Return to My Account</a>
+                <a href="<?php echo home_url(); ?>" class="btn btn-secondary">Go to Homepage</a>
             </div>
         </div>
     </div>

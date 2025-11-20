@@ -82,7 +82,7 @@
 }
 
 .btn-primary {
-  background-color: var(--dark-blue);
+  background-color: var(--light-blue);
   color: var(--white);
 }
 
@@ -118,16 +118,6 @@
 .btn-link:hover:not(:disabled) {
   color: var(--light-blue);
   opacity: 1;
-}
-
-.btn-sm {
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-}
-
-.btn-md {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
 }
 
 .btn-lg {

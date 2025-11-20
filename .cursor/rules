@@ -3,13 +3,11 @@
 1. Always start with the shared `.btn` base class for any blue button. This provides padding, font, border radius, hover, and disabled behavior.
 2. Use color modifiers:
    - `.btn-primary-gradient` for the dark-blue → light-blue gradient CTA.
-   - `.btn-primary` for solid dark-blue buttons.
+   - `.btn-primary` for solid light-blue buttons (var(--light-blue)).
    - `.btn-secondary` for neutral gray actions.
    - `.btn-link` for text-only actions (underline + no padding).
-3. Pick a size modifier per context:
-   - `.btn-sm` for inline/edit actions.
-   - `.btn-md` for standard form buttons (default).
-   - `.btn-lg` for primary form submissions or hero CTAs.
+3. Size modifiers:
+   - Default `.btn` covers regular usage.
+   - `.btn-lg` is reserved for the primary submit buttons on the add/edit car listing flows.
 4. Width, layout, and context-specific tweaks should be applied in the local CSS (e.g., `.filter-submit-button { width: 100%; }`) without redefining padding/typography.
 5. Do not reintroduce legacy classes like `.gradient-button`, `.button-primary`, or `.submit-button`; migrate any new UI to the shared system above.
-

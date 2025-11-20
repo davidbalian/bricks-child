@@ -61,7 +61,7 @@ get_header(); ?>
 									<label><input name="rememberme" type="checkbox" id="rememberme" value="forever"> <?php _e( 'Remember Me', 'bricks-child' ); ?></label>
 								</p>
 								<p class="login-submit">
-									<input type="submit" name="wp-submit" id="wp-submit" class="btn btn-primary btn-md" value="<?php esc_attr_e( 'Log In', 'bricks-child' ); ?>" />
+									<input type="submit" name="wp-submit" id="wp-submit" class="btn btn-primary" value="<?php esc_attr_e( 'Log In', 'bricks-child' ); ?>" />
 									<input type="hidden" name="redirect_to" value="<?php echo esc_url( home_url() ); ?>" />
 									<!-- Add custom redirect for failed login -->
 									<input type="hidden" name="login_failed_redirect" value="<?php echo esc_url( get_permalink() ); ?>?login=failed" />
