@@ -139,6 +139,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
   const fileInput = $("#car_images");
   const fileUploadArea = $("#file-upload-area");
   const imagePreview = $("#image-preview");
+  const addListingForm = $("#add-car-listing-form");
   let accumulatedFilesList = []; // Source of truth for selected files
 
   // Add mileage formatting
@@ -683,23 +684,58 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         .addClass("remove-image")
         .html('<i class="fas fa-times"></i>')
         .on("click", function () {
-          if (isDevelopment) console.log("[Add Listing] Remove button clicked for:", file.name);
+          if (isDevelopment) {
+            console.log(
+              "[Add Listing] Remove button clicked for:",
+              file.name
+            );
+          }
 
           // Remove from async system if applicable
           if (file.asyncFileKey && asyncUploadManager) {
-            asyncUploadManager.removeImage(file.asyncFileKey).catch((error) => {
-              if (isDevelopment) console.error(
-                "[Add Listing] Failed to remove from async system:",
-                error
-              );
-            });
+            asyncUploadManager.removeImage(file.asyncFileKey).catch(
+              (error) => {
+                if (isDevelopment) {
+                  console.error(
+                    "[Add Listing] Failed to remove from async system:",
+                    error
+                  );
+                }
+              }
+            );
           }
 
           removeFileFromSelection(file.name);
           previewItem.remove();
+
+          // Re-sync file order after removal
+          syncFileOrderWithPreview();
         });
 
-      previewItem.append(img).append(removeBtn);
+      const moveControls = $("<div>")
+        .addClass("image-reorder-controls")
+        .append(
+          $("<button>")
+            .attr("type", "button")
+            .addClass("move-image-up")
+            .text("↑")
+            .on("click", function (e) {
+              e.preventDefault();
+              movePreviewItem(previewItem, "up", file);
+            })
+        )
+        .append(
+          $("<button>")
+            .attr("type", "button")
+            .addClass("move-image-down")
+            .text("↓")
+            .on("click", function (e) {
+              e.preventDefault();
+              movePreviewItem(previewItem, "down", file);
+            })
+        );
+
+      previewItem.append(img).append(removeBtn).append(moveControls);
 
       // Add initial upload status if async upload is starting
       if (file.asyncFileKey) {
@@ -783,6 +819,113 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       "[Add Listing] File removed. Accumulated files count:",
       accumulatedFilesList.length
     );
+  }
+
+  /**
+   * Ensure accumulatedFilesList order matches the DOM order of preview items.
+   * This is critical so traditional uploads preserve the visual order.
+   */
+  function syncFileOrderWithPreview() {
+    const orderedFiles = [];
+
+    $("#image-preview .image-preview-item").each(function () {
+      const $item = $(this);
+      const imgEl = $item.find("img")[0];
+      if (!imgEl || !imgEl.alt) return;
+
+      const fileName = imgEl.alt;
+      const match = accumulatedFilesList.find((f) => f.name === fileName);
+      if (match) {
+        orderedFiles.push(match);
+      }
+    });
+
+    if (orderedFiles.length === accumulatedFilesList.length) {
+      accumulatedFilesList = orderedFiles;
+      updateActualFileInput();
+      if (isDevelopment) {
+        console.log(
+          "[Add Listing] Synced accumulatedFilesList order with preview"
+        );
+      }
+
+      // Also keep async image order inputs in sync when using async uploads
+      updateAsyncOrderHiddenInputs();
+    } else if (isDevelopment) {
+      console.warn(
+        "[Add Listing] syncFileOrderWithPreview mismatch - keeping existing order"
+      );
+    }
+  }
+
+  /**
+   * Move a preview item up or down and then sync the underlying file list.
+   */
+  function movePreviewItem(previewItem, direction, file) {
+    const $item = $(previewItem);
+    if (direction === "up") {
+      const $prev = $item.prev(".image-preview-item");
+      if ($prev.length) {
+        $item.insertBefore($prev);
+      }
+    } else if (direction === "down") {
+      const $next = $item.next(".image-preview-item");
+      if ($next.length) {
+        $item.insertAfter($next);
+      }
+    }
+
+    syncFileOrderWithPreview();
+
+    if (isDevelopment) {
+      console.log(
+        "[Add Listing] Moved image in preview:",
+        file.name,
+        "direction:",
+        direction
+      );
+    }
+  }
+
+  /**
+   * Maintain hidden async_image_order[] inputs that reflect the current
+   * preview / file order for async-uploaded images.
+   * This is used on the server to persist a custom image order.
+   */
+  function updateAsyncOrderHiddenInputs() {
+    if (!asyncUploadManager) {
+      return;
+    }
+
+    if (!addListingForm.length) {
+      return;
+    }
+
+    // Clear previous values
+    addListingForm.find('input[name="async_image_order[]"]').remove();
+
+    // Add inputs in the current file order for files that have an attachmentId
+    accumulatedFilesList.forEach((file) => {
+      if (!file.attachmentId) {
+        return;
+      }
+
+      $("<input>")
+        .attr({
+          type: "hidden",
+          name: "async_image_order[]",
+          value: file.attachmentId,
+        })
+        .appendTo(addListingForm);
+    });
+
+    if (isDevelopment) {
+      console.log(
+        "[Add Listing] Updated async_image_order[] hidden inputs with",
+        addListingForm.find('input[name="async_image_order[]"]').length,
+        "entries"
+      );
+    }
   }
 
   function updateActualFileInput() {
@@ -884,10 +1027,17 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         });
       }, 3000);
 
-      if (isDevelopment) console.log(
-        "[Add Listing] Async upload completed for:",
-        data.original_filename
-      );
+      if (isDevelopment) {
+        console.log(
+          "[Add Listing] Async upload completed for:",
+          data.original_filename,
+          "attachmentId:",
+          data.attachment_id
+        );
+      }
+
+      // Ensure async_image_order[] reflects latest successful uploads
+      updateAsyncOrderHiddenInputs();
     }
   }
 

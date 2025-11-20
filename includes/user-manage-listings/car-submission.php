@@ -279,16 +279,46 @@ function handle_add_car_listing() {
         // Use async uploaded images
         car_submission_log('✅ USING ASYNC UPLOADS - Processing should be instant');
         car_submission_log('Using async uploaded images for post: ' . $post_id);
-        
+
+        // Normalize to integers for safety
+        $async_images = array_map('intval', $async_images);
+
+        // Optional explicit order from the client (attachment IDs)
+        $ordered_async_images = array();
+        if (isset($_POST['async_image_order']) && is_array($_POST['async_image_order'])) {
+            $client_order = array_map('intval', $_POST['async_image_order']);
+            $used_ids = array();
+
+            // First, keep only IDs that exist in the async set, in the order provided
+            foreach ($client_order as $attachment_id) {
+                if (in_array($attachment_id, $async_images, true) && !isset($used_ids[$attachment_id])) {
+                    $ordered_async_images[] = $attachment_id;
+                    $used_ids[$attachment_id] = true;
+                }
+            }
+
+            // Then append any async images that were not present in the client order
+            foreach ($async_images as $attachment_id) {
+                if (!isset($used_ids[$attachment_id])) {
+                    $ordered_async_images[] = $attachment_id;
+                }
+            }
+
+            if (!empty($ordered_async_images)) {
+                $async_images = $ordered_async_images;
+                car_submission_log('Applied client-provided async image order: ' . implode(', ', $async_images));
+            }
+        }
+
         // Mark session as completed to preserve files
         mark_upload_session_completed($async_session_id, $post_id);
-        
-        // Update car_images field with async attachment IDs
+
+        // Update car_images field with async attachment IDs (in final order)
         update_field('car_images', $async_images, $post_id);
-        
+
         car_submission_log('Successfully linked ' . count($async_images) . ' async images to post: ' . $post_id);
         $image_ids = $async_images;
-        
+
     } else {
         // Traditional image upload processing
         car_submission_log('⚠️ FALLING BACK TO TRADITIONAL UPLOADS - This will be slow');
