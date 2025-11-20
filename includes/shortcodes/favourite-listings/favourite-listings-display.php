@@ -30,9 +30,9 @@ if ( ! $user_id ) {
             <p>Simply sign in or register to manage your saved adverts.</p>
             
             <div class="favorites-auth-buttons">
-                <a href="<?php echo esc_url( wp_login_url( get_permalink() ) ); ?>" class="favorites-signin-btn">Sign in</a>
+                <a href="<?php echo esc_url( wp_login_url( get_permalink() ) ); ?>" class="btn btn-lg favorites-signin-btn">Sign in</a>
                 <span class="auth-separator">/</span>
-                <a href="<?php echo esc_url( ($register_page = get_page_by_path('register')) ? get_permalink($register_page->ID) : wp_registration_url() ); ?>" class="favorites-register-btn">Register</a>
+                <a href="<?php echo esc_url( ($register_page = get_page_by_path('register')) ? get_permalink($register_page->ID) : wp_registration_url() ); ?>" class="btn btn-lg favorites-register-btn">Register</a>
             </div>
         </div>
     </div>
@@ -50,7 +50,7 @@ if (empty($favorite_car_ids)) {
         <div class="no-favorites-message">
             <h2>No Favorite Cars Yet</h2>
             <p>You haven't added any cars to your favorites yet.</p>
-            <a href="<?php echo esc_url(get_permalink(get_page_by_path('car-listings'))); ?>" class="browse-cars-button">Browse Cars</a>
+            <a href="<?php echo esc_url(get_permalink(get_page_by_path('car-listings'))); ?>" class="btn btn-primary btn-md browse-cars-button">Browse Cars</a>
         </div>
     </div>
     <?php

@@ -121,7 +121,7 @@ get_header(); ?>
                 <div class="listing-success-message">
                     <h2><?php esc_html_e( 'Your listing has been submitted successfully!', 'bricks-child' ); ?></h2>
                     <p><?php esc_html_e( 'Thank you for submitting your car listing. It will be reviewed by our team and published soon.', 'bricks-child' ); ?></p>
-                    <p><a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="button"><?php esc_html_e( 'Return to Home', 'bricks-child' ); ?></a></p>
+                    <p><a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="btn btn-primary btn-md"><?php esc_html_e( 'Return to Home', 'bricks-child' ); ?></a></p>
                 </div>
                 <?php
             } elseif ( isset( $_GET['listing_error'] ) ) {
@@ -555,7 +555,7 @@ get_header(); ?>
                     </div>
 
                     <div class="form-row">
-                        <button type="submit" class="submit-button gradient-button"><?php esc_html_e( 'Submit Listing', 'bricks-child' ); ?></button>
+                        <button type="submit" class="btn btn-primary-gradient btn-lg"><?php esc_html_e( 'Submit Listing', 'bricks-child' ); ?></button>
                     </div>
                 </form>
                 <?php

@@ -243,19 +243,6 @@
 
 .filter-submit-button {
   width: 100%; /* Full width */
-  padding: 12px 20px;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  font-weight: 500;
-  color: #fff;
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.filter-submit-button:hover {
-  background: linear-gradient(135deg, #0056b3, #004085);
 }
 
 /* Reset Button Style */

@@ -424,35 +424,9 @@ input[readonly]:hover {
   border-top: 1px solid #eee;
 }
 
-#edit-car-listing-form .submit-button.gradient-button,
-#edit-car-listing-form button.submit-button.gradient-button {
-  background: var(--dark-blue) !important;
-  color: white !important;
-  border: none !important;
-  padding: 12px 24px !important;
-  border-radius: var(--border-radius-small) !important;
-  cursor: pointer !important;
-  font-size: 1rem !important;
-  font-weight: 500 !important;
-  transition: all 0.2s !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 0.5rem !important;
-  width: auto !important;
-  margin: 0 !important;
-}
-
-#edit-car-listing-form .submit-button.gradient-button:hover,
-#edit-car-listing-form button.submit-button.gradient-button:hover {
-  opacity: var(--opacity) !important;
-}
-
-#edit-car-listing-form .submit-button.gradient-button:disabled,
-#edit-car-listing-form button.submit-button.gradient-button:disabled {
-  background: #ccc !important;
-  cursor: not-allowed !important;
-  transform: none !important;
-  opacity: 0.6 !important;
+#edit-car-listing-form .form-row:last-child .btn {
+  width: auto;
+  margin: 0;
 }
 
 /* Mobile Responsive Styles */

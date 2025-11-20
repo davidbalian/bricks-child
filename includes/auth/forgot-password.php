@@ -30,8 +30,8 @@ if (!defined('ABSPATH')) {
                 <input type="tel" name="forgot_phone_number_display" id="forgot-phone-number-display" required placeholder="Enter your phone number">
             </div>
             <div class="form-actions">
-                <button type="button" id="send-forgot-otp-button" class="button button-primary">Send Verification Code</button>
-                <a href="<?php echo wp_login_url(); ?>" class="button button-secondary">Back to Login</a>
+                <button type="button" id="send-forgot-otp-button" class="btn btn-primary btn-md">Send Verification Code</button>
+                <a href="<?php echo wp_login_url(); ?>" class="btn btn-secondary btn-md">Back to Login</a>
             </div>
         </div>
 
@@ -44,11 +44,11 @@ if (!defined('ABSPATH')) {
                 <input type="text" name="forgot_verification_code" id="forgot-verification-code" maxlength="6" required placeholder="000000" class="verification-input">
             </div>
             <div class="form-actions">
-                <button type="button" id="verify-forgot-otp-button" class="button button-primary">Verify Code</button>
-                <button type="button" id="change-forgot-phone-button" class="button button-secondary">Change Phone Number</button>
+                <button type="button" id="verify-forgot-otp-button" class="btn btn-primary btn-md">Verify Code</button>
+                <button type="button" id="change-forgot-phone-button" class="btn btn-secondary btn-md">Change Phone Number</button>
             </div>
             <div class="form-actions">
-                <button type="button" id="resend-forgot-otp-button" class="button button-link">Resend Code</button>
+                <button type="button" id="resend-forgot-otp-button" class="btn btn-link btn-sm">Resend Code</button>
             </div>
         </div>
 
@@ -72,8 +72,8 @@ if (!defined('ABSPATH')) {
             </div>
             
             <div class="form-actions">
-                <button type="button" id="update-forgot-password-button" class="button button-primary">Update Password</button>
-                <button type="button" id="cancel-forgot-password-button" class="button button-secondary">Cancel</button>
+                <button type="button" id="update-forgot-password-button" class="btn btn-primary btn-md">Update Password</button>
+                <button type="button" id="cancel-forgot-password-button" class="btn btn-secondary btn-md">Cancel</button>
             </div>
         </div>
 
@@ -83,8 +83,8 @@ if (!defined('ABSPATH')) {
             <h2>Password Reset Complete!</h2>
             <p class="step-description">Your password has been successfully updated. You can now log in with your new password.</p>
             <div class="form-actions">
-                <a href="<?php echo wp_login_url(); ?>" class="button button-primary">Go to Login</a>
-                <a href="<?php echo home_url(); ?>" class="button button-secondary">Go to Homepage</a>
+                <a href="<?php echo wp_login_url(); ?>" class="btn btn-primary btn-md">Go to Login</a>
+                <a href="<?php echo home_url(); ?>" class="btn btn-secondary btn-md">Go to Homepage</a>
             </div>
         </div>
 

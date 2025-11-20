@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
                 To receive notifications, activate <strong><?php echo esc_html($user_email); ?></strong>
             </span>
         </div>
-        <button class="send-verification-btn" data-email="<?php echo esc_attr($user_email); ?>">
+        <button class="btn btn-primary-gradient btn-sm send-verification-btn" data-email="<?php echo esc_attr($user_email); ?>">
             Send Verification Email
         </button>
         <button class="dismiss-notice-btn" title="Dismiss notification">×</button>

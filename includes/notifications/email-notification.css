@@ -49,26 +49,7 @@
 }
 
 .send-verification-btn {
-  background: linear-gradient(to right, var(--dark-blue), var(--light-blue));
-  color: var(--white);
-  border: none;
-  padding: 8px 16px;
-  border-radius: var(--border-radius-small);
-  cursor: pointer;
-  font-size: var(--small-font-size);
-  font-weight: 500;
-  transition: opacity var(--transition-time);
   flex-shrink: 0;
-}
-
-.send-verification-btn:hover {
-  opacity: var(--opacity);
-}
-
-.send-verification-btn:disabled {
-  background: var(--borders);
-  cursor: not-allowed;
-  opacity: 0.6;
 }
 
 .dismiss-notice-btn {

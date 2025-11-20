@@ -2,483 +2,466 @@
 
 /* Overlay Background */
 .seller-reviews-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.2);
-    z-index: 999999;
-    display: none;
-    opacity: 0;
-    transition: opacity 0.4s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 999999;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
 
 .seller-reviews-overlay.show {
-    display: block;
-    opacity: 1;
+  display: block;
+  opacity: 1;
 }
 
 /* Overlay Content Container */
 .seller-reviews-overlay-content {
-    background: white;
-    border-radius: 0;
-    width: 40vw; /* 40% of viewport width like AutoTrader */
-    min-width: 400px; /* Minimum width for smaller screens */
-    max-width: 600px; /* Maximum width for very large screens */
-    height: 100vh;
-    overflow: hidden;
-    position: fixed;
-    right: -100%; /* Start completely hidden off-screen */
-    top: 0;
-    transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.4);
-    z-index: 1000000;
-    border-left: 1px solid #e0e0e0;
-    display: flex;
-    flex-direction: column;
+  background: white;
+  border-radius: 0;
+  width: 40vw; /* 40% of viewport width like AutoTrader */
+  min-width: 400px; /* Minimum width for smaller screens */
+  max-width: 600px; /* Maximum width for very large screens */
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  right: -100%; /* Start completely hidden off-screen */
+  top: 0;
+  transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.4);
+  z-index: 1000000;
+  border-left: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
 }
 
 .seller-reviews-overlay.show .seller-reviews-overlay-content {
-    right: 0; /* Slide in to position */
+  right: 0; /* Slide in to position */
 }
 
 /* Overlay Header */
 .overlay-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 25px 30px;
-    border-bottom: 2px solid #e5e5e5;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 30px;
+  border-bottom: 2px solid #e5e5e5;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .overlay-header h3 {
-    margin: 0;
-    font-size: 24px;
-    color: #333;
-    font-weight: 600;
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+  font-weight: 600;
 }
 
 .close-overlay {
-    background: rgba(255, 255, 255, 0.9);
-    border: 2px solid #dee2e6;
-    font-size: 24px;
-    color: #495057;
-    cursor: pointer;
-    padding: 0;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    font-weight: bold;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #dee2e6;
+  font-size: 24px;
+  color: #495057;
+  cursor: pointer;
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  font-weight: bold;
 }
 
 .close-overlay:hover {
-    background: #fff;
-    border-color: #007acc;
-    color: #007acc;
-    transform: scale(1.05);
+  background: #fff;
+  border-color: #007acc;
+  color: #007acc;
+  transform: scale(1.05);
 }
 
 /* Rating Summary in Overlay */
 .overlay-rating-summary {
-    padding: 30px;
-    text-align: center;
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    border-bottom: 2px solid #e5e5e5;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 30px;
+  text-align: center;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-bottom: 2px solid #e5e5e5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .rating-display {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .rating-display .stars-container {
-    font-size: 28px;
+  font-size: 28px;
 }
 
 .rating-display .rating-text {
-    font-size: 18px;
-    color: #555;
-    font-weight: 500;
+  font-size: 18px;
+  color: #555;
+  font-weight: 500;
 }
 
 /* Reviews Section */
 .overlay-reviews-section {
-    padding: 30px;
-    flex: 1;
-    overflow-y: auto;
-    background: #ffffff;
+  padding: 30px;
+  flex: 1;
+  overflow-y: auto;
+  background: #ffffff;
 }
 
 .overlay-reviews-section h4 {
-    margin: 0 0 20px 0;
-    font-size: 20px;
-    color: #333;
-    font-weight: 600;
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  color: #333;
+  font-weight: 600;
 }
 
 .reviews-list .review-item {
-    padding: 20px 0;
-    border-bottom: 1px solid #f0f0f0;
+  padding: 20px 0;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .reviews-list .review-item:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .no-reviews {
-    text-align: center;
-    padding: 40px 20px;
-    color: #666;
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
 }
 
 .no-reviews p {
-    font-size: 16px;
-    margin: 0;
+  font-size: 16px;
+  margin: 0;
 }
 
 /* Review Form Section */
 .overlay-review-form-section {
-    padding: 30px;
-    border-top: 2px solid #e5e5e5;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 0;
-    margin-top: auto;
+  padding: 30px;
+  border-top: 2px solid #e5e5e5;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 0;
+  margin-top: auto;
 }
 
 .overlay-review-form-section h4 {
-    margin: 0 0 20px 0;
-    font-size: 20px;
-    color: #333;
-    font-weight: 600;
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  color: #333;
+  font-weight: 600;
 }
 
 /* Form Styles */
 .seller-review-form .form-group {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .seller-review-form label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #333;
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
 }
 
 /* Star Rating Input */
 .star-rating-input {
-    display: flex;
-    flex-direction: row;
-    gap: 3px;
-    margin-bottom: 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  margin-bottom: 10px;
 }
 
 .star-rating-input input {
-    display: none;
+  display: none;
 }
 
 .star-rating-input label {
-    font-size: 30px;
-    color: #ddd;
-    cursor: pointer;
-    transition: color 0.2s ease;
-    margin: 0;
-    padding: 1px;
-    user-select: none;
-    line-height: 1;
+  font-size: 30px;
+  color: #ddd;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  margin: 0;
+  padding: 1px;
+  user-select: none;
+  line-height: 1;
 }
 
 .star-rating-input label:hover {
-    color: #ffa500;
+  color: #ffa500;
 }
 
 .star-rating-input label.active {
-    color: #ffa500;
+  color: #ffa500;
 }
 
 /* Textarea */
 .seller-review-form textarea {
-    width: 100%;
-    min-height: 100px;
-    padding: 12px;
-    border: 2px solid #e5e5e5;
-    border-radius: 8px;
-    font-family: inherit;
-    font-size: 16px; /* Prevent mobile zoom - must be 16px or larger */
-    resize: vertical;
-    transition: border-color 0.2s ease;
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 2px solid #e5e5e5;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 16px; /* Prevent mobile zoom - must be 16px or larger */
+  resize: vertical;
+  transition: border-color 0.2s ease;
 }
 
 .seller-review-form textarea:focus {
-    outline: none;
-    border-color: #007acc;
+  outline: none;
+  border-color: #007acc;
 }
 
 .seller-review-form small {
-    color: #666;
-    font-size: 12px;
+  color: #666;
+  font-size: 12px;
 }
 
 /* Checkbox */
 .checkbox-label {
-    display: flex !important;
-    align-items: center;
-    gap: 8px;
-    font-weight: normal !important;
-    cursor: pointer;
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  font-weight: normal !important;
+  cursor: pointer;
 }
 
 .checkbox-label input {
-    margin: 0;
+  margin: 0;
 }
 
 /* Form Actions */
 .form-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-top: 25px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 25px;
 }
 
-.btn-submit-review {
-    background: #007acc;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.btn-submit-review:hover {
-    background: #005a9e;
-}
-
-.btn-submit-review:disabled {
-    background: #ccc;
-    cursor: not-allowed;
+.form-actions .btn {
+  border-radius: 8px;
 }
 
 .form-messages {
-    flex: 1;
+  flex: 1;
 }
 
 .form-messages .success {
-    color: #28a745;
-    font-weight: 500;
+  color: #28a745;
+  font-weight: 500;
 }
 
 .form-messages .error {
-    color: #dc3545;
-    font-weight: 500;
+  color: #dc3545;
+  font-weight: 500;
 }
 
 /* Login Prompt */
 .login-prompt {
-    text-align: center;
-    padding: 30px 20px;
+  text-align: center;
+  padding: 30px 20px;
 }
 
 .login-prompt p {
-    font-size: 16px;
-    color: #666;
-    margin: 0;
+  font-size: 16px;
+  color: #666;
+  margin: 0;
 }
 
 .login-link {
-    color: #007acc;
-    text-decoration: none;
-    font-weight: 600;
+  color: #007acc;
+  text-decoration: none;
+  font-weight: 600;
 }
 
 .login-link:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .review-notice {
-    text-align: center;
-    padding: 30px 20px;
-    color: #666;
+  text-align: center;
+  padding: 30px 20px;
+  color: #666;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .seller-reviews-overlay {
-        padding: 0;
-    }
-    
-    .seller-reviews-overlay-content {
-        width: 100%;
-        min-width: 100%;
-        max-width: 100%;
-        right: -100%; /* Start off-screen on mobile */
-        border-left: none;
-        box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
-    }
-    
-    .seller-reviews-overlay.show .seller-reviews-overlay-content {
-        right: 0;
-    }
-    
-    .overlay-header {
-        padding: 20px;
-        border-radius: 0;
-        flex-shrink: 0; /* Don't let header shrink */
-    }
-    
-    .overlay-header h3 {
-        font-size: 20px;
-    }
-    
-    .overlay-rating-summary {
-        padding: 15px 20px;
-        flex-shrink: 0; /* Don't let rating summary shrink */
-    }
-    
-    .rating-display .stars-container {
-        font-size: 24px;
-    }
-    
-    .rating-display .rating-text {
-        font-size: 16px;
-    }
-    
-    /* Give reviews section most of the available space */
-    .overlay-reviews-section {
-        padding: 20px;
-        flex: 1; /* Take up available space */
-        min-height: 0; /* Allow flexbox to shrink if needed */
-        max-height: none; /* Remove height restriction! */
-    }
-    
-    /* Limit form section to reasonable height */
-    .overlay-review-form-section {
-        padding: 20px;
-        flex-shrink: 0; /* Don't let form shrink */
-        max-height: 40vh; /* Maximum 40% of viewport height */
-        overflow-y: auto; /* Allow scrolling if form is too tall */
-        margin-top: 0; /* Remove auto margin */
-    }
-    
-    .star-rating-input label {
-        font-size: 26px;
-        padding: 3px;
-    }
-    
-    /* Make form elements more compact on mobile */
-    .seller-review-form textarea {
-        min-height: 80px; /* Smaller textarea on mobile */
-    }
-    
-    .form-actions {
-        margin-top: 20px;
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .btn-submit-review {
-        width: 100%;
-        padding: 14px 24px;
-    }
+  .seller-reviews-overlay {
+    padding: 0;
+  }
+
+  .seller-reviews-overlay-content {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    right: -100%; /* Start off-screen on mobile */
+    border-left: none;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+  }
+
+  .seller-reviews-overlay.show .seller-reviews-overlay-content {
+    right: 0;
+  }
+
+  .overlay-header {
+    padding: 20px;
+    border-radius: 0;
+    flex-shrink: 0; /* Don't let header shrink */
+  }
+
+  .overlay-header h3 {
+    font-size: 20px;
+  }
+
+  .overlay-rating-summary {
+    padding: 15px 20px;
+    flex-shrink: 0; /* Don't let rating summary shrink */
+  }
+
+  .rating-display .stars-container {
+    font-size: 24px;
+  }
+
+  .rating-display .rating-text {
+    font-size: 16px;
+  }
+
+  /* Give reviews section most of the available space */
+  .overlay-reviews-section {
+    padding: 20px;
+    flex: 1; /* Take up available space */
+    min-height: 0; /* Allow flexbox to shrink if needed */
+    max-height: none; /* Remove height restriction! */
+  }
+
+  /* Limit form section to reasonable height */
+  .overlay-review-form-section {
+    padding: 20px;
+    flex-shrink: 0; /* Don't let form shrink */
+    max-height: 40vh; /* Maximum 40% of viewport height */
+    overflow-y: auto; /* Allow scrolling if form is too tall */
+    margin-top: 0; /* Remove auto margin */
+  }
+
+  .star-rating-input label {
+    font-size: 26px;
+    padding: 3px;
+  }
+
+  /* Make form elements more compact on mobile */
+  .seller-review-form textarea {
+    min-height: 80px; /* Smaller textarea on mobile */
+  }
+
+  .form-actions {
+    margin-top: 20px;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+    padding: 14px 24px;
+  }
 }
 
 /* Additional mobile optimizations to prevent zoom and improve keyboard handling */
 @media (max-width: 768px) {
-    /* Ensure all form inputs have 16px+ font-size to prevent iOS zoom */
-    .seller-review-form textarea,
-    .seller-review-form select,
-    .seller-review-form input[type="text"],
-    .seller-review-form input[type="email"],
-    .seller-review-form input[type="number"] {
-        font-size: 16px !important;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-    }
-    
-    /* Keep checkboxes and radio buttons with default appearance */
-    .seller-review-form input[type="checkbox"],
-    .seller-review-form input[type="radio"] {
-        font-size: 16px !important;
-        -webkit-appearance: checkbox;
-        -moz-appearance: checkbox;
-        appearance: auto;
-    }
-    
-    /* Better mobile focus handling */
-    .seller-review-form textarea:focus {
-        /* Prevent the form from jumping around on focus */
-        transform: translateZ(0);
-        -webkit-backface-visibility: hidden;
-        backface-visibility: hidden;
-    }
-    
-    /* Ensure overlay stays properly positioned when keyboard opens */
+  /* Ensure all form inputs have 16px+ font-size to prevent iOS zoom */
+  .seller-review-form textarea,
+  .seller-review-form select,
+  .seller-review-form input[type="text"],
+  .seller-review-form input[type="email"],
+  .seller-review-form input[type="number"] {
+    font-size: 16px !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+
+  /* Keep checkboxes and radio buttons with default appearance */
+  .seller-review-form input[type="checkbox"],
+  .seller-review-form input[type="radio"] {
+    font-size: 16px !important;
+    -webkit-appearance: checkbox;
+    -moz-appearance: checkbox;
+    appearance: auto;
+  }
+
+  /* Better mobile focus handling */
+  .seller-review-form textarea:focus {
+    /* Prevent the form from jumping around on focus */
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  /* Ensure overlay stays properly positioned when keyboard opens */
+  .seller-reviews-overlay-content {
+    /* Use fixed positioning that adapts to keyboard */
+    position: fixed;
+    height: 100vh;
+    height: 100dvh; /* Use dynamic viewport height if supported */
+  }
+
+  /* When keyboard is open, allow scrolling within the overlay */
+  @supports (height: 100dvh) {
     .seller-reviews-overlay-content {
-        /* Use fixed positioning that adapts to keyboard */
-        position: fixed;
-        height: 100vh;
-        height: 100dvh; /* Use dynamic viewport height if supported */
+      height: 100dvh;
     }
-    
-    /* When keyboard is open, allow scrolling within the overlay */
-    @supports (height: 100dvh) {
-        .seller-reviews-overlay-content {
-            height: 100dvh;
-        }
-    }
+  }
 }
 
 /* Disabled form elements */
 .seller-review-form .star-rating-input.disabled {
-    opacity: 0.5;
-    pointer-events: none;
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .seller-review-form input:disabled,
 .seller-review-form textarea:disabled,
 .seller-review-form button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    background-color: #f5f5f5;
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f5f5f5;
 }
 
 .seller-review-form .star-rating-input.disabled label {
-    cursor: not-allowed;
-    color: #ddd !important;
+  cursor: not-allowed;
+  color: #ddd !important;
 }
 
 /* Email verification notice */
 .email-verification-notice {
-    margin: 10px 0 0 0;
-    padding: 8px 12px;
-    background-color: #fff3cd;
-    border: 1px solid #ffeaa7;
-    border-radius: 4px;
-    color: #856404;
-    font-size: 14px;
+  margin: 10px 0 0 0;
+  padding: 8px 12px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  color: #856404;
+  font-size: 14px;
 }
 
 .email-verification-notice .verify-email-link {
-    color: #0073aa;
-    text-decoration: none;
-    font-weight: 500;
+  color: #0073aa;
+  text-decoration: none;
+  font-weight: 500;
 }
 
 .email-verification-notice .verify-email-link:hover {
-    text-decoration: underline;
-} 
+  text-decoration: underline;
+}

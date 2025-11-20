@@ -25,18 +25,7 @@
   font-weight: bold;
 }
 
-.button {
-  display: inline-block;
-  padding: 5px 10px;
+.my-account-container .btn {
   margin: 0 5px;
-  background-color: #0073aa;
-  color: white;
-  text-decoration: none;
-  border-radius: 3px;
-  font-size: 14px;
-}
-
-.button:hover {
-  background-color: #005177;
-  color: white;
+  font-size: 0.875rem;
 }

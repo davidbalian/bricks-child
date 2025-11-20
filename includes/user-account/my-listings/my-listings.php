@@ -236,7 +236,7 @@ function display_my_listings($atts) {
                                     ?>
                                 </div>
                                 <div class="listing-actions">
-                                    <a href="<?php echo esc_url(add_query_arg('car_id', $post_id, home_url('/edit-listing/'))); ?>" class="button"><i class="fas fa-pencil-alt"></i> Edit</a>
+                                    <a href="<?php echo esc_url(add_query_arg('car_id', $post_id, home_url('/edit-listing/'))); ?>" class="btn btn-primary btn-md"><i class="fas fa-pencil-alt"></i> Edit</a>
                                     <?php 
                                     // Show refresh button for published, unsold listings
                                     if (get_post_status() === 'publish' && !get_field('is_sold', $post_id)) {
@@ -247,7 +247,9 @@ function display_my_listings($atts) {
                                     if (get_post_status() === 'publish') {
                                         $is_sold = get_field('is_sold', $post_id);
                                         $button_text = $is_sold ? ' Mark as Available' : ' Mark as Sold';
-                                        $button_class = $is_sold ? 'button available-button' : 'button sold-button';
+                                        $button_class = $is_sold
+                                            ? 'btn btn-primary btn-md available-button'
+                                            : 'btn btn-primary btn-md sold-button';
                                         $icon_class = $is_sold ? 'fas fa-undo-alt' : 'fas fa-check-circle';
                                         ?>
                                         <button class="<?php echo esc_attr($button_class); ?>" 
@@ -263,7 +265,7 @@ function display_my_listings($atts) {
                                         '_wpnonce' => wp_create_nonce('delete_car_listing_' . $post_id)
                                     ), admin_url('admin-post.php'));
                                     ?>
-                                    <a href="<?php echo esc_url($delete_url); ?>" class="button delete-button" onclick="return confirm('Are you sure you want to delete this listing? This action cannot be undone.');"><i class="fas fa-trash-alt"></i> Delete</a>
+                                    <a href="<?php echo esc_url($delete_url); ?>" class="btn btn-secondary btn-md delete-button" onclick="return confirm('Are you sure you want to delete this listing? This action cannot be undone.');"><i class="fas fa-trash-alt"></i> Delete</a>
                                 </div>
                             </div>
                         </div>
@@ -272,7 +274,7 @@ function display_my_listings($atts) {
             <?php 
             else :
                 echo '<p>You haven\'t created any car listings yet.</p>';
-                echo '<p><a href="' . esc_url(home_url('/add-listing/')) . '" class="button">Add New Listing</a></p>';
+                echo '<p><a href="' . esc_url(home_url('/add-listing/')) . '" class="btn btn-primary btn-md">Add New Listing</a></p>';
             endif;
             
             wp_reset_postdata();
