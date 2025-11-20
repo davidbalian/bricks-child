@@ -424,9 +424,8 @@ input[readonly]:hover {
   border-top: 1px solid #eee;
 }
 
-#edit-car-listing-form .form-row:last-child .btn {
-  width: auto;
-  margin: 2rem 0 0 0;
+#update-listing-button {
+  margin-top: 2rem;
 }
 
 /* Mobile Responsive Styles */

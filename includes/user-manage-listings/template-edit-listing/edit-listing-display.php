@@ -305,7 +305,7 @@ if (!defined('ABSPATH')) {
                 </div>
 
                 <div class="form-row">
-                    <button type="submit" class="btn btn-primary-gradient btn-lg"><?php esc_html_e('Update Listing', 'bricks-child'); ?></button>
+                    <button type="submit" id="update-listing-button" class="btn btn-primary-gradient btn-lg"><?php esc_html_e('Update Listing', 'bricks-child'); ?></button>
                 </div>
             </form>
         </div>
