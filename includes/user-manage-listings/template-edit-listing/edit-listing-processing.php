@@ -83,12 +83,13 @@ function process_edit_listing_form($data, $car_id) {
  * Now uses consistent approach: car_images field contains ALL images,
  * with first image serving as main image (no separate featured image)
  *
- * @param int $car_id Post ID
- * @param array $files Uploaded files
+ * @param int   $car_id        Post ID
+ * @param array $files         Uploaded files
  * @param array $removed_images Image IDs to remove
+ * @param array $image_order   Optional explicit image order (attachment IDs)
  * @return bool Success status
  */
-function process_edit_listing_images($car_id, $files, $removed_images) {
+function process_edit_listing_images($car_id, $files, $removed_images, $image_order = array()) {
     // Get ALL existing images from car_images field
     $existing_images = get_field('car_images', $car_id);
     if (!is_array($existing_images)) {
@@ -160,12 +161,12 @@ function process_edit_listing_images($car_id, $files, $removed_images) {
         }
     }
     
-    // FIXED LOGIC: Simply append new images to existing images
-    // This maintains the order and doesn't disrupt the main image
+    // Combine existing + new images, then apply explicit order if provided
     $all_images = array_merge($existing_images, $new_image_ids);
+    $final_images = apply_image_order($all_images, $image_order);
     
     // Update the car_images field with ALL images (no splitting/reorganizing)
-    update_field('car_images', $all_images, $car_id);
+    update_field('car_images', $final_images, $car_id);
     
     // FIXED: Remove any separate featured image to avoid duplication
     // Since car_images now contains all images with first as main
@@ -181,13 +182,14 @@ function process_edit_listing_images($car_id, $files, $removed_images) {
  * 
  * Uses already-uploaded async images for instant processing
  *
- * @param int $car_id Post ID
- * @param array $async_images Array of async uploaded attachment IDs
- * @param array $removed_images Image IDs to remove
- * @param string $session_id Async upload session ID
+ * @param int    $car_id        Post ID
+ * @param array  $async_images  Array of async uploaded attachment IDs
+ * @param array  $removed_images Image IDs to remove
+ * @param string $session_id    Async upload session ID
+ * @param array  $image_order   Optional explicit image order (attachment IDs)
  * @return bool Success status
  */
-function process_edit_listing_images_async($car_id, $async_images, $removed_images, $session_id) {
+function process_edit_listing_images_async($car_id, $async_images, $removed_images, $session_id, $image_order = array()) {
     // Get ALL existing images from car_images field
     $existing_images = get_field('car_images', $car_id);
     if (!is_array($existing_images)) {
@@ -218,12 +220,12 @@ function process_edit_listing_images_async($car_id, $async_images, $removed_imag
     // Mark async session as completed to preserve files and link to post
     mark_upload_session_completed($session_id, $car_id);
     
-    // Simply append new async images to existing images
-    // This maintains the order and doesn't disrupt the main image
-    $all_images = array_merge($existing_images, $async_images);
+    // Combine existing + async images, then apply explicit order if provided
+    $all_images   = array_merge($existing_images, $async_images);
+    $final_images = apply_image_order($all_images, $image_order);
     
     // Update the car_images field with ALL images
-    update_field('car_images', $all_images, $car_id);
+    update_field('car_images', $final_images, $car_id);
     
     // Remove any separate featured image to avoid duplication
     // Since car_images now contains all images with first as main
@@ -255,3 +257,38 @@ function handle_edit_listing_redirect($type, $message_key, $fallback_url = '') {
     }
     exit;
 } 
+
+/**
+ * Apply explicit image order to a candidate list of attachment IDs.
+ *
+ * @param array $candidates  All attachment IDs that should exist after save.
+ * @param array $image_order Explicit order from the client (attachment IDs).
+ * @return array Ordered list of attachment IDs.
+ */
+function apply_image_order($candidates, $image_order) {
+    if (empty($image_order) || !is_array($image_order)) {
+        return array_values(array_map('intval', $candidates));
+    }
+
+    $candidates   = array_values(array_map('intval', $candidates));
+    $image_order  = array_values(array_unique(array_map('intval', $image_order)));
+    $ordered      = array();
+    $used         = array();
+
+    // First honour the posted order where it matches candidates.
+    foreach ($image_order as $attachment_id) {
+        if (in_array($attachment_id, $candidates, true) && !in_array($attachment_id, $used, true)) {
+            $ordered[] = $attachment_id;
+            $used[]    = $attachment_id;
+        }
+    }
+
+    // Append any remaining candidate IDs that were not explicitly ordered.
+    foreach ($candidates as $attachment_id) {
+        if (!in_array($attachment_id, $used, true)) {
+            $ordered[] = $attachment_id;
+        }
+    }
+
+    return $ordered;
+}

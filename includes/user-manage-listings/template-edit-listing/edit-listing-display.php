@@ -30,6 +30,8 @@ if (!defined('ABSPATH')) {
                 <input type="hidden" name="action" value="edit_car_listing">
                 <input type="hidden" name="car_id" value="<?php echo esc_attr($car_id); ?>">
                 <input type="hidden" id="async_session_id" name="async_session_id" value="">
+                <!-- This hidden array will be populated by JS to reflect the final image order -->
+                <div id="image-order-container"></div>
 
                 <div class="add-listing-main-row">
                     <div class="add-listing-main-info-column">

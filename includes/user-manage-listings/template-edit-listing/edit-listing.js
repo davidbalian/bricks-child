@@ -50,6 +50,131 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     const initialExistingImageCount = imagePreviewContainer.find(existingImageSelector).length;
     if (isDevelopment) console.log('[Edit Listing] Initial existing images on page load:', initialExistingImageCount);
 
+    /**
+     * IMAGE REORDERING (drag & drop)
+     * --------------------------------
+     * We use native HTML5 drag & drop on each .image-preview-item.
+     * - Desktop: hover → click & hold → drag
+     * - Mobile: tap & hold where supported.
+     *
+     * Reordering affects:
+     * - The DOM order of .image-preview-item
+     * - The order we send to PHP via hidden image_order[] inputs
+     * - The order of accumulatedFilesList for traditional uploads
+     */
+    let dragSourceItem = null;
+
+    // Attach identity metadata to existing items (their attachment IDs)
+    imagePreviewContainer.find('.image-preview-item').each(function () {
+        const imageId = $(this).find('.remove-image[data-image-id]').data('image-id');
+        if (imageId) {
+            $(this).data('imageId', parseInt(imageId, 10));
+        }
+        $(this).attr('draggable', 'true');
+    });
+
+    function enableImageReordering() {
+        imagePreviewContainer.on('dragstart', '.image-preview-item', function (e) {
+            dragSourceItem = this;
+            $(this).addClass('dragging');
+            if (e.originalEvent && e.originalEvent.dataTransfer) {
+                e.originalEvent.dataTransfer.effectAllowed = 'move';
+                e.originalEvent.dataTransfer.setData('text/plain', 'drag');
+            }
+        });
+
+        imagePreviewContainer.on('dragover', '.image-preview-item', function (e) {
+            e.preventDefault();
+            if (e.originalEvent && e.originalEvent.dataTransfer) {
+                e.originalEvent.dataTransfer.dropEffect = 'move';
+            }
+        });
+
+        imagePreviewContainer.on('drop', '.image-preview-item', function (e) {
+            e.preventDefault();
+            if (!dragSourceItem || dragSourceItem === this) {
+                return;
+            }
+
+            const $dragSource = $(dragSourceItem);
+            const $target = $(this);
+
+            if ($target.index() < $dragSource.index()) {
+                $target.before($dragSource);
+            } else {
+                $target.after($dragSource);
+            }
+
+            imagePreviewContainer.find('.image-preview-item').removeClass('dragging');
+            dragSourceItem = null;
+
+            syncNewFilesWithDomOrder();
+            updateImageOrderField();
+        });
+
+        imagePreviewContainer.on('dragend', '.image-preview-item', function () {
+            imagePreviewContainer.find('.image-preview-item').removeClass('dragging');
+            dragSourceItem = null;
+        });
+    }
+
+    function syncNewFilesWithDomOrder() {
+        if (!accumulatedFilesList.length) return;
+
+        const reorderedNewFiles = [];
+        imagePreviewContainer.find('.image-preview-item').each(function () {
+            const fileObj = $(this).data('fileObj');
+            if (fileObj) {
+                reorderedNewFiles.push(fileObj);
+            }
+        });
+
+        if (reorderedNewFiles.length === accumulatedFilesList.length) {
+            accumulatedFilesList = reorderedNewFiles;
+            updateActualFileInput();
+            if (isDevelopment) {
+                console.log(
+                    '[Edit Listing] New files reordered. New order:',
+                    accumulatedFilesList.map((f) => f.name)
+                );
+            }
+        }
+    }
+
+    function updateImageOrderField() {
+        const $form = $('#edit-car-listing-form');
+        if (!$form.length) return;
+
+        // Clear old order inputs
+        $form.find('input[name="image_order[]"]').remove();
+
+        // Build new order from DOM, mixing existing + async-completed images
+        imagePreviewContainer.find('.image-preview-item').each(function () {
+            const imageId = $(this).data('imageId');
+            const fileObj = $(this).data('fileObj');
+            let attachmentId = null;
+
+            if (imageId) {
+                attachmentId = imageId;
+            } else if (fileObj && fileObj.attachmentId) {
+                attachmentId = fileObj.attachmentId;
+            }
+
+            if (attachmentId) {
+                $('<input>')
+                    .attr({
+                        type: 'hidden',
+                        name: 'image_order[]',
+                        value: attachmentId,
+                    })
+                    .appendTo($form);
+            }
+        });
+    }
+
+    // Enable drag & drop reordering on load
+    enableImageReordering();
+
     // Set initial make value
     const selectedMake = editListingData.selectedMake;
     if (selectedMake) {
@@ -145,6 +270,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             if (isDevelopment) console.log('[Edit Listing] Marked existing image for removal, ID:', imageId);
         }
         $(this).closest('.image-preview-item').remove(); // Use closest to ensure the correct item is removed
+        // After removal, refresh order field
+        updateImageOrderField();
     });
     
     function processNewFiles(candidateFiles) {
@@ -317,6 +444,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         const reader = new FileReader();
         reader.onload = function(e) {
             const previewItem = $('<div>').addClass('image-preview-item new-image');
+            // Keep reference to underlying file for later reordering
+            previewItem.data('fileObj', file);
             
             // Add async file key if available (FIXED TO MATCH ADD LISTING)
             if (file.asyncFileKey) {
@@ -362,6 +491,10 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             }
             
             imagePreviewContainer.append(previewItem);
+
+            // Ensure new items are draggable and part of the order calculations
+            previewItem.attr('draggable', 'true');
+            updateImageOrderField();
         };
         reader.onerror = function() {
             if (isDevelopment) console.error('[Edit Listing] Error reading new file for preview:', file.name);

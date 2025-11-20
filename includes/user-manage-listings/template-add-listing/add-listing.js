@@ -139,8 +139,124 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
   const fileInput = $("#car_images");
   const fileUploadArea = $("#file-upload-area");
   const imagePreview = $("#image-preview");
-  const addListingForm = $("#add-car-listing-form");
   let accumulatedFilesList = []; // Source of truth for selected files
+
+  /**
+   * IMAGE REORDERING (drag & drop)
+   * --------------------------------
+   * We use native HTML5 drag & drop on each .image-preview-item.
+   * - Desktop: hover → click & hold → drag
+   * - Mobile: tap & hold (where supported by the browser)
+   *
+   * Reordering affects both:
+   * - The DOM order of .image-preview-item
+   * - The order of accumulatedFilesList (and therefore the <input type="file">)
+   */
+  let dragSourceItem = null;
+
+  function enableImageReordering() {
+    // Mark items as draggable whenever they are (re)created
+    imagePreview.on("mouseenter", ".image-preview-item", function () {
+      $(this).attr("draggable", "true");
+    });
+
+    imagePreview.on("dragstart", ".image-preview-item", function (e) {
+      dragSourceItem = this;
+      $(this).addClass("dragging");
+      if (e.originalEvent && e.originalEvent.dataTransfer) {
+        e.originalEvent.dataTransfer.effectAllowed = "move";
+        // Some browsers require data to be set to enable drag
+        e.originalEvent.dataTransfer.setData("text/plain", "drag");
+      }
+    });
+
+    imagePreview.on("dragover", ".image-preview-item", function (e) {
+      e.preventDefault();
+      if (e.originalEvent && e.originalEvent.dataTransfer) {
+        e.originalEvent.dataTransfer.dropEffect = "move";
+      }
+    });
+
+    imagePreview.on("drop", ".image-preview-item", function (e) {
+      e.preventDefault();
+      if (!dragSourceItem || dragSourceItem === this) {
+        return;
+      }
+
+      const $dragSource = $(dragSourceItem);
+      const $target = $(this);
+
+      // Insert the dragged item before/after target based on index
+      if ($target.index() < $dragSource.index()) {
+        $target.before($dragSource);
+      } else {
+        $target.after($dragSource);
+      }
+
+      imagePreview.find(".image-preview-item").removeClass("dragging");
+      dragSourceItem = null;
+
+      // Sync our in-memory list and file input with new DOM order
+      syncAccumulatedFilesWithDomOrder();
+      updateAsyncImageOrderField();
+    });
+
+    imagePreview.on("dragend", ".image-preview-item", function () {
+      imagePreview.find(".image-preview-item").removeClass("dragging");
+      dragSourceItem = null;
+    });
+  }
+
+  function syncAccumulatedFilesWithDomOrder() {
+    if (!accumulatedFilesList.length) return;
+
+    const reordered = [];
+    imagePreview.find(".image-preview-item").each(function () {
+      const fileObj = $(this).data("fileObj");
+      if (fileObj) {
+        reordered.push(fileObj);
+      }
+    });
+
+    // Only overwrite if we actually found matching file objects
+    if (reordered.length === accumulatedFilesList.length) {
+      accumulatedFilesList = reordered;
+      updateActualFileInput();
+      if (isDevelopment)
+        console.log(
+          "[Add Listing] Files reordered. New order:",
+          accumulatedFilesList.map((f) => f.name)
+        );
+    }
+  }
+
+  /**
+   * Maintain async image order (attachment IDs) for the backend.
+   * We store IDs in a hidden input: <input name="async_image_order[]" ... />
+   */
+  function updateAsyncImageOrderField() {
+    const $form = $("#add-car-listing-form");
+    if (!$form.length) return;
+
+    // Remove previous values
+    $form.find('input[name="async_image_order[]"]').remove();
+
+    // Only relevant when using async uploads
+    if (!asyncUploadManager) return;
+
+    imagePreview.find(".image-preview-item").each(function () {
+      const fileObj = $(this).data("fileObj");
+      if (fileObj && fileObj.attachmentId) {
+        $("<input>")
+          .attr({
+            type: "hidden",
+            name: "async_image_order[]",
+            value: fileObj.attachmentId,
+          })
+          .appendTo($form);
+      }
+    });
+  }
 
   // Add mileage formatting
   const mileageInput = $("#mileage");
@@ -325,6 +441,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     fileUploadArea: fileUploadArea.length,
     imagePreview: imagePreview.length,
   });
+
+  // Initialise drag & drop reordering
+  enableImageReordering();
 
   // Handle click on upload area
   fileUploadArea.on("click", function (e) {
@@ -671,6 +790,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     reader.onload = function (e) {
       const previewItem = $("<div>").addClass("image-preview-item");
 
+      // Store reference to the underlying file object for reordering
+      previewItem.data("fileObj", file);
+
       // Add async file key if available
       if (file.asyncFileKey) {
         previewItem
@@ -684,58 +806,23 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         .addClass("remove-image")
         .html('<i class="fas fa-times"></i>')
         .on("click", function () {
-          if (isDevelopment) {
-            console.log(
-              "[Add Listing] Remove button clicked for:",
-              file.name
-            );
-          }
+          if (isDevelopment) console.log("[Add Listing] Remove button clicked for:", file.name);
 
           // Remove from async system if applicable
           if (file.asyncFileKey && asyncUploadManager) {
-            asyncUploadManager.removeImage(file.asyncFileKey).catch(
-              (error) => {
-                if (isDevelopment) {
-                  console.error(
-                    "[Add Listing] Failed to remove from async system:",
-                    error
-                  );
-                }
-              }
-            );
+            asyncUploadManager.removeImage(file.asyncFileKey).catch((error) => {
+              if (isDevelopment) console.error(
+                "[Add Listing] Failed to remove from async system:",
+                error
+              );
+            });
           }
 
           removeFileFromSelection(file.name);
           previewItem.remove();
-
-          // Re-sync file order after removal
-          syncFileOrderWithPreview();
         });
 
-      const moveControls = $("<div>")
-        .addClass("image-reorder-controls")
-        .append(
-          $("<button>")
-            .attr("type", "button")
-            .addClass("move-image-up")
-            .text("↑")
-            .on("click", function (e) {
-              e.preventDefault();
-              movePreviewItem(previewItem, "up", file);
-            })
-        )
-        .append(
-          $("<button>")
-            .attr("type", "button")
-            .addClass("move-image-down")
-            .text("↓")
-            .on("click", function (e) {
-              e.preventDefault();
-              movePreviewItem(previewItem, "down", file);
-            })
-        );
-
-      previewItem.append(img).append(removeBtn).append(moveControls);
+      previewItem.append(img).append(removeBtn);
 
       // Add initial upload status if async upload is starting
       if (file.asyncFileKey) {
@@ -746,6 +833,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
       imagePreview.append(previewItem);
       if (isDevelopment) console.log("[Add Listing] Preview added to DOM for:", file.name);
+
+      // Ensure the reorder drag behaviour applies to this new item
+      previewItem.attr("draggable", "true");
+
+      // Whenever we add a new async-uploaded image, refresh the order field
+      updateAsyncImageOrderField();
     };
     reader.onerror = function () {
       if (isDevelopment) console.error("[Add Listing] Error reading file for preview:", file.name);
@@ -819,113 +912,6 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       "[Add Listing] File removed. Accumulated files count:",
       accumulatedFilesList.length
     );
-  }
-
-  /**
-   * Ensure accumulatedFilesList order matches the DOM order of preview items.
-   * This is critical so traditional uploads preserve the visual order.
-   */
-  function syncFileOrderWithPreview() {
-    const orderedFiles = [];
-
-    $("#image-preview .image-preview-item").each(function () {
-      const $item = $(this);
-      const imgEl = $item.find("img")[0];
-      if (!imgEl || !imgEl.alt) return;
-
-      const fileName = imgEl.alt;
-      const match = accumulatedFilesList.find((f) => f.name === fileName);
-      if (match) {
-        orderedFiles.push(match);
-      }
-    });
-
-    if (orderedFiles.length === accumulatedFilesList.length) {
-      accumulatedFilesList = orderedFiles;
-      updateActualFileInput();
-      if (isDevelopment) {
-        console.log(
-          "[Add Listing] Synced accumulatedFilesList order with preview"
-        );
-      }
-
-      // Also keep async image order inputs in sync when using async uploads
-      updateAsyncOrderHiddenInputs();
-    } else if (isDevelopment) {
-      console.warn(
-        "[Add Listing] syncFileOrderWithPreview mismatch - keeping existing order"
-      );
-    }
-  }
-
-  /**
-   * Move a preview item up or down and then sync the underlying file list.
-   */
-  function movePreviewItem(previewItem, direction, file) {
-    const $item = $(previewItem);
-    if (direction === "up") {
-      const $prev = $item.prev(".image-preview-item");
-      if ($prev.length) {
-        $item.insertBefore($prev);
-      }
-    } else if (direction === "down") {
-      const $next = $item.next(".image-preview-item");
-      if ($next.length) {
-        $item.insertAfter($next);
-      }
-    }
-
-    syncFileOrderWithPreview();
-
-    if (isDevelopment) {
-      console.log(
-        "[Add Listing] Moved image in preview:",
-        file.name,
-        "direction:",
-        direction
-      );
-    }
-  }
-
-  /**
-   * Maintain hidden async_image_order[] inputs that reflect the current
-   * preview / file order for async-uploaded images.
-   * This is used on the server to persist a custom image order.
-   */
-  function updateAsyncOrderHiddenInputs() {
-    if (!asyncUploadManager) {
-      return;
-    }
-
-    if (!addListingForm.length) {
-      return;
-    }
-
-    // Clear previous values
-    addListingForm.find('input[name="async_image_order[]"]').remove();
-
-    // Add inputs in the current file order for files that have an attachmentId
-    accumulatedFilesList.forEach((file) => {
-      if (!file.attachmentId) {
-        return;
-      }
-
-      $("<input>")
-        .attr({
-          type: "hidden",
-          name: "async_image_order[]",
-          value: file.attachmentId,
-        })
-        .appendTo(addListingForm);
-    });
-
-    if (isDevelopment) {
-      console.log(
-        "[Add Listing] Updated async_image_order[] hidden inputs with",
-        addListingForm.find('input[name="async_image_order[]"]').length,
-        "entries"
-      );
-    }
   }
 
   function updateActualFileInput() {
@@ -1027,17 +1013,10 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         });
       }, 3000);
 
-      if (isDevelopment) {
-        console.log(
-          "[Add Listing] Async upload completed for:",
-          data.original_filename,
-          "attachmentId:",
-          data.attachment_id
-        );
-      }
-
-      // Ensure async_image_order[] reflects latest successful uploads
-      updateAsyncOrderHiddenInputs();
+      if (isDevelopment) console.log(
+        "[Add Listing] Async upload completed for:",
+        data.original_filename
+      );
     }
   }
 

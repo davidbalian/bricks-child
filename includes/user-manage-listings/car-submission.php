@@ -280,45 +280,44 @@ function handle_add_car_listing() {
         car_submission_log('✅ USING ASYNC UPLOADS - Processing should be instant');
         car_submission_log('Using async uploaded images for post: ' . $post_id);
 
-        // Normalize to integers for safety
-        $async_images = array_map('intval', $async_images);
-
-        // Optional explicit order from the client (attachment IDs)
-        $ordered_async_images = array();
+        // Apply custom order from the client, if provided
+        $ordered_async_images = array_map('intval', $async_images);
         if (isset($_POST['async_image_order']) && is_array($_POST['async_image_order'])) {
-            $client_order = array_map('intval', $_POST['async_image_order']);
-            $used_ids = array();
+            $requested_order = array_map('intval', $_POST['async_image_order']);
+            $requested_order = array_values(array_unique($requested_order));
 
-            // First, keep only IDs that exist in the async set, in the order provided
-            foreach ($client_order as $attachment_id) {
-                if (in_array($attachment_id, $async_images, true) && !isset($used_ids[$attachment_id])) {
-                    $ordered_async_images[] = $attachment_id;
-                    $used_ids[$attachment_id] = true;
+            $reordered = array();
+            $used      = array();
+
+            // First, honour the explicit order coming from the UI
+            foreach ($requested_order as $attachment_id) {
+                if (in_array($attachment_id, $ordered_async_images, true) && !in_array($attachment_id, $used, true)) {
+                    $reordered[] = $attachment_id;
+                    $used[]      = $attachment_id;
                 }
             }
 
-            // Then append any async images that were not present in the client order
-            foreach ($async_images as $attachment_id) {
-                if (!isset($used_ids[$attachment_id])) {
-                    $ordered_async_images[] = $attachment_id;
+            // Then append any remaining async images that were not in the posted order
+            foreach ($ordered_async_images as $attachment_id) {
+                if (!in_array($attachment_id, $used, true)) {
+                    $reordered[] = $attachment_id;
                 }
             }
 
-            if (!empty($ordered_async_images)) {
-                $async_images = $ordered_async_images;
-                car_submission_log('Applied client-provided async image order: ' . implode(', ', $async_images));
+            if (!empty($reordered)) {
+                $ordered_async_images = $reordered;
             }
         }
 
         // Mark session as completed to preserve files
         mark_upload_session_completed($async_session_id, $post_id);
-
+        
         // Update car_images field with async attachment IDs (in final order)
-        update_field('car_images', $async_images, $post_id);
-
-        car_submission_log('Successfully linked ' . count($async_images) . ' async images to post: ' . $post_id);
-        $image_ids = $async_images;
-
+        update_field('car_images', $ordered_async_images, $post_id);
+        
+        car_submission_log('Successfully linked ' . count($ordered_async_images) . ' async images to post: ' . $post_id);
+        $image_ids = $ordered_async_images;
+        
     } else {
         // Traditional image upload processing
         car_submission_log('⚠️ FALLING BACK TO TRADITIONAL UPLOADS - This will be slow');
@@ -729,13 +728,18 @@ function handle_edit_car_listing() {
     // Process form data
     process_edit_listing_form($_POST, $car_id);
     
+    // Collect explicit image order from the client (if any)
+    $image_order = isset($_POST['image_order']) && is_array($_POST['image_order'])
+        ? array_map('intval', $_POST['image_order'])
+        : array();
+    
     // Process images - UPDATED to use async uploads if available
     if (!empty($async_images)) {
         // Use async uploaded images (fast path)
-        process_edit_listing_images_async($car_id, $async_images, $removed_images, $async_session_id);
+        process_edit_listing_images_async($car_id, $async_images, $removed_images, $async_session_id, $image_order);
     } else {
         // Traditional image upload processing (slow path)
-        process_edit_listing_images($car_id, $_FILES, $removed_images);
+        process_edit_listing_images($car_id, $_FILES, $removed_images, $image_order);
     }
     
     // Redirect with success message
