@@ -3,8 +3,10 @@
 1. Always start with the shared `.btn` base class for any blue button. This provides padding, font, border radius, hover, and disabled behavior.
 2. Use color modifiers:
    - `.btn-primary-gradient` for the dark-blue → light-blue gradient CTA.
-   - `.btn-primary` for solid light-blue buttons (var(--light-blue)).
+   - `.btn-primary` for solid light-blue buttons (`var(--light-blue)`).
    - `.btn-secondary` for neutral gray actions.
+   - `.btn-success` for success/green actions (`var(--success-green)`).
+   - `.btn-danger` for destructive actions (`#e63e32`).
    - `.btn-link` for text-only actions (underline + no padding).
 3. Size modifiers:
    - Default `.btn` covers regular usage.
