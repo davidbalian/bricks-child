@@ -48,6 +48,19 @@
   font-weight: 600;
 }
 
+/* Specific styling for verification links inside the banner */
+.notice-text .verify-email-link {
+  color: var(--dark-blue);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px solid transparent;
+  transition: border-bottom-color var(--transition-time);
+}
+
+.notice-text .verify-email-link:hover {
+  border-bottom-color: var(--dark-blue);
+}
+
 .send-verification-btn {
   flex-shrink: 0;
 }

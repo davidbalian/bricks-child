@@ -14,6 +14,55 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Get email verification banner HTML
+ * 
+ * Returns the standard HTML structure for the email verification banner.
+ * Can be used in various contexts (global header, reviews overlay, etc.)
+ * 
+ * @param string $user_email The user's email address
+ * @param array $args Optional arguments to customize the display
+ * @return string HTML output
+ */
+function get_email_verification_banner_html($user_email, $args = array()) {
+    $defaults = array(
+        'id' => 'email-verification-notification',
+        'message_html' => 'To receive notifications, activate <strong>' . esc_html($user_email) . '</strong>',
+        'show_send_button' => true,
+        'show_dismiss_button' => true,
+        'container_style' => '',
+        'wrapper_style' => ''
+    );
+    
+    $args = wp_parse_args($args, $defaults);
+    
+    $style_attr = !empty($args['wrapper_style']) ? ' style="' . esc_attr($args['wrapper_style']) . '"' : '';
+    $container_style_attr = !empty($args['container_style']) ? ' style="' . esc_attr($args['container_style']) . '"' : '';
+    
+    ob_start();
+    ?>
+    <div <?php echo !empty($args['id']) ? 'id="' . esc_attr($args['id']) . '"' : ''; ?> class="email-verification-notice"<?php echo $style_attr; ?>>
+        <div class="notice-container"<?php echo $container_style_attr; ?>>
+            <div class="text-and-icon">
+                <span class="notice-icon"><i class="fas fa-envelope"></i></span>
+                <span class="notice-text">
+                    <?php echo $args['message_html']; ?>
+                </span>
+            </div>
+            <?php if ($args['show_send_button']): ?>
+                <button class="btn btn-primary-gradient send-verification-btn" data-email="<?php echo esc_attr($user_email); ?>">
+                    Send Verification Email
+                </button>
+            <?php endif; ?>
+            <?php if ($args['show_dismiss_button']): ?>
+                <button class="dismiss-notice-btn" title="Dismiss notification">×</button>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+/**
  * Show email verification notification under header
  */
 function show_email_verification_notification() {
@@ -148,4 +197,4 @@ function start_email_notification_session() {
         session_start();
     }
 }
-add_action('init', 'start_email_notification_session'); 
+add_action('init', 'start_email_notification_session');

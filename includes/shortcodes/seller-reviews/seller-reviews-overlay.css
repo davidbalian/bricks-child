@@ -445,23 +445,3 @@
   color: #ddd !important;
 }
 
-/* Email verification notice */
-.email-verification-notice {
-  margin: 10px 0 0 0;
-  padding: 8px 12px;
-  background-color: #fff3cd;
-  border: 1px solid #ffeaa7;
-  border-radius: 4px;
-  color: #856404;
-  font-size: 14px;
-}
-
-.email-verification-notice .verify-email-link {
-  color: #0073aa;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.email-verification-notice .verify-email-link:hover {
-  text-decoration: underline;
-}

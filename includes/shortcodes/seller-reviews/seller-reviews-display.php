@@ -217,6 +217,7 @@ function seller_reviews_display_shortcode($atts) {
                     <?php if (get_current_user_id() != $seller_id): ?>
                         <?php 
                         $current_user_id = get_current_user_id();
+                        $current_user = wp_get_current_user();
                         $email_verified = get_user_meta($current_user_id, 'email_verified', true);
                         $can_review = ($email_verified === '1');
                         ?>
@@ -253,9 +254,18 @@ function seller_reviews_display_shortcode($atts) {
                                 <button type="submit" class="btn btn-primary btn-submit-review" <?php echo !$can_review ? 'disabled' : ''; ?>>Submit Review</button>
                                 
                                 <?php if (!$can_review): ?>
-                                    <p class="email-verification-notice">
-                                        <a href="<?php echo home_url('/my-account'); ?>" class="verify-email-link">Verify your email</a> to leave a review.
-                                    </p>
+                                    <?php 
+                                    if (function_exists('get_email_verification_banner_html')) {
+                                        echo get_email_verification_banner_html($current_user->user_email, array(
+                                            'id' => '', // No ID for this instance
+                                            'message_html' => '<a href="' . home_url('/my-account') . '" class="verify-email-link">Verify your email</a> to leave a review.',
+                                            'show_send_button' => false,
+                                            'show_dismiss_button' => false,
+                                            'wrapper_style' => 'margin-top: 10px; width: 100%;',
+                                            'container_style' => 'justify-content: flex-start;'
+                                        ));
+                                    }
+                                    ?>
                                 <?php endif; ?>
                                 
                                 <div class="form-messages"></div>
