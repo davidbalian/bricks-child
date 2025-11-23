@@ -44,6 +44,7 @@ require_once get_stylesheet_directory() . '/includes/admin/user-favorites-column
 
 // Simple Dealership Account Creation
 require_once get_stylesheet_directory() . '/includes/admin/dealership-accounts.php';
+require_once get_stylesheet_directory() . '/includes/admin/listing-click-metrics.php';
 
 // NEWLY ADDED FROM ASTRA CHILD (SECOND FILE)
 require_once get_stylesheet_directory() . '/includes/notifications/email-verification-notification.php';
