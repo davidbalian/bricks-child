@@ -35,7 +35,8 @@ function handle_add_car_listing() {
         'interior_color' => 'Interior Color',
         'description' => 'Description',
         'number_of_doors' => 'Number of Doors',
-        'number_of_seats' => 'Number of Seats'
+        'number_of_seats' => 'Number of Seats',
+        'availability' => 'Availability',
     );
     
     // Verify nonce
@@ -122,6 +123,7 @@ function handle_add_car_listing() {
     $description = wp_kses_post($_POST['description']);
     $number_of_doors = intval($_POST['number_of_doors']);
     $number_of_seats = intval($_POST['number_of_seats']);
+    $availability = sanitize_text_field($_POST['availability']);
     
     // Process MOT status (optional)
     $motuntil = isset($_POST['motuntil']) ? sanitize_text_field($_POST['motuntil']) : '';
@@ -192,6 +194,7 @@ function handle_add_car_listing() {
     update_field('number_of_seats', $number_of_seats, $post_id);
     update_field('motuntil', $motuntil, $post_id);
     update_field('extras', $extras, $post_id);
+    update_field('availability', $availability, $post_id);
     
     // Update ACF fields
     update_field('hp', $hp, $post_id);
