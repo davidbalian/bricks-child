@@ -20,7 +20,8 @@ function process_edit_listing_form($data, $car_id) {
     $editable_fields = array(
         'mileage' => 'Mileage',
         'price' => 'Price',
-        'description' => 'Description'
+        'description' => 'Description',
+        'availability' => 'Availability',
     );
     
     // Update only editable fields

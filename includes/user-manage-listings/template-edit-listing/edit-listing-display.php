@@ -77,6 +77,14 @@ if (!defined('ABSPATH')) {
                                     <input type="hidden" name="car_longitude" id="car_longitude" value="<?php echo esc_attr(get_field('car_longitude', $car_id)); ?>">
                                     <input type="hidden" name="car_address" id="car_address" value="<?php echo esc_attr(get_field('car_address', $car_id)); ?>">
                                 </div>
+                                
+                                <div class="form-row">
+                                    <label for="availability"><i class="fas fa-check-circle"></i> <?php esc_html_e('Availability', 'bricks-child'); ?></label>
+                                    <select id="availability" name="availability" class="form-control" required>
+                                        <option value="In Stock" <?php selected($availability, 'In Stock'); ?>><?php esc_html_e('In Stock', 'bricks-child'); ?></option>
+                                        <option value="In Transit" <?php selected($availability, 'In Transit'); ?>><?php esc_html_e('In Transit', 'bricks-child'); ?></option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="form-section engine-performance-section">
