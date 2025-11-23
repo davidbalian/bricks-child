@@ -236,6 +236,18 @@
   margin-bottom: 0.5rem;
   font-weight: 600;
   font-size: 1.1rem;
+  color: #363636;
+}
+
+#add-car-listing-form input::placeholder,
+#add-car-listing-form textarea::placeholder {
+  color: #666;
+  opacity: 1;
+}
+
+#add-car-listing-form input::-ms-input-placeholder,
+#add-car-listing-form textarea::-ms-input-placeholder {
+  color: #666;
 }
 
 /**
