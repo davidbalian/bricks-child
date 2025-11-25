@@ -64,7 +64,8 @@ function bricks_child_enqueue_styles() {
     }
     
     // Also load on car archive pages or specific templates
-    if ( is_post_type_archive('car') || is_tax('car_make') || is_tax('car_model') ) {
+    // COMMENTED OUT: Don't load on taxonomy archive pages (car_make, car_model)
+    if ( is_post_type_archive('car') /* || is_tax('car_make') || is_tax('car_model') */ ) {
         $load_car_listings_script = true;
     }
     
