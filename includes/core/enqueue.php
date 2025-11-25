@@ -122,8 +122,8 @@ function bricks_child_enqueue_styles() {
         }
         
         // 2. Get filter counts and data using functions from car-listings-data.php
-        $make_data = get_car_makes_with_counts();
-        $model_data = get_car_models_by_make_with_counts($make_data['makes']);
+        // $make_data = get_car_makes_with_counts(); // COMMENTED OUT: Function doesn't exist
+        // $model_data = get_car_models_by_make_with_counts($make_data['makes']); // COMMENTED OUT: Depends on line above
         // variant data removed
         $price_data = get_car_price_ranges_with_counts();
         $year_data = get_car_years_with_counts();
@@ -141,8 +141,8 @@ function bricks_child_enqueue_styles() {
             'nonce'   => wp_create_nonce('toggle_favorite_car'),
             'filter_nonce' => wp_create_nonce('filter_car_listings_nonce'),
             'all_cars' => $all_cars_data, // Pass the array of car objects
-            'make_counts' => $make_data['counts'],
-            'model_counts' => $model_data['model_counts'],
+            // 'make_counts' => $make_data['counts'], // COMMENTED OUT: Depends on commented function
+            // 'model_counts' => $model_data['model_counts'], // COMMENTED OUT: Depends on commented function
             // variant data removed
             'price_counts' => $price_data['counts'],
             'year_counts' => $year_data['counts'],
