@@ -31,8 +31,8 @@ require_once get_stylesheet_directory() . '/includes/user-account/user-profile.p
 require_once get_stylesheet_directory() . '/includes/auth/access-control.php';
 require_once get_stylesheet_directory() . '/includes/auth/login-logout.php';
 require_once get_stylesheet_directory() . '/includes/core/ajax.php';
-require_once get_stylesheet_directory() . '/includes/email/sendgrid-config.php';
-require_once get_stylesheet_directory() . '/includes/email/test-sendgrid.php';
+require_once get_stylesheet_directory() . '/includes/email/email-sender.php';
+require_once get_stylesheet_directory() . '/includes/email/test-email-sender.php';
 require_once get_stylesheet_directory() . '/includes/email/email-verification-init.php';
 require_once get_stylesheet_directory() . '/includes/email/email-verification.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/favourites-button.php';

@@ -34,7 +34,7 @@ function test_email_sender() {
     }
 
     // Change this to your email if needed
-    $test_email    = get_option('leonidaskotidis4@gmail.com');
+    $test_email    = 'leonidaskotidis4@gmail.com';
     $subject       = 'Email Sender Test (Resend) from AutoAgora';
     $html_content  = '
         <html>
