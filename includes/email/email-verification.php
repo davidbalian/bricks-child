@@ -11,8 +11,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Load SendGrid configuration
-require_once get_stylesheet_directory() . '/includes/email/sendgrid-config.php';
+// Load generic email sender (Resend-backed)
+require_once get_stylesheet_directory() . '/includes/email/email-sender.php';
 
 /**
  * Generate a secure verification token
@@ -133,8 +133,8 @@ function send_verification_email($user_id, $email) {
     $text_content .= "This verification link will expire in 72 hours.\n\n";
     $text_content .= "If you did not request this email verification, please ignore this email.";
     
-    // Send email using SendGrid
-    return send_sendgrid_email($email, $subject, $html_content, $text_content);
+    // Send email using the application email sender (Resend)
+    return send_app_email($email, $subject, $html_content, $text_content);
 }
 
 /**
