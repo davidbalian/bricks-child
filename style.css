@@ -300,7 +300,13 @@ textarea:disabled,
   margin-top: 0;
 }
 
-/* Buttons within success message inherit global styles */
+.listing-success-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
 
 /* Error message styling */
 .listing-error-message {
