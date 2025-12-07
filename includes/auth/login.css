@@ -1,0 +1,52 @@
+/* Custom login page styling */
+
+.custom-login-container {
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px;
+}
+
+.custom-login-form {
+    max-width: 420px;
+    width: 100%;
+}
+
+.custom-login-form h1 {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.selling-car-login-banner {
+    margin: 12px 0 20px;
+    padding: 12px 16px;
+    background: #e0f2fe;
+    border: 1px solid #38bdf8;
+    border-radius: 8px;
+    color: #0f172a;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.custom-login-form p {
+    margin-bottom: 12px;
+}
+
+.custom-login-form .register-link,
+.custom-login-form .lost-password {
+    text-align: center;
+    margin-top: 8px;
+}
+
+.custom-login-form .register-link a,
+.custom-login-form .lost-password a {
+    color: #1d4ed8;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.custom-login-form .register-link a:hover,
+.custom-login-form .lost-password a:hover {
+    color: #1e40af;
+}
+
+
