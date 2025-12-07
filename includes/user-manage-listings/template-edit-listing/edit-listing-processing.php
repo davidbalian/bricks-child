@@ -55,6 +55,12 @@ function process_edit_listing_form($data, $car_id) {
     if (isset($data['hp'])) {
         update_field('hp', sanitize_text_field($data['hp']), $car_id);
     }
+
+    // Update MOT status (optional)
+    if (isset($data['motuntil'])) {
+        $motuntil = sanitize_text_field($data['motuntil']);
+        update_field('motuntil', $motuntil, $car_id);
+    }
     
     // Update number of owners
     if (isset($data['numowners'])) {

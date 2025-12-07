@@ -153,6 +153,35 @@ if (!defined('ABSPATH')) {
 
                             <div class="form-section mot-section">
                                 <h2><?php esc_html_e('Registration & Background Info', 'bricks-child'); ?></h2>
+
+                                <div class="form-row">
+                                    <label for="motuntil"><i class="fas fa-clipboard-check"></i> <?php esc_html_e('MOT Status (Optional)', 'bricks-child'); ?></label>
+                                    <select id="motuntil" name="motuntil" class="form-control">
+                                        <option value=""><?php esc_html_e('Select MOT Status', 'bricks-child'); ?></option>
+                                        <option value="Expired" <?php selected($mot_status, 'Expired'); ?>><?php esc_html_e('Expired', 'bricks-child'); ?></option>
+                                        <?php
+                                        // Generate month options from current month up to 2 years ahead
+                                        try {
+                                            $current_date = new DateTime('first day of this month');
+                                            $end_date     = new DateTime('last day of +2 years');
+
+                                            while ($current_date <= $end_date) {
+                                                $value   = $current_date->format('Y-m');
+                                                $display = $current_date->format('F Y');
+                                                ?>
+                                                <option value="<?php echo esc_attr($value); ?>" <?php selected($mot_status, $value); ?>>
+                                                    <?php echo esc_html($display); ?>
+                                                </option>
+                                                <?php
+                                                $current_date->modify('+1 month');
+                                            }
+                                        } catch (Exception $e) {
+                                            // Fail silently if DateTime is not available or errors occur.
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+
                                 <div class="form-row">
                                     <label for="numowners"><i class="fas fa-users"></i> <?php esc_html_e('Number of Owners', 'bricks-child'); ?></label>
                                     <input type="text" id="numowners" name="numowners" class="form-control" value="<?php echo esc_attr($num_owners); ?>">
