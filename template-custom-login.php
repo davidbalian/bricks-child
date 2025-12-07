@@ -28,6 +28,11 @@ get_header(); ?>
 				<div class="entry-content clear">
 					<div class="custom-login-container">
 						<div class="custom-login-form">
+                            <?php if ( isset( $_GET['selling_car'] ) && $_GET['selling_car'] === '1' ) : ?>
+                                <div class="selling-car-login-banner">
+                                    <?php esc_html_e( 'Log in to continue selling your car.', 'bricks-child' ); ?>
+                                </div>
+                            <?php endif; ?>
 							<h1><?php _e( 'Log In', 'bricks-child' ); ?></h1>
 
 							<!-- Display Login Errors -->

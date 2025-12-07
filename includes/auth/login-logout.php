@@ -249,19 +249,3 @@ function custom_lost_password_url($url) {
 }
 add_filter('lostpassword_url', 'custom_lost_password_url', 10, 1); 
 
-/**
- * Show a contextual banner on the custom login page
- * when the user arrived via the "Sell My Car" flow.
- */
-function bricks_child_selling_car_login_banner( $content ) {
-    if ( is_page( 'signin' ) && isset( $_GET['selling_car'] ) && $_GET['selling_car'] === '1' ) {
-        $banner  = '<div class="selling-car-login-banner">';
-        $banner .= esc_html__( 'Log in to continue selling your car.', 'bricks-child' );
-        $banner .= '</div>';
-
-        return $banner . $content;
-    }
-
-    return $content;
-}
-add_filter( 'the_content', 'bricks_child_selling_car_login_banner' );
