@@ -28,13 +28,13 @@ get_header(); ?>
 				<div class="entry-content clear">
 					<div class="custom-login-container">
 						<div class="custom-login-form">
-                            <?php if ( isset( $_GET['selling_car'] ) && $_GET['selling_car'] === '1' ) : ?>
-                                <div class="selling-car-login-banner">
-                                    <?php esc_html_e( 'Log in to continue selling your car.', 'bricks-child' ); ?>
-                                </div>
-                            <?php endif; ?>
 							<h1><?php _e( 'Log In', 'bricks-child' ); ?></h1>
 
+							<?php if ( isset( $_GET['selling_car'] ) && $_GET['selling_car'] === '1' ) : ?>
+                                <div class="selling-car-login-banner">
+                                    <?php esc_html_e( 'To continue selling your car, please log in.', 'bricks-child' ); ?>
+                                </div>
+                            <?php endif; ?>
 							<!-- Display Login Errors -->
 							<?php if ( isset( $_GET['login'] ) && $_GET['login'] === 'failed' ) : ?>
 								<div class="login-error">
@@ -77,7 +77,7 @@ get_header(); ?>
 								<?php
 								$registration_page = get_page_by_path( 'register' ); // Adjust slug if needed
 								if ( $registration_page ) {
-									echo '<a href="' . esc_url( get_permalink( $registration_page->ID ) ) . '">' . esc_html__( 'Register', 'bricks-child' ) . '</a>';
+									echo '<a href="' . esc_url( get_permalink( $registration_page->ID ) ) . '">' . esc_html__( 'Don’t have an account? Register ', 'bricks-child' ) . '</a>';
 								}
 								?>
 							</p>
