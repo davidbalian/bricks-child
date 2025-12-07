@@ -10,6 +10,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+// If the user is not logged in, send them straight to the login page
+// and mark that they came from the "Sell My Car" flow so we can show
+// a contextual banner on the login screen.
+if ( ! is_user_logged_in() ) {
+    $login_url = add_query_arg(
+        'selling_car',
+        '1',
+        wp_login_url()
+    );
+
+    wp_safe_redirect( $login_url );
+    exit;
+}
+
 // Get Makes data using PHP before the form
 $add_listing_makes = [];
 
@@ -75,11 +89,6 @@ wp_localize_script('astra-child-add-listing-js', 'addListingData', array(
 
 get_header(); ?>
 
-
-<div class="sell-title-block">
-    <h1>Sell Your Car</h1>
-    <p class="sell-subtitle">Log in to create your listing — it only takes 2 minutes.</p>
-</div>
 
 
 <div class="bricks-container">
