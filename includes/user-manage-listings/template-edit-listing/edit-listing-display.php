@@ -263,7 +263,7 @@ if (!defined('ABSPATH')) {
                                 <h2><?php esc_html_e('Description', 'bricks-child'); ?></h2>
                                 <div class="form-row">
                                     <label for="description"><i class="fas fa-align-left"></i> <?php esc_html_e('Description', 'bricks-child'); ?></label>
-                                    <textarea id="description" name="description" class="form-control" rows="6" required><?php 
+                                    <textarea id="description" name="description" class="form-control" rows="6"><?php 
                                         // Convert HTML back to plain text with proper line breaks for textarea editing
                                         $clean_description = $description;
                                         $clean_description = str_replace('</p><p>', "\n\n", $clean_description);

@@ -75,41 +75,12 @@ wp_localize_script('astra-child-add-listing-js', 'addListingData', array(
 
 get_header(); ?>
 
-<style>
-    .sell-header {
-        background: #f9fafb;
-        padding: 20px 25px;
-        border-radius: 10px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-        text-align: center;
-        margin-bottom: 25px;
-    }
-    .sell-header h2 {
-        margin-bottom: 8px;
-        font-weight: 700;
-    }
-    .sell-header p {
-        color: #444;
-        font-size: 16px;
-    }
 
-    @media (max-width: 768px) {
-      .sell-header { padding: 14px 12px; }
-      .sell-header h2 { font-size: 1.2rem; margin-bottom: 4px; }
-      .sell-header p { font-size: 0.9rem; line-height: 1.3; }
-    }
-
-    @media (max-width: 600px) {
-      .sell-benefits { display: block; text-align: center; }
-      .sell-benefits span { display: block; margin: 3px 0; }
-    }
-</style>
-
-<div class="sell-header">
-    <h2>🚗 Sell Your Car in 2 Minutes — Free!</h2>
-    <p>Reach thousands of buyers in Cyprus. No commission, no waiting — buyers call or WhatsApp you directly.</p>
-    <p class="sell-benefits"><span>✅ New listings every week</span> <span>📞 Direct calls</span> <span>💬 WhatsApp inquiries</span></p>
+<div class="sell-title-block">
+    <h1>Sell Your Car</h1>
+    <p class="sell-subtitle">Log in to create your listing — it only takes 2 minutes.</p>
 </div>
+
 
 <div class="bricks-container">
     <div class="bricks-content">
@@ -550,7 +521,7 @@ get_header(); ?>
                         <p class="description-guidelines-green"><?php esc_html_e( 'Focus on condition, upgrades, or unique features.', 'bricks-child' ); ?></p>
                         
                         <div class="form-row">
-                            <textarea id="description" name="description" class="form-control" rows="5" required placeholder="Enter your description here..."></textarea>
+                            <textarea id="description" name="description" class="form-control" rows="5" placeholder="Enter your description here..."></textarea>
                         </div>
                     </div>
 

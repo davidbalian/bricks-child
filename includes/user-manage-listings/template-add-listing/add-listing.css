@@ -1131,3 +1131,20 @@ label svg path,
     right: 8px;
   }
 }
+
+.sell-title-block {
+  text-align: center;
+  margin: 20px auto 30px;
+}
+
+.sell-title-block h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.sell-title-block .sell-subtitle {
+  font-size: 1rem;
+  color: #444;
+  opacity: 0.85;
+}

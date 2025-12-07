@@ -33,7 +33,7 @@ function handle_add_car_listing() {
         'drive_type' => 'Drive Type',
         'exterior_color' => 'Exterior Color',
         'interior_color' => 'Interior Color',
-        'description' => 'Description',
+        // 'description' => 'Description', DESCRIPTION NOT MANDATORY ANYMORE
         'number_of_doors' => 'Number of Doors',
         'number_of_seats' => 'Number of Seats',
         'availability' => 'Availability',
