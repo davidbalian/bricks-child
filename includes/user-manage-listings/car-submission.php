@@ -205,6 +205,11 @@ function handle_add_car_listing() {
     
     // Save vehicle history both as post meta and ACF field to ensure compatibility
     update_field('vehiclehistory', $vehiclehistory, $post_id);
+
+    // Recalculate badges based on optional details (hp, vehicle history, extras, description, MOT, numowners)
+    if (class_exists('Listing_Details_Badge_Manager')) {
+        Listing_Details_Badge_Manager::update_badges_for_listing($post_id);
+    }
     
     // Debug logging after save
     error_log('Saved Vehicle History (post meta): ' . print_r(get_post_meta($post_id, 'vehiclehistory', true), true));
@@ -744,7 +749,12 @@ function handle_edit_car_listing() {
         // Traditional image upload processing (slow path)
         process_edit_listing_images($car_id, $_FILES, $removed_images, $image_order);
     }
-    
+
+    // Recalculate badges based on optional details after edits are saved
+    if (class_exists('Listing_Details_Badge_Manager')) {
+        Listing_Details_Badge_Manager::update_badges_for_listing($car_id);
+    }
+
     // Redirect with success message
     handle_edit_listing_redirect('success', 'listing_updated');
 }

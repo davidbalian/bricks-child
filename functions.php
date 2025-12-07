@@ -17,6 +17,7 @@ define('BRICKS_CHILD_THEME_VERSION', '1.0.0');
 // IMPORTANT: Ensure these files and the '/vendor' directory exist in your Bricks child theme folder.
 require_once get_stylesheet_directory() . '/vendor/autoload.php';
 require_once get_stylesheet_directory() . '/includes/core/google-maps-assets.php';
+require_once get_stylesheet_directory() . '/includes/user-manage-listings/listing-details-badge-manager.php';
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/car-submission.php';
 require_once get_stylesheet_directory() . '/includes/user-account/my-account/my-account.php';
 require_once get_stylesheet_directory() . '/includes/user-account/my-listings/my-listings.php';
