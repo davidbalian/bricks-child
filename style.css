@@ -306,6 +306,7 @@ textarea:disabled,
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
+  margin-top: 1rem;
 }
 
 /* Error message styling */

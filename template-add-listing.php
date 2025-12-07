@@ -101,7 +101,7 @@ get_header(); ?>
                 <div class="listing-success-message">
                     <h2><?php esc_html_e( 'Your listing has been submitted successfully!', 'bricks-child' ); ?></h2>
                     <p><?php esc_html_e( 'Thank you for submitting your car listing. It will be reviewed by our team and published soon.', 'bricks-child' ); ?></p>
-                    <p><?php esc_html_e( 'To receive email notifications about views and clicks on your listing, verify your email from your account page if you haven\'t already.', 'bricks-child' ); ?></p>
+                    <p><?php esc_html_e( 'To receive email notifications about views and clicks on your listing,', 'bricks-child' ); ?><br><?php esc_html_e( 'verify your email from your account page if you haven\'t already.', 'bricks-child' ); ?></p>
                     <div class="listing-success-buttons">
                         <a href="<?php echo esc_url( home_url( '/my-account' ) ); ?>" class="btn btn-primary"><?php esc_html_e( 'My Account', 'bricks-child' ); ?></a>
                         <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="btn btn-primary"><?php esc_html_e( 'Return to Home', 'bricks-child' ); ?></a>
