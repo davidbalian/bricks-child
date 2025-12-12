@@ -2,12 +2,17 @@
 /**
  * Favorite Listings Display - Main HTML and PHP Logic
  * Separated from favourite-listings.php for better organization
+ * 
+ * FAVOURITES PAGE DISABLED - All functionality disabled
  */
 
 // Prevent direct access
 if (!defined('ABSPATH')) {
     exit;
 }
+
+// FAVOURITES PAGE DISABLED - Early exit to prevent any code execution
+return;
 
 // Get the current page number
 $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;

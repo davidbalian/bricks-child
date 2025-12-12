@@ -6,7 +6,9 @@
  * @since 1.0.0
  */
 
+// FAVOURITES PAGE DISABLED - All functionality commented out
 // Enqueue separated CSS and JS files
+/*
 function enqueue_favourite_listings_assets() {
     // Only load on specific contexts - be more restrictive to avoid conflicts
     $should_load = false;
@@ -65,4 +67,5 @@ function display_favourite_listings($atts) {
     include get_stylesheet_directory() . '/includes/shortcodes/favourite-listings/favourite-listings-display.php';
     return ob_get_clean();
 }
+*/
 ?>

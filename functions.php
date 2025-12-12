@@ -21,7 +21,8 @@ require_once get_stylesheet_directory() . '/includes/user-manage-listings/listin
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/car-submission.php';
 require_once get_stylesheet_directory() . '/includes/user-account/my-account/my-account.php';
 require_once get_stylesheet_directory() . '/includes/user-account/my-listings/my-listings.php';
-require_once get_stylesheet_directory() . '/includes/shortcodes/favourite-listings.php';
+// FAVOURITES PAGE DISABLED - Commented out to disable favourites page functionality
+// require_once get_stylesheet_directory() . '/includes/shortcodes/favourite-listings.php';
 require_once get_stylesheet_directory() . '/includes/core/enqueue.php';
 require_once get_stylesheet_directory() . '/includes/core/image-optimization.php';
 require_once get_stylesheet_directory() . '/includes/core/async-uploads.php';
