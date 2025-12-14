@@ -10,6 +10,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+use Throwable;
+
 add_action('admin_menu', function () {
     add_management_page(
         'Listing Notification Tester',
@@ -36,32 +38,39 @@ function render_listing_notification_tester_page() {
             $response = '';
             $manager = listing_notification_manager();
             $state_repo = new ListingNotificationStateRepository();
-            if ($action === 'view_milestone') {
-                $original_views = get_post_meta($listing_id, 'total_views_count', true);
-                $original_views = $original_views !== '' ? intval($original_views) : 0;
+            try {
+                if ($action === 'view_milestone') {
+                    $original_views = get_post_meta($listing_id, 'total_views_count', true);
+                    $original_views = $original_views !== '' ? intval($original_views) : 0;
 
-                $original_milestones = $state_repo->getViewMilestonesSent($listing_id);
+                    $original_milestones = $state_repo->getViewMilestonesSent($listing_id);
 
-                update_post_meta($listing_id, 'total_views_count', $view_milestone_target);
-                delete_post_meta($listing_id, 'notification_view_milestones_sent');
-
-                $sent = $manager->maybeSendViewMilestoneNotification($listing_id);
-
-                if (!empty($original_milestones)) {
-                    update_post_meta($listing_id, 'notification_view_milestones_sent', $original_milestones);
-                } else {
+                    update_post_meta($listing_id, 'total_views_count', $view_milestone_target);
                     delete_post_meta($listing_id, 'notification_view_milestones_sent');
-                }
 
-                update_post_meta($listing_id, 'total_views_count', $original_views);
-                $response = $sent ? 'View milestone email dispatched (if conditions met).' : 'No view milestone sent (probably already marked).';
-            } elseif ($action === 'reminder') {
-                $refresh_url = admin_url('admin.php?page=my-listings');
-                $mark_as_sold_url = admin_url('admin.php?page=my-listings');
-                $sent = $manager->maybeSendReminderNotification($listing_id, $refresh_url, $mark_as_sold_url);
-                $response = $sent ? 'Reminder email sent.' : 'Reminder not sent (maybe already at limit or preferences off).';
-            } else {
-                $response = 'Unknown action.';
+                    $sent = $manager->maybeSendViewMilestoneNotification($listing_id);
+
+                    if (!empty($original_milestones)) {
+                        update_post_meta($listing_id, 'notification_view_milestones_sent', $original_milestones);
+                    } else {
+                        delete_post_meta($listing_id, 'notification_view_milestones_sent');
+                    }
+
+                    update_post_meta($listing_id, 'total_views_count', $original_views);
+                    $response = $sent ? 'View milestone email dispatched (if conditions met).' : 'No view milestone sent (probably already marked).';
+                } elseif ($action === 'reminder') {
+                    $refresh_url = admin_url('admin.php?page=my-listings');
+                    $mark_as_sold_url = admin_url('admin.php?page=my-listings');
+                    $sent = $manager->maybeSendReminderNotification($listing_id, $refresh_url, $mark_as_sold_url);
+                    $response = $sent ? 'Reminder email sent.' : 'Reminder not sent (maybe already at limit or preferences off).';
+                } else {
+                    $response = 'Unknown action.';
+                }
+            } catch (Throwable $error) {
+                $response = 'Tester error: ' . $error->getMessage();
+                if (function_exists('error_log')) {
+                    error_log($response);
+                }
             }
             $notice = esc_html($response);
         } else {

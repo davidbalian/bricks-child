@@ -113,12 +113,9 @@ final class ListingNotificationMessageFactory
 
     private function getListingsUrl(): string
     {
-        if (stripos(home_url(), 'staging') !== false) {
-            return home_url('/my-listings/');
-        }
-
         return home_url('/my-listings/');
     }
+
 
 
     /**
