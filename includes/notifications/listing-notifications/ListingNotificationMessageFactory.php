@@ -46,8 +46,8 @@ final class ListingNotificationMessageFactory
         $copy = $this->getMilestoneCopy($listing_title, $views, $milestone);
 
         $subject = $copy['subject'];
-        $body = $copy['body'];
-        $text = $copy['text'];
+        $body = sprintf($copy['body'], $listing_title, $views);
+        $text = sprintf($copy['text'], $listing_title, $views);
 
         $support = $copy['support'] ?? '';
 
@@ -73,27 +73,27 @@ final class ListingNotificationMessageFactory
         $map = [
             150 => [
                 'subject' => '150 views — strong interest in your listing',
-                'body' => '150 people have already viewed your car. Listings with this level of attention often receive multiple enquiries.',
+                'body' => '%1$s has reached 150 views. Listings with this level of attention often receive multiple enquiries.',
                 'support' => 'Keeping your listing up to date can help you close faster.',
-                'text' => '150 people have already viewed your car. Listings with this level of attention often receive multiple enquiries.'
+                'text' => '%1$s has reached 150 views. Listings with this level of attention often receive multiple enquiries.'
             ],
             100 => [
                 'subject' => '100 buyers have viewed your car',
-                'body' => 'Your listing has passed 100 views. Buyers are clearly finding it and spending time reviewing it.',
+                'body' => '%1$s has passed 100 views. Buyers are clearly finding it and spending time reviewing it.',
                 'support' => 'Highlighting your car’s best features can help turn views into enquiries.',
-                'text' => 'Your listing has passed 100 views. Buyers are clearly finding it and spending time reviewing it.'
+                'text' => '%1$s has passed 100 views. Buyers are clearly finding it and spending time reviewing it.'
             ],
             50 => [
                 'subject' => 'Your listing has reached 50 views',
-                'body' => '50 people have viewed your car so far. This usually means your price and details are attracting attention.',
+                'body' => '50 people have viewed %1$s so far. That usually means your price and details are attracting attention.',
                 'support' => 'A small update can help keep your listing visible and competitive.',
-                'text' => '50 people have viewed your car so far. This usually means your price and details are attracting attention.'
+                'text' => '50 people have viewed %1$s so far. That usually means your price and details are attracting attention.'
             ],
             20 => [
                 'subject' => 'Your listing has reached 20 views',
-                'body' => '20 people have already viewed your car. This is a good early sign that buyers are finding your listing.',
+                'body' => '20 people have already viewed %1$s. This is a good early sign that buyers are finding your listing.',
                 'support' => 'Early interest is a great time to double-check photos, price, and details.',
-                'text' => '20 people have already viewed your car. This is a good early sign that buyers are finding your listing.'
+                'text' => '20 people have already viewed %1$s. This is a good early sign that buyers are finding your listing.'
             ],
         ];
 
