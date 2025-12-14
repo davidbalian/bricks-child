@@ -16,16 +16,23 @@ final class ListingReminderScheduler
     private const POSTS_PER_RUN = 25;
     private const REMINDER_INTERVAL_SECONDS = WEEK_IN_SECONDS;
 
-    private RefreshListingManager $refreshManager;
+    private ?RefreshListingManager $refreshManager = null;
     private ListingNotificationStateRepository $stateRepository;
 
     public function __construct()
     {
-        $this->refreshManager = new RefreshListingManager();
         $this->stateRepository = new ListingNotificationStateRepository();
 
+        add_action('init', array($this, 'setupRefreshManager'), 11);
         add_action('init', array($this, 'maybeScheduleCron'));
         add_action(self::CRON_HOOK, array($this, 'handleReminderCron'));
+    }
+
+    public function setupRefreshManager(): void
+    {
+        if ($this->refreshManager === null) {
+            $this->refreshManager = new RefreshListingManager();
+        }
     }
 
     public function maybeScheduleCron(): void
@@ -114,7 +121,7 @@ final class ListingReminderScheduler
             $timestamps[] = strtotime($publication);
         }
 
-        $refresh = $this->refreshManager->get_last_refresh_date($car_id);
+        $refresh = $this->getRefreshManager()->get_last_refresh_date($car_id);
         if ($refresh) {
             $timestamps[] = strtotime($refresh);
         }
@@ -129,6 +136,15 @@ final class ListingReminderScheduler
         }
 
         return max($timestamps);
+    }
+
+    private function getRefreshManager(): RefreshListingManager
+    {
+        if ($this->refreshManager === null) {
+            $this->setupRefreshManager();
+        }
+
+        return $this->refreshManager;
     }
 }
 
