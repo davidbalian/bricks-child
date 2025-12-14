@@ -107,10 +107,6 @@ final class ListingNotificationMessageFactory
 
     private function getListingsUrl(): string
     {
-        if (strpos(home_url(), 'staging4.autoagora.cy') !== false) {
-            return 'https://staging4.autoagora.cy/my-listings/';
-        }
-
         return home_url('/my-listings/');
     }
 
