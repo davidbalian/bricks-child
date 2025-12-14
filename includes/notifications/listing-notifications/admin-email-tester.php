@@ -29,12 +29,31 @@ function render_listing_notification_tester_page() {
     $action = isset($_POST['notification_action']) ? sanitize_text_field($_POST['notification_action']) : '';
     $notice = '';
 
+    $view_milestone_target = isset($_POST['view_milestone_target']) ? intval($_POST['view_milestone_target']) : 50;
+
     if (wp_verify_nonce($_POST['_wpnonce'] ?? '', 'listing_notification_tester')) {
         if ($listing_id && get_post_type($listing_id) === 'car') {
             $response = '';
             $manager = listing_notification_manager();
+            $state_repo = new ListingNotificationStateRepository();
             if ($action === 'view_milestone') {
+                $original_views = get_post_meta($listing_id, 'total_views_count', true);
+                $original_views = $original_views !== '' ? intval($original_views) : 0;
+
+                $original_milestones = $state_repo->getViewMilestonesSent($listing_id);
+
+                update_post_meta($listing_id, 'total_views_count', $view_milestone_target);
+                delete_post_meta($listing_id, 'notification_view_milestones_sent');
+
                 $sent = $manager->maybeSendViewMilestoneNotification($listing_id);
+
+                if (!empty($original_milestones)) {
+                    update_post_meta($listing_id, 'notification_view_milestones_sent', $original_milestones);
+                } else {
+                    delete_post_meta($listing_id, 'notification_view_milestones_sent');
+                }
+
+                update_post_meta($listing_id, 'total_views_count', $original_views);
                 $response = $sent ? 'View milestone email dispatched (if conditions met).' : 'No view milestone sent (probably already marked).';
             } elseif ($action === 'reminder') {
                 $refresh_url = admin_url('admin.php?page=my-listings');
@@ -64,6 +83,18 @@ function render_listing_notification_tester_page() {
                 <tr>
                     <th scope="row"><label for="listing_id">Listing ID</label></th>
                     <td><input name="listing_id" type="number" id="listing_id" class="regular-text" required value="<?php echo esc_attr($listing_id); ?>"></td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="view_milestone_target">Milestone</label></th>
+                    <td>
+                        <select name="view_milestone_target" id="view_milestone_target">
+                            <?php foreach ([50, 100, 150] as $milestone): ?>
+                                <option value="<?php echo esc_attr($milestone); ?>" <?php selected($view_milestone_target, $milestone); ?>>
+                                    <?php echo esc_html($milestone . ' views'); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </td>
                 </tr>
             </table>
             <p class="submit">
