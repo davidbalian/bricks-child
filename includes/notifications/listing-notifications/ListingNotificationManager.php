@@ -71,7 +71,7 @@ final class ListingNotificationManager
                     $milestone
                 );
 
-        if ($this->sendEmailToOwner($car_id, $payload, false)) {
+                if ($this->sendEmailToOwner($car_id, $payload, false)) {
                     $this->stateRepository->markViewMilestoneSent($car_id, $milestone);
                     return true;
                 }
