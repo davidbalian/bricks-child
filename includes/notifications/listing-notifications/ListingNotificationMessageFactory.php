@@ -19,17 +19,23 @@ final class ListingNotificationMessageFactory
      */
     public function buildContactClickNotification(string $listing_title, int $total_clicks): array
     {
-        $subject = 'Your car is getting attention!';
-        $body = sprintf(
-            '%s just recorded %d contact clicks. That means buyers are interested—nice work!',
-            $listing_title,
-            $total_clicks
+        $subject = 'Buyers are contacting you about your car';
+        $body = 'Your listing has received multiple contact requests. This is a strong sign that buyers are interested in your car.';
+        $support = 'Listings with fresh photos and clear details tend to receive more enquiries.';
+
+        $html = sprintf(
+            '<p>%s</p><p>%s</p><p><a href="%s" style="background:#0073aa;color:#fff;padding:10px 16px;border-radius:4px;text-decoration:none;font-weight:600;">My Listings</a></p><p><small>%s</small></p><p><small>%s</small></p>',
+            esc_html($body),
+            esc_html($support),
+            esc_url($this->getListingsUrl()),
+            esc_html($this->getGlobalFooter())
         );
 
-        return $this->buildEmailPayload($subject, $body, [
-            'html' => sprintf('<p>%s</p><p>Keep the momentum by refreshing your listing or adding a photo.</p>', esc_html($body)),
-            'text' => $body . "\n\nRefresh your listing to stay at the top."
-        ]);
+        return [
+            'subject' => $subject,
+            'html' => $html,
+            'text' => $body . "\n\n" . $support . "\n\nVisit: " . $this->getListingsUrl() . "\n" . $this->getGlobalFooter(),
+        ];
     }
 
     /**
@@ -49,10 +55,20 @@ final class ListingNotificationMessageFactory
             esc_url($this->getListingsUrl())
         );
 
+        $support = $copy['support'] ?? '';
+
+        $html = sprintf(
+            '<p>%s</p><p>%s</p><p><a href="%s" style="background:#0073aa;color:#fff;padding:10px 16px;border-radius:4px;text-decoration:none;font-weight:600;">My Listings</a></p><p><small>%s</small></p><p><small>%s</small></p>',
+            esc_html($body),
+            esc_html($support),
+            esc_url($this->getListingsUrl()),
+            esc_html($this->getGlobalFooter())
+        );
+
         return [
             'subject' => $subject,
             'html' => $html,
-            'text' => $text . "\n\nVisit: " . $this->getListingsUrl(),
+            'text' => $text . "\n\n" . $support . "\n\nVisit: " . $this->getListingsUrl() . "\n" . $this->getGlobalFooter(),
         ];
     }
 
@@ -62,44 +78,44 @@ final class ListingNotificationMessageFactory
 
         $map = [
             150 => [
-                'subject' => '🔥 Huge momentum: 150 views!',
-                'body' => 'Your listing is getting serious attention—150 visitors have already checked it out. Keep the details crisp to close the deal.',
-                'text' => 'Keep the momentum by refreshing photos or highlighting upgrades.'
+                'subject' => '150 views — strong interest in your listing',
+                'body' => '150 people have already viewed your car. Listings with this level of attention often receive multiple enquiries.',
+                'support' => 'Keeping your listing up to date can help you close faster.',
+                'text' => '150 people have already viewed your car. Listings with this level of attention often receive multiple enquiries.'
             ],
             100 => [
-                'subject' => '✅ 100 views and counting!',
-                'body' => '100 people have peeked at your car. That’s buyers noticing the value—play it up with a quick refresh.',
-                'text' => 'Need ideas? Update the description or highlight new perks.'
+                'subject' => '100 buyers have viewed your car',
+                'body' => 'Your listing has passed 100 views. Buyers are clearly finding it and spending time reviewing it.',
+                'support' => 'Highlighting your car’s best features can help turn views into enquiries.',
+                'text' => 'Your listing has passed 100 views. Buyers are clearly finding it and spending time reviewing it.'
             ],
             50 => [
-                'subject' => 'Good news: 50 views reached!',
-                'body' => 'Half a hundred buyers have seen your listing. That’s proof your car is being considered.',
-                'text' => 'Give it another boost with a price tweak or fresh angle.'
+                'subject' => 'Your listing has reached 50 views',
+                'body' => '50 people have viewed your car so far. This usually means your price and details are attracting attention.',
+                'support' => 'A small update can help keep your listing visible and competitive.',
+                'text' => '50 people have viewed your car so far. This usually means your price and details are attracting attention.'
             ],
             20 => [
-                'subject' => 'Nice start: 20 views already!',
-                'body' => '20 people have clicked through—early traction is the best time to polish the listing.',
-                'text' => 'Refresh the headline or add a friendly note so even more buyers keep coming back.'
+                'subject' => 'Your listing has reached 20 views',
+                'body' => '20 people have already viewed your car. This is a good early sign that buyers are finding your listing.',
+                'support' => 'Early interest is a great time to double-check photos, price, and details.',
+                'text' => '20 people have already viewed your car. This is a good early sign that buyers are finding your listing.'
             ],
         ];
 
         return $map[$milestone] ?? [
             'subject' => sprintf('Momentum building: %d views!', $views),
             'body' => $base,
+            'support' => 'Stay active—fine-tune your listing so the interest keeps growing.',
             'text' => 'Stay active—fine-tune your listing so the interest keeps growing.'
         ];
     }
 
     private function getListingsUrl(): string
     {
-        $next = home_url('/my-listings/');
-
-        if (strpos(home_url(), 'staging4.autoagora.cy') !== false) {
-            return 'https://staging4.autoagora.cy/my-listings/';
-        }
-
-        return $next;
+        return home_url('/my-listings/');
     }
+
 
     /**
      * Build message for reminder emails.
@@ -108,19 +124,21 @@ final class ListingNotificationMessageFactory
     {
         $subject = 'Quick reminder to keep your listing fresh';
         $body = sprintf(
-            '%s could use a fresh look. Update the price, headline, or photos to help it stand out.',
+            '%s has been live for a while. Small updates can help it stand out again in search results.',
             $listing_title
         );
+        $support = 'You can refresh your listing or mark it as sold at any time from your account.';
 
         $html = sprintf(
-            '<p>%s</p><p><a href="%s" style="background:#0073aa;color:#fff;padding:10px 18px;border-radius:5px;text-decoration:none;margin-right:10px;">Refresh listing</a><a href="%s" style="background:#444;color:#fff;padding:10px 18px;border-radius:5px;text-decoration:none;">Mark as sold</a></p><p>You are receiving reminder %d of 3.</p>',
+            '<p>%s</p><p>%s</p><p><a href="%s" style="background:#0073aa;color:#fff;padding:10px 18px;border-radius:5px;text-decoration:none;font-weight:600;">My Listings</a></p><p><small>You are receiving reminder %d of 3.</small></p><p><small>%s</small></p>',
             esc_html($body),
+            esc_html($support),
             esc_url($refresh_url),
-            esc_url($mark_as_sold_url),
-            $reminder_count
+            $reminder_count,
+            esc_html($this->getGlobalFooter())
         );
 
-        $text = $body . "\n\nRefresh listing: " . $refresh_url . "\nMark as sold: " . $mark_as_sold_url;
+        $text = $body . "\n\n" . $support . "\n\nVisit: " . $refresh_url . "\n" . $this->getGlobalFooter() . "\nYou are receiving reminder " . $reminder_count . " of 3.";
 
         return [
             'subject' => $subject,
@@ -141,6 +159,11 @@ final class ListingNotificationMessageFactory
         ];
 
         return array_merge($payload, $overrides);
+    }
+
+    private function getGlobalFooter(): string
+    {
+        return 'You can manage or turn off these emails anytime in your account settings.';
     }
 }
 
