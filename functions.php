@@ -56,6 +56,7 @@ require_once get_stylesheet_directory() . '/includes/notifications/listing-notif
 require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/ListingNotificationMessageFactory.php';
 require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/ListingNotificationManager.php';
 require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/init.php';
+require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/admin-email-tester.php';
 require_once get_stylesheet_directory() . '/includes/legal/legal-pages.php';
 // Cookie consent functionality disabled
 // require_once get_stylesheet_directory() . '/includes/legal/cookie-consent.php';
