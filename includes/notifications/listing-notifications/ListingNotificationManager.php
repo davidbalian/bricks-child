@@ -182,7 +182,7 @@ final class ListingNotificationManager
 
     private function getViewMilestones(): array
     {
-        return [150, 100, 50];
+        return [150, 100, 50, 20];
     }
 }
 

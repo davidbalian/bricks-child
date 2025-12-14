@@ -37,17 +37,68 @@ final class ListingNotificationMessageFactory
      */
     public function buildViewMilestoneNotification(string $listing_title, int $views, int $milestone): array
     {
-        $subject = sprintf('Nice news: %s hit %d views!', $listing_title, $milestone);
-        $body = sprintf(
-            '%s has now reached %d views. That is the kind of traction every seller wants.',
-            $listing_title,
-            $views
+        $copy = $this->getMilestoneCopy($listing_title, $views, $milestone);
+
+        $subject = $copy['subject'];
+        $body = $copy['body'];
+        $text = $copy['text'];
+
+        $html = sprintf(
+            '<p>%s</p><p><a href="%s" style="background:#0073aa;color:#fff;padding:10px 16px;border-radius:4px;text-decoration:none;font-weight:600;">My Listings</a></p>',
+            esc_html($body),
+            esc_url($this->getListingsUrl())
         );
 
-        return $this->buildEmailPayload($subject, $body, [
-            'html' => sprintf('<p>%s</p><p>Want even more attention? Refresh your listing with updated info or pricing.</p>', esc_html($body)),
-            'text' => $body . "\n\nTry refreshing your listing to keep the attention rolling."
-        ]);
+        return [
+            'subject' => $subject,
+            'html' => $html,
+            'text' => $text . "\n\nVisit: " . $this->getListingsUrl(),
+        ];
+    }
+
+    private function getMilestoneCopy(string $listing_title, int $views, int $milestone): array
+    {
+        $base = sprintf('%s just hit %d views—buyers are tuning in for real.', $listing_title, $views);
+
+        $map = [
+            150 => [
+                'subject' => '🔥 Huge momentum: 150 views!',
+                'body' => 'Your listing is getting serious attention—150 visitors have already checked it out. Keep the details crisp to close the deal.',
+                'text' => 'Keep the momentum by refreshing photos or highlighting upgrades.'
+            ],
+            100 => [
+                'subject' => '✅ 100 views and counting!',
+                'body' => '100 people have peeked at your car. That’s buyers noticing the value—play it up with a quick refresh.',
+                'text' => 'Need ideas? Update the description or highlight new perks.'
+            ],
+            50 => [
+                'subject' => 'Good news: 50 views reached!',
+                'body' => 'Half a hundred buyers have seen your listing. That’s proof your car is being considered.',
+                'text' => 'Give it another boost with a price tweak or fresh angle.'
+            ],
+            20 => [
+                'subject' => 'Nice start: 20 views already!',
+                'body' => '20 people have clicked through—early traction is the best time to polish the listing.',
+                'text' => 'Refresh the headline or add a friendly note so even more buyers keep coming back.'
+            ],
+        ];
+
+        return $map[$milestone] ?? [
+            'subject' => sprintf('Momentum building: %d views!', $views),
+            'body' => $base,
+            'text' => 'Stay active—fine-tune your listing so the interest keeps growing.'
+        ];
+    }
+
+    private function getListingsUrl(): string
+    {
+        $next = home_url('/my-listings/');
+
+        if (strpos(home_url(), 'staging4.autoagora.cy') !== false) {
+            return 'https://staging4.autoagora.cy/my-listings/';
+        }
+
+        return $next;
     }
 
     /**

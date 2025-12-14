@@ -88,7 +88,7 @@ function render_listing_notification_tester_page() {
                     <th scope="row"><label for="view_milestone_target">Milestone</label></th>
                     <td>
                         <select name="view_milestone_target" id="view_milestone_target">
-                            <?php foreach ([50, 100, 150] as $milestone): ?>
+                            <?php foreach ([20, 50, 100, 150] as $milestone): ?>
                                 <option value="<?php echo esc_attr($milestone); ?>" <?php selected($view_milestone_target, $milestone); ?>>
                                     <?php echo esc_html($milestone . ' views'); ?>
                                 </option>
