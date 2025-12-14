@@ -152,6 +152,76 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             alert('Error sending verification code. Please try again.');
         });
     }
+
+    // Notification preference toggles
+    var activityToggle = document.getElementById('activity-notifications-toggle');
+    var reminderToggle = document.getElementById('reminder-notifications-toggle');
+    var notificationFeedback = document.getElementById('notification-preferences-feedback');
+    var notificationRequestInFlight = false;
+
+    function updateNotificationPreferences(activityValue, reminderValue) {
+        if (notificationRequestInFlight) {
+            return;
+        }
+
+        if (!activityToggle || !reminderToggle) {
+            return;
+        }
+
+        notificationRequestInFlight = true;
+
+        if (notificationFeedback) {
+            notificationFeedback.textContent = 'Saving preferences...';
+            notificationFeedback.classList.remove('success', 'error');
+        }
+
+        var formData = new FormData();
+        formData.append('action', 'update_listing_notification_preferences');
+        formData.append('activity_notifications', activityValue ? '1' : '0');
+        formData.append('reminder_notifications', reminderValue ? '1' : '0');
+        formData.append('nonce', MyAccountAjax.notification_preferences_nonce);
+
+        fetch(MyAccountAjax.ajax_url, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            notificationRequestInFlight = false;
+
+            if (!notificationFeedback) {
+                return;
+            }
+
+            if (data.success) {
+                notificationFeedback.textContent = 'Preferences saved.';
+                notificationFeedback.classList.add('success');
+            } else {
+                notificationFeedback.textContent = data.data || 'Unable to save preferences.';
+                notificationFeedback.classList.add('error');
+            }
+        })
+        .catch(error => {
+            notificationRequestInFlight = false;
+            if (!notificationFeedback) {
+                return;
+            }
+
+            notificationFeedback.textContent = 'Connection error. Please try again.';
+            notificationFeedback.classList.add('error');
+        });
+    }
+
+    if (activityToggle && reminderToggle) {
+        activityToggle.addEventListener('change', function() {
+            updateNotificationPreferences(activityToggle.checked, reminderToggle.checked);
+        });
+
+        reminderToggle.addEventListener('change', function() {
+            updateNotificationPreferences(activityToggle.checked, reminderToggle.checked);
+        });
+    }
 });
 
 /**

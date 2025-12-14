@@ -346,3 +346,29 @@ function handle_send_email_verification() {
         wp_send_json_error('Failed to send verification email. Please try again later.');
     }
 } 
+
+add_action('wp_ajax_update_listing_notification_preferences', 'handle_update_listing_notification_preferences');
+function handle_update_listing_notification_preferences() {
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'notification_preferences_nonce')) {
+        wp_send_json_error('Invalid nonce');
+        return;
+    }
+
+    if (!is_user_logged_in()) {
+        wp_send_json_error('User not logged in');
+        return;
+    }
+
+    $user_id = get_current_user_id();
+    $activity = isset($_POST['activity_notifications']) && $_POST['activity_notifications'] === '1';
+    $reminders = isset($_POST['reminder_notifications']) && $_POST['reminder_notifications'] === '1';
+
+    $preferences = new ListingNotificationPreferences();
+    $preferences->setActivityNotificationsEnabled($user_id, $activity);
+    $preferences->setReminderNotificationsEnabled($user_id, $reminders);
+
+    wp_send_json_success(array(
+        'activity_notifications' => $activity,
+        'reminder_notifications' => $reminders
+    ));
+}

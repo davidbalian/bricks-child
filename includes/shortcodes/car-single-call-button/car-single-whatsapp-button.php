@@ -99,6 +99,7 @@ function handle_car_whatsapp_button_click() {
     $updated = update_field('whatsapp_button_clicks', $new_count, $post_id);
 
     if ($updated) {
+        listing_notification_manager()->maybeSendContactClickNotification($post_id);
         wp_send_json_success(array(
             'message' => 'WhatsApp click tracked successfully',
             'new_count' => $new_count

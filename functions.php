@@ -50,6 +50,14 @@ require_once get_stylesheet_directory() . '/includes/admin/listing-click-metrics
 
 // NEWLY ADDED FROM ASTRA CHILD (SECOND FILE)
 require_once get_stylesheet_directory() . '/includes/notifications/email-verification-notification.php';
+require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/ListingNotificationEmailResolver.php';
+require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/ListingNotificationPreferences.php';
+require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/ListingNotificationStateRepository.php';
+require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/ListingNotificationMessageFactory.php';
+require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/ListingNotificationManager.php';
+require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/ListingReminderScheduler.php';
+require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/init.php';
+new ListingReminderScheduler();
 require_once get_stylesheet_directory() . '/includes/legal/legal-pages.php';
 // Cookie consent functionality disabled
 // require_once get_stylesheet_directory() . '/includes/legal/cookie-consent.php';

@@ -135,8 +135,13 @@ class CarViewsTracker {
             return array('unique_view' => false, 'total_view' => false);
         }
         
-        // Record the view using new dual tracking system
-        return $this->database->record_view($car_id, $ip_address, $user_agent, $user_id);
+        $results = $this->database->record_view($car_id, $ip_address, $user_agent, $user_id);
+
+        if (!empty($results['total_view'])) {
+            listing_notification_manager()->maybeSendViewMilestoneNotification($car_id);
+        }
+
+        return $results;
     }
     
     /**

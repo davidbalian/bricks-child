@@ -112,6 +112,41 @@ function display_my_account_main($current_user) {
             </div>
         </div>
 
+        <?php
+        $preferences = new ListingNotificationPreferences();
+        $activity_enabled = $preferences->isActivityNotificationsEnabled($current_user->ID);
+        $reminder_enabled = $preferences->isReminderNotificationsEnabled($current_user->ID);
+        $notification_disabled = ($email_verified !== '1');
+        ?>
+        <div class="account-section notification-preferences-section">
+            <h3>Email Notifications</h3>
+            <p class="notification-description">Only verified emails receive optional career reminders. You can toggle activity emails and 7-day reminders below.</p>
+            <div class="info-row notification-row">
+                <label class="notification-toggle">
+                    <input type="checkbox" id="activity-notifications-toggle"
+                           data-email-verified="<?php echo $email_verified === '1' ? '1' : '0'; ?>"
+                           <?php checked($activity_enabled); ?>
+                           <?php disabled($notification_disabled); ?>>
+                    <span>Listing activity updates (clicks/views)</span>
+                </label>
+                <?php if ($notification_disabled): ?>
+                    <p class="notification-hint">Verify your email to enable activity notifications.</p>
+                <?php endif; ?>
+            </div>
+            <div class="info-row notification-row">
+                <label class="notification-toggle">
+                    <input type="checkbox" id="reminder-notifications-toggle"
+                           <?php checked($reminder_enabled); ?>
+                           <?php disabled($notification_disabled); ?>>
+                    <span>7-day reminders to refresh or mark as sold</span>
+                </label>
+                <?php if ($notification_disabled): ?>
+                    <p class="notification-hint">Verify your email to receive reminders.</p>
+                <?php endif; ?>
+            </div>
+            <div id="notification-preferences-feedback" class="notification-feedback" aria-live="polite"></div>
+        </div>
+
         <div class="account-actions">
             <a href="<?php echo esc_url(wp_logout_url(home_url())); ?>" class="btn btn-primary">Logout</a>
         </div>
