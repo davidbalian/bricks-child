@@ -24,7 +24,7 @@ final class ListingNotificationMessageFactory
         $support = 'Listings with fresh photos and clear details tend to receive more enquiries.';
 
         $html = sprintf(
-            '<p>%s</p><p>%s</p><p><a href="%s" style="background:#0073aa;color:#fff;padding:10px 16px;border-radius:4px;text-decoration:none;font-weight:600;">My Listings</a></p><p><small>%s</small></p><p><small>%s</small></p>',
+            '<p>%s</p><p>%s</p><p><a href="%s" style="background:#0073aa;color:#fff;padding:10px 16px;border-radius:4px;text-decoration:none;font-weight:600;">My Listings</a></p><p><small>%s</small></p>',
             esc_html($body),
             esc_html($support),
             esc_url($this->getListingsUrl()),
@@ -49,16 +49,10 @@ final class ListingNotificationMessageFactory
         $body = $copy['body'];
         $text = $copy['text'];
 
-        $html = sprintf(
-            '<p>%s</p><p><a href="%s" style="background:#0073aa;color:#fff;padding:10px 16px;border-radius:4px;text-decoration:none;font-weight:600;">My Listings</a></p>',
-            esc_html($body),
-            esc_url($this->getListingsUrl())
-        );
-
         $support = $copy['support'] ?? '';
 
         $html = sprintf(
-            '<p>%s</p><p>%s</p><p><a href="%s" style="background:#0073aa;color:#fff;padding:10px 16px;border-radius:4px;text-decoration:none;font-weight:600;">My Listings</a></p><p><small>%s</small></p><p><small>%s</small></p>',
+            '<p>%s</p><p>%s</p><p><a href="%s" style="background:#0073aa;color:#fff;padding:10px 16px;border-radius:4px;text-decoration:none;font-weight:600;">My Listings</a></p><p><small>%s</small></p>',
             esc_html($body),
             esc_html($support),
             esc_url($this->getListingsUrl()),
@@ -113,6 +107,10 @@ final class ListingNotificationMessageFactory
 
     private function getListingsUrl(): string
     {
+        if (strpos(home_url(), 'staging4.autoagora.cy') !== false) {
+            return 'https://staging4.autoagora.cy/my-listings/';
+        }
+
         return home_url('/my-listings/');
     }
 
