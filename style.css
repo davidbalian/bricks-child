@@ -27,6 +27,16 @@
   --max-width: 1300px;
 }
 
+/* My Listings login link styling */
+.my-listings-login-link {
+  color: var(--dark-blue);
+  text-decoration: underline;
+}
+
+.my-listings-login-link:hover {
+  color: var(--light-blue);
+}
+
 /*
  Theme Name:   Bricks Child Theme
  Theme URI:    https://bricksbuilder.io/

@@ -12,7 +12,8 @@ add_shortcode('my_listings', 'display_my_listings');
 function display_my_listings($atts) {
     // Check if user is logged in
     if (!is_user_logged_in()) {
-        return '<p>Please <a href="' . wp_login_url(get_permalink()) . '">log in</a> to view your listings.</p>';
+        $login_url = wp_login_url(get_permalink());
+        return '<p>Please <a class="my-listings-login-link" href="' . esc_url($login_url) . '">log in</a> to view your listings.</p>';
     }
 
     // Get current user
