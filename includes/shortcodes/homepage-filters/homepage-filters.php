@@ -101,9 +101,14 @@ function homepage_filters_shortcode($atts) {
             <div class="homepage-filters-slider-container">
                 <div id="homepage-filter-price-slider" class="homepage-filters-slider"></div>
                 <div class="homepage-filters-slider-inputs">
-                    <input type="number" id="homepage-filter-price-min" class="homepage-filters-input" placeholder="Min" min="0" step="100">
-                    <span class="homepage-filters-separator">—</span>
-                    <input type="number" id="homepage-filter-price-max" class="homepage-filters-input" placeholder="Max" min="0" step="100">
+                    <div class="homepage-filters-input-wrapper">
+                        <label for="homepage-filter-price-min" class="homepage-filters-input-label">From (€)</label>
+                        <input type="number" id="homepage-filter-price-min" class="homepage-filters-input" placeholder="Min" min="0" step="100">
+                    </div>
+                    <div class="homepage-filters-input-wrapper">
+                        <label for="homepage-filter-price-max" class="homepage-filters-input-label">To (€)</label>
+                        <input type="number" id="homepage-filter-price-max" class="homepage-filters-input" placeholder="Max" min="0" step="100">
+                    </div>
                 </div>
             </div>
         </div>
@@ -113,9 +118,14 @@ function homepage_filters_shortcode($atts) {
             <div class="homepage-filters-slider-container">
                 <div id="homepage-filter-mileage-slider" class="homepage-filters-slider"></div>
                 <div class="homepage-filters-slider-inputs">
-                    <input type="number" id="homepage-filter-mileage-min" class="homepage-filters-input" placeholder="Min" min="0" step="1000">
-                    <span class="homepage-filters-separator">—</span>
-                    <input type="number" id="homepage-filter-mileage-max" class="homepage-filters-input" placeholder="Max" min="0" step="1000">
+                    <div class="homepage-filters-input-wrapper">
+                        <label for="homepage-filter-mileage-min" class="homepage-filters-input-label">From (km)</label>
+                        <input type="number" id="homepage-filter-mileage-min" class="homepage-filters-input" placeholder="Min" min="0" step="1000">
+                    </div>
+                    <div class="homepage-filters-input-wrapper">
+                        <label for="homepage-filter-mileage-max" class="homepage-filters-input-label">To (km)</label>
+                        <input type="number" id="homepage-filter-mileage-max" class="homepage-filters-input" placeholder="Max" min="0" step="1000">
+                    </div>
                 </div>
             </div>
         </div>
