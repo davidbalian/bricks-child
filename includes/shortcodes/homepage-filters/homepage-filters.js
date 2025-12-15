@@ -237,8 +237,9 @@
     initializeDropdown("make");
     initializeDropdown("model");
 
-    // Click outside to close dropdowns
-    $(document).on("click", function (e) {
+    // Click/touch outside to close dropdowns
+    $(document).on("click touchend", function (e) {
+      // Don't close if clicking inside dropdown
       if (!$(e.target).closest(".homepage-filters-dropdown").length) {
         closeAllDropdowns();
       }
@@ -256,23 +257,51 @@
     const options = $(`#homepage-filter-${type}-options`);
     const hiddenSelect = $(`#homepage-filter-${type}`);
 
-    // Toggle dropdown on button click
-    button.on("click", function (e) {
+    // Track if touch was used to prevent double-firing on mobile
+    let touchUsed = false;
+
+    // Toggle dropdown on button click/touch
+    function handleButtonToggle(e) {
       e.stopPropagation();
-      if ($(this).prop("disabled")) return;
+      if (button.prop("disabled")) return;
 
       const isOpen = menu.hasClass("open");
       closeAllDropdowns();
 
       if (!isOpen) {
         openDropdown(type);
-        search.focus();
+        // Small delay for mobile to ensure menu is visible before focusing
+        setTimeout(function () {
+          search.focus();
+        }, 100);
+      }
+    }
+
+    // Handle touch events for mobile
+    button.on("touchend", function (e) {
+      touchUsed = true;
+      handleButtonToggle(e);
+      // Prevent click event from firing after touch
+      setTimeout(function () {
+        touchUsed = false;
+      }, 300);
+    });
+
+    // Handle click events (desktop and mobile fallback)
+    button.on("click", function (e) {
+      if (!touchUsed) {
+        handleButtonToggle(e);
       }
     });
 
-    // Handle option selection
-    options.on("click", ".homepage-filters-dropdown-option", function (e) {
+    // Track touch for option selection
+    let optionTouchUsed = false;
+
+    // Handle option selection with touch
+    options.on("touchend", ".homepage-filters-dropdown-option", function (e) {
+      optionTouchUsed = true;
       e.stopPropagation();
+      e.preventDefault();
       const $option = $(this);
       const value = $option.data("value");
       const slug = $option.data("slug");
@@ -298,6 +327,45 @@
       } else if (type === "model") {
         handleModelSelection(value, slug);
       }
+
+      // Reset touch flag
+      setTimeout(function () {
+        optionTouchUsed = false;
+      }, 300);
+    });
+
+    // Handle option selection with click
+    options.on("click", ".homepage-filters-dropdown-option", function (e) {
+      if (!optionTouchUsed) {
+        e.stopPropagation();
+        const $option = $(this);
+        const value = $option.data("value");
+        const slug = $option.data("slug");
+        const text = $option.text().trim();
+
+        // Update button text
+        const buttonText = button.find(".homepage-filters-dropdown-text");
+        buttonText.text(text).removeClass("placeholder");
+
+        // Update hidden select
+        hiddenSelect.val(value).trigger("change");
+
+        // Update selected state
+        options
+          .find(".homepage-filters-dropdown-option")
+          .removeClass("selected");
+        $option.addClass("selected");
+
+        // Close dropdown
+        closeDropdown(type);
+
+        // Handle selection logic
+        if (type === "make") {
+          handleMakeSelection(value, slug);
+        } else if (type === "model") {
+          handleModelSelection(value, slug);
+        }
+      }
     });
 
     // Search functionality
@@ -306,8 +374,8 @@
       filterDropdownOptions(options, searchTerm);
     });
 
-    // Prevent dropdown from closing when clicking inside
-    menu.on("click", function (e) {
+    // Prevent dropdown from closing when clicking/touching inside
+    menu.on("click touchend", function (e) {
       e.stopPropagation();
     });
   }

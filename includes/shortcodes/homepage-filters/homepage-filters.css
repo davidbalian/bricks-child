@@ -49,6 +49,9 @@
   font-weight: 500;
   text-align: left;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
   transition: border-color var(--transition-time, 0.3s) ease,
     box-shadow 0.3s ease, background-color 0.2s ease, color 0.2s ease;
   position: relative;
@@ -169,6 +172,9 @@
   color: #2a3546;
   border: none;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
   font-size: 16px;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
