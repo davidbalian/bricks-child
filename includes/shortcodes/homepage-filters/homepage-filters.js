@@ -69,169 +69,165 @@
    * Initialize noUiSlider instances for price and mileage
    */
   function initializeSliders() {
-    // Price Slider
-    const priceSliderEl = document.getElementById(
-      "homepage-filter-price-slider"
+    // Price Slider - COMMENTED OUT
+    // const priceSliderEl = document.getElementById(
+    //   "homepage-filter-price-slider"
+    // );
+    // if (priceSliderEl) {
+    //   priceSlider = noUiSlider.create(priceSliderEl, {
+    //     start: [currentRanges.price.min, currentRanges.price.max],
+    //     connect: true,
+    //     range: {
+    //       min: currentRanges.price.min,
+    //       max: currentRanges.price.max,
+    //     },
+    //     step: 100,
+    //     format: {
+    //       to: function (value) {
+    //         return Math.round(value);
+    //       },
+    //       from: function (value) {
+    //         return Number(value);
+    //       },
+    //     },
+    //   });
+
+    // Set initial values
+    $("#homepage-filter-price-min").val(formatNumber(currentRanges.price.min));
+    $("#homepage-filter-price-max").val(formatNumber(currentRanges.price.max));
+
+    // Update inputs when slider changes - COMMENTED OUT
+    // priceSlider.on("update", function (values) {
+    //   const minFormatted = formatNumber(Math.round(values[0]));
+    //   const maxFormatted = formatNumber(Math.round(values[1]));
+    //   $("#homepage-filter-price-min").val(minFormatted);
+    //   $("#homepage-filter-price-max").val(maxFormatted);
+    // });
+
+    // Format on input (as user types) - only format if there's a value
+    $("#homepage-filter-price-min, #homepage-filter-price-max").on(
+      "input",
+      function () {
+        const $input = $(this);
+        const value = $input.val();
+
+        // Allow empty or just commas
+        if (value === "" || value === ",") {
+          return;
+        }
+
+        const cursorPos = this.selectionStart;
+        const numericValue = parseFormattedNumber(value);
+
+        if (numericValue !== null && !isNaN(numericValue)) {
+          const formatted = formatNumber(numericValue);
+          $input.val(formatted);
+
+          // Restore cursor position
+          const diff = formatted.length - value.length;
+          const newCursorPos = Math.max(
+            0,
+            Math.min(cursorPos + diff, formatted.length)
+          );
+          this.setSelectionRange(newCursorPos, newCursorPos);
+        }
+      }
     );
-    if (priceSliderEl) {
-      priceSlider = noUiSlider.create(priceSliderEl, {
-        start: [currentRanges.price.min, currentRanges.price.max],
-        connect: true,
-        range: {
-          min: currentRanges.price.min,
-          max: currentRanges.price.max,
-        },
-        step: 100,
-        format: {
-          to: function (value) {
-            return Math.round(value);
-          },
-          from: function (value) {
-            return Number(value);
-          },
-        },
-      });
 
-      // Set initial values
-      $("#homepage-filter-price-min").val(
-        formatNumber(currentRanges.price.min)
-      );
-      $("#homepage-filter-price-max").val(
-        formatNumber(currentRanges.price.max)
-      );
+    // Update slider when inputs change - COMMENTED OUT
+    // $("#homepage-filter-price-min, #homepage-filter-price-max").on(
+    //   "change",
+    //   function () {
+    //     const minVal = $("#homepage-filter-price-min").val();
+    //     const maxVal = $("#homepage-filter-price-max").val();
+    //     const min = parseFormattedNumber(minVal) || currentRanges.price.min;
+    //     const max = parseFormattedNumber(maxVal) || currentRanges.price.max;
+    //     priceSlider.set([min, max]);
+    //   }
+    // );
+    // }
 
-      // Update inputs when slider changes
-      priceSlider.on("update", function (values) {
-        const minFormatted = formatNumber(Math.round(values[0]));
-        const maxFormatted = formatNumber(Math.round(values[1]));
-        $("#homepage-filter-price-min").val(minFormatted);
-        $("#homepage-filter-price-max").val(maxFormatted);
-      });
+    // Mileage Slider - COMMENTED OUT
+    // const mileageSliderEl = document.getElementById(
+    //   "homepage-filter-mileage-slider"
+    // );
+    // if (mileageSliderEl) {
+    //   mileageSlider = noUiSlider.create(mileageSliderEl, {
+    //     start: [currentRanges.mileage.min, currentRanges.mileage.max],
+    //     connect: true,
+    //     range: {
+    //       min: currentRanges.mileage.min,
+    //       max: currentRanges.mileage.max,
+    //     },
+    //     step: 1000,
+    //     format: {
+    //       to: function (value) {
+    //         return Math.round(value);
+    //       },
+    //       from: function (value) {
+    //         return Number(value);
+    //       },
+    //     },
+    //   });
 
-      // Format on input (as user types) - only format if there's a value
-      $("#homepage-filter-price-min, #homepage-filter-price-max").on(
-        "input",
-        function () {
-          const $input = $(this);
-          const value = $input.val();
-
-          // Allow empty or just commas
-          if (value === "" || value === ",") {
-            return;
-          }
-
-          const cursorPos = this.selectionStart;
-          const numericValue = parseFormattedNumber(value);
-
-          if (numericValue !== null && !isNaN(numericValue)) {
-            const formatted = formatNumber(numericValue);
-            $input.val(formatted);
-
-            // Restore cursor position
-            const diff = formatted.length - value.length;
-            const newCursorPos = Math.max(
-              0,
-              Math.min(cursorPos + diff, formatted.length)
-            );
-            this.setSelectionRange(newCursorPos, newCursorPos);
-          }
-        }
-      );
-
-      // Update slider when inputs change
-      $("#homepage-filter-price-min, #homepage-filter-price-max").on(
-        "change",
-        function () {
-          const minVal = $("#homepage-filter-price-min").val();
-          const maxVal = $("#homepage-filter-price-max").val();
-          const min = parseFormattedNumber(minVal) || currentRanges.price.min;
-          const max = parseFormattedNumber(maxVal) || currentRanges.price.max;
-          priceSlider.set([min, max]);
-        }
-      );
-    }
-
-    // Mileage Slider
-    const mileageSliderEl = document.getElementById(
-      "homepage-filter-mileage-slider"
+    // Set initial values
+    $("#homepage-filter-mileage-min").val(
+      formatNumber(currentRanges.mileage.min)
     );
-    if (mileageSliderEl) {
-      mileageSlider = noUiSlider.create(mileageSliderEl, {
-        start: [currentRanges.mileage.min, currentRanges.mileage.max],
-        connect: true,
-        range: {
-          min: currentRanges.mileage.min,
-          max: currentRanges.mileage.max,
-        },
-        step: 1000,
-        format: {
-          to: function (value) {
-            return Math.round(value);
-          },
-          from: function (value) {
-            return Number(value);
-          },
-        },
-      });
+    $("#homepage-filter-mileage-max").val(
+      formatNumber(currentRanges.mileage.max)
+    );
 
-      // Set initial values
-      $("#homepage-filter-mileage-min").val(
-        formatNumber(currentRanges.mileage.min)
-      );
-      $("#homepage-filter-mileage-max").val(
-        formatNumber(currentRanges.mileage.max)
-      );
+    // Update inputs when slider changes - COMMENTED OUT
+    // mileageSlider.on("update", function (values) {
+    //   const minFormatted = formatNumber(Math.round(values[0]));
+    //   const maxFormatted = formatNumber(Math.round(values[1]));
+    //   $("#homepage-filter-mileage-min").val(minFormatted);
+    //   $("#homepage-filter-mileage-max").val(maxFormatted);
+    // });
 
-      // Update inputs when slider changes
-      mileageSlider.on("update", function (values) {
-        const minFormatted = formatNumber(Math.round(values[0]));
-        const maxFormatted = formatNumber(Math.round(values[1]));
-        $("#homepage-filter-mileage-min").val(minFormatted);
-        $("#homepage-filter-mileage-max").val(maxFormatted);
-      });
+    // Format on input (as user types) - only format if there's a value
+    $("#homepage-filter-mileage-min, #homepage-filter-mileage-max").on(
+      "input",
+      function () {
+        const $input = $(this);
+        const value = $input.val();
 
-      // Format on input (as user types) - only format if there's a value
-      $("#homepage-filter-mileage-min, #homepage-filter-mileage-max").on(
-        "input",
-        function () {
-          const $input = $(this);
-          const value = $input.val();
-
-          // Allow empty or just commas
-          if (value === "" || value === ",") {
-            return;
-          }
-
-          const cursorPos = this.selectionStart;
-          const numericValue = parseFormattedNumber(value);
-
-          if (numericValue !== null && !isNaN(numericValue)) {
-            const formatted = formatNumber(numericValue);
-            $input.val(formatted);
-
-            // Restore cursor position
-            const diff = formatted.length - value.length;
-            const newCursorPos = Math.max(
-              0,
-              Math.min(cursorPos + diff, formatted.length)
-            );
-            this.setSelectionRange(newCursorPos, newCursorPos);
-          }
+        // Allow empty or just commas
+        if (value === "" || value === ",") {
+          return;
         }
-      );
 
-      // Update slider when inputs change
-      $("#homepage-filter-mileage-min, #homepage-filter-mileage-max").on(
-        "change",
-        function () {
-          const minVal = $("#homepage-filter-mileage-min").val();
-          const maxVal = $("#homepage-filter-mileage-max").val();
-          const min = parseFormattedNumber(minVal) || currentRanges.mileage.min;
-          const max = parseFormattedNumber(maxVal) || currentRanges.mileage.max;
-          mileageSlider.set([min, max]);
+        const cursorPos = this.selectionStart;
+        const numericValue = parseFormattedNumber(value);
+
+        if (numericValue !== null && !isNaN(numericValue)) {
+          const formatted = formatNumber(numericValue);
+          $input.val(formatted);
+
+          // Restore cursor position
+          const diff = formatted.length - value.length;
+          const newCursorPos = Math.max(
+            0,
+            Math.min(cursorPos + diff, formatted.length)
+          );
+          this.setSelectionRange(newCursorPos, newCursorPos);
         }
-      );
-    }
+      }
+    );
+
+    // Update slider when inputs change - COMMENTED OUT
+    // $("#homepage-filter-mileage-min, #homepage-filter-mileage-max").on(
+    //   "change",
+    //   function () {
+    //     const minVal = $("#homepage-filter-mileage-min").val();
+    //     const maxVal = $("#homepage-filter-mileage-max").val();
+    //     const min = parseFormattedNumber(minVal) || currentRanges.mileage.min;
+    //     const max = parseFormattedNumber(maxVal) || currentRanges.mileage.max;
+    //     mileageSlider.set([min, max]);
+    //   }
+    // );
+    // }
   }
 
   /**
@@ -502,30 +498,46 @@
         if (response.success && response.data) {
           currentRanges = response.data;
 
-          // Update price slider
-          if (priceSlider) {
-            priceSlider.updateOptions({
-              range: {
-                min: currentRanges.price.min,
-                max: currentRanges.price.max,
-              },
-            });
-            priceSlider.set([currentRanges.price.min, currentRanges.price.max]);
-          }
+          // Update price inputs
+          $("#homepage-filter-price-min").val(
+            formatNumber(currentRanges.price.min)
+          );
+          $("#homepage-filter-price-max").val(
+            formatNumber(currentRanges.price.max)
+          );
 
-          // Update mileage slider
-          if (mileageSlider) {
-            mileageSlider.updateOptions({
-              range: {
-                min: currentRanges.mileage.min,
-                max: currentRanges.mileage.max,
-              },
-            });
-            mileageSlider.set([
-              currentRanges.mileage.min,
-              currentRanges.mileage.max,
-            ]);
-          }
+          // Update mileage inputs
+          $("#homepage-filter-mileage-min").val(
+            formatNumber(currentRanges.mileage.min)
+          );
+          $("#homepage-filter-mileage-max").val(
+            formatNumber(currentRanges.mileage.max)
+          );
+
+          // Update price slider - COMMENTED OUT
+          // if (priceSlider) {
+          //   priceSlider.updateOptions({
+          //     range: {
+          //       min: currentRanges.price.min,
+          //       max: currentRanges.price.max,
+          //     },
+          //   });
+          //   priceSlider.set([currentRanges.price.min, currentRanges.price.max]);
+          // }
+
+          // Update mileage slider - COMMENTED OUT
+          // if (mileageSlider) {
+          //   mileageSlider.updateOptions({
+          //     range: {
+          //       min: currentRanges.mileage.min,
+          //       max: currentRanges.mileage.max,
+          //     },
+          //   });
+          //   mileageSlider.set([
+          //     currentRanges.mileage.min,
+          //     currentRanges.mileage.max,
+          //   ]);
+          // }
         }
       },
       error: function () {
@@ -540,25 +552,39 @@
   function resetRanges() {
     currentRanges = filterData.ranges;
 
-    if (priceSlider) {
-      priceSlider.updateOptions({
-        range: {
-          min: currentRanges.price.min,
-          max: currentRanges.price.max,
-        },
-      });
-      priceSlider.set([currentRanges.price.min, currentRanges.price.max]);
-    }
+    // Update price inputs
+    $("#homepage-filter-price-min").val(formatNumber(currentRanges.price.min));
+    $("#homepage-filter-price-max").val(formatNumber(currentRanges.price.max));
 
-    if (mileageSlider) {
-      mileageSlider.updateOptions({
-        range: {
-          min: currentRanges.mileage.min,
-          max: currentRanges.mileage.max,
-        },
-      });
-      mileageSlider.set([currentRanges.mileage.min, currentRanges.mileage.max]);
-    }
+    // Update mileage inputs
+    $("#homepage-filter-mileage-min").val(
+      formatNumber(currentRanges.mileage.min)
+    );
+    $("#homepage-filter-mileage-max").val(
+      formatNumber(currentRanges.mileage.max)
+    );
+
+    // Update price slider - COMMENTED OUT
+    // if (priceSlider) {
+    //   priceSlider.updateOptions({
+    //     range: {
+    //       min: currentRanges.price.min,
+    //       max: currentRanges.price.max,
+    //     },
+    //   });
+    //   priceSlider.set([currentRanges.price.min, currentRanges.price.max]);
+    // }
+
+    // Update mileage slider - COMMENTED OUT
+    // if (mileageSlider) {
+    //   mileageSlider.updateOptions({
+    //     range: {
+    //       min: currentRanges.mileage.min,
+    //       max: currentRanges.mileage.max,
+    //     },
+    //   });
+    //   mileageSlider.set([currentRanges.mileage.min, currentRanges.mileage.max]);
+    // }
   }
 
   /**

@@ -99,7 +99,7 @@ function homepage_filters_shortcode($atts) {
         <div class="homepage-filters-row homepage-filters-price">
             <label for="homepage-filter-price-slider">Price</label>
             <div class="homepage-filters-slider-container">
-                <div id="homepage-filter-price-slider" class="homepage-filters-slider"></div>
+                <!-- <div id="homepage-filter-price-slider" class="homepage-filters-slider"></div> -->
                 <div class="homepage-filters-slider-inputs">
                     <div class="homepage-filters-input-wrapper">
                         <label for="homepage-filter-price-min" class="homepage-filters-input-label">From (€)</label>
@@ -116,7 +116,7 @@ function homepage_filters_shortcode($atts) {
         <div class="homepage-filters-row homepage-filters-mileage">
             <label for="homepage-filter-mileage-slider">Mileage</label>
             <div class="homepage-filters-slider-container">
-                <div id="homepage-filter-mileage-slider" class="homepage-filters-slider"></div>
+                <!-- <div id="homepage-filter-mileage-slider" class="homepage-filters-slider"></div> -->
                 <div class="homepage-filters-slider-inputs">
                     <div class="homepage-filters-input-wrapper">
                         <label for="homepage-filter-mileage-min" class="homepage-filters-input-label">From (km)</label>

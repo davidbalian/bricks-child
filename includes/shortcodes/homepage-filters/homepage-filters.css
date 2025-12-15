@@ -173,6 +173,10 @@
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+.homepage-filters-row label {
+  margin: 0 !important;
+}
+
 .homepage-filters-dropdown-option:hover,
 .homepage-filters-dropdown-option:focus {
   background-color: rgba(13, 134, 227, 0.1);
@@ -228,9 +232,9 @@
   color: #2a3546;
 }
 
-.homepage-filters-slider-container {
+/* .homepage-filters-slider-container {
   margin-top: 1rem;
-}
+} */
 
 .homepage-filters-slider {
   margin-bottom: 1rem;
@@ -367,6 +371,7 @@
   font-weight: 600;
   cursor: pointer;
   min-width: 200px;
+  width: 100%;
 }
 
 .homepage-filters-search-btn:hover {
