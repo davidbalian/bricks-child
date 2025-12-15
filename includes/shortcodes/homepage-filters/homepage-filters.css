@@ -50,7 +50,7 @@
   padding: 0.75rem 1rem;
   padding-right: 2.5rem;
   border: 2px solid #dfe2e6;
-  border-radius: 4px;
+  border-radius: 0.5rem;
   background-color: #ffffff;
   color: #2a3546;
   font-size: 1rem;
@@ -119,7 +119,7 @@
   right: 0;
   background-color: #ffffff;
   border: 2px solid #dfe2e6;
-  border-radius: 4px;
+  border-radius: 0.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1000;
   max-height: 300px;
@@ -271,19 +271,27 @@
   font-size: 0.875rem;
 }
 
+.homepage-filters-slider .noUi-target,
 .homepage-filters-slider .noUi-base {
   background: #e0e0e0;
   border-radius: 3px;
-  border: none;
+  border: none !important;
 }
 
-.homepage-filters-slider .noUi-origin,
-.homepage-filters-slider .noUi-target {
-  border: none;
+.homepage-filters-slider .noUi-origin {
+  border: none !important;
 }
 
 .homepage-filters-slider .noUi-background {
-  border: none;
+  border: none !important;
+}
+
+.homepage-filters-slider .noUi-connects {
+  border: none !important;
+}
+
+.homepage-filters-slider .noUi-connect {
+  border: none !important;
 }
 
 /* Slider Inputs */
@@ -312,8 +320,8 @@
   padding: 4px 8px !important;
   border: none !important;
   border-radius: 4px !important;
-  background-color: #2a3546 !important;
-  color: #ffffff !important;
+  background-color: rgb(232, 232, 232) !important;
+  color: #2a3546 !important;
   font-size: 1rem;
   transition: none;
 }
@@ -325,7 +333,7 @@
 }
 
 .homepage-filters-input::placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
+  color: rgba(42, 53, 70, 0.5) !important;
 }
 
 /* Search Button */
