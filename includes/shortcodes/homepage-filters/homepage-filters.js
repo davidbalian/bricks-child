@@ -143,34 +143,81 @@
 
     // Validate min/max relationship on blur (when user clicks/touches away)
     $container.find("#homepage-filter-price-max").on("blur", function () {
+      console.log("Price max blur triggered");
       const minVal = $container.find("#homepage-filter-price-min").val();
       const maxVal = $container.find("#homepage-filter-price-max").val();
-      const min = parseFormattedNumber(minVal) ?? currentRanges.price.min;
-      const max = parseFormattedNumber(maxVal) ?? currentRanges.price.max;
+      console.log("Raw values - minVal:", minVal, "maxVal:", maxVal);
+
+      const parsedMin = parseFormattedNumber(minVal);
+      const parsedMax = parseFormattedNumber(maxVal);
+      console.log(
+        "Parsed values - parsedMin:",
+        parsedMin,
+        "parsedMax:",
+        parsedMax
+      );
+
+      const min = parsedMin ?? currentRanges.price.min;
+      const max = parsedMax ?? currentRanges.price.max;
+      console.log(
+        "Final values - min:",
+        min,
+        "max:",
+        max,
+        "currentRanges.price.min:",
+        currentRanges.price.min,
+        "currentRanges.price.max:",
+        currentRanges.price.max
+      );
+      console.log("Comparison - max < min:", max < min);
 
       // If max is smaller than min, adjust min to be smaller than max
       if (max < min) {
+        console.log("Adjusting min because max < min");
         const step = 100;
         const adjustedMin = Math.max(currentRanges.price.min, max - step);
+        console.log("Adjusted min:", adjustedMin);
         $container
           .find("#homepage-filter-price-min")
           .val(formatNumber(adjustedMin));
+        console.log("Set min value to:", formatNumber(adjustedMin));
+      } else {
+        console.log("No adjustment needed");
       }
     });
 
     $container.find("#homepage-filter-price-min").on("blur", function () {
+      console.log("Price min blur triggered");
       const minVal = $container.find("#homepage-filter-price-min").val();
       const maxVal = $container.find("#homepage-filter-price-max").val();
-      const min = parseFormattedNumber(minVal) ?? currentRanges.price.min;
-      const max = parseFormattedNumber(maxVal) ?? currentRanges.price.max;
+      console.log("Raw values - minVal:", minVal, "maxVal:", maxVal);
+
+      const parsedMin = parseFormattedNumber(minVal);
+      const parsedMax = parseFormattedNumber(maxVal);
+      console.log(
+        "Parsed values - parsedMin:",
+        parsedMin,
+        "parsedMax:",
+        parsedMax
+      );
+
+      const min = parsedMin ?? currentRanges.price.min;
+      const max = parsedMax ?? currentRanges.price.max;
+      console.log("Final values - min:", min, "max:", max);
+      console.log("Comparison - min > max:", min > max);
 
       // If min is greater than max, adjust max to be larger than min
       if (min > max) {
+        console.log("Adjusting max because min > max");
         const step = 100;
         const adjustedMax = Math.min(currentRanges.price.max, min + step);
+        console.log("Adjusted max:", adjustedMax);
         $container
           .find("#homepage-filter-price-max")
           .val(formatNumber(adjustedMax));
+        console.log("Set max value to:", formatNumber(adjustedMax));
+      } else {
+        console.log("No adjustment needed");
       }
     });
 
@@ -257,34 +304,72 @@
 
     // Validate min/max relationship on blur (when user clicks/touches away)
     $container.find("#homepage-filter-mileage-max").on("blur", function () {
+      console.log("Mileage max blur triggered");
       const minVal = $container.find("#homepage-filter-mileage-min").val();
       const maxVal = $container.find("#homepage-filter-mileage-max").val();
-      const min = parseFormattedNumber(minVal) ?? currentRanges.mileage.min;
-      const max = parseFormattedNumber(maxVal) ?? currentRanges.mileage.max;
+      console.log("Raw values - minVal:", minVal, "maxVal:", maxVal);
+
+      const parsedMin = parseFormattedNumber(minVal);
+      const parsedMax = parseFormattedNumber(maxVal);
+      console.log(
+        "Parsed values - parsedMin:",
+        parsedMin,
+        "parsedMax:",
+        parsedMax
+      );
+
+      const min = parsedMin ?? currentRanges.mileage.min;
+      const max = parsedMax ?? currentRanges.mileage.max;
+      console.log("Final values - min:", min, "max:", max);
+      console.log("Comparison - max < min:", max < min);
 
       // If max is smaller than min, adjust min to be smaller than max
       if (max < min) {
+        console.log("Adjusting min because max < min");
         const step = 1000;
         const adjustedMin = Math.max(currentRanges.mileage.min, max - step);
+        console.log("Adjusted min:", adjustedMin);
         $container
           .find("#homepage-filter-mileage-min")
           .val(formatNumber(adjustedMin));
+        console.log("Set min value to:", formatNumber(adjustedMin));
+      } else {
+        console.log("No adjustment needed");
       }
     });
 
     $container.find("#homepage-filter-mileage-min").on("blur", function () {
+      console.log("Mileage min blur triggered");
       const minVal = $container.find("#homepage-filter-mileage-min").val();
       const maxVal = $container.find("#homepage-filter-mileage-max").val();
-      const min = parseFormattedNumber(minVal) ?? currentRanges.mileage.min;
-      const max = parseFormattedNumber(maxVal) ?? currentRanges.mileage.max;
+      console.log("Raw values - minVal:", minVal, "maxVal:", maxVal);
+
+      const parsedMin = parseFormattedNumber(minVal);
+      const parsedMax = parseFormattedNumber(maxVal);
+      console.log(
+        "Parsed values - parsedMin:",
+        parsedMin,
+        "parsedMax:",
+        parsedMax
+      );
+
+      const min = parsedMin ?? currentRanges.mileage.min;
+      const max = parsedMax ?? currentRanges.mileage.max;
+      console.log("Final values - min:", min, "max:", max);
+      console.log("Comparison - min > max:", min > max);
 
       // If min is greater than max, adjust max to be larger than min
       if (min > max) {
+        console.log("Adjusting max because min > max");
         const step = 1000;
         const adjustedMax = Math.min(currentRanges.mileage.max, min + step);
+        console.log("Adjusted max:", adjustedMax);
         $container
           .find("#homepage-filter-mileage-max")
           .val(formatNumber(adjustedMax));
+        console.log("Set max value to:", formatNumber(adjustedMax));
+      } else {
+        console.log("No adjustment needed");
       }
     });
 
