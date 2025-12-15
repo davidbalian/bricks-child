@@ -30,10 +30,15 @@
    * Parse formatted number (remove commas)
    */
   function parseFormattedNumber(str) {
-    if (!str || str === "") {
+    if (!str || str === "" || str === "Min" || str === "Max") {
       return null;
     }
-    return parseInt(str.replace(/,/g, ""), 10);
+    const cleaned = str.replace(/,/g, "").trim();
+    if (cleaned === "") {
+      return null;
+    }
+    const parsed = parseInt(cleaned, 10);
+    return isNaN(parsed) ? null : parsed;
   }
 
   /**
@@ -87,23 +92,35 @@
         },
       });
 
+      // Set initial values
+      $("#homepage-filter-price-min").val(
+        formatNumber(currentRanges.price.min)
+      );
+      $("#homepage-filter-price-max").val(
+        formatNumber(currentRanges.price.max)
+      );
+
       // Update inputs when slider changes
       priceSlider.on("update", function (values) {
-        $("#homepage-filter-price-min").val(
-          formatNumber(Math.round(values[0]))
-        );
-        $("#homepage-filter-price-max").val(
-          formatNumber(Math.round(values[1]))
-        );
+        const minFormatted = formatNumber(Math.round(values[0]));
+        const maxFormatted = formatNumber(Math.round(values[1]));
+        $("#homepage-filter-price-min").val(minFormatted);
+        $("#homepage-filter-price-max").val(maxFormatted);
       });
 
-      // Format on input (as user types)
+      // Format on input (as user types) - only format if there's a value
       $("#homepage-filter-price-min, #homepage-filter-price-max").on(
         "input",
         function () {
           const $input = $(this);
-          const cursorPos = this.selectionStart;
           const value = $input.val();
+
+          // Allow empty or just commas
+          if (value === "" || value === ",") {
+            return;
+          }
+
+          const cursorPos = this.selectionStart;
           const numericValue = parseFormattedNumber(value);
 
           if (numericValue !== null && !isNaN(numericValue)) {
@@ -111,7 +128,11 @@
             $input.val(formatted);
 
             // Restore cursor position
-            const newCursorPos = cursorPos + (formatted.length - value.length);
+            const diff = formatted.length - value.length;
+            const newCursorPos = Math.max(
+              0,
+              Math.min(cursorPos + diff, formatted.length)
+            );
             this.setSelectionRange(newCursorPos, newCursorPos);
           }
         }
@@ -153,23 +174,35 @@
         },
       });
 
+      // Set initial values
+      $("#homepage-filter-mileage-min").val(
+        formatNumber(currentRanges.mileage.min)
+      );
+      $("#homepage-filter-mileage-max").val(
+        formatNumber(currentRanges.mileage.max)
+      );
+
       // Update inputs when slider changes
       mileageSlider.on("update", function (values) {
-        $("#homepage-filter-mileage-min").val(
-          formatNumber(Math.round(values[0]))
-        );
-        $("#homepage-filter-mileage-max").val(
-          formatNumber(Math.round(values[1]))
-        );
+        const minFormatted = formatNumber(Math.round(values[0]));
+        const maxFormatted = formatNumber(Math.round(values[1]));
+        $("#homepage-filter-mileage-min").val(minFormatted);
+        $("#homepage-filter-mileage-max").val(maxFormatted);
       });
 
-      // Format on input (as user types)
+      // Format on input (as user types) - only format if there's a value
       $("#homepage-filter-mileage-min, #homepage-filter-mileage-max").on(
         "input",
         function () {
           const $input = $(this);
-          const cursorPos = this.selectionStart;
           const value = $input.val();
+
+          // Allow empty or just commas
+          if (value === "" || value === ",") {
+            return;
+          }
+
+          const cursorPos = this.selectionStart;
           const numericValue = parseFormattedNumber(value);
 
           if (numericValue !== null && !isNaN(numericValue)) {
@@ -177,7 +210,11 @@
             $input.val(formatted);
 
             // Restore cursor position
-            const newCursorPos = cursorPos + (formatted.length - value.length);
+            const diff = formatted.length - value.length;
+            const newCursorPos = Math.max(
+              0,
+              Math.min(cursorPos + diff, formatted.length)
+            );
             this.setSelectionRange(newCursorPos, newCursorPos);
           }
         }
