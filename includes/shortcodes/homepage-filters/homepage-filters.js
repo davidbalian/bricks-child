@@ -17,6 +17,26 @@
   let firstSelectedFilter = null; // Track which filter was selected first
 
   /**
+   * Format number with commas
+   */
+  function formatNumber(num) {
+    if (num === null || num === undefined || isNaN(num)) {
+      return "";
+    }
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  /**
+   * Parse formatted number (remove commas)
+   */
+  function parseFormattedNumber(str) {
+    if (!str || str === "") {
+      return null;
+    }
+    return parseInt(str.replace(/,/g, ""), 10);
+  }
+
+  /**
    * Initialize filters when DOM is ready
    */
   $(document).ready(function () {
@@ -69,9 +89,33 @@
 
       // Update inputs when slider changes
       priceSlider.on("update", function (values) {
-        $("#homepage-filter-price-min").val(Math.round(values[0]));
-        $("#homepage-filter-price-max").val(Math.round(values[1]));
+        $("#homepage-filter-price-min").val(
+          formatNumber(Math.round(values[0]))
+        );
+        $("#homepage-filter-price-max").val(
+          formatNumber(Math.round(values[1]))
+        );
       });
+
+      // Format on input (as user types)
+      $("#homepage-filter-price-min, #homepage-filter-price-max").on(
+        "input",
+        function () {
+          const $input = $(this);
+          const cursorPos = this.selectionStart;
+          const value = $input.val();
+          const numericValue = parseFormattedNumber(value);
+
+          if (numericValue !== null && !isNaN(numericValue)) {
+            const formatted = formatNumber(numericValue);
+            $input.val(formatted);
+
+            // Restore cursor position
+            const newCursorPos = cursorPos + (formatted.length - value.length);
+            this.setSelectionRange(newCursorPos, newCursorPos);
+          }
+        }
+      );
 
       // Update slider when inputs change
       $("#homepage-filter-price-min, #homepage-filter-price-max").on(
@@ -79,14 +123,8 @@
         function () {
           const minVal = $("#homepage-filter-price-min").val();
           const maxVal = $("#homepage-filter-price-max").val();
-          const min =
-            minVal !== "" && !isNaN(minVal)
-              ? parseInt(minVal)
-              : currentRanges.price.min;
-          const max =
-            maxVal !== "" && !isNaN(maxVal)
-              ? parseInt(maxVal)
-              : currentRanges.price.max;
+          const min = parseFormattedNumber(minVal) || currentRanges.price.min;
+          const max = parseFormattedNumber(maxVal) || currentRanges.price.max;
           priceSlider.set([min, max]);
         }
       );
@@ -117,9 +155,33 @@
 
       // Update inputs when slider changes
       mileageSlider.on("update", function (values) {
-        $("#homepage-filter-mileage-min").val(Math.round(values[0]));
-        $("#homepage-filter-mileage-max").val(Math.round(values[1]));
+        $("#homepage-filter-mileage-min").val(
+          formatNumber(Math.round(values[0]))
+        );
+        $("#homepage-filter-mileage-max").val(
+          formatNumber(Math.round(values[1]))
+        );
       });
+
+      // Format on input (as user types)
+      $("#homepage-filter-mileage-min, #homepage-filter-mileage-max").on(
+        "input",
+        function () {
+          const $input = $(this);
+          const cursorPos = this.selectionStart;
+          const value = $input.val();
+          const numericValue = parseFormattedNumber(value);
+
+          if (numericValue !== null && !isNaN(numericValue)) {
+            const formatted = formatNumber(numericValue);
+            $input.val(formatted);
+
+            // Restore cursor position
+            const newCursorPos = cursorPos + (formatted.length - value.length);
+            this.setSelectionRange(newCursorPos, newCursorPos);
+          }
+        }
+      );
 
       // Update slider when inputs change
       $("#homepage-filter-mileage-min, #homepage-filter-mileage-max").on(
@@ -127,14 +189,8 @@
         function () {
           const minVal = $("#homepage-filter-mileage-min").val();
           const maxVal = $("#homepage-filter-mileage-max").val();
-          const min =
-            minVal !== "" && !isNaN(minVal)
-              ? parseInt(minVal)
-              : currentRanges.mileage.min;
-          const max =
-            maxVal !== "" && !isNaN(maxVal)
-              ? parseInt(maxVal)
-              : currentRanges.mileage.max;
+          const min = parseFormattedNumber(minVal) || currentRanges.mileage.min;
+          const max = parseFormattedNumber(maxVal) || currentRanges.mileage.max;
           mileageSlider.set([min, max]);
         }
       );
@@ -503,13 +559,9 @@
     const priceMinVal = $("#homepage-filter-price-min").val();
     const priceMaxVal = $("#homepage-filter-price-max").val();
     const priceMin =
-      priceMinVal !== "" && !isNaN(priceMinVal)
-        ? parseInt(priceMinVal)
-        : currentRanges.price.min;
+      parseFormattedNumber(priceMinVal) || currentRanges.price.min;
     const priceMax =
-      priceMaxVal !== "" && !isNaN(priceMaxVal)
-        ? parseInt(priceMaxVal)
-        : currentRanges.price.max;
+      parseFormattedNumber(priceMaxVal) || currentRanges.price.max;
     if (
       priceMin !== currentRanges.price.min ||
       priceMax !== currentRanges.price.max
@@ -521,13 +573,9 @@
     const mileageMinVal = $("#homepage-filter-mileage-min").val();
     const mileageMaxVal = $("#homepage-filter-mileage-max").val();
     const mileageMin =
-      mileageMinVal !== "" && !isNaN(mileageMinVal)
-        ? parseInt(mileageMinVal)
-        : currentRanges.mileage.min;
+      parseFormattedNumber(mileageMinVal) || currentRanges.mileage.min;
     const mileageMax =
-      mileageMaxVal !== "" && !isNaN(mileageMaxVal)
-        ? parseInt(mileageMaxVal)
-        : currentRanges.mileage.max;
+      parseFormattedNumber(mileageMaxVal) || currentRanges.mileage.max;
     if (
       mileageMin !== currentRanges.mileage.min ||
       mileageMax !== currentRanges.mileage.max
