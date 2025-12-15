@@ -235,6 +235,7 @@
 .homepage-filters-slider {
   margin-bottom: 1rem;
   height: 4px;
+  border: none !important;
 }
 
 /* noUiSlider Custom Styling */
