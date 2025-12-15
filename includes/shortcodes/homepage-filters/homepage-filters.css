@@ -238,6 +238,10 @@
   border: none !important;
 }
 
+.noUi-target {
+  border: none !important;
+}
+
 /* noUiSlider Custom Styling */
 .homepage-filters-slider .noUi-connect {
   background: #0d86e3;
