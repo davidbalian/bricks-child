@@ -141,6 +141,33 @@
         }
       });
 
+    // Validate min/max relationship on change
+    $container
+      .find("#homepage-filter-price-min, #homepage-filter-price-max")
+      .on("change", function () {
+        const minVal = $container.find("#homepage-filter-price-min").val();
+        const maxVal = $container.find("#homepage-filter-price-max").val();
+        const min = parseFormattedNumber(minVal);
+        const max = parseFormattedNumber(maxVal);
+
+        if (min !== null && max !== null) {
+          const step = 100;
+          if (min > max) {
+            // If min is greater than max, adjust min to be max - step
+            const adjustedMin = Math.max(currentRanges.price.min, max - step);
+            $container
+              .find("#homepage-filter-price-min")
+              .val(formatNumber(adjustedMin));
+          } else if (max < min) {
+            // If max is less than min, adjust max to be min + step
+            const adjustedMax = Math.min(currentRanges.price.max, min + step);
+            $container
+              .find("#homepage-filter-price-max")
+              .val(formatNumber(adjustedMax));
+          }
+        }
+      });
+
     // Update slider when inputs change - COMMENTED OUT
     // $("#homepage-filter-price-min, #homepage-filter-price-max").on(
     //   "change",
@@ -219,6 +246,33 @@
             Math.min(cursorPos + diff, formatted.length)
           );
           this.setSelectionRange(newCursorPos, newCursorPos);
+        }
+      });
+
+    // Validate min/max relationship on change
+    $container
+      .find("#homepage-filter-mileage-min, #homepage-filter-mileage-max")
+      .on("change", function () {
+        const minVal = $container.find("#homepage-filter-mileage-min").val();
+        const maxVal = $container.find("#homepage-filter-mileage-max").val();
+        const min = parseFormattedNumber(minVal);
+        const max = parseFormattedNumber(maxVal);
+
+        if (min !== null && max !== null) {
+          const step = 1000;
+          if (min > max) {
+            // If min is greater than max, adjust min to be max - step
+            const adjustedMin = Math.max(currentRanges.mileage.min, max - step);
+            $container
+              .find("#homepage-filter-mileage-min")
+              .val(formatNumber(adjustedMin));
+          } else if (max < min) {
+            // If max is less than min, adjust max to be min + step
+            const adjustedMax = Math.min(currentRanges.mileage.max, min + step);
+            $container
+              .find("#homepage-filter-mileage-max")
+              .val(formatNumber(adjustedMax));
+          }
         }
       });
 
