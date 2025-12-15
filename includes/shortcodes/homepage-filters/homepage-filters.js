@@ -45,8 +45,8 @@
    * Initialize filters when DOM is ready
    */
   $(document).ready(function () {
-    // Get filter data from JSON script tag
-    const dataScript = $("#homepage-filters-data");
+    // Get filter data from JSON script tag (use first one found, data is shared)
+    const dataScript = $("#homepage-filters-data").first();
     if (dataScript.length) {
       try {
         filterData = JSON.parse(dataScript.html());
@@ -60,15 +60,19 @@
       return;
     }
 
-    initializeSliders();
-    initializeSelects();
-    initializeSearchButton();
+    // Initialize each container instance separately
+    $(".homepage-filters-container").each(function () {
+      const $container = $(this);
+      initializeSliders($container);
+      initializeSelects($container);
+      initializeSearchButton($container);
+    });
   });
 
   /**
    * Initialize noUiSlider instances for price and mileage
    */
-  function initializeSliders() {
+  function initializeSliders($container) {
     // Price Slider - COMMENTED OUT
     // const priceSliderEl = document.getElementById(
     //   "homepage-filter-price-slider"
@@ -93,21 +97,25 @@
     //   });
 
     // Set initial values
-    $("#homepage-filter-price-min").val(formatNumber(currentRanges.price.min));
-    $("#homepage-filter-price-max").val(formatNumber(currentRanges.price.max));
+    $container
+      .find("#homepage-filter-price-min")
+      .val(formatNumber(currentRanges.price.min));
+    $container
+      .find("#homepage-filter-price-max")
+      .val(formatNumber(currentRanges.price.max));
 
     // Update inputs when slider changes - COMMENTED OUT
     // priceSlider.on("update", function (values) {
     //   const minFormatted = formatNumber(Math.round(values[0]));
     //   const maxFormatted = formatNumber(Math.round(values[1]));
-    //   $("#homepage-filter-price-min").val(minFormatted);
-    //   $("#homepage-filter-price-max").val(maxFormatted);
+    //   $container.find("#homepage-filter-price-min").val(minFormatted);
+    //   $container.find("#homepage-filter-price-max").val(maxFormatted);
     // });
 
     // Format on input (as user types) - only format if there's a value
-    $("#homepage-filter-price-min, #homepage-filter-price-max").on(
-      "input",
-      function () {
+    $container
+      .find("#homepage-filter-price-min, #homepage-filter-price-max")
+      .on("input", function () {
         const $input = $(this);
         const value = $input.val();
 
@@ -131,8 +139,7 @@
           );
           this.setSelectionRange(newCursorPos, newCursorPos);
         }
-      }
-    );
+      });
 
     // Update slider when inputs change - COMMENTED OUT
     // $("#homepage-filter-price-min, #homepage-filter-price-max").on(
@@ -171,25 +178,25 @@
     //   });
 
     // Set initial values
-    $("#homepage-filter-mileage-min").val(
-      formatNumber(currentRanges.mileage.min)
-    );
-    $("#homepage-filter-mileage-max").val(
-      formatNumber(currentRanges.mileage.max)
-    );
+    $container
+      .find("#homepage-filter-mileage-min")
+      .val(formatNumber(currentRanges.mileage.min));
+    $container
+      .find("#homepage-filter-mileage-max")
+      .val(formatNumber(currentRanges.mileage.max));
 
     // Update inputs when slider changes - COMMENTED OUT
     // mileageSlider.on("update", function (values) {
     //   const minFormatted = formatNumber(Math.round(values[0]));
     //   const maxFormatted = formatNumber(Math.round(values[1]));
-    //   $("#homepage-filter-mileage-min").val(minFormatted);
-    //   $("#homepage-filter-mileage-max").val(maxFormatted);
+    //   $container.find("#homepage-filter-mileage-min").val(minFormatted);
+    //   $container.find("#homepage-filter-mileage-max").val(maxFormatted);
     // });
 
     // Format on input (as user types) - only format if there's a value
-    $("#homepage-filter-mileage-min, #homepage-filter-mileage-max").on(
-      "input",
-      function () {
+    $container
+      .find("#homepage-filter-mileage-min, #homepage-filter-mileage-max")
+      .on("input", function () {
         const $input = $(this);
         const value = $input.val();
 
@@ -213,8 +220,7 @@
           );
           this.setSelectionRange(newCursorPos, newCursorPos);
         }
-      }
-    );
+      });
 
     // Update slider when inputs change - COMMENTED OUT
     // $("#homepage-filter-mileage-min, #homepage-filter-mileage-max").on(
@@ -233,75 +239,56 @@
   /**
    * Initialize make/model custom dropdowns with search functionality
    */
-  function initializeSelects() {
-    initializeDropdown("make");
-    initializeDropdown("model");
+  function initializeSelects($container) {
+    initializeDropdown("make", $container);
+    initializeDropdown("model", $container);
+  }
 
-    // Click/touch outside to close dropdowns
-    $(document).on("click touchend", function (e) {
-      // Don't close if clicking inside dropdown
-      if (!$(e.target).closest(".homepage-filters-dropdown").length) {
-        closeAllDropdowns();
+  // Click outside to close dropdowns (single global handler for all containers)
+  $(document).on("click", function (e) {
+    $(".homepage-filters-container").each(function () {
+      const $container = $(this);
+      // Close dropdowns if click is outside this container or outside dropdowns within this container
+      if (
+        !$(e.target).closest($container).length ||
+        ($(e.target).closest($container).length &&
+          !$(e.target).closest(".homepage-filters-dropdown", $container).length)
+      ) {
+        closeAllDropdowns($container);
       }
     });
-  }
+  });
 
   /**
    * Initialize a single dropdown (make or model)
    */
-  function initializeDropdown(type) {
-    const dropdown = $(`.homepage-filters-dropdown[data-filter="${type}"]`);
-    const button = $(`#homepage-filter-${type}-button`);
-    const menu = $(`#homepage-filter-${type}-menu`);
-    const search = $(`#homepage-filter-${type}-search`);
-    const options = $(`#homepage-filter-${type}-options`);
-    const hiddenSelect = $(`#homepage-filter-${type}`);
+  function initializeDropdown(type, $container) {
+    const dropdown = $container.find(
+      `.homepage-filters-dropdown[data-filter="${type}"]`
+    );
+    const button = $container.find(`#homepage-filter-${type}-button`);
+    const menu = $container.find(`#homepage-filter-${type}-menu`);
+    const search = $container.find(`#homepage-filter-${type}-search`);
+    const options = $container.find(`#homepage-filter-${type}-options`);
+    const hiddenSelect = $container.find(`#homepage-filter-${type}`);
 
-    // Track if touch was used to prevent double-firing on mobile
-    let touchUsed = false;
-
-    // Toggle dropdown on button click/touch
-    function handleButtonToggle(e) {
+    // Toggle dropdown on button click
+    button.on("click", function (e) {
       e.stopPropagation();
-      if (button.prop("disabled")) return;
+      if ($(this).prop("disabled")) return;
 
       const isOpen = menu.hasClass("open");
-      closeAllDropdowns();
+      closeAllDropdowns($container);
 
       if (!isOpen) {
-        openDropdown(type);
-        // Small delay for mobile to ensure menu is visible before focusing
-        setTimeout(function () {
-          search.focus();
-        }, 100);
-      }
-    }
-
-    // Handle touch events for mobile
-    button.on("touchend", function (e) {
-      touchUsed = true;
-      handleButtonToggle(e);
-      // Prevent click event from firing after touch
-      setTimeout(function () {
-        touchUsed = false;
-      }, 300);
-    });
-
-    // Handle click events (desktop and mobile fallback)
-    button.on("click", function (e) {
-      if (!touchUsed) {
-        handleButtonToggle(e);
+        openDropdown(type, $container);
+        search.focus();
       }
     });
 
-    // Track touch for option selection
-    let optionTouchUsed = false;
-
-    // Handle option selection with touch
-    options.on("touchend", ".homepage-filters-dropdown-option", function (e) {
-      optionTouchUsed = true;
+    // Handle option selection
+    options.on("click", ".homepage-filters-dropdown-option", function (e) {
       e.stopPropagation();
-      e.preventDefault();
       const $option = $(this);
       const value = $option.data("value");
       const slug = $option.data("slug");
@@ -319,52 +306,13 @@
       $option.addClass("selected");
 
       // Close dropdown
-      closeDropdown(type);
+      closeDropdown(type, $container);
 
       // Handle selection logic
       if (type === "make") {
-        handleMakeSelection(value, slug);
+        handleMakeSelection(value, slug, $container);
       } else if (type === "model") {
-        handleModelSelection(value, slug);
-      }
-
-      // Reset touch flag
-      setTimeout(function () {
-        optionTouchUsed = false;
-      }, 300);
-    });
-
-    // Handle option selection with click
-    options.on("click", ".homepage-filters-dropdown-option", function (e) {
-      if (!optionTouchUsed) {
-        e.stopPropagation();
-        const $option = $(this);
-        const value = $option.data("value");
-        const slug = $option.data("slug");
-        const text = $option.text().trim();
-
-        // Update button text
-        const buttonText = button.find(".homepage-filters-dropdown-text");
-        buttonText.text(text).removeClass("placeholder");
-
-        // Update hidden select
-        hiddenSelect.val(value).trigger("change");
-
-        // Update selected state
-        options
-          .find(".homepage-filters-dropdown-option")
-          .removeClass("selected");
-        $option.addClass("selected");
-
-        // Close dropdown
-        closeDropdown(type);
-
-        // Handle selection logic
-        if (type === "make") {
-          handleMakeSelection(value, slug);
-        } else if (type === "model") {
-          handleModelSelection(value, slug);
-        }
+        handleModelSelection(value, slug, $container);
       }
     });
 
@@ -374,8 +322,8 @@
       filterDropdownOptions(options, searchTerm);
     });
 
-    // Prevent dropdown from closing when clicking/touching inside
-    menu.on("click touchend", function (e) {
+    // Prevent dropdown from closing when clicking inside
+    menu.on("click", function (e) {
       e.stopPropagation();
     });
   }
@@ -383,9 +331,9 @@
   /**
    * Open a dropdown
    */
-  function openDropdown(type) {
-    const menu = $(`#homepage-filter-${type}-menu`);
-    const button = $(`#homepage-filter-${type}-button`);
+  function openDropdown(type, $container) {
+    const menu = $container.find(`#homepage-filter-${type}-menu`);
+    const button = $container.find(`#homepage-filter-${type}-button`);
 
     menu.addClass("open");
     button.addClass("homepage-filters-dropdown-button-open");
@@ -395,24 +343,27 @@
   /**
    * Close a dropdown
    */
-  function closeDropdown(type) {
-    const menu = $(`#homepage-filter-${type}-menu`);
-    const button = $(`#homepage-filter-${type}-button`);
-    const search = $(`#homepage-filter-${type}-search`);
+  function closeDropdown(type, $container) {
+    const menu = $container.find(`#homepage-filter-${type}-menu`);
+    const button = $container.find(`#homepage-filter-${type}-button`);
+    const search = $container.find(`#homepage-filter-${type}-search`);
 
     menu.removeClass("open");
     button.removeClass("homepage-filters-dropdown-button-open");
     button.attr("aria-expanded", "false");
     search.val("");
-    filterDropdownOptions($(`#homepage-filter-${type}-options`), "");
+    filterDropdownOptions(
+      $container.find(`#homepage-filter-${type}-options`),
+      ""
+    );
   }
 
   /**
    * Close all dropdowns
    */
-  function closeAllDropdowns() {
-    closeDropdown("make");
-    closeDropdown("model");
+  function closeAllDropdowns($container) {
+    closeDropdown("make", $container);
+    closeDropdown("model", $container);
   }
 
   /**
@@ -436,120 +387,140 @@
   /**
    * Handle make selection
    */
-  function handleMakeSelection(makeTermId, makeSlug) {
+  function handleMakeSelection(makeTermId, makeSlug, $container) {
     selectedMake = makeTermId ? { id: makeTermId, slug: makeSlug } : null;
     selectedModel = null;
 
-    // Reset model dropdown
-    const modelButton = $("#homepage-filter-model-button");
-    const modelButtonText = modelButton.find(".homepage-filters-dropdown-text");
-    const modelOptions = $("#homepage-filter-model-options");
-    const modelHiddenSelect = $("#homepage-filter-model");
-    const modelSearch = $("#homepage-filter-model-search");
+    // Reset model dropdown in all containers
+    $(".homepage-filters-container").each(function () {
+      const $cont = $(this);
+      const modelButton = $cont.find("#homepage-filter-model-button");
+      const modelButtonText = modelButton.find(
+        ".homepage-filters-dropdown-text"
+      );
+      const modelOptions = $cont.find("#homepage-filter-model-options");
+      const modelHiddenSelect = $cont.find("#homepage-filter-model");
+      const modelSearch = $cont.find("#homepage-filter-model-search");
 
-    modelButton
-      .prop("disabled", true)
-      .addClass("homepage-filters-dropdown-button-disabled");
-    modelButtonText.text("Select Model").addClass("placeholder");
-    modelOptions.empty();
-    modelHiddenSelect
-      .prop("disabled", true)
-      .html('<option value="">Select Model</option>');
-    modelSearch.prop("disabled", true);
+      modelButton
+        .prop("disabled", true)
+        .addClass("homepage-filters-dropdown-button-disabled");
+      modelButtonText.text("Select Model").addClass("placeholder");
+      modelOptions.empty();
+      modelHiddenSelect
+        .prop("disabled", true)
+        .html('<option value="">Select Model</option>');
+      modelSearch.prop("disabled", true);
+    });
 
     if (makeTermId) {
       if (!firstSelectedFilter) {
         firstSelectedFilter = "make";
       }
-      loadModels(makeTermId);
-      updateRanges();
+      loadModels(makeTermId, $container);
+      updateRanges($container);
     } else {
       firstSelectedFilter = null;
-      resetRanges();
+      resetRanges($container);
     }
   }
 
   /**
    * Handle model selection
    */
-  function handleModelSelection(modelTermId, modelSlug) {
+  function handleModelSelection(modelTermId, modelSlug, $container) {
     selectedModel = modelTermId ? { id: modelTermId, slug: modelSlug } : null;
 
     if (modelTermId) {
       if (!firstSelectedFilter) {
         firstSelectedFilter = "model";
       }
-      updateRanges();
+      updateRanges($container);
     } else {
       if (firstSelectedFilter === "model") {
         firstSelectedFilter = selectedMake ? "make" : null;
       }
-      updateRanges();
+      updateRanges($container);
     }
   }
 
   /**
    * Load models for selected make
    */
-  function loadModels(makeTermId) {
-    const modelOptions = $("#homepage-filter-model-options");
-    const modelHiddenSelect = $("#homepage-filter-model");
-    const modelButton = $("#homepage-filter-model-button");
-    const modelSearch = $("#homepage-filter-model-search");
+  function loadModels(makeTermId, $container) {
+    // Update all containers with the same models
+    $(".homepage-filters-container").each(function () {
+      const $cont = $(this);
+      const modelOptions = $cont.find("#homepage-filter-model-options");
+      const modelHiddenSelect = $cont.find("#homepage-filter-model");
+      const modelButton = $cont.find("#homepage-filter-model-button");
+      const modelSearch = $cont.find("#homepage-filter-model-search");
 
-    // Use AJAX to get models from taxonomy
-    $.ajax({
-      url: filterData.ajaxUrl,
-      type: "POST",
-      data: {
-        action: "homepage_filters_get_models",
-        make_term_id: makeTermId,
-        nonce: filterData.nonce,
-      },
-      success: function (response) {
-        if (response.success && response.data) {
-          // Clear existing options
-          modelOptions.empty();
-          modelHiddenSelect.html('<option value="">Select Model</option>');
+      // Use AJAX to get models from taxonomy (only call once, then update all containers)
+      if ($cont.is($container)) {
+        $.ajax({
+          url: filterData.ajaxUrl,
+          type: "POST",
+          data: {
+            action: "homepage_filters_get_models",
+            make_term_id: makeTermId,
+            nonce: filterData.nonce,
+          },
+          success: function (response) {
+            if (response.success && response.data) {
+              // Update all containers with the same models
+              $(".homepage-filters-container").each(function () {
+                const $c = $(this);
+                const $mOptions = $c.find("#homepage-filter-model-options");
+                const $mHiddenSelect = $c.find("#homepage-filter-model");
+                const $mButton = $c.find("#homepage-filter-model-button");
+                const $mSearch = $c.find("#homepage-filter-model-search");
 
-          // Build options for custom dropdown and hidden select
-          response.data.forEach(function (model) {
-            // Add to custom dropdown
-            const $option = $("<button>", {
-              type: "button",
-              class: "homepage-filters-dropdown-option",
-              "data-value": model.term_id,
-              "data-slug": model.slug,
-              text: model.name,
-            });
-            modelOptions.append($option);
+                // Clear existing options
+                $mOptions.empty();
+                $mHiddenSelect.html('<option value="">Select Model</option>');
 
-            // Add to hidden select
-            const $hiddenOption = $("<option>", {
-              value: model.term_id,
-              "data-slug": model.slug,
-              text: model.name,
-            });
-            modelHiddenSelect.append($hiddenOption);
-          });
+                // Build options for custom dropdown and hidden select
+                response.data.forEach(function (model) {
+                  // Add to custom dropdown
+                  const $option = $("<button>", {
+                    type: "button",
+                    class: "homepage-filters-dropdown-option",
+                    "data-value": model.term_id,
+                    "data-slug": model.slug,
+                    text: model.name,
+                  });
+                  $mOptions.append($option);
 
-          // Enable dropdown
-          modelButton
-            .prop("disabled", false)
-            .removeClass("homepage-filters-dropdown-button-disabled");
-          modelSearch.prop("disabled", false);
-        }
-      },
-      error: function () {
-        console.error("Error loading models");
-      },
+                  // Add to hidden select
+                  const $hiddenOption = $("<option>", {
+                    value: model.term_id,
+                    "data-slug": model.slug,
+                    text: model.name,
+                  });
+                  $mHiddenSelect.append($hiddenOption);
+                });
+
+                // Enable dropdown
+                $mButton
+                  .prop("disabled", false)
+                  .removeClass("homepage-filters-dropdown-button-disabled");
+                $mSearch.prop("disabled", false);
+              });
+            }
+          },
+          error: function () {
+            console.error("Error loading models");
+          },
+        });
+      }
     });
   }
 
   /**
    * Update slider ranges based on selected make/model
    */
-  function updateRanges() {
+  function updateRanges($container) {
     const makeTermId = selectedMake ? selectedMake.id : 0;
     const modelTermId = selectedModel ? selectedModel.id : 0;
 
@@ -566,21 +537,24 @@
         if (response.success && response.data) {
           currentRanges = response.data;
 
-          // Update price inputs
-          $("#homepage-filter-price-min").val(
-            formatNumber(currentRanges.price.min)
-          );
-          $("#homepage-filter-price-max").val(
-            formatNumber(currentRanges.price.max)
-          );
+          // Update price inputs in all containers
+          $(".homepage-filters-container").each(function () {
+            const $c = $(this);
+            $c.find("#homepage-filter-price-min").val(
+              formatNumber(currentRanges.price.min)
+            );
+            $c.find("#homepage-filter-price-max").val(
+              formatNumber(currentRanges.price.max)
+            );
 
-          // Update mileage inputs
-          $("#homepage-filter-mileage-min").val(
-            formatNumber(currentRanges.mileage.min)
-          );
-          $("#homepage-filter-mileage-max").val(
-            formatNumber(currentRanges.mileage.max)
-          );
+            // Update mileage inputs
+            $c.find("#homepage-filter-mileage-min").val(
+              formatNumber(currentRanges.mileage.min)
+            );
+            $c.find("#homepage-filter-mileage-max").val(
+              formatNumber(currentRanges.mileage.max)
+            );
+          });
 
           // Update price slider - COMMENTED OUT
           // if (priceSlider) {
@@ -617,20 +591,27 @@
   /**
    * Reset ranges to global values
    */
-  function resetRanges() {
+  function resetRanges($container) {
     currentRanges = filterData.ranges;
 
-    // Update price inputs
-    $("#homepage-filter-price-min").val(formatNumber(currentRanges.price.min));
-    $("#homepage-filter-price-max").val(formatNumber(currentRanges.price.max));
+    // Update price inputs in all containers
+    $(".homepage-filters-container").each(function () {
+      const $c = $(this);
+      $c.find("#homepage-filter-price-min").val(
+        formatNumber(currentRanges.price.min)
+      );
+      $c.find("#homepage-filter-price-max").val(
+        formatNumber(currentRanges.price.max)
+      );
 
-    // Update mileage inputs
-    $("#homepage-filter-mileage-min").val(
-      formatNumber(currentRanges.mileage.min)
-    );
-    $("#homepage-filter-mileage-max").val(
-      formatNumber(currentRanges.mileage.max)
-    );
+      // Update mileage inputs
+      $c.find("#homepage-filter-mileage-min").val(
+        formatNumber(currentRanges.mileage.min)
+      );
+      $c.find("#homepage-filter-mileage-max").val(
+        formatNumber(currentRanges.mileage.max)
+      );
+    });
 
     // Update price slider - COMMENTED OUT
     // if (priceSlider) {
@@ -658,9 +639,9 @@
   /**
    * Initialize search button and URL generation
    */
-  function initializeSearchButton() {
-    $("#homepage-filters-search-btn").on("click", function () {
-      const url = buildFilterUrl();
+  function initializeSearchButton($container) {
+    $container.find("#homepage-filters-search-btn").on("click", function () {
+      const url = buildFilterUrl($container);
       if (url) {
         window.location.href = url;
       }
@@ -670,7 +651,7 @@
   /**
    * Build JetSmartFilters URL from current filter selections
    */
-  function buildFilterUrl() {
+  function buildFilterUrl($container) {
     let url = filterData.baseUrl;
     const parts = [];
 
@@ -686,9 +667,9 @@
     // Build meta filters part
     const metaParts = [];
 
-    // Price range
-    const priceMinVal = $("#homepage-filter-price-min").val();
-    const priceMaxVal = $("#homepage-filter-price-max").val();
+    // Price range (get from the container that triggered the search)
+    const priceMinVal = $container.find("#homepage-filter-price-min").val();
+    const priceMaxVal = $container.find("#homepage-filter-price-max").val();
     const priceMin =
       parseFormattedNumber(priceMinVal) || currentRanges.price.min;
     const priceMax =
@@ -700,9 +681,9 @@
       metaParts.push("price!range:" + priceMin + "_" + priceMax);
     }
 
-    // Mileage range
-    const mileageMinVal = $("#homepage-filter-mileage-min").val();
-    const mileageMaxVal = $("#homepage-filter-mileage-max").val();
+    // Mileage range (get from the container that triggered the search)
+    const mileageMinVal = $container.find("#homepage-filter-mileage-min").val();
+    const mileageMaxVal = $container.find("#homepage-filter-mileage-max").val();
     const mileageMin =
       parseFormattedNumber(mileageMinVal) || currentRanges.mileage.min;
     const mileageMax =
