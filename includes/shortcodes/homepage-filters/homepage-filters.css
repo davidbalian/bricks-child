@@ -3,9 +3,7 @@
  */
 
 .homepage-filters-container {
-  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
 }
 
 .homepage-filters-row {
@@ -386,10 +384,6 @@
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-  .homepage-filters-container {
-    padding: 1rem;
-  }
-
   .homepage-filters-row {
     margin-bottom: 1.5rem;
   }
