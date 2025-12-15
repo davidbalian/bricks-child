@@ -142,167 +142,192 @@
   }
 
   /**
-   * Initialize make/model selects with search functionality
+   * Initialize make/model custom dropdowns with search functionality
    */
   function initializeSelects() {
-    const makeSelect = $("#homepage-filter-make");
-    const modelSelect = $("#homepage-filter-model");
-    const makeSearch = $("#homepage-filter-make-search");
-    const modelSearch = $("#homepage-filter-model-search");
+    initializeDropdown("make");
+    initializeDropdown("model");
 
-    // Store original options for make select (for search functionality)
-    const makeOptionsData = [];
-    makeSelect.find("option").each(function () {
-      makeOptionsData.push({
-        value: $(this).val(),
-        text: $(this).text(),
-        data: {
-          slug: $(this).data("slug") || "",
-        },
-      });
-    });
-    makeSelect.data("original-options", makeOptionsData);
-
-    // Make select change handler
-    makeSelect.on("change", function () {
-      const makeTermId = $(this).val();
-      const makeSlug = $(this).find("option:selected").data("slug");
-
-      selectedMake = makeTermId ? { id: makeTermId, slug: makeSlug } : null;
-      selectedModel = null;
-
-      // Reset model select
-      modelSelect
-        .prop("disabled", true)
-        .html('<option value="">Select Model</option>');
-      modelSearch.prop("disabled", true);
-
-      if (makeTermId) {
-        if (!firstSelectedFilter) {
-          firstSelectedFilter = "make";
-        }
-        loadModels(makeTermId);
-        updateRanges();
-      } else {
-        firstSelectedFilter = null;
-        // Reset to global ranges
-        resetRanges();
+    // Click outside to close dropdowns
+    $(document).on("click", function (e) {
+      if (!$(e.target).closest(".homepage-filters-dropdown").length) {
+        closeAllDropdowns();
       }
-    });
-
-    // Model select change handler
-    modelSelect.on("change", function () {
-      const modelTermId = $(this).val();
-      const modelSlug = $(this).find("option:selected").data("slug");
-
-      selectedModel = modelTermId ? { id: modelTermId, slug: modelSlug } : null;
-
-      if (modelTermId) {
-        if (!firstSelectedFilter) {
-          firstSelectedFilter = "model";
-        }
-        updateRanges();
-      } else {
-        if (firstSelectedFilter === "model") {
-          firstSelectedFilter = selectedMake ? "make" : null;
-        }
-        updateRanges();
-      }
-    });
-
-    // Search functionality for make select
-    makeSelect.on("focus", function () {
-      makeSearch.addClass("active");
-    });
-
-    makeSearch.on("input", function () {
-      const searchTerm = $(this).val();
-      filterSelectOptions(makeSelect, searchTerm);
-    });
-
-    makeSearch.on("blur", function () {
-      setTimeout(function () {
-        // Clear search and restore all options when search loses focus
-        makeSearch.val("");
-        filterSelectOptions(makeSelect, "");
-        makeSearch.removeClass("active");
-      }, 200);
-    });
-
-    // Search functionality for model select
-    modelSelect.on("focus", function () {
-      if (!$(this).prop("disabled")) {
-        modelSearch.addClass("active");
-      }
-    });
-
-    modelSearch.on("input", function () {
-      const searchTerm = $(this).val();
-      filterSelectOptions(modelSelect, searchTerm);
-    });
-
-    modelSearch.on("blur", function () {
-      setTimeout(function () {
-        // Clear search and restore all options when search loses focus
-        modelSearch.val("");
-        filterSelectOptions(modelSelect, "");
-        modelSearch.removeClass("active");
-      }, 200);
     });
   }
 
   /**
-   * Filter select options based on search term
-   * Note: Native selects don't support hiding options well, so we'll
-   * rebuild the select with filtered options
+   * Initialize a single dropdown (make or model)
    */
-  function filterSelectOptions($select, searchTerm) {
-    if (!searchTerm) {
-      // Show all options
-      $select.find("option").show();
-      return;
-    }
+  function initializeDropdown(type) {
+    const dropdown = $(`.homepage-filters-dropdown[data-filter="${type}"]`);
+    const button = $(`#homepage-filter-${type}-button`);
+    const menu = $(`#homepage-filter-${type}-menu`);
+    const search = $(`#homepage-filter-${type}-search`);
+    const options = $(`#homepage-filter-${type}-options`);
+    const hiddenSelect = $(`#homepage-filter-${type}`);
 
-    // Store original options if not already stored
-    if (!$select.data("original-options")) {
-      const originalOptions = [];
-      $select.find("option").each(function () {
-        originalOptions.push({
-          value: $(this).val(),
-          text: $(this).text(),
-          data: $(this).data(),
-        });
-      });
-      $select.data("original-options", originalOptions);
-    }
+    // Toggle dropdown on button click
+    button.on("click", function (e) {
+      e.stopPropagation();
+      if ($(this).prop("disabled")) return;
 
-    const originalOptions = $select.data("original-options");
-    const filteredOptions = originalOptions.filter(function (option) {
-      if (!option.value) return true; // Always show placeholder
-      return option.text.toLowerCase().includes(searchTerm.toLowerCase());
+      const isOpen = menu.hasClass("open");
+      closeAllDropdowns();
+
+      if (!isOpen) {
+        openDropdown(type);
+        search.focus();
+      }
     });
 
-    // Rebuild select with filtered options
-    const currentValue = $select.val();
-    $select.empty();
-    filteredOptions.forEach(function (option) {
-      const $option = $("<option>", {
-        value: option.value,
-        text: option.text,
-      });
-      // Restore data attributes
-      Object.keys(option.data || {}).forEach(function (key) {
-        $option.attr("data-" + key, option.data[key]);
-      });
-      $select.append($option);
+    // Handle option selection
+    options.on("click", ".homepage-filters-dropdown-option", function (e) {
+      e.stopPropagation();
+      const $option = $(this);
+      const value = $option.data("value");
+      const slug = $option.data("slug");
+      const text = $option.text().trim();
+
+      // Update button text
+      const buttonText = button.find(".homepage-filters-dropdown-text");
+      buttonText.text(text).removeClass("placeholder");
+
+      // Update hidden select
+      hiddenSelect.val(value).trigger("change");
+
+      // Update selected state
+      options.find(".homepage-filters-dropdown-option").removeClass("selected");
+      $option.addClass("selected");
+
+      // Close dropdown
+      closeDropdown(type);
+
+      // Handle selection logic
+      if (type === "make") {
+        handleMakeSelection(value, slug);
+      } else if (type === "model") {
+        handleModelSelection(value, slug);
+      }
     });
 
-    // Restore selection if it's still in filtered list
-    if (
-      currentValue &&
-      $select.find('option[value="' + currentValue + '"]').length
-    ) {
-      $select.val(currentValue);
+    // Search functionality
+    search.on("input", function () {
+      const searchTerm = $(this).val().toLowerCase();
+      filterDropdownOptions(options, searchTerm);
+    });
+
+    // Prevent dropdown from closing when clicking inside
+    menu.on("click", function (e) {
+      e.stopPropagation();
+    });
+  }
+
+  /**
+   * Open a dropdown
+   */
+  function openDropdown(type) {
+    const menu = $(`#homepage-filter-${type}-menu`);
+    const button = $(`#homepage-filter-${type}-button`);
+
+    menu.addClass("open");
+    button.addClass("homepage-filters-dropdown-button-open");
+    button.attr("aria-expanded", "true");
+  }
+
+  /**
+   * Close a dropdown
+   */
+  function closeDropdown(type) {
+    const menu = $(`#homepage-filter-${type}-menu`);
+    const button = $(`#homepage-filter-${type}-button`);
+    const search = $(`#homepage-filter-${type}-search`);
+
+    menu.removeClass("open");
+    button.removeClass("homepage-filters-dropdown-button-open");
+    button.attr("aria-expanded", "false");
+    search.val("");
+    filterDropdownOptions($(`#homepage-filter-${type}-options`), "");
+  }
+
+  /**
+   * Close all dropdowns
+   */
+  function closeAllDropdowns() {
+    closeDropdown("make");
+    closeDropdown("model");
+  }
+
+  /**
+   * Filter dropdown options based on search term
+   */
+  function filterDropdownOptions($optionsContainer, searchTerm) {
+    $optionsContainer
+      .find(".homepage-filters-dropdown-option")
+      .each(function () {
+        const $option = $(this);
+        const text = $option.text().toLowerCase();
+
+        if (!searchTerm || text.includes(searchTerm.toLowerCase())) {
+          $option.removeClass("hidden");
+        } else {
+          $option.addClass("hidden");
+        }
+      });
+  }
+
+  /**
+   * Handle make selection
+   */
+  function handleMakeSelection(makeTermId, makeSlug) {
+    selectedMake = makeTermId ? { id: makeTermId, slug: makeSlug } : null;
+    selectedModel = null;
+
+    // Reset model dropdown
+    const modelButton = $("#homepage-filter-model-button");
+    const modelButtonText = modelButton.find(".homepage-filters-dropdown-text");
+    const modelOptions = $("#homepage-filter-model-options");
+    const modelHiddenSelect = $("#homepage-filter-model");
+    const modelSearch = $("#homepage-filter-model-search");
+
+    modelButton
+      .prop("disabled", true)
+      .addClass("homepage-filters-dropdown-button-disabled");
+    modelButtonText.text("Select Model").addClass("placeholder");
+    modelOptions.empty();
+    modelHiddenSelect
+      .prop("disabled", true)
+      .html('<option value="">Select Model</option>');
+    modelSearch.prop("disabled", true);
+
+    if (makeTermId) {
+      if (!firstSelectedFilter) {
+        firstSelectedFilter = "make";
+      }
+      loadModels(makeTermId);
+      updateRanges();
+    } else {
+      firstSelectedFilter = null;
+      resetRanges();
+    }
+  }
+
+  /**
+   * Handle model selection
+   */
+  function handleModelSelection(modelTermId, modelSlug) {
+    selectedModel = modelTermId ? { id: modelTermId, slug: modelSlug } : null;
+
+    if (modelTermId) {
+      if (!firstSelectedFilter) {
+        firstSelectedFilter = "model";
+      }
+      updateRanges();
+    } else {
+      if (firstSelectedFilter === "model") {
+        firstSelectedFilter = selectedMake ? "make" : null;
+      }
+      updateRanges();
     }
   }
 
@@ -310,8 +335,9 @@
    * Load models for selected make
    */
   function loadModels(makeTermId) {
-    // Get all model terms (children of selected make)
-    const modelSelect = $("#homepage-filter-model");
+    const modelOptions = $("#homepage-filter-model-options");
+    const modelHiddenSelect = $("#homepage-filter-model");
+    const modelButton = $("#homepage-filter-model-button");
     const modelSearch = $("#homepage-filter-model-search");
 
     // Use AJAX to get models from taxonomy
@@ -325,33 +351,35 @@
       },
       success: function (response) {
         if (response.success && response.data) {
-          // Clear existing options and reset search data
-          modelSelect.html('<option value="">Select Model</option>');
-          modelSelect.removeData("original-options");
+          // Clear existing options
+          modelOptions.empty();
+          modelHiddenSelect.html('<option value="">Select Model</option>');
 
-          // Build options array for search functionality
-          const optionsData = [{ value: "", text: "Select Model", data: {} }];
-
+          // Build options for custom dropdown and hidden select
           response.data.forEach(function (model) {
-            const $option = $("<option>", {
+            // Add to custom dropdown
+            const $option = $("<button>", {
+              type: "button",
+              class: "homepage-filters-dropdown-option",
+              "data-value": model.term_id,
+              "data-slug": model.slug,
+              text: model.name,
+            });
+            modelOptions.append($option);
+
+            // Add to hidden select
+            const $hiddenOption = $("<option>", {
               value: model.term_id,
               "data-slug": model.slug,
               text: model.name,
             });
-            modelSelect.append($option);
-
-            // Store in options data for search
-            optionsData.push({
-              value: model.term_id,
-              text: model.name,
-              data: { slug: model.slug },
-            });
+            modelHiddenSelect.append($hiddenOption);
           });
 
-          // Store original options for search filtering
-          modelSelect.data("original-options", optionsData);
-
-          modelSelect.prop("disabled", false);
+          // Enable dropdown
+          modelButton
+            .prop("disabled", false)
+            .removeClass("homepage-filters-dropdown-button-disabled");
           modelSearch.prop("disabled", false);
         }
       },
