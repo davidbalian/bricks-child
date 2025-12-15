@@ -37,10 +37,10 @@ function homepage_filters_shortcode($atts) {
     <div class="homepage-filters-container">
         <div class="homepage-filters-row homepage-filters-selects">
             <div class="homepage-filters-select-wrapper">
-                <label for="homepage-filter-make">Make</label>
+                <label for="homepage-filter-make">Brand</label>
                 <div class="homepage-filters-dropdown" data-filter="make">
                     <button type="button" class="homepage-filters-dropdown-button" id="homepage-filter-make-button" aria-haspopup="listbox" aria-expanded="false">
-                        <span class="homepage-filters-dropdown-text placeholder">Select Make</span>
+                        <span class="homepage-filters-dropdown-text placeholder">All Brands</span>
                         <span class="homepage-filters-dropdown-arrow">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M19 9l-7 7-7-7"></path>
@@ -48,8 +48,11 @@ function homepage_filters_shortcode($atts) {
                         </span>
                     </button>
                     <div class="homepage-filters-dropdown-menu" id="homepage-filter-make-menu" role="listbox">
-                        <input type="text" class="homepage-filters-search" placeholder="Search makes..." id="homepage-filter-make-search">
+                        <input type="text" class="homepage-filters-search" placeholder="Search brands..." id="homepage-filter-make-search">
                         <div class="homepage-filters-dropdown-options" id="homepage-filter-make-options">
+                            <button type="button" class="homepage-filters-dropdown-option" role="option" data-value="" data-slug="">
+                                All Brands
+                            </button>
                             <?php if (!is_wp_error($makes) && !empty($makes)) : ?>
                                 <?php foreach ($makes as $make) : ?>
                                     <button type="button" class="homepage-filters-dropdown-option" role="option" data-value="<?php echo esc_attr($make->term_id); ?>" data-slug="<?php echo esc_attr($make->slug); ?>">
@@ -60,7 +63,7 @@ function homepage_filters_shortcode($atts) {
                         </div>
                     </div>
                     <select id="homepage-filter-make" class="homepage-filters-select-hidden" data-filter="make" aria-hidden="true" tabindex="-1">
-                        <option value="">Select Make</option>
+                        <option value="">All Brands</option>
                         <?php if (!is_wp_error($makes) && !empty($makes)) : ?>
                             <?php foreach ($makes as $make) : ?>
                                 <option value="<?php echo esc_attr($make->term_id); ?>" data-slug="<?php echo esc_attr($make->slug); ?>">
@@ -76,7 +79,7 @@ function homepage_filters_shortcode($atts) {
                 <label for="homepage-filter-model">Model</label>
                 <div class="homepage-filters-dropdown" data-filter="model">
                     <button type="button" class="homepage-filters-dropdown-button homepage-filters-dropdown-button-disabled" id="homepage-filter-model-button" aria-haspopup="listbox" aria-expanded="false" disabled>
-                        <span class="homepage-filters-dropdown-text placeholder">Select Model</span>
+                        <span class="homepage-filters-dropdown-text placeholder">All Models</span>
                         <span class="homepage-filters-dropdown-arrow">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M19 9l-7 7-7-7"></path>
@@ -90,7 +93,7 @@ function homepage_filters_shortcode($atts) {
                         </div>
                     </div>
                     <select id="homepage-filter-model" class="homepage-filters-select-hidden" data-filter="model" aria-hidden="true" tabindex="-1" disabled>
-                        <option value="">Select Model</option>
+                        <option value="">All Models</option>
                     </select>
                 </div>
             </div>

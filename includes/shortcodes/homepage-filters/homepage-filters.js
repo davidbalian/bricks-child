@@ -451,7 +451,13 @@
 
       // Update button text
       const buttonText = button.find(".homepage-filters-dropdown-text");
-      buttonText.text(text).removeClass("placeholder");
+      buttonText.text(text);
+      // Keep placeholder class for "All Brands" and "All Models"
+      if (value === "" || text === "All Brands" || text === "All Models") {
+        buttonText.addClass("placeholder");
+      } else {
+        buttonText.removeClass("placeholder");
+      }
 
       // Update hidden select
       hiddenSelect.val(value).trigger("change");
@@ -560,11 +566,11 @@
       modelButton
         .prop("disabled", true)
         .addClass("homepage-filters-dropdown-button-disabled");
-      modelButtonText.text("Select Model").addClass("placeholder");
+      modelButtonText.text("All Models").addClass("placeholder");
       modelOptions.empty();
       modelHiddenSelect
         .prop("disabled", true)
-        .html('<option value="">Select Model</option>');
+        .html('<option value="">All Models</option>');
       modelSearch.prop("disabled", true);
     });
 
@@ -633,7 +639,17 @@
 
                 // Clear existing options
                 $mOptions.empty();
-                $mHiddenSelect.html('<option value="">Select Model</option>');
+                $mHiddenSelect.html('<option value="">All Models</option>');
+
+                // Add "All Models" as first option
+                const $allModelsOption = $("<button>", {
+                  type: "button",
+                  class: "homepage-filters-dropdown-option",
+                  "data-value": "",
+                  "data-slug": "",
+                  text: "All Models",
+                });
+                $mOptions.append($allModelsOption);
 
                 // Build options for custom dropdown and hidden select
                 response.data.forEach(function (model) {
