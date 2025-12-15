@@ -54,10 +54,11 @@
   background-color: #ffffff;
   color: #2a3546;
   font-size: 1rem;
+  font-weight: 500;
   text-align: left;
   cursor: pointer;
   transition: border-color var(--transition-time, 0.3s) ease,
-    box-shadow 0.3s ease;
+    box-shadow 0.3s ease, background-color 0.2s ease, color 0.2s ease;
   position: relative;
   display: flex;
   align-items: center;
@@ -66,6 +67,7 @@
 
 .homepage-filters-dropdown-button:hover:not(:disabled) {
   border-color: #dfe2e6;
+  transition: none;
 }
 
 .homepage-filters-dropdown-button:focus {
@@ -176,6 +178,7 @@
   background-color: rgba(13, 134, 227, 0.1);
   color: #2a3546;
   outline: none;
+  transition: none;
 }
 
 .homepage-filters-dropdown-option.selected {
