@@ -175,7 +175,8 @@
       if (max < min) {
         console.log("Adjusting min because max < min");
         const step = 100;
-        const adjustedMin = Math.max(currentRanges.price.min, max - step);
+        // Allow min to go below range minimum if user sets a lower max
+        const adjustedMin = Math.max(0, max - step);
         console.log("Adjusted min:", adjustedMin);
         $container
           .find("#homepage-filter-price-min")
@@ -210,7 +211,8 @@
       if (min > max) {
         console.log("Adjusting max because min > max");
         const step = 100;
-        const adjustedMax = Math.min(currentRanges.price.max, min + step);
+        // Allow max to go above range maximum if user sets a higher min
+        const adjustedMax = min + step;
         console.log("Adjusted max:", adjustedMax);
         $container
           .find("#homepage-filter-price-max")
@@ -327,7 +329,8 @@
       if (max < min) {
         console.log("Adjusting min because max < min");
         const step = 1000;
-        const adjustedMin = Math.max(currentRanges.mileage.min, max - step);
+        // Allow min to go below range minimum if user sets a lower max
+        const adjustedMin = Math.max(0, max - step);
         console.log("Adjusted min:", adjustedMin);
         $container
           .find("#homepage-filter-mileage-min")
@@ -362,7 +365,8 @@
       if (min > max) {
         console.log("Adjusting max because min > max");
         const step = 1000;
-        const adjustedMax = Math.min(currentRanges.mileage.max, min + step);
+        // Allow max to go above range maximum if user sets a higher min
+        const adjustedMax = min + step;
         console.log("Adjusted max:", adjustedMax);
         $container
           .find("#homepage-filter-mileage-max")
