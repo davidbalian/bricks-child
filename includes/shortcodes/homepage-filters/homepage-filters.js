@@ -488,12 +488,12 @@
     const parts = [];
 
     // Build make/model part
-    if (selectedMake) {
-      let makePart = "make:" + selectedMake.slug;
-      if (selectedModel) {
-        makePart += "-" + selectedModel.slug;
-      }
-      parts.push(makePart);
+    // If model is selected, use model slug (it already includes make slug)
+    // Otherwise, use make slug if only make is selected
+    if (selectedModel) {
+      parts.push("make:" + selectedModel.slug);
+    } else if (selectedMake) {
+      parts.push("make:" + selectedMake.slug);
     }
 
     // Build meta filters part
