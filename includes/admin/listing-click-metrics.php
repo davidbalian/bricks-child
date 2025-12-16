@@ -37,14 +37,17 @@ final class ListingClickMetricsRepository
             SELECT
                 p.ID,
                 p.post_title,
+                COALESCE(
+                    author.user_login,
+                    CONCAT(%s, p.post_author)
+                ) AS poster_username,
+                NULLIF(author.display_name, '') AS poster_display_name,
                 COALESCE(CAST(phone_meta.meta_value AS UNSIGNED), 0)     AS phone_clicks,
                 COALESCE(CAST(wa_meta.meta_value AS UNSIGNED), 0)        AS whatsapp_clicks,
                 (
                     COALESCE(CAST(phone_meta.meta_value AS UNSIGNED), 0) +
                     COALESCE(CAST(wa_meta.meta_value AS UNSIGNED), 0)
-                ) AS total_clicks,
-                COALESCE(author.user_login, CONCAT(%s, p.post_author)) AS poster_username,
-                author.display_name AS poster_display_name
+                ) AS total_clicks
             FROM {$wpdb->posts} AS p
             LEFT JOIN {$wpdb->users} AS author
                 ON author.ID = p.post_author
@@ -270,12 +273,11 @@ final class ListingClickMetricsPage
     private function formatPosterLabel(object $listing): string
     {
         $username = trim((string) ($listing->poster_username ?? ''));
+        $displayName = trim((string) ($listing->poster_display_name ?? ''));
 
         if ($username === '') {
             return sprintf(__('User #%d', 'bricks-child'), $listing->ID);
         }
-
-        $displayName = trim((string) ($listing->poster_display_name ?? ''));
 
         if ($displayName !== '' && $displayName !== $username) {
             return sprintf('%s (%s)', $username, $displayName);
