@@ -42,6 +42,8 @@ final class ListingClickMetricsRepository
                     CONCAT(%s, p.post_author)
                 ) AS poster_username,
                 NULLIF(author.display_name, '') AS poster_display_name,
+                NULLIF(first_name_meta.meta_value, '') AS poster_first_name,
+                NULLIF(last_name_meta.meta_value, '') AS poster_last_name,
                 COALESCE(CAST(phone_meta.meta_value AS UNSIGNED), 0)     AS phone_clicks,
                 COALESCE(CAST(wa_meta.meta_value AS UNSIGNED), 0)        AS whatsapp_clicks,
                 (
@@ -51,6 +53,12 @@ final class ListingClickMetricsRepository
             FROM {$wpdb->posts} AS p
             LEFT JOIN {$wpdb->users} AS author
                 ON author.ID = p.post_author
+            LEFT JOIN {$wpdb->usermeta} AS first_name_meta
+                ON first_name_meta.user_id = author.ID
+                AND first_name_meta.meta_key = 'first_name'
+            LEFT JOIN {$wpdb->usermeta} AS last_name_meta
+                ON last_name_meta.user_id = author.ID
+                AND last_name_meta.meta_key = 'last_name'
             LEFT JOIN {$wpdb->postmeta} AS phone_meta
                 ON phone_meta.post_id = p.ID
                 AND phone_meta.meta_key = %s
@@ -274,13 +282,20 @@ final class ListingClickMetricsPage
     {
         $username = trim((string) ($listing->poster_username ?? ''));
         $displayName = trim((string) ($listing->poster_display_name ?? ''));
+        $firstName = trim((string) ($listing->poster_first_name ?? ''));
+        $lastName = trim((string) ($listing->poster_last_name ?? ''));
+        $fullName = trim(sprintf('%s %s', $firstName, $lastName));
+
+        if ($fullName === '') {
+            $fullName = $displayName;
+        }
 
         if ($username === '') {
             return sprintf(__('User #%d', 'bricks-child'), $listing->ID);
         }
 
-        if ($displayName !== '' && $displayName !== $username) {
-            return sprintf('%s (%s)', $username, $displayName);
+        if ($fullName !== '' && $fullName !== $username) {
+            return sprintf('%s (%s)', $username, $fullName);
         }
 
         return $username;
