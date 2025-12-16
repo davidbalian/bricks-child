@@ -37,16 +37,14 @@ final class ListingClickMetricsRepository
             SELECT
                 p.ID,
                 p.post_title,
-                COALESCE(
-                    NULLIF(author.display_name, ''),
-                    CONCAT(%s, p.post_author)
-                ) AS poster_name,
                 COALESCE(CAST(phone_meta.meta_value AS UNSIGNED), 0)     AS phone_clicks,
                 COALESCE(CAST(wa_meta.meta_value AS UNSIGNED), 0)        AS whatsapp_clicks,
                 (
                     COALESCE(CAST(phone_meta.meta_value AS UNSIGNED), 0) +
                     COALESCE(CAST(wa_meta.meta_value AS UNSIGNED), 0)
-                ) AS total_clicks
+                ) AS total_clicks,
+                COALESCE(author.user_login, CONCAT(%s, p.post_author)) AS poster_username,
+                author.display_name AS poster_display_name
             FROM {$wpdb->posts} AS p
             LEFT JOIN {$wpdb->users} AS author
                 ON author.ID = p.post_author
@@ -61,9 +59,9 @@ final class ListingClickMetricsRepository
             ORDER BY {$orderColumn} DESC, p.post_date DESC
             LIMIT %d
             ",
+            esc_html__('User #', 'bricks-child'),
             self::PHONE_META_KEY,
             self::WHATSAPP_META_KEY,
-            esc_html__('User #', 'bricks-child'),
             self::POST_TYPE,
             $limit
         );
@@ -212,7 +210,7 @@ final class ListingClickMetricsPage
                                     </div>
                                 </td>
                                 <td>
-                                    <?php echo esc_html($listing->poster_name ?? __('—', 'bricks-child')); ?>
+                                    <?php echo esc_html($this->formatPosterLabel($listing)); ?>
                                 </td>
                                 <td><?php echo esc_html(number_format_i18n((int) $listing->phone_clicks)); ?></td>
                                 <td><?php echo esc_html(number_format_i18n((int) $listing->whatsapp_clicks)); ?></td>
@@ -267,6 +265,23 @@ final class ListingClickMetricsPage
         }
 
         return $summary;
+    }
+
+    private function formatPosterLabel(object $listing): string
+    {
+        $username = trim((string) ($listing->poster_username ?? ''));
+
+        if ($username === '') {
+            return sprintf(__('User #%d', 'bricks-child'), $listing->ID);
+        }
+
+        $displayName = trim((string) ($listing->poster_display_name ?? ''));
+
+        if ($displayName !== '' && $displayName !== $username) {
+            return sprintf('%s (%s)', $username, $displayName);
+        }
+
+        return $username;
     }
 
     private function getOrderSelection(): string
