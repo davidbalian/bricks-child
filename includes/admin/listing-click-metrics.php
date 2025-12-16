@@ -37,6 +37,10 @@ final class ListingClickMetricsRepository
             SELECT
                 p.ID,
                 p.post_title,
+                COALESCE(
+                    NULLIF(author.display_name, ''),
+                    CONCAT(%s, p.post_author)
+                ) AS poster_name,
                 COALESCE(CAST(phone_meta.meta_value AS UNSIGNED), 0)     AS phone_clicks,
                 COALESCE(CAST(wa_meta.meta_value AS UNSIGNED), 0)        AS whatsapp_clicks,
                 (
@@ -44,6 +48,8 @@ final class ListingClickMetricsRepository
                     COALESCE(CAST(wa_meta.meta_value AS UNSIGNED), 0)
                 ) AS total_clicks
             FROM {$wpdb->posts} AS p
+            LEFT JOIN {$wpdb->users} AS author
+                ON author.ID = p.post_author
             LEFT JOIN {$wpdb->postmeta} AS phone_meta
                 ON phone_meta.post_id = p.ID
                 AND phone_meta.meta_key = %s
@@ -57,6 +63,7 @@ final class ListingClickMetricsRepository
             ",
             self::PHONE_META_KEY,
             self::WHATSAPP_META_KEY,
+            esc_html__('User #', 'bricks-child'),
             self::POST_TYPE,
             $limit
         );
@@ -183,6 +190,7 @@ final class ListingClickMetricsPage
                 <thead>
                     <tr>
                         <th><?php esc_html_e('Listing', 'bricks-child'); ?></th>
+                        <th><?php esc_html_e('Poster', 'bricks-child'); ?></th>
                         <th><?php esc_html_e('Phone clicks', 'bricks-child'); ?></th>
                         <th><?php esc_html_e('WhatsApp clicks', 'bricks-child'); ?></th>
                         <th><?php esc_html_e('Total clicks', 'bricks-child'); ?></th>
@@ -202,6 +210,9 @@ final class ListingClickMetricsPage
                                     <div style="font-size: 12px; color: #555;">
                                         ID: <?php echo esc_html($listing->ID); ?>
                                     </div>
+                                </td>
+                                <td>
+                                    <?php echo esc_html($listing->poster_name ?? __('—', 'bricks-child')); ?>
                                 </td>
                                 <td><?php echo esc_html(number_format_i18n((int) $listing->phone_clicks)); ?></td>
                                 <td><?php echo esc_html(number_format_i18n((int) $listing->whatsapp_clicks)); ?></td>
