@@ -137,6 +137,36 @@ final class ListingNotificationManager
         return send_app_email($email, $payload['subject'], $payload['html'], $payload['text'] ?? '');
     }
 
+    public function maybeSendListingPublishedNotification(int $car_id): bool
+    {
+        $post = get_post($car_id);
+        if (!$post || $post->post_type !== 'car') {
+            return false;
+        }
+
+        $owner_id = $this->getListingOwnerId($car_id);
+        if (!$owner_id) {
+            return false;
+        }
+
+        $email = $this->emailResolver->resolveVerifiedEmail($owner_id);
+        if (!$email) {
+            return false;
+        }
+
+        // Respect activity preference (same category as other listing updates).
+        if (!$this->preferences->isActivityNotificationsEnabled($owner_id)) {
+            return false;
+        }
+
+        $payload = $this->messageFactory->buildListingPublishedNotification(
+            $this->getListingTitle($car_id),
+            get_permalink($car_id)
+        );
+
+        return send_app_email($email, $payload['subject'], $payload['html'], $payload['text'] ?? '');
+    }
+
     private function getTotalViews(int $car_id): int
     {
         return max(0, absint(get_post_meta($car_id, 'total_views_count', true)));

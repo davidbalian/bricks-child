@@ -75,6 +75,7 @@ require_once get_stylesheet_directory() . '/includes/admin/seller-reviews-admin.
 // Refresh Listing System
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/refresh-listing/init.php';
 require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/ListingReminderScheduler.php';
+require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/publish-notification-hook.php';
 new ListingReminderScheduler();
 
 // =========================================================================

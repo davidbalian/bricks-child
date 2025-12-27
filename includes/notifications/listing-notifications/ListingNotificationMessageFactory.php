@@ -160,5 +160,31 @@ final class ListingNotificationMessageFactory
     {
         return 'You can manage or turn off these emails anytime in your account settings.';
     }
+
+    /**
+     * Build message for listing published notification.
+     */
+    public function buildListingPublishedNotification(string $listing_title, string $listing_url): array
+    {
+        $subject = 'Your listing is now live';
+        $body = sprintf('%s is published and visible to buyers.', $listing_title);
+        $support = 'Keep it fresh: verify photos, price, and details to stay competitive.';
+
+        $html = sprintf(
+            '<p>%s</p><p>%s</p><p><a href="%s" style="background:#0073aa;color:#fff;padding:10px 16px;border-radius:4px;text-decoration:none;font-weight:600;">My Listings</a></p><p><small>%s</small></p>',
+            esc_html($body),
+            esc_html($support),
+            esc_url($this->getListingsUrl()),
+            esc_html($this->getGlobalFooter())
+        );
+
+        $text = $body . "\n\n" . $support . "\n\nVisit: " . $listing_url . "\n" . $this->getGlobalFooter();
+
+        return [
+            'subject' => $subject,
+            'html' => $html,
+            'text' => $text,
+        ];
+    }
 }
 
