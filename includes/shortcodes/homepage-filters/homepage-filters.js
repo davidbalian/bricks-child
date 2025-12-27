@@ -872,10 +872,18 @@
     }
 
     if (metaParts.length > 0) {
-      url += "/meta/" + metaParts.join(";");
+      // Ensure we don't create double slashes
+      if (url.endsWith("/")) {
+        url += "meta/" + metaParts.join(";");
+      } else {
+        url += "/meta/" + metaParts.join(";");
+      }
     }
 
-    url += "/";
+    // Ensure URL ends with a single slash
+    if (!url.endsWith("/")) {
+      url += "/";
+    }
 
     return url;
   }
