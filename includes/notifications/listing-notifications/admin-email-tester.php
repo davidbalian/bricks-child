@@ -63,6 +63,18 @@ function render_listing_notification_tester_page() {
                     $mark_as_sold_url = admin_url('admin.php?page=my-listings');
                     $sent = $manager->maybeSendReminderNotification($listing_id, $refresh_url, $mark_as_sold_url);
                     $response = $sent ? 'Reminder email sent.' : 'Reminder not sent (maybe already at limit or preferences off).';
+                } elseif ($action === 'publish') {
+                    $original_publish_sent = $state_repo->hasPublishNotificationBeenSent($listing_id);
+                    delete_post_meta($listing_id, 'notification_publish_sent'); // Clear for testing
+
+                    $sent = $manager->maybeSendPublishNotification($listing_id);
+
+                    // Restore original state if it was sent before
+                    if ($original_publish_sent) {
+                        $state_repo->markPublishNotificationSent($listing_id);
+                    }
+
+                    $response = $sent ? 'Publish notification email sent.' : 'Publish notification not sent (maybe already sent or conditions not met).';
                 } else {
                     $response = 'Unknown action.';
                 }
@@ -109,6 +121,7 @@ function render_listing_notification_tester_page() {
             <p class="submit">
                 <button type="submit" name="notification_action" value="view_milestone" class="button button-primary">Send view milestone email</button>
                 <button type="submit" name="notification_action" value="reminder" class="button">Send reminder email</button>
+                <button type="submit" name="notification_action" value="publish" class="button">Send publish notification email</button>
             </p>
         </form>
         <p><strong>Note:</strong> This tool reuses the real notification manager and is intended for staging/local QA. Remove before pushing to production.</p>

@@ -39,6 +39,33 @@ final class ListingNotificationMessageFactory
     }
 
     /**
+     * Build message for publish notification.
+     */
+    public function buildPublishNotification(string $listing_title, int $car_id): array
+    {
+        $subject = 'Congratulations! Your listing is now live';
+        $body = sprintf(
+            '%s is now live and visible to buyers. This is an exciting moment—your car is officially on the market!',
+            $listing_title
+        );
+        $support = 'Take a moment to share your listing with friends or on social media to get the word out.';
+
+        $html = sprintf(
+            '<p>%s</p><p>%s</p><p><a href="%s" style="background:#0073aa;color:#fff;padding:10px 16px;border-radius:4px;text-decoration:none;font-weight:600;">My Listings</a></p><p><small>%s</small></p>',
+            esc_html($body),
+            esc_html($support),
+            esc_url($this->getListingsUrl()),
+            esc_html($this->getGlobalFooter())
+        );
+
+        return [
+            'subject' => $subject,
+            'html' => $html,
+            'text' => $body . "\n\n" . $support . "\n\nVisit: " . $this->getListingsUrl() . "\n" . $this->getGlobalFooter(),
+        ];
+    }
+
+    /**
      * Build message for view milestone.
      */
     public function buildViewMilestoneNotification(string $listing_title, int $views, int $milestone): array
