@@ -112,29 +112,6 @@ final class ListingNotificationManager
         return false;
     }
 
-    public function maybeSendPublishNotification(int $car_id): bool
-    {
-        if (!$this->isSendAllowed($car_id, false)) {
-            return false;
-        }
-
-        if ($this->stateRepository->hasPublishNotificationBeenSent($car_id)) {
-            return false;
-        }
-
-        $payload = $this->messageFactory->buildPublishNotification(
-            $this->getListingTitle($car_id),
-            $car_id
-        );
-
-        if ($this->sendEmailToOwner($car_id, $payload, false)) {
-            $this->stateRepository->markPublishNotificationSent($car_id);
-            return true;
-        }
-
-        return false;
-    }
-
     private function sendEmailToOwner(int $car_id, array $payload, bool $isReminder): bool
     {
         $owner_id = $this->getListingOwnerId($car_id);
@@ -156,6 +133,36 @@ final class ListingNotificationManager
         if (!$email) {
             return false;
         }
+
+        return send_app_email($email, $payload['subject'], $payload['html'], $payload['text'] ?? '');
+    }
+
+    public function maybeSendListingPublishedNotification(int $car_id): bool
+    {
+        $post = get_post($car_id);
+        if (!$post || $post->post_type !== 'car') {
+            return false;
+        }
+
+        $owner_id = $this->getListingOwnerId($car_id);
+        if (!$owner_id) {
+            return false;
+        }
+
+        $email = $this->emailResolver->resolveVerifiedEmail($owner_id);
+        if (!$email) {
+            return false;
+        }
+
+        // Respect activity preference (same category as other listing updates).
+        if (!$this->preferences->isActivityNotificationsEnabled($owner_id)) {
+            return false;
+        }
+
+        $payload = $this->messageFactory->buildListingPublishedNotification(
+            $this->getListingTitle($car_id),
+            get_permalink($car_id)
+        );
 
         return send_app_email($email, $payload['subject'], $payload['html'], $payload['text'] ?? '');
     }
@@ -182,15 +189,11 @@ final class ListingNotificationManager
         return get_the_title($car_id) ?: sprintf(__('Car listing #%d', 'bricks-child'), $car_id);
     }
 
-    private function isSendAllowed(int $car_id, bool $requirePublished = true): bool
+    private function isSendAllowed(int $car_id): bool
     {
         $post = get_post($car_id);
 
-        if (!$post || $post->post_type !== 'car') {
-            return false;
-        }
-
-        if ($requirePublished && $post->post_status !== 'publish') {
+        if (!$post || $post->post_type !== 'car' || $post->post_status !== 'publish') {
             return false;
         }
 

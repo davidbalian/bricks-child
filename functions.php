@@ -55,7 +55,6 @@ require_once get_stylesheet_directory() . '/includes/notifications/listing-notif
 require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/ListingNotificationStateRepository.php';
 require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/ListingNotificationMessageFactory.php';
 require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/ListingNotificationManager.php';
-require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/ListingNotificationPublishHook.php';
 require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/init.php';
 require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/admin-email-tester.php';
 require_once get_stylesheet_directory() . '/includes/legal/legal-pages.php';
@@ -76,6 +75,7 @@ require_once get_stylesheet_directory() . '/includes/admin/seller-reviews-admin.
 // Refresh Listing System
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/refresh-listing/init.php';
 require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/ListingReminderScheduler.php';
+require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/publish-notification-hook.php';
 new ListingReminderScheduler();
 
 // =========================================================================
