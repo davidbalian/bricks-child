@@ -276,24 +276,31 @@ function delete_legacy_attachment_files($metadata, $current_file_path) {
  */
 function delete_non_webp_siblings($webp_path) {
     if (!$webp_path || !file_exists($webp_path)) {
+        car_image_opt_log('delete_non_webp_siblings: webp path missing or not found; skipping');
         return;
     }
+
     $pathinfo = pathinfo($webp_path);
     $dir      = isset($pathinfo['dirname']) ? $pathinfo['dirname'] : '';
     $base     = isset($pathinfo['filename']) ? $pathinfo['filename'] : '';
     if (!$dir || !$base) {
+        car_image_opt_log('delete_non_webp_siblings: dirname or filename missing; skipping');
         return;
     }
-    $candidates = glob($dir . '/' . $base . '*');
+
+    $pattern    = trailingslashit($dir) . $base . '.*';
+    $candidates = glob($pattern);
     if (!$candidates) {
+        car_image_opt_log('delete_non_webp_siblings: no siblings found for pattern ' . $pattern);
         return;
     }
+
     foreach ($candidates as $candidate) {
         if ($candidate === $webp_path) {
             continue;
         }
-        $ext = pathinfo($candidate, PATHINFO_EXTENSION);
-        if (strtolower($ext) === 'webp') {
+        $ext = strtolower(pathinfo($candidate, PATHINFO_EXTENSION));
+        if ($ext === 'webp') {
             continue;
         }
         if (file_exists($candidate)) {
@@ -322,6 +329,7 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
             : 0;
         car_image_opt_log("Starting WebP conversion for attachment {$attachment_id}; legacy sizes: {$legacy_size_count}");
         $file_path = get_attached_file($attachment_id);
+        car_image_opt_log("Paths | file_path: {$file_path} | legacy file: " . ($legacy_metadata['file'] ?? 'n/a'));
         
         if (!$file_path || !file_exists($file_path)) {
             car_image_opt_log("WebP conversion skipped - file not found for attachment {$attachment_id}");
@@ -345,6 +353,7 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
         }
 
         $webp_path = $pathinfo['dirname'] . '/' . $pathinfo['filename'] . '.webp';
+        car_image_opt_log("Paths | webp_path: {$webp_path}");
 
         // Load the image editor
         $image_editor = wp_get_image_editor($file_path);
