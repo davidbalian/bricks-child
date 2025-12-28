@@ -50,6 +50,17 @@ function init_car_image_optimization() {
 }
 
 /**
+ * Lightweight logger for image optimization (enabled only when WP_DEBUG is true).
+ *
+ * @param string $message
+ */
+function car_image_opt_log($message) {
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('[car-image-opt] ' . $message);
+    }
+}
+
+/**
  * Remove unnecessary WordPress image sizes and add optimized car-specific sizes
  */
 function optimize_wordpress_image_sizes() {
@@ -218,11 +229,13 @@ function is_car_listing_operation() {
  */
 function delete_legacy_attachment_files($metadata, $current_file_path) {
     if (empty($metadata) || empty($metadata['file'])) {
+        car_image_opt_log('delete_legacy_attachment_files: missing metadata or file; skipping cleanup');
         return;
     }
 
     $upload_dir = wp_get_upload_dir();
     if (empty($upload_dir['basedir'])) {
+        car_image_opt_log('delete_legacy_attachment_files: upload basedir missing; skipping cleanup');
         return;
     }
 
@@ -251,6 +264,7 @@ function delete_legacy_attachment_files($metadata, $current_file_path) {
     foreach ($files_to_delete as $legacy_file) {
         if ($legacy_file && $legacy_file !== $current_file_path && file_exists($legacy_file)) {
             unlink($legacy_file);
+            car_image_opt_log('Deleted legacy derivative: ' . $legacy_file);
         }
     }
 }
@@ -266,10 +280,14 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
     try {
         // Use provided metadata (with derivative filenames) if available; fallback to stored metadata.
         $legacy_metadata = $pre_conversion_metadata ?: wp_get_attachment_metadata($attachment_id);
+        $legacy_size_count = isset($legacy_metadata['sizes']) && is_array($legacy_metadata['sizes'])
+            ? count($legacy_metadata['sizes'])
+            : 0;
+        car_image_opt_log("Starting WebP conversion for attachment {$attachment_id}; legacy sizes: {$legacy_size_count}");
         $file_path = get_attached_file($attachment_id);
         
         if (!$file_path || !file_exists($file_path)) {
-            error_log("WebP conversion skipped - file not found for attachment {$attachment_id}");
+            car_image_opt_log("WebP conversion skipped - file not found for attachment {$attachment_id}");
             return false;
         }
 
@@ -279,13 +297,13 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
         
         // Skip if already WebP
         if ($original_mime === 'image/webp') {
-            error_log("Attachment {$attachment_id} is already WebP, skipping conversion");
+            car_image_opt_log("Attachment {$attachment_id} is already WebP, skipping conversion");
             return true;
         }
 
         // Check if WordPress supports WebP (GD or ImageMagick)
         if (!function_exists('wp_image_editor_supports') || !wp_image_editor_supports(array('mime_type' => 'image/webp'))) {
-            error_log('WebP not supported by WordPress image editor - keeping original format');
+            car_image_opt_log('WebP not supported by WordPress image editor - keeping original format');
             return false;
         }
 
@@ -295,7 +313,7 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
         $image_editor = wp_get_image_editor($file_path);
         
         if (is_wp_error($image_editor)) {
-            error_log('Error loading image editor: ' . $image_editor->get_error_message());
+            car_image_opt_log('Error loading image editor: ' . $image_editor->get_error_message());
             return false;
         }
 
@@ -305,10 +323,10 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
             if ($current_size['width'] > 1920 || $current_size['height'] > 1080) {
                 $resize_result = $image_editor->resize(1920, 1080, false);
                 if (is_wp_error($resize_result)) {
-                    error_log('Error resizing image: ' . $resize_result->get_error_message());
+                    car_image_opt_log('Error resizing image: ' . $resize_result->get_error_message());
                     return false;
                 }
-                error_log("Resized large image for attachment {$attachment_id}");
+                car_image_opt_log("Resized large image for attachment {$attachment_id}");
             }
         }
 
@@ -325,7 +343,7 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
         $saved = $image_editor->save($webp_path, 'image/webp');
         
         if (is_wp_error($saved)) {
-            error_log('Error saving WebP: ' . $saved->get_error_message());
+            car_image_opt_log('Error saving WebP: ' . $saved->get_error_message());
             return false;
         }
 
@@ -348,9 +366,9 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
         $new_metadata = wp_generate_attachment_metadata($attachment_id, $webp_path);
         if ($new_metadata && !is_wp_error($new_metadata)) {
             wp_update_attachment_metadata($attachment_id, $new_metadata);
-            error_log("Regenerated metadata for WebP attachment {$attachment_id}");
+            car_image_opt_log("Regenerated metadata for WebP attachment {$attachment_id}");
         } else {
-            error_log("Failed to regenerate metadata for WebP attachment {$attachment_id}");
+            car_image_opt_log("Failed to regenerate metadata for WebP attachment {$attachment_id}");
         }
 
         // Remove legacy JPG/PNG derivatives now that WebP variants are in place.
@@ -359,15 +377,15 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
         // Remove the processing flag
         delete_post_meta($attachment_id, '_webp_conversion_in_progress');
 
-        error_log("Successfully converted attachment {$attachment_id} from {$original_mime} to WebP");
+        car_image_opt_log("Successfully converted attachment {$attachment_id} from {$original_mime} to WebP");
         // Return the fresh metadata so filters can persist WebP info upstream.
         return $new_metadata ?: true;
         
     } catch (Exception $e) {
-        error_log("WebP conversion failed for attachment {$attachment_id}: " . $e->getMessage());
+        car_image_opt_log("WebP conversion failed for attachment {$attachment_id}: " . $e->getMessage());
         return false;
     } catch (Error $e) {
-        error_log("WebP conversion error for attachment {$attachment_id}: " . $e->getMessage());
+        car_image_opt_log("WebP conversion error for attachment {$attachment_id}: " . $e->getMessage());
         return false;
     }
 }
@@ -383,7 +401,7 @@ function convert_car_images_to_webp($metadata, $attachment_id) {
     
     // ROBUST: Check if this attachment is already being processed to prevent infinite loops
     if (get_post_meta($attachment_id, '_webp_conversion_in_progress', true)) {
-        error_log("WebP conversion skipped for attachment {$attachment_id} - already in progress");
+        car_image_opt_log("WebP conversion skipped for attachment {$attachment_id} - already in progress");
         return $metadata;
     }
     
@@ -403,7 +421,7 @@ function convert_car_images_to_webp($metadata, $attachment_id) {
         }
     } catch (Exception $e) {
         // Log error but don't break the upload process
-        error_log('WebP conversion failed for attachment ' . $attachment_id . ': ' . $e->getMessage());
+        car_image_opt_log('WebP conversion failed for attachment ' . $attachment_id . ': ' . $e->getMessage());
         // Clean up the processing flag if it exists
         delete_post_meta($attachment_id, '_webp_conversion_in_progress');
     }
