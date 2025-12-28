@@ -270,6 +270,43 @@ function delete_legacy_attachment_files($metadata, $current_file_path) {
 }
 
 /**
+ * Delete any sibling files sharing the same basename as the WebP, except WebP files.
+ *
+ * @param string $webp_path Absolute path to the WebP file to keep.
+ */
+function delete_non_webp_siblings($webp_path) {
+    if (!$webp_path || !file_exists($webp_path)) {
+        return;
+    }
+    $pathinfo = pathinfo($webp_path);
+    $dir      = isset($pathinfo['dirname']) ? $pathinfo['dirname'] : '';
+    $base     = isset($pathinfo['filename']) ? $pathinfo['filename'] : '';
+    if (!$dir || !$base) {
+        return;
+    }
+    $candidates = glob($dir . '/' . $base . '*');
+    if (!$candidates) {
+        return;
+    }
+    foreach ($candidates as $candidate) {
+        if ($candidate === $webp_path) {
+            continue;
+        }
+        $ext = pathinfo($candidate, PATHINFO_EXTENSION);
+        if (strtolower($ext) === 'webp') {
+            continue;
+        }
+        if (file_exists($candidate)) {
+            if (@unlink($candidate)) {
+                car_image_opt_log('Deleted non-webp sibling: ' . $candidate);
+            } else {
+                car_image_opt_log('Failed to delete non-webp sibling: ' . $candidate);
+            }
+        }
+    }
+}
+
+/**
  * Convert uploaded images to WebP format - handles any input format optimally
  * 
  * @param int   $attachment_id            The attachment ID
@@ -387,6 +424,8 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
         } else {
             car_image_opt_log('Skipped original cleanup because source path equals WebP path or missing.');
         }
+        // Final sweep: remove any non-webp siblings sharing the same basename.
+        delete_non_webp_siblings($webp_path);
         
         // Remove the processing flag
         delete_post_meta($attachment_id, '_webp_conversion_in_progress');
