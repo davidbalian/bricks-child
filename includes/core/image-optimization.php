@@ -211,6 +211,51 @@ function is_car_listing_operation() {
 }
 
 /**
+ * Delete original upload and its generated derivatives created before WebP conversion.
+ *
+ * @param array  $metadata          Attachment metadata prior to conversion.
+ * @param string $current_file_path Absolute path to the new WebP file to keep.
+ */
+function delete_legacy_attachment_files($metadata, $current_file_path) {
+    if (empty($metadata) || empty($metadata['file'])) {
+        return;
+    }
+
+    $upload_dir = wp_get_upload_dir();
+    if (empty($upload_dir['basedir'])) {
+        return;
+    }
+
+    $base_dir      = trailingslashit($upload_dir['basedir']);
+    $relative_path = $metadata['file'];
+    $dir_name      = pathinfo($relative_path, PATHINFO_DIRNAME);
+    $root_dir      = ($dir_name && $dir_name !== '.')
+        ? trailingslashit($base_dir . $dir_name)
+        : $base_dir;
+
+    $files_to_delete = array();
+
+    // Original uploaded file path.
+    $original_full_path = $base_dir . $relative_path;
+    $files_to_delete[]  = $original_full_path;
+
+    // Any generated size files.
+    if (!empty($metadata['sizes']) && is_array($metadata['sizes'])) {
+        foreach ($metadata['sizes'] as $size_data) {
+            if (!empty($size_data['file'])) {
+                $files_to_delete[] = $root_dir . $size_data['file'];
+            }
+        }
+    }
+
+    foreach ($files_to_delete as $legacy_file) {
+        if ($legacy_file && $legacy_file !== $current_file_path && file_exists($legacy_file)) {
+            unlink($legacy_file);
+        }
+    }
+}
+
+/**
  * Convert uploaded images to WebP format - handles any input format optimally
  * 
  * @param int $attachment_id The attachment ID
@@ -218,6 +263,8 @@ function is_car_listing_operation() {
  */
 function convert_to_webp_with_fallback($attachment_id) {
     try {
+        // Capture existing metadata so we can remove legacy derivatives after conversion.
+        $original_metadata = wp_get_attachment_metadata($attachment_id);
         $file_path = get_attached_file($attachment_id);
         
         if (!$file_path || !file_exists($file_path)) {
@@ -304,14 +351,12 @@ function convert_to_webp_with_fallback($attachment_id) {
         } else {
             error_log("Failed to regenerate metadata for WebP attachment {$attachment_id}");
         }
+
+        // Remove legacy JPG/PNG derivatives now that WebP variants are in place.
+        delete_legacy_attachment_files($original_metadata, $webp_path);
         
         // Remove the processing flag
         delete_post_meta($attachment_id, '_webp_conversion_in_progress');
-
-        // Delete original file to save space (only if WebP was successfully created and metadata updated)
-        if (file_exists($webp_path) && file_exists($file_path) && $file_path !== $webp_path) {
-            unlink($file_path);
-        }
 
         error_log("Successfully converted attachment {$attachment_id} from {$original_mime} to WebP");
         return true;
