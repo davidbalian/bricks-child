@@ -460,7 +460,7 @@ function should_convert_to_webp($attachment_id) {
 }
 // Only add WebP conversion hook if NOT during async uploads to prevent response interference
 if (!defined('DOING_AJAX') || !DOING_AJAX || !isset($_POST['action']) || $_POST['action'] !== 'async_upload_image') {
-    add_action('wp_generate_attachment_metadata', 'convert_car_images_to_webp', 20);
+    add_filter('wp_generate_attachment_metadata', 'convert_car_images_to_webp', 20, 2);
 }
 
 /**
