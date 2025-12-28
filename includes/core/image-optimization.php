@@ -258,13 +258,14 @@ function delete_legacy_attachment_files($metadata, $current_file_path) {
 /**
  * Convert uploaded images to WebP format - handles any input format optimally
  * 
- * @param int $attachment_id The attachment ID
+ * @param int   $attachment_id            The attachment ID
+ * @param array $pre_conversion_metadata  Metadata (including generated sizes) before WebP conversion
  * @return bool Success/failure
  */
-function convert_to_webp_with_fallback($attachment_id) {
+function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata = null) {
     try {
-        // Capture existing metadata so we can remove legacy derivatives after conversion.
-        $original_metadata = wp_get_attachment_metadata($attachment_id);
+        // Use provided metadata (with derivative filenames) if available; fallback to stored metadata.
+        $legacy_metadata = $pre_conversion_metadata ?: wp_get_attachment_metadata($attachment_id);
         $file_path = get_attached_file($attachment_id);
         
         if (!$file_path || !file_exists($file_path)) {
@@ -353,13 +354,14 @@ function convert_to_webp_with_fallback($attachment_id) {
         }
 
         // Remove legacy JPG/PNG derivatives now that WebP variants are in place.
-        delete_legacy_attachment_files($original_metadata, $webp_path);
+        delete_legacy_attachment_files($legacy_metadata, $webp_path);
         
         // Remove the processing flag
         delete_post_meta($attachment_id, '_webp_conversion_in_progress');
 
         error_log("Successfully converted attachment {$attachment_id} from {$original_mime} to WebP");
-        return true;
+        // Return the fresh metadata so filters can persist WebP info upstream.
+        return $new_metadata ?: true;
         
     } catch (Exception $e) {
         error_log("WebP conversion failed for attachment {$attachment_id}: " . $e->getMessage());
@@ -393,7 +395,11 @@ function convert_car_images_to_webp($metadata, $attachment_id) {
     try {
         // Check if this could be a car listing image (safe check)
         if (should_convert_to_webp($attachment_id)) {
-            convert_to_webp_with_fallback($attachment_id);
+            $webp_metadata = convert_to_webp_with_fallback($attachment_id, $metadata);
+            if (is_array($webp_metadata)) {
+                // Persist WebP metadata so caller does not overwrite with pre-conversion data.
+                return $webp_metadata;
+            }
         }
     } catch (Exception $e) {
         // Log error but don't break the upload process
