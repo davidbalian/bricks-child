@@ -373,6 +373,11 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
 
         // Remove legacy JPG/PNG derivatives now that WebP variants are in place.
         delete_legacy_attachment_files($legacy_metadata, $webp_path);
+        // Fallback cleanup: ensure original source file is removed even if metadata was missing.
+        if ($file_path && $file_path !== $webp_path && file_exists($file_path)) {
+            unlink($file_path);
+            car_image_opt_log('Deleted original source after WebP conversion: ' . $file_path);
+        }
         
         // Remove the processing flag
         delete_post_meta($attachment_id, '_webp_conversion_in_progress');
