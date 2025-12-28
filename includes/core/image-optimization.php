@@ -282,16 +282,30 @@ function delete_non_webp_siblings($webp_path) {
 
     $pathinfo = pathinfo($webp_path);
     $dir      = isset($pathinfo['dirname']) ? $pathinfo['dirname'] : '';
-    $base     = isset($pathinfo['filename']) ? $pathinfo['filename'] : '';
+    $base       = isset($pathinfo['filename']) ? $pathinfo['filename'] : '';
     if (!$dir || !$base) {
         car_image_opt_log('delete_non_webp_siblings: dirname or filename missing; skipping');
         return;
     }
 
-    $pattern    = trailingslashit($dir) . $base . '.*';
-    $candidates = glob($pattern);
+    // Also look for variants without a trailing "-scaled" suffix.
+    $base_unsuffixed = str_ends_with($base, '-scaled') ? substr($base, 0, -7) : $base;
+
+    $patterns = array(
+        trailingslashit($dir) . $base . '.*',
+        trailingslashit($dir) . $base_unsuffixed . '.*',
+    );
+
+    $candidates = array();
+    foreach ($patterns as $pattern) {
+        $found = glob($pattern);
+        if ($found) {
+            $candidates = array_merge($candidates, $found);
+        } else {
+            car_image_opt_log('delete_non_webp_siblings: no siblings found for pattern ' . $pattern);
+        }
+    }
     if (!$candidates) {
-        car_image_opt_log('delete_non_webp_siblings: no siblings found for pattern ' . $pattern);
         return;
     }
 
