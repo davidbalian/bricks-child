@@ -30,6 +30,7 @@ require_once get_stylesheet_directory() . '/includes/auth/registration.php';
 require_once get_stylesheet_directory() . '/includes/auth/roles.php';
 require_once get_stylesheet_directory() . '/includes/auth/forgot-password-ajax.php';
 require_once get_stylesheet_directory() . '/includes/user-account/user-profile.php';
+require_once get_stylesheet_directory() . '/includes/shortcodes/user-logo-shortcode/';
 require_once get_stylesheet_directory() . '/includes/auth/access-control.php';
 require_once get_stylesheet_directory() . '/includes/auth/login-logout.php';
 require_once get_stylesheet_directory() . '/includes/core/ajax.php';
