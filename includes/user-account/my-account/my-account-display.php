@@ -110,7 +110,7 @@ function display_my_account_main($current_user) {
                     ?></span>
                 </div>
             </div>
-        </div>
+        
 
         <?php
         $preferences = new ListingNotificationPreferences();
@@ -180,6 +180,7 @@ function display_my_account_main($current_user) {
                 <?php endif; ?>
             </div>
             <div id="notification-preferences-feedback" class="notification-feedback" aria-live="polite"></div>
+        </div>
         </div>
 
         <div class="account-actions">
