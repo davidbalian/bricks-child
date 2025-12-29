@@ -118,6 +118,41 @@ function display_my_account_main($current_user) {
         $reminder_enabled = $preferences->isReminderNotificationsEnabled($current_user->ID);
         $notification_disabled = ($email_verified !== '1');
         ?>
+
+        <div class="account-section account-logo-section">
+            <h3>Account Logo</h3>
+            <div class="account-logo-wrapper">
+                <?php
+                $logo_manager = new UserLogoManager();
+                $logo_url = $logo_manager->getUserLogoUrl($current_user->ID, 'thumbnail');
+                ?>
+                <div class="account-logo-preview">
+                    <?php if (!empty($logo_url)) : ?>
+                        <img src="<?php echo esc_url($logo_url); ?>" alt="Account logo" id="account-logo-image">
+                    <?php else : ?>
+                        <div class="account-logo-placeholder" id="account-logo-placeholder">
+                            <span>No logo uploaded</span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <div class="account-logo-actions">
+                    <input type="file" id="account-logo-input" accept="image/*" style="display:none;">
+                    <button type="button" class="btn btn-primary" id="upload-account-logo-btn">
+                        <?php echo !empty($logo_url) ? 'Change Logo' : 'Upload Logo'; ?>
+                    </button>
+                    <?php if (!empty($logo_url)) : ?>
+                        <button type="button" class="btn btn-secondary" id="remove-account-logo-btn">
+                            Remove Logo
+                        </button>
+                    <?php endif; ?>
+                    <p class="account-logo-help-text">
+                        Recommended: square image, max 2 MB.
+                    </p>
+                    <div id="account-logo-feedback" class="account-logo-feedback" aria-live="polite"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="account-section notification-preferences-section">
             <h3>Email Notifications</h3>
             <p class="notification-description">Only verified emails receive optional career reminders. You can toggle activity emails and 7-day reminders below.</p>

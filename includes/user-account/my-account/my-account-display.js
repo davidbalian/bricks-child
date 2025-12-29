@@ -222,6 +222,196 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             updateNotificationPreferences(activityToggle.checked, reminderToggle.checked);
         });
     }
+
+    // Account logo upload/remove handling
+    var uploadLogoBtn = document.getElementById('upload-account-logo-btn');
+    var removeLogoBtn = document.getElementById('remove-account-logo-btn');
+    var logoInput = document.getElementById('account-logo-input');
+    var logoImage = document.getElementById('account-logo-image');
+    var logoPlaceholder = document.getElementById('account-logo-placeholder');
+    var logoFeedback = document.getElementById('account-logo-feedback');
+    var logoRequestInFlight = false;
+
+    function setLogoFeedback(message, type) {
+        if (!logoFeedback) {
+            return;
+        }
+        logoFeedback.textContent = message || '';
+        logoFeedback.classList.remove('success', 'error');
+        if (type === 'success') {
+            logoFeedback.classList.add('success');
+        } else if (type === 'error') {
+            logoFeedback.classList.add('error');
+        }
+    }
+
+    function setLogoLoadingState(isLoading) {
+        logoRequestInFlight = isLoading;
+        if (uploadLogoBtn) {
+            uploadLogoBtn.disabled = isLoading;
+            uploadLogoBtn.textContent = isLoading ? 'Uploading...' : (logoImage && logoImage.src ? 'Change Logo' : 'Upload Logo');
+        }
+        if (removeLogoBtn) {
+            removeLogoBtn.disabled = isLoading;
+        }
+    }
+
+    if (uploadLogoBtn && logoInput) {
+        uploadLogoBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (logoRequestInFlight) {
+                return;
+            }
+            logoInput.click();
+        });
+
+        logoInput.addEventListener('change', function () {
+            if (!logoInput.files || !logoInput.files[0]) {
+                return;
+            }
+
+            var file = logoInput.files[0];
+
+            // Basic front-end validation (2MB, image type)
+            var maxSizeBytes = 2 * 1024 * 1024;
+            if (file.size > maxSizeBytes) {
+                setLogoFeedback('Image is too large. Max size is 2 MB.', 'error');
+                logoInput.value = '';
+                return;
+            }
+
+            if (!file.type || !file.type.startsWith('image/')) {
+                setLogoFeedback('Please choose a valid image file.', 'error');
+                logoInput.value = '';
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append('action', 'upload_account_logo');
+            formData.append('account_logo', file);
+            formData.append('nonce', MyAccountAjax.upload_account_logo_nonce);
+
+            setLogoLoadingState(true);
+            setLogoFeedback('Uploading logo...', null);
+
+            fetch(MyAccountAjax.ajax_url, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            })
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    if (data && data.success && data.data && data.data.logoUrl) {
+                        var url = data.data.logoUrl;
+                        if (!logoImage) {
+                            logoImage = document.createElement('img');
+                            logoImage.id = 'account-logo-image';
+                            logoImage.alt = 'Account logo';
+                            var preview = document.querySelector('.account-logo-preview');
+                            if (preview) {
+                                preview.innerHTML = '';
+                                preview.appendChild(logoImage);
+                            }
+                        }
+                        logoImage.src = url;
+                        if (logoPlaceholder && logoPlaceholder.parentNode) {
+                            logoPlaceholder.parentNode.removeChild(logoPlaceholder);
+                            logoPlaceholder = null;
+                        }
+                        if (!removeLogoBtn) {
+                            var actions = document.querySelector('.account-logo-actions');
+                            if (actions) {
+                                removeLogoBtn = document.createElement('button');
+                                removeLogoBtn.type = 'button';
+                                removeLogoBtn.className = 'btn btn-secondary';
+                                removeLogoBtn.id = 'remove-account-logo-btn';
+                                removeLogoBtn.textContent = 'Remove Logo';
+                                actions.insertBefore(removeLogoBtn, actions.querySelector('.account-logo-help-text'));
+                                removeLogoBtn.addEventListener('click', handleRemoveLogo);
+                            }
+                        }
+                        if (uploadLogoBtn) {
+                            uploadLogoBtn.textContent = 'Change Logo';
+                        }
+                        setLogoFeedback(data.data.message || 'Logo updated successfully.', 'success');
+                    } else {
+                        var errorMsg = data && data.data ? data.data : 'Failed to upload logo.';
+                        setLogoFeedback(errorMsg, 'error');
+                    }
+                })
+                .catch(function () {
+                    setLogoFeedback('Connection error while uploading logo.', 'error');
+                })
+                .finally(function () {
+                    setLogoLoadingState(false);
+                    logoInput.value = '';
+                });
+        });
+    }
+
+    function handleRemoveLogo(e) {
+        if (e) {
+            e.preventDefault();
+        }
+        if (logoRequestInFlight) {
+            return;
+        }
+
+        if (!confirm('Remove your account logo? This cannot be undone.')) {
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append('action', 'remove_account_logo');
+        formData.append('nonce', MyAccountAjax.remove_account_logo_nonce);
+
+        setLogoLoadingState(true);
+        setLogoFeedback('Removing logo...', null);
+
+        fetch(MyAccountAjax.ajax_url, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        })
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                if (data && data.success) {
+                    if (logoImage && logoImage.parentNode) {
+                        var previewContainer = logoImage.parentNode;
+                        previewContainer.removeChild(logoImage);
+                        logoImage = null;
+                        if (!logoPlaceholder) {
+                            logoPlaceholder = document.createElement('div');
+                            logoPlaceholder.id = 'account-logo-placeholder';
+                            logoPlaceholder.className = 'account-logo-placeholder';
+                            logoPlaceholder.innerHTML = '<span>No logo uploaded</span>';
+                            previewContainer.appendChild(logoPlaceholder);
+                        }
+                    }
+                    if (removeLogoBtn && removeLogoBtn.parentNode) {
+                        removeLogoBtn.parentNode.removeChild(removeLogoBtn);
+                        removeLogoBtn = null;
+                    }
+                    if (uploadLogoBtn) {
+                        uploadLogoBtn.textContent = 'Upload Logo';
+                    }
+                    setLogoFeedback('Logo removed successfully.', 'success');
+                } else {
+                    var errorMsg = data && data.data ? data.data : 'Failed to remove logo.';
+                    setLogoFeedback(errorMsg, 'error');
+                }
+            })
+            .catch(function () {
+                setLogoFeedback('Connection error while removing logo.', 'error');
+            })
+            .finally(function () {
+                setLogoLoadingState(false);
+            });
+    }
+
+    if (removeLogoBtn) {
+        removeLogoBtn.addEventListener('click', handleRemoveLogo);
+    }
 });
 
 /**
