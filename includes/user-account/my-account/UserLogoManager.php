@@ -186,6 +186,11 @@ final class UserLogoManager
             wp_delete_attachment($existing_id, true);
         }
 
+        // Clear ACF user profile picture field.
+        if (function_exists('update_field')) {
+            update_field('user_profile_picture', '', 'user_' . $user_id);
+        }
+
         return delete_user_meta($user_id, self::USER_META_KEY);
     }
 
@@ -197,6 +202,11 @@ final class UserLogoManager
         $old_id = $this->getUserLogoAttachmentId($user_id);
 
         update_user_meta($user_id, self::USER_META_KEY, $new_attachment_id);
+
+        // Sync to ACF user profile picture field.
+        if (function_exists('update_field')) {
+            update_field('user_profile_picture', $new_attachment_id, 'user_' . $user_id);
+        }
 
         if ($old_id > 0 && $old_id !== $new_attachment_id) {
             wp_delete_attachment($old_id, true);
