@@ -232,12 +232,19 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     var logoFeedback = document.getElementById('account-logo-feedback');
     var logoRequestInFlight = false;
 
+    // Hide feedback element initially if empty
+    if (logoFeedback && !logoFeedback.textContent.trim()) {
+        logoFeedback.style.display = 'none';
+    }
+
     function setLogoFeedback(message, type) {
         if (!logoFeedback) {
             return;
         }
         logoFeedback.textContent = message || '';
         logoFeedback.classList.remove('success', 'error');
+        // Hide if empty, show if has message
+        logoFeedback.style.display = message ? '' : 'none';
         if (type === 'success') {
             logoFeedback.classList.add('success');
         } else if (type === 'error') {
