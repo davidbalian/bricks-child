@@ -407,6 +407,16 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
             return false;
         }
 
+        // Verify WebP file was created and is not empty/corrupted
+        if (!file_exists($webp_path) || filesize($webp_path) < 100) {
+            car_image_opt_log("WebP conversion produced empty/invalid file for attachment {$attachment_id}, keeping original");
+            // Clean up the empty WebP file if it exists
+            if (file_exists($webp_path)) {
+                @unlink($webp_path);
+            }
+            return false;
+        }
+
         // Update attachment to point to WebP file
         update_attached_file($attachment_id, $webp_path);
         
