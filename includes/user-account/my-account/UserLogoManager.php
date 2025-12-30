@@ -144,6 +144,15 @@ final class UserLogoManager
         // Generate attachment metadata (sizes, etc.).
         $attachment_data = wp_generate_attachment_metadata($attachment_id, $file_path);
         if (!is_wp_error($attachment_data) && !empty($attachment_data)) {
+            // Convert logo to WebP using the shared image optimization pipeline if available.
+            if (function_exists('convert_to_webp_with_fallback')) {
+                $webp_metadata = convert_to_webp_with_fallback($attachment_id, $attachment_data);
+                if (is_array($webp_metadata)) {
+                    $attachment_data = $webp_metadata;
+                }
+            }
+
+            // Persist final metadata (WebP-aware when conversion ran successfully).
             wp_update_attachment_metadata($attachment_id, $attachment_data);
         }
 
