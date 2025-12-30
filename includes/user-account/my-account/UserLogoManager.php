@@ -141,6 +141,9 @@ final class UserLogoManager
             ];
         }
 
+        // Increase memory limit for image processing (GD is memory-hungry).
+        @ini_set('memory_limit', '512M');
+
         // Generate attachment metadata (sizes, etc.).
         $attachment_data = wp_generate_attachment_metadata($attachment_id, $file_path);
         if (!is_wp_error($attachment_data) && !empty($attachment_data)) {
