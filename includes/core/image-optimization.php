@@ -328,6 +328,52 @@ function delete_non_webp_siblings($webp_path) {
 }
 
 /**
+ * Convert a palette/indexed PNG to truecolor PNG so GD can encode it as WebP.
+ * 
+ * @param string $file_path Path to the PNG file.
+ * @return bool True if converted (or already truecolor), false on failure.
+ */
+function convert_palette_png_to_truecolor($file_path) {
+    if (!function_exists('imagecreatefrompng') || !function_exists('imagepalettetotruecolor')) {
+        return false;
+    }
+
+    $image = @imagecreatefrompng($file_path);
+    if (!$image) {
+        car_image_opt_log('Failed to load PNG for palette check: ' . $file_path);
+        return false;
+    }
+
+    // Check if image is palette-based (not truecolor)
+    if (!imageistruecolor($image)) {
+        car_image_opt_log('Converting palette PNG to truecolor: ' . $file_path);
+        
+        // Preserve transparency
+        imagealphablending($image, false);
+        imagesavealpha($image, true);
+        
+        // Convert palette to truecolor
+        if (!imagepalettetotruecolor($image)) {
+            car_image_opt_log('Failed to convert palette to truecolor');
+            imagedestroy($image);
+            return false;
+        }
+
+        // Save back to the same file
+        if (!imagepng($image, $file_path, 9)) {
+            car_image_opt_log('Failed to save truecolor PNG');
+            imagedestroy($image);
+            return false;
+        }
+
+        car_image_opt_log('Successfully converted palette PNG to truecolor');
+    }
+
+    imagedestroy($image);
+    return true;
+}
+
+/**
  * Convert uploaded images to WebP format - handles any input format optimally
  * 
  * @param int   $attachment_id            The attachment ID
@@ -368,6 +414,11 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
 
         $webp_path = $pathinfo['dirname'] . '/' . $pathinfo['filename'] . '.webp';
         car_image_opt_log("Paths | webp_path: {$webp_path}");
+
+        // For PNG files, convert palette images to truecolor first (GD can't encode palette PNGs to WebP)
+        if ($original_mime === 'image/png') {
+            convert_palette_png_to_truecolor($file_path);
+        }
 
         // Load the image editor
         $image_editor = wp_get_image_editor($file_path);
