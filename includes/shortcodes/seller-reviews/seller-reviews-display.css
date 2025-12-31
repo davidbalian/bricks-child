@@ -5,13 +5,13 @@
   padding: 20px;
   background: #fff;
   border: 1px solid var(--bricks-color-chsdhg);
-  border-radius: .75rem;
+  border-radius: 0.75rem;
 }
 
 /* Rating Summary Section */
 .seller-rating-summary {
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 .rating-stars {
@@ -130,8 +130,8 @@
 
 /* Review Form Section */
 .seller-review-form-container {
-  margin-top: 20px;
-  padding-top: 20px;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
 }
 
 .review-form-toggle {
