@@ -91,9 +91,11 @@ Filters can be combined for more specific results:
 
 ### Sorting
 
+**Important:** Featured listings (`is_featured` = true) always appear first, regardless of sort order. The `orderby` attribute controls the secondary sort within featured and non-featured groups.
+
 | Attribute | Values | Default | Description |
 |-----------|--------|---------|-------------|
-| `orderby` | `date`, `price`, `mileage`, `year` | `date` | Field to sort by |
+| `orderby` | `date`, `price`, `mileage`, `year` | `date` | Secondary sort field (after featured) |
 | `order` | `DESC`, `ASC` | `DESC` | Sort direction |
 
 ```
@@ -101,6 +103,12 @@ Filters can be combined for more specific results:
 [car_listings orderby="year" order="DESC"]
 [car_listings orderby="mileage" order="ASC"]
 ```
+
+**Example Result Order:**
+1. Featured car A (newest)
+2. Featured car B (older)
+3. Regular car C (newest)
+4. Regular car D (older)
 
 ---
 

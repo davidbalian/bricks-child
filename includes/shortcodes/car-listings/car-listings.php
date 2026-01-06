@@ -148,33 +148,65 @@ function car_listings_build_query_args($atts) {
         );
     }
 
-    // Add meta_query if we have conditions
-    if (count($meta_query) > 1) {
-        $args['meta_query'] = $meta_query;
-    }
+    // === FEATURED SORTING (always show featured first) ===
+    // Add is_featured to meta_query with named clause for sorting
+    $meta_query['is_featured_clause'] = array(
+        'key'     => 'is_featured',
+        'compare' => 'EXISTS',
+    );
+
+    // Add meta_query
+    $args['meta_query'] = $meta_query;
 
     // === SORTING ===
+    // Featured listings always come first, then sort by specified orderby
     $valid_orderby = array('date', 'price', 'mileage', 'year');
     $orderby = in_array($atts['orderby'], $valid_orderby) ? $atts['orderby'] : 'date';
+    $order = strtoupper($atts['order']) === 'ASC' ? 'ASC' : 'DESC';
 
     switch ($orderby) {
         case 'price':
-            $args['meta_key'] = 'price';
-            $args['orderby'] = 'meta_value_num';
+            $meta_query['price_clause'] = array(
+                'key'     => 'price',
+                'compare' => 'EXISTS',
+                'type'    => 'NUMERIC',
+            );
+            $args['meta_query'] = $meta_query;
+            $args['orderby'] = array(
+                'is_featured_clause' => 'DESC',  // Featured first
+                'price_clause'       => $order,
+            );
             break;
         case 'mileage':
-            $args['meta_key'] = 'mileage';
-            $args['orderby'] = 'meta_value_num';
+            $meta_query['mileage_clause'] = array(
+                'key'     => 'mileage',
+                'compare' => 'EXISTS',
+                'type'    => 'NUMERIC',
+            );
+            $args['meta_query'] = $meta_query;
+            $args['orderby'] = array(
+                'is_featured_clause' => 'DESC',  // Featured first
+                'mileage_clause'     => $order,
+            );
             break;
         case 'year':
-            $args['meta_key'] = 'year';
-            $args['orderby'] = 'meta_value_num';
+            $meta_query['year_clause'] = array(
+                'key'     => 'year',
+                'compare' => 'EXISTS',
+                'type'    => 'NUMERIC',
+            );
+            $args['meta_query'] = $meta_query;
+            $args['orderby'] = array(
+                'is_featured_clause' => 'DESC',  // Featured first
+                'year_clause'        => $order,
+            );
             break;
         default:
-            $args['orderby'] = 'date';
+            $args['orderby'] = array(
+                'is_featured_clause' => 'DESC',  // Featured first
+                'date'               => $order,
+            );
     }
-
-    $args['order'] = strtoupper($atts['order']) === 'ASC' ? 'ASC' : 'DESC';
 
     return $args;
 }
