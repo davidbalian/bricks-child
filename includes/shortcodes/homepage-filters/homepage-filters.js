@@ -659,15 +659,21 @@
                     class: "homepage-filters-dropdown-option",
                     "data-value": model.term_id,
                     "data-slug": model.slug,
-                    text: model.name,
                   });
+                  $option.text(model.name + " ");
+                  $option.append(
+                    $("<span>", {
+                      class: "homepage-filters-count",
+                      text: "(" + model.count + ")",
+                    })
+                  );
                   $mOptions.append($option);
 
                   // Add to hidden select
                   const $hiddenOption = $("<option>", {
                     value: model.term_id,
                     "data-slug": model.slug,
-                    text: model.name,
+                    text: model.name + " (" + model.count + ")",
                   });
                   $mHiddenSelect.append($hiddenOption);
                 });

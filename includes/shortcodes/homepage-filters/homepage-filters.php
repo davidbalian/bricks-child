@@ -14,20 +14,47 @@ if (!defined('ABSPATH')) {
 add_shortcode('homepage_filters', 'homepage_filters_shortcode');
 
 /**
+ * Get car makes (parent terms) that have at least one car, with aggregated counts
+ * This handles the hierarchical taxonomy where cars are assigned to models (children),
+ * not directly to makes (parents)
+ *
+ * @return array Array of make objects with 'car_count' property added
+ */
+function homepage_filters_get_makes_with_counts() {
+    global $wpdb;
+
+    // Query to get parent terms (makes) with sum of their children's (models) post counts
+    // Only returns makes that have at least one car across all their models
+    $query = "
+        SELECT
+            t.term_id,
+            t.name,
+            t.slug,
+            COALESCE(SUM(tt_child.count), 0) as car_count
+        FROM {$wpdb->terms} t
+        INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+        LEFT JOIN {$wpdb->term_taxonomy} tt_child ON tt_child.parent = t.term_id AND tt_child.taxonomy = 'car_make'
+        WHERE tt.taxonomy = 'car_make'
+        AND tt.parent = 0
+        GROUP BY t.term_id, t.name, t.slug
+        HAVING car_count > 0
+        ORDER BY t.name ASC
+    ";
+
+    $results = $wpdb->get_results($query);
+
+    return $results ? $results : array();
+}
+
+/**
  * Main shortcode function
  */
 function homepage_filters_shortcode($atts) {
     // Enqueue assets
     homepage_filters_enqueue_assets();
-    
-    // Get car makes (parent terms)
-    $makes = get_terms(array(
-        'taxonomy' => 'car_make',
-        'parent' => 0,
-        'hide_empty' => false,
-        'orderby' => 'name',
-        'order' => 'ASC'
-    ));
+
+    // Get car makes (parent terms) with counts - only non-empty
+    $makes = homepage_filters_get_makes_with_counts();
     
     // Get initial min/max values for price and mileage
     $ranges = homepage_filters_get_ranges();
@@ -53,10 +80,11 @@ function homepage_filters_shortcode($atts) {
                             <button type="button" class="homepage-filters-dropdown-option" role="option" data-value="" data-slug="">
                                 All Brands
                             </button>
-                            <?php if (!is_wp_error($makes) && !empty($makes)) : ?>
+                            <?php if (!empty($makes)) : ?>
                                 <?php foreach ($makes as $make) : ?>
                                     <button type="button" class="homepage-filters-dropdown-option" role="option" data-value="<?php echo esc_attr($make->term_id); ?>" data-slug="<?php echo esc_attr($make->slug); ?>">
                                         <?php echo esc_html($make->name); ?>
+                                        <span class="homepage-filters-count">(<?php echo esc_html($make->car_count); ?>)</span>
                                     </button>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -64,10 +92,10 @@ function homepage_filters_shortcode($atts) {
                     </div>
                     <select id="homepage-filter-make" class="homepage-filters-select-hidden" data-filter="make" aria-hidden="true" tabindex="-1">
                         <option value="">All Brands</option>
-                        <?php if (!is_wp_error($makes) && !empty($makes)) : ?>
+                        <?php if (!empty($makes)) : ?>
                             <?php foreach ($makes as $make) : ?>
                                 <option value="<?php echo esc_attr($make->term_id); ?>" data-slug="<?php echo esc_attr($make->slug); ?>">
-                                    <?php echo esc_html($make->name); ?>
+                                    <?php echo esc_html($make->name); ?> (<?php echo esc_html($make->car_count); ?>)
                                 </option>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -281,22 +309,23 @@ function homepage_filters_ajax_get_models() {
     $models = get_terms(array(
         'taxonomy' => 'car_make',
         'parent' => $make_term_id,
-        'hide_empty' => false,
+        'hide_empty' => true,
         'orderby' => 'name',
         'order' => 'ASC'
     ));
-    
+
     if (is_wp_error($models)) {
         wp_send_json_error(array('message' => $models->get_error_message()));
         return;
     }
-    
+
     $model_data = array();
     foreach ($models as $model) {
         $model_data[] = array(
             'term_id' => $model->term_id,
             'name' => $model->name,
-            'slug' => $model->slug
+            'slug' => $model->slug,
+            'count' => $model->count
         );
     }
     

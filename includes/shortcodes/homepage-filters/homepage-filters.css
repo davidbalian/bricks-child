@@ -201,6 +201,13 @@
   display: none;
 }
 
+/* Count badge */
+.homepage-filters-count {
+  color: #6b7280;
+  font-weight: 400;
+  font-size: 0.875em;
+}
+
 /* Hidden native select for form submission */
 .homepage-filters-select-hidden {
   position: absolute !important;
