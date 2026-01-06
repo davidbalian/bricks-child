@@ -46,8 +46,8 @@ function car_listings_shortcode($atts) {
     // Build WP_Query arguments
     $query_args = car_listings_build_query_args($atts);
 
-    // Execute query
-    $car_query = new WP_Query($query_args);
+    // Execute query with featured-first sorting
+    $car_query = car_listings_execute_query($query_args);
 
     // Start output buffering
     ob_start();
@@ -382,8 +382,8 @@ function car_listings_ajax_load_more() {
     // Remove offset for paged queries (offset breaks paged)
     unset($query_args['offset']);
 
-    // Execute query
-    $car_query = new WP_Query($query_args);
+    // Execute query with featured-first sorting
+    $car_query = car_listings_execute_query($query_args);
 
     // Render cards
     ob_start();
@@ -410,11 +410,6 @@ add_action('wp_ajax_nopriv_car_listings_load_more', 'car_listings_ajax_load_more
  * This adds a LEFT JOIN for is_featured and sorts by it first
  */
 function car_listings_featured_first_orderby($clauses, $query) {
-    // Only apply to our car_listings queries
-    if (!isset($query->query_vars['_car_listings_orderby'])) {
-        return $clauses;
-    }
-
     global $wpdb;
 
     // Add LEFT JOIN for is_featured meta
@@ -425,4 +420,14 @@ function car_listings_featured_first_orderby($clauses, $query) {
 
     return $clauses;
 }
-add_filter('posts_clauses', 'car_listings_featured_first_orderby', 10, 2);
+
+/**
+ * Execute a car listings query with featured-first sorting
+ * Adds the filter only for this specific query, then removes it
+ */
+function car_listings_execute_query($query_args) {
+    add_filter('posts_clauses', 'car_listings_featured_first_orderby', 10, 2);
+    $query = new WP_Query($query_args);
+    remove_filter('posts_clauses', 'car_listings_featured_first_orderby', 10, 2);
+    return $query;
+}
