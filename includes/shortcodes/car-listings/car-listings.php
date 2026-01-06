@@ -148,65 +148,38 @@ function car_listings_build_query_args($atts) {
         );
     }
 
-    // === FEATURED SORTING (always show featured first) ===
-    // Add is_featured to meta_query with named clause for sorting
-    $meta_query['is_featured_clause'] = array(
-        'key'     => 'is_featured',
-        'compare' => 'EXISTS',
-    );
-
-    // Add meta_query
-    $args['meta_query'] = $meta_query;
+    // Add meta_query if we have conditions
+    if (count($meta_query) > 1) {
+        $args['meta_query'] = $meta_query;
+    }
 
     // === SORTING ===
-    // Featured listings always come first, then sort by specified orderby
     $valid_orderby = array('date', 'price', 'mileage', 'year');
     $orderby = in_array($atts['orderby'], $valid_orderby) ? $atts['orderby'] : 'date';
     $order = strtoupper($atts['order']) === 'ASC' ? 'ASC' : 'DESC';
 
+    // Store sort params for the filter
+    $args['_car_listings_orderby'] = $orderby;
+    $args['_car_listings_order'] = $order;
+
+    // We'll use a filter to add featured-first sorting via SQL
     switch ($orderby) {
         case 'price':
-            $meta_query['price_clause'] = array(
-                'key'     => 'price',
-                'compare' => 'EXISTS',
-                'type'    => 'NUMERIC',
-            );
-            $args['meta_query'] = $meta_query;
-            $args['orderby'] = array(
-                'is_featured_clause' => 'DESC',  // Featured first
-                'price_clause'       => $order,
-            );
+            $args['meta_key'] = 'price';
+            $args['orderby'] = 'meta_value_num';
             break;
         case 'mileage':
-            $meta_query['mileage_clause'] = array(
-                'key'     => 'mileage',
-                'compare' => 'EXISTS',
-                'type'    => 'NUMERIC',
-            );
-            $args['meta_query'] = $meta_query;
-            $args['orderby'] = array(
-                'is_featured_clause' => 'DESC',  // Featured first
-                'mileage_clause'     => $order,
-            );
+            $args['meta_key'] = 'mileage';
+            $args['orderby'] = 'meta_value_num';
             break;
         case 'year':
-            $meta_query['year_clause'] = array(
-                'key'     => 'year',
-                'compare' => 'EXISTS',
-                'type'    => 'NUMERIC',
-            );
-            $args['meta_query'] = $meta_query;
-            $args['orderby'] = array(
-                'is_featured_clause' => 'DESC',  // Featured first
-                'year_clause'        => $order,
-            );
+            $args['meta_key'] = 'year';
+            $args['orderby'] = 'meta_value_num';
             break;
         default:
-            $args['orderby'] = array(
-                'is_featured_clause' => 'DESC',  // Featured first
-                'date'               => $order,
-            );
+            $args['orderby'] = 'date';
     }
+    $args['order'] = $order;
 
     return $args;
 }
@@ -431,3 +404,25 @@ function car_listings_ajax_load_more() {
 }
 add_action('wp_ajax_car_listings_load_more', 'car_listings_ajax_load_more');
 add_action('wp_ajax_nopriv_car_listings_load_more', 'car_listings_ajax_load_more');
+
+/**
+ * Filter to add featured-first sorting via SQL
+ * This adds a LEFT JOIN for is_featured and sorts by it first
+ */
+function car_listings_featured_first_orderby($clauses, $query) {
+    // Only apply to our car_listings queries
+    if (!isset($query->query_vars['_car_listings_orderby'])) {
+        return $clauses;
+    }
+
+    global $wpdb;
+
+    // Add LEFT JOIN for is_featured meta
+    $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS featured_meta ON ({$wpdb->posts}.ID = featured_meta.post_id AND featured_meta.meta_key = 'is_featured')";
+
+    // Prepend featured sorting to orderby (featured=1 first, then NULL/0)
+    $clauses['orderby'] = "CASE WHEN featured_meta.meta_value = '1' THEN 0 ELSE 1 END ASC, " . $clauses['orderby'];
+
+    return $clauses;
+}
+add_filter('posts_clauses', 'car_listings_featured_first_orderby', 10, 2);
