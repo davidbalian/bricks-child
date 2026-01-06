@@ -348,6 +348,7 @@ require_once get_stylesheet_directory() . '/includes/shortcodes/car-single-call-
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-single-call-button/car-single-whatsapp-button.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/homepage-filters/homepage-filters.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-listings/car-listings.php';
+require_once get_stylesheet_directory() . '/includes/shortcodes/car-filters/car-filters.php';
 
 
 // =========================================================================

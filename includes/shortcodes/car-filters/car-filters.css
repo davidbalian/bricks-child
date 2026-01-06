@@ -1,0 +1,440 @@
+/**
+ * Car Filters Styles
+ * Modular filter system styling
+ */
+
+/* ============================================
+   Container & Layout
+   ============================================ */
+
+.car-filters-container {
+    margin: 0 auto;
+}
+
+.car-filters-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* Layout variations */
+.car-filters-horizontal .car-filters-wrapper {
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.car-filters-vertical .car-filters-wrapper {
+    flex-direction: column;
+}
+
+.car-filters-inline .car-filters-wrapper {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+}
+
+/* Items */
+.car-filters-item {
+    flex: 1;
+    min-width: 150px;
+}
+
+.car-filters-vertical .car-filters-item {
+    width: 100%;
+}
+
+.car-filters-inline .car-filters-item {
+    flex: 0 1 auto;
+}
+
+/* ============================================
+   Individual Filter Base
+   ============================================ */
+
+.car-filter {
+    position: relative;
+}
+
+.car-filter-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2a3546;
+}
+
+/* ============================================
+   Custom Dropdown
+   ============================================ */
+
+.car-filter-dropdown {
+    position: relative;
+}
+
+.car-filter-dropdown.open {
+    z-index: 1001;
+}
+
+.car-filter-dropdown-button {
+    width: 100%;
+    padding: 0.75rem 0.5rem;
+    padding-right: 2rem;
+    border: 2px solid #dfe2e6;
+    border-radius: 0.5rem;
+    background-color: #ffffff;
+    color: #2a3546;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.car-filter-dropdown-button:hover:not(:disabled) {
+    border-color: #c0c4c9;
+}
+
+.car-filter-dropdown-button:focus {
+    outline: none;
+    border-color: #0d86e3;
+    box-shadow: 0 0 0 3px rgba(13, 134, 227, 0.1);
+}
+
+.car-filter-dropdown.open .car-filter-dropdown-button {
+    border-color: #0d86e3;
+    box-shadow: 0 0 0 3px rgba(13, 134, 227, 0.1);
+}
+
+.car-filter-dropdown-button:disabled,
+.car-filter-dropdown-disabled .car-filter-dropdown-button {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.car-filter-dropdown-text {
+    flex: 1;
+    color: #2a3546;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.car-filter-dropdown-text.placeholder {
+    color: #6b7280;
+}
+
+.car-filter-dropdown-arrow {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #6b7280;
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.car-filter-dropdown.open .car-filter-dropdown-arrow {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+/* Dropdown Menu */
+.car-filter-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border: 2px solid #dfe2e6;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-height: 300px;
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+}
+
+.car-filter-dropdown.open .car-filter-dropdown-menu {
+    display: flex;
+}
+
+/* Search Input */
+.car-filter-dropdown-search {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-bottom: 1px solid #dfe2e6;
+    border-radius: 0;
+    background-color: #f5f5f5;
+    color: #2a3546;
+    font-size: 14px;
+    outline: none;
+}
+
+.car-filter-dropdown-search:focus {
+    background-color: #eef2f7;
+}
+
+.car-filter-dropdown-search::placeholder {
+    color: #6b7280;
+}
+
+.car-filter-dropdown-search:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Options Container */
+.car-filter-dropdown-options {
+    max-height: 240px;
+    overflow-y: auto;
+    padding: 0.25rem 0;
+}
+
+/* Individual Option */
+.car-filter-dropdown-option {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    text-align: left;
+    background-color: #ffffff;
+    color: #2a3546;
+    border: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    font-size: 14px;
+    transition: background-color 0.15s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.car-filter-dropdown-option:hover,
+.car-filter-dropdown-option.focused {
+    background-color: rgba(13, 134, 227, 0.1);
+}
+
+.car-filter-dropdown-option.selected {
+    background-color: rgba(13, 134, 227, 0.15);
+    font-weight: 600;
+}
+
+.car-filter-dropdown-option.hidden {
+    display: none;
+}
+
+/* Count Badge */
+.car-filter-count {
+    color: #6b7280;
+    font-weight: 400;
+    font-size: 0.875em;
+    margin-left: 0.5rem;
+}
+
+/* Section Header */
+.car-filter-section-header {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: #f9fafb;
+}
+
+/* Separator */
+.car-filter-separator {
+    height: 1px;
+    background-color: #dfe2e6;
+    margin: 0.25rem 0;
+}
+
+/* No Results / Loading / Error */
+.car-filter-no-results,
+.car-filter-loading,
+.car-filter-error {
+    padding: 0.75rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.car-filter-error {
+    color: #dc2626;
+}
+
+.car-filter-no-results.hidden,
+.car-filter-section-header.hidden,
+.car-filter-separator.hidden {
+    display: none;
+}
+
+/* Hidden Native Select */
+.car-filter-select-hidden {
+    position: absolute !important;
+    left: -9999px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+}
+
+/* ============================================
+   Range Inputs
+   ============================================ */
+
+.car-filter-range {
+    width: 100%;
+}
+
+.car-filter-range-inputs {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.car-filter-input-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.car-filter-input-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.car-filter-input {
+    width: 100%;
+    padding: 0.75rem 0.5rem;
+    border: 2px solid #dfe2e6;
+    border-radius: 0.5rem;
+    background-color: #ffffff;
+    color: #2a3546;
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.car-filter-input:hover {
+    border-color: #c0c4c9;
+}
+
+.car-filter-input:focus {
+    outline: none;
+    border-color: #0d86e3;
+    box-shadow: 0 0 0 3px rgba(13, 134, 227, 0.1);
+}
+
+.car-filter-input::placeholder {
+    color: #9ca3af;
+}
+
+/* ============================================
+   Search Button
+   ============================================ */
+
+.car-filters-button-wrapper {
+    margin-top: 1rem;
+}
+
+.car-filters-search-btn {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: #0d86e3;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.car-filters-search-btn:hover {
+    background-color: #0b75c9;
+}
+
+.car-filters-search-btn:active {
+    background-color: #0965b0;
+}
+
+.car-filters-search-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13, 134, 227, 0.3);
+}
+
+/* ============================================
+   Loading State for Listings
+   ============================================ */
+
+.car-listings-wrapper.car-listings-loading {
+    opacity: 0.5;
+    pointer-events: none;
+    position: relative;
+}
+
+.car-listings-wrapper.car-listings-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 3px solid #dfe2e6;
+    border-top-color: #0d86e3;
+    border-radius: 50%;
+    animation: car-filters-spin 0.8s linear infinite;
+}
+
+@keyframes car-filters-spin {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+
+@media (max-width: 768px) {
+    .car-filters-wrapper {
+        flex-direction: column;
+    }
+
+    .car-filters-item {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .car-filters-inline .car-filters-wrapper {
+        flex-wrap: wrap;
+    }
+
+    .car-filter-range-inputs {
+        flex-direction: row;
+    }
+}
+
+@media (max-width: 480px) {
+    .car-filter-dropdown-button,
+    .car-filter-input {
+        font-size: 16px; /* Prevent iOS zoom */
+    }
+}

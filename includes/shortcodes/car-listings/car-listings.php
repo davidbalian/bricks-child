@@ -32,7 +32,14 @@ function car_listings_shortcode($atts) {
         'order'           => 'DESC',
         'show_sold'       => 'false',
         'offset'          => 0,
+        'id'              => '',            // Explicit ID for filter targeting
+        'filter_group'    => '',            // Auto-connect to filter group
     ), $atts, 'car_listings');
+
+    // Generate instance ID if not provided
+    if (empty($atts['id'])) {
+        $atts['id'] = 'car-listings-' . wp_rand(1000, 9999);
+    }
 
     // Sanitize layout
     $valid_layouts = array('grid', 'carousel', 'vertical');
@@ -139,6 +146,118 @@ function car_listings_build_query_args($atts) {
         );
     }
 
+    // === URL PARAMETER FILTERS (for filter integration) ===
+    $tax_query = array();
+
+    // Make/Model filter from URL
+    if (isset($_GET['model']) && !empty($_GET['model'])) {
+        $model_param = sanitize_text_field($_GET['model']);
+        $model_term = get_term_by('slug', $model_param, 'car_make');
+        if ($model_term) {
+            $tax_query[] = array(
+                'taxonomy' => 'car_make',
+                'field'    => 'term_id',
+                'terms'    => $model_term->term_id,
+            );
+        }
+    } elseif (isset($_GET['make']) && !empty($_GET['make'])) {
+        $make_param = sanitize_text_field($_GET['make']);
+        $make_term = get_term_by('slug', $make_param, 'car_make');
+        if ($make_term && $make_term->parent === 0) {
+            // Get all models for this make
+            $models = get_terms(array(
+                'taxonomy' => 'car_make',
+                'parent' => $make_term->term_id,
+                'hide_empty' => true,
+                'fields' => 'ids',
+            ));
+            if (!empty($models) && !is_wp_error($models)) {
+                $tax_query[] = array(
+                    'taxonomy' => 'car_make',
+                    'field'    => 'term_id',
+                    'terms'    => $models,
+                );
+            }
+        }
+    }
+
+    // Price range from URL
+    if (isset($_GET['price_min']) && is_numeric($_GET['price_min'])) {
+        $meta_query[] = array(
+            'key'     => 'price',
+            'value'   => intval($_GET['price_min']),
+            'compare' => '>=',
+            'type'    => 'NUMERIC',
+        );
+    }
+    if (isset($_GET['price_max']) && is_numeric($_GET['price_max'])) {
+        $meta_query[] = array(
+            'key'     => 'price',
+            'value'   => intval($_GET['price_max']),
+            'compare' => '<=',
+            'type'    => 'NUMERIC',
+        );
+    }
+
+    // Mileage range from URL
+    if (isset($_GET['mileage_min']) && is_numeric($_GET['mileage_min'])) {
+        $meta_query[] = array(
+            'key'     => 'mileage',
+            'value'   => intval($_GET['mileage_min']),
+            'compare' => '>=',
+            'type'    => 'NUMERIC',
+        );
+    }
+    if (isset($_GET['mileage_max']) && is_numeric($_GET['mileage_max'])) {
+        $meta_query[] = array(
+            'key'     => 'mileage',
+            'value'   => intval($_GET['mileage_max']),
+            'compare' => '<=',
+            'type'    => 'NUMERIC',
+        );
+    }
+
+    // Year range from URL
+    if (isset($_GET['year_min']) && is_numeric($_GET['year_min'])) {
+        $meta_query[] = array(
+            'key'     => 'year',
+            'value'   => intval($_GET['year_min']),
+            'compare' => '>=',
+            'type'    => 'NUMERIC',
+        );
+    }
+    if (isset($_GET['year_max']) && is_numeric($_GET['year_max'])) {
+        $meta_query[] = array(
+            'key'     => 'year',
+            'value'   => intval($_GET['year_max']),
+            'compare' => '<=',
+            'type'    => 'NUMERIC',
+        );
+    }
+
+    // Fuel type from URL
+    if (isset($_GET['fuel_type']) && !empty($_GET['fuel_type'])) {
+        $meta_query[] = array(
+            'key'     => 'fuel_type',
+            'value'   => sanitize_text_field($_GET['fuel_type']),
+            'compare' => '=',
+        );
+    }
+
+    // Body type from URL
+    if (isset($_GET['body_type']) && !empty($_GET['body_type'])) {
+        $meta_query[] = array(
+            'key'     => 'body_type',
+            'value'   => sanitize_text_field($_GET['body_type']),
+            'compare' => '=',
+        );
+    }
+
+    // Add tax_query if we have conditions
+    if (!empty($tax_query)) {
+        $args['tax_query'] = $tax_query;
+    }
+
     // Add meta_query if we have conditions
     if (count($meta_query) > 1) {
         $args['meta_query'] = $meta_query;
@@ -189,8 +308,9 @@ function car_listings_render_output($car_query, $atts) {
         update_postmeta_cache($post_ids);
     }
 
-    // Generate unique instance ID for multiple shortcodes on same page
-    $instance_id = 'car-listings-' . wp_rand(1000, 9999);
+    // Use ID from attributes (already set in main function)
+    $instance_id = $atts['id'];
+    $filter_group = $atts['filter_group'];
     ?>
 
     <div class="car-listings-container <?php echo esc_attr($layout_class); ?>"
@@ -199,7 +319,8 @@ function car_listings_render_output($car_query, $atts) {
          data-infinite-scroll="<?php echo $infinite_scroll ? 'true' : 'false'; ?>"
          data-page="1"
          data-max-pages="<?php echo esc_attr($car_query->max_num_pages); ?>"
-         data-atts="<?php echo esc_attr(wp_json_encode($atts)); ?>">
+         data-atts="<?php echo esc_attr(wp_json_encode($atts)); ?>"
+         <?php if (!empty($filter_group)) : ?>data-filter-group="<?php echo esc_attr($filter_group); ?>"<?php endif; ?>>
 
         <?php if ($car_query->have_posts()) : ?>
             <div class="car-listings-wrapper">
