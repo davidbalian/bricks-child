@@ -55,6 +55,13 @@ function homepage_filters_shortcode($atts) {
 
     // Get car makes (parent terms) with counts - only non-empty
     $makes = homepage_filters_get_makes_with_counts();
+
+    // Get top 3 most popular makes (by car count)
+    $popular_makes = $makes;
+    usort($popular_makes, function($a, $b) {
+        return $b->car_count - $a->car_count;
+    });
+    $popular_makes = array_slice($popular_makes, 0, 3);
     
     // Get initial min/max values for price and mileage
     $ranges = homepage_filters_get_ranges();
@@ -80,6 +87,16 @@ function homepage_filters_shortcode($atts) {
                             <button type="button" class="homepage-filters-dropdown-option" role="option" data-value="" data-slug="">
                                 All Brands
                             </button>
+                            <?php if (!empty($popular_makes)) : ?>
+                                <div class="homepage-filters-section-header">Most Popular</div>
+                                <?php foreach ($popular_makes as $make) : ?>
+                                    <button type="button" class="homepage-filters-dropdown-option" role="option" data-value="<?php echo esc_attr($make->term_id); ?>" data-slug="<?php echo esc_attr($make->slug); ?>">
+                                        <?php echo esc_html($make->name); ?>
+                                        <span class="homepage-filters-count">(<?php echo esc_html($make->car_count); ?>)</span>
+                                    </button>
+                                <?php endforeach; ?>
+                                <div class="homepage-filters-separator"></div>
+                            <?php endif; ?>
                             <?php if (!empty($makes)) : ?>
                                 <?php foreach ($makes as $make) : ?>
                                     <button type="button" class="homepage-filters-dropdown-option" role="option" data-value="<?php echo esc_attr($make->term_id); ?>" data-slug="<?php echo esc_attr($make->slug); ?>">

@@ -208,6 +208,23 @@
   font-size: 0.875em;
 }
 
+/* Section header */
+.homepage-filters-section-header {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Separator */
+.homepage-filters-separator {
+  height: 1px;
+  background-color: #dfe2e6;
+  margin: 0.25rem 0;
+}
+
 /* Hidden native select for form submission */
 .homepage-filters-select-hidden {
   position: absolute !important;
