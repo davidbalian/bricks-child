@@ -59,7 +59,7 @@ function car_filter_fuel_shortcode($atts) {
     ob_start();
     ?>
     <div class="car-filter car-filter-fuel"
-         data-filter-type="fuel"
+         data-filter-type="fuel_type"
          data-group="<?php echo esc_attr($atts['group']); ?>"
          data-mode="<?php echo esc_attr($atts['mode']); ?>">
 
@@ -77,7 +77,7 @@ function car_filter_fuel_shortcode($atts) {
             'show_count'  => $atts['show_count'] === 'true',
             'searchable'  => false,
             'data_attrs'  => array(
-                'filter-type' => 'fuel',
+                'filter-type' => 'fuel_type',
                 'group'       => $atts['group'],
             ),
         ));

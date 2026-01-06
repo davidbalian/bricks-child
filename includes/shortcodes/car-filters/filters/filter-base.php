@@ -292,7 +292,7 @@ function car_filter_get_models($make_term_id) {
 }
 
 /**
- * Get distinct meta values with counts
+ * Get distinct meta values with counts (sorted by count descending)
  */
 function car_filter_get_meta_options($meta_key) {
     global $wpdb;
@@ -311,7 +311,7 @@ function car_filter_get_meta_options($meta_key) {
             AND pm.meta_value != ''
             AND pm.meta_value IS NOT NULL
             GROUP BY pm.meta_value
-            ORDER BY pm.meta_value ASC
+            ORDER BY count DESC, pm.meta_value ASC
         ", $meta_key);
 
         $options = $wpdb->get_results($query);
