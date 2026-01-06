@@ -123,6 +123,7 @@ function car_listings_build_query_args($atts) {
     }
 
     // === SOLD LISTINGS FILTER ===
+    // Simplified: exclude only cars explicitly marked as sold (is_sold = '1')
     if ($atts['show_sold'] !== 'true') {
         $meta_query[] = array(
             'relation' => 'OR',
@@ -134,16 +135,6 @@ function car_listings_build_query_args($atts) {
                 'key'     => 'is_sold',
                 'value'   => '1',
                 'compare' => '!='
-            ),
-            array(
-                'key'     => 'is_sold',
-                'value'   => '',
-                'compare' => '='
-            ),
-            array(
-                'key'     => 'is_sold',
-                'value'   => '0',
-                'compare' => '='
             )
         );
     }
@@ -191,6 +182,12 @@ function car_listings_render_output($car_query, $atts) {
     $layout = sanitize_text_field($atts['layout']);
     $layout_class = 'car-listings-' . $layout;
     $infinite_scroll = $atts['infinite_scroll'] === 'true';
+
+    // Pre-fetch all post meta in one query to avoid N+1 queries
+    if ($car_query->have_posts()) {
+        $post_ids = wp_list_pluck($car_query->posts, 'ID');
+        update_postmeta_cache($post_ids);
+    }
 
     // Generate unique instance ID for multiple shortcodes on same page
     $instance_id = 'car-listings-' . wp_rand(1000, 9999);
@@ -303,11 +300,32 @@ function car_listings_render_card($post_id) {
             </div>
         </a>
 
-        <?php
-        // Include favorite button shortcode (reusing existing component)
-        echo do_shortcode('[favorite_button car_id="' . $post_id . '"]');
-        ?>
+        <?php car_listings_render_favorite_button($post_id); ?>
     </article>
+    <?php
+}
+
+/**
+ * Render favorite button inline (avoids do_shortcode overhead)
+ */
+function car_listings_render_favorite_button($post_id) {
+    static $user_id = null;
+    static $favorite_cars = null;
+
+    // Cache user data for all cards in the loop
+    if ($user_id === null) {
+        $user_id = get_current_user_id();
+        $favorite_cars = $user_id ? get_user_meta($user_id, 'favorite_cars', true) : array();
+        $favorite_cars = is_array($favorite_cars) ? $favorite_cars : array();
+    }
+
+    $is_favorite = $user_id && in_array($post_id, $favorite_cars);
+    $heart_class = $is_favorite ? 'fas fa-heart' : 'far fa-heart';
+    $button_class = 'favorite-btn favorite-btn-listing' . ($is_favorite ? ' active' : '');
+    ?>
+    <button class="<?php echo esc_attr($button_class); ?>" data-car-id="<?php echo esc_attr($post_id); ?>" title="<?php echo $is_favorite ? 'Remove from favorites' : 'Add to favorites'; ?>">
+        <i class="<?php echo esc_attr($heart_class); ?>"></i>
+    </button>
     <?php
 }
 
@@ -384,6 +402,12 @@ function car_listings_ajax_load_more() {
 
     // Execute query with featured-first sorting
     $car_query = car_listings_execute_query($query_args);
+
+    // Pre-fetch all post meta in one query
+    if ($car_query->have_posts()) {
+        $post_ids = wp_list_pluck($car_query->posts, 'ID');
+        update_postmeta_cache($post_ids);
+    }
 
     // Render cards
     ob_start();
