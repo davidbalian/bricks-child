@@ -531,6 +531,15 @@
    * Filter dropdown options based on search term
    */
   function filterDropdownOptions($optionsContainer, searchTerm) {
+    let visibleCount = 0;
+
+    // Hide section headers and separators when searching
+    if (searchTerm) {
+      $optionsContainer.find(".homepage-filters-section-header, .homepage-filters-separator").addClass("hidden");
+    } else {
+      $optionsContainer.find(".homepage-filters-section-header, .homepage-filters-separator").removeClass("hidden");
+    }
+
     $optionsContainer
       .find(".homepage-filters-dropdown-option")
       .each(function () {
@@ -539,10 +548,19 @@
 
         if (!searchTerm || text.includes(searchTerm.toLowerCase())) {
           $option.removeClass("hidden");
+          visibleCount++;
         } else {
           $option.addClass("hidden");
         }
       });
+
+    // Show/hide "No results" message
+    const $noResults = $optionsContainer.find(".homepage-filters-no-results");
+    if (visibleCount === 0 && searchTerm) {
+      $noResults.removeClass("hidden");
+    } else {
+      $noResults.addClass("hidden");
+    }
   }
 
   /**

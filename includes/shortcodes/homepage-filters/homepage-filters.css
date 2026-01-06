@@ -225,6 +225,20 @@
   margin: 0.25rem 0;
 }
 
+/* No results message */
+.homepage-filters-no-results {
+  padding: 0.75rem 1rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.homepage-filters-no-results.hidden,
+.homepage-filters-section-header.hidden,
+.homepage-filters-separator.hidden {
+  display: none;
+}
+
 /* Hidden native select for form submission */
 .homepage-filters-select-hidden {
   position: absolute !important;

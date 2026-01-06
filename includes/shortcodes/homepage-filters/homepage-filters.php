@@ -105,6 +105,7 @@ function homepage_filters_shortcode($atts) {
                                     </button>
                                 <?php endforeach; ?>
                             <?php endif; ?>
+                            <div class="homepage-filters-no-results hidden">No matching results</div>
                         </div>
                     </div>
                     <select id="homepage-filter-make" class="homepage-filters-select-hidden" data-filter="make" aria-hidden="true" tabindex="-1">
@@ -135,6 +136,7 @@ function homepage_filters_shortcode($atts) {
                         <input type="text" class="homepage-filters-search" placeholder="Search models..." id="homepage-filter-model-search" disabled>
                         <div class="homepage-filters-dropdown-options" id="homepage-filter-model-options">
                             <!-- Options loaded dynamically -->
+                            <div class="homepage-filters-no-results hidden">No matching results</div>
                         </div>
                     </div>
                     <select id="homepage-filter-model" class="homepage-filters-select-hidden" data-filter="model" aria-hidden="true" tabindex="-1" disabled>
