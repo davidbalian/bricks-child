@@ -104,8 +104,9 @@
 
         /**
          * Build URL with filter parameters
+         * Uses current page URL for AJAX mode, redirectUrl for redirect mode
          */
-        buildUrl: function(group) {
+        buildUrl: function(group, forRedirect) {
             var state = this.getState(group);
             var params = new URLSearchParams();
 
@@ -121,7 +122,12 @@
             if (state.body_type) params.set('body_type', state.body_type);
 
             var queryString = params.toString();
-            return state.redirectUrl + (queryString ? '?' + queryString : '');
+
+            // For redirect mode, use the configured redirectUrl
+            // For AJAX mode (pushState), use current page path
+            var baseUrl = forRedirect ? state.redirectUrl : window.location.pathname;
+
+            return baseUrl + (queryString ? '?' + queryString : '');
         },
 
         /**
@@ -140,7 +146,7 @@
             this.debounceTimers[group] = setTimeout(function() {
                 if (state.mode === 'redirect') {
                     // Redirect mode - navigate to URL
-                    window.location.href = self.buildUrl(group);
+                    window.location.href = self.buildUrl(group, true);
                 } else {
                     // AJAX mode - update listings
                     self.ajaxFilter(group);
@@ -190,8 +196,8 @@
                     if (response.success) {
                         $wrapper.html(response.data.html);
 
-                        // Update URL without reload
-                        var url = CarFilters.buildUrl(group);
+                        // Update URL without reload (use current page path, not redirect URL)
+                        var url = CarFilters.buildUrl(group, false);
                         history.pushState({ filters: CarFilters.getFilterData(group) }, '', url);
 
                         // Trigger event for other scripts

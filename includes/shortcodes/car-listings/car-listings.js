@@ -78,6 +78,16 @@
         currentPage++;
         $loader.show();
 
+        // Get current URL parameters to pass filter state
+        var urlParams = new URLSearchParams(window.location.search);
+        var filterParams = {};
+        ['make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max',
+         'year_min', 'year_max', 'fuel_type', 'body_type'].forEach(function(key) {
+          if (urlParams.has(key)) {
+            filterParams[key] = urlParams.get(key);
+          }
+        });
+
         $.ajax({
           url: carListingsConfig.ajaxUrl,
           type: "POST",
@@ -86,6 +96,7 @@
             nonce: carListingsConfig.nonce,
             page: currentPage,
             atts: JSON.stringify(atts),
+            filters: JSON.stringify(filterParams),
           },
           success: function (response) {
             if (response.success && response.data.html) {

@@ -498,6 +498,17 @@ function car_listings_ajax_load_more() {
     // Get parameters
     $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
     $atts = isset($_POST['atts']) ? json_decode(stripslashes($_POST['atts']), true) : array();
+    $filters = isset($_POST['filters']) ? json_decode(stripslashes($_POST['filters']), true) : array();
+
+    // Temporarily set $_GET from filters so build_query_args can use them
+    // This allows the URL parameter filtering logic to work in AJAX context
+    if (!empty($filters) && is_array($filters)) {
+        foreach ($filters as $key => $value) {
+            if (!empty($value)) {
+                $_GET[$key] = sanitize_text_field($value);
+            }
+        }
+    }
 
     // Sanitize atts
     $atts = shortcode_atts(array(
@@ -514,7 +525,7 @@ function car_listings_ajax_load_more() {
         'offset'          => 0,
     ), $atts);
 
-    // Build query args
+    // Build query args (will use $_GET for filters)
     $query_args = car_listings_build_query_args($atts);
     $query_args['paged'] = $page;
 
