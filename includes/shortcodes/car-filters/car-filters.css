@@ -97,17 +97,18 @@
 }
 
 .car-filter-dropdown-button:hover:not(:disabled) {
-    border-color: #c0c4c9;
+    border-color: #dfe2e6;
+    transition: none;
 }
 
 .car-filter-dropdown-button:focus {
     outline: none;
-    border-color: #0d86e3;
+    border-color: #dfe2e6;
     box-shadow: 0 0 0 3px rgba(13, 134, 227, 0.1);
 }
 
 .car-filter-dropdown.open .car-filter-dropdown-button {
-    border-color: #0d86e3;
+    border-color: #dfe2e6;
     box-shadow: 0 0 0 3px rgba(13, 134, 227, 0.1);
 }
 
@@ -127,7 +128,7 @@
 }
 
 .car-filter-dropdown-text.placeholder {
-    color: #6b7280;
+    color: #2a3546;
 }
 
 .car-filter-dropdown-arrow {
@@ -136,8 +137,8 @@
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
-    color: #6b7280;
-    transition: transform 0.3s ease;
+    color: #2a3546;
+    transition: transform var(--transition-time, 0.3s) ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -171,22 +172,29 @@
 /* Search Input */
 .car-filter-dropdown-search {
     width: 100%;
-    padding: 0.5rem 0.75rem;
-    border: none;
+    padding: 4px 8px !important;
+    border: none !important;
     border-bottom: 1px solid #dfe2e6;
-    border-radius: 0;
-    background-color: #f5f5f5;
-    color: #2a3546;
-    font-size: 14px;
+    border-radius: 0 !important;
+    background-color: rgb(232, 232, 232) !important;
+    color: #2a3546 !important;
+    font-size: 16px !important;
+    font-weight: 600;
     outline: none;
+    margin: 0 !important;
 }
 
 .car-filter-dropdown-search:focus {
-    background-color: #eef2f7;
+    border-bottom-color: #dfe2e6;
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 .car-filter-dropdown-search::placeholder {
-    color: #6b7280;
+    color: #2a3546 !important;
+    font-weight: 600;
+    opacity: 1;
 }
 
 .car-filter-dropdown-search:disabled {
@@ -205,7 +213,7 @@
 /* Individual Option */
 .car-filter-dropdown-option {
     width: 100%;
-    padding: 0.625rem 0.75rem;
+    padding: 0.75rem 1rem;
     text-align: left;
     background-color: #ffffff;
     color: #2a3546;
@@ -214,20 +222,22 @@
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
-    font-size: 14px;
-    transition: background-color 0.15s ease;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    font-size: 16px;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .car-filter-dropdown-option:hover,
+.car-filter-dropdown-option:focus,
 .car-filter-dropdown-option.focused {
     background-color: rgba(13, 134, 227, 0.1);
+    color: #2a3546;
+    outline: none;
+    transition: none;
 }
 
 .car-filter-dropdown-option.selected {
     background-color: rgba(13, 134, 227, 0.15);
+    color: #2a3546;
     font-weight: 600;
 }
 
@@ -245,13 +255,12 @@
 
 /* Section Header */
 .car-filter-section-header {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.7rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: #6b7280;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    background-color: #f9fafb;
 }
 
 /* Separator */
@@ -315,34 +324,31 @@
 }
 
 .car-filter-input-label {
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #2a3546;
+    margin: 0 !important;
 }
 
 .car-filter-input {
-    width: 100%;
-    padding: 0.75rem 0.5rem;
-    border: 2px solid #dfe2e6;
-    border-radius: 0.5rem;
-    background-color: #ffffff;
-    color: #2a3546;
-    font-size: 16px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.car-filter-input:hover {
-    border-color: #c0c4c9;
+    flex: 1;
+    padding: 4px 8px !important;
+    border: none !important;
+    border-radius: 0.5rem !important;
+    background-color: rgb(232, 232, 232) !important;
+    color: #2a3546 !important;
+    font-size: 16px !important;
+    transition: none;
 }
 
 .car-filter-input:focus {
-    outline: none;
-    border-color: #0d86e3;
-    box-shadow: 0 0 0 3px rgba(13, 134, 227, 0.1);
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 .car-filter-input::placeholder {
-    color: #9ca3af;
+    color: rgba(42, 53, 70, 0.5) !important;
 }
 
 /* ============================================
