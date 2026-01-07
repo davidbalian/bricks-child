@@ -291,10 +291,23 @@ function delete_non_webp_siblings($webp_path) {
     // Also look for variants without a trailing "-scaled" suffix.
     $base_unsuffixed = str_ends_with($base, '-scaled') ? substr($base, 0, -7) : $base;
 
+    // Handle attachment ID suffix in WebP filename (e.g., "photo-123" -> also look for "photo")
+    // Pattern: basename ends with "-" followed by digits (the attachment ID)
+    $base_without_id = preg_replace('/-\d+$/', '', $base);
+    $base_unsuffixed_without_id = preg_replace('/-\d+$/', '', $base_unsuffixed);
+
     $patterns = array(
         trailingslashit($dir) . $base . '.*',
         trailingslashit($dir) . $base_unsuffixed . '.*',
     );
+
+    // Add patterns for original basename without attachment ID suffix
+    if ($base_without_id !== $base) {
+        $patterns[] = trailingslashit($dir) . $base_without_id . '.*';
+    }
+    if ($base_unsuffixed_without_id !== $base_unsuffixed && $base_unsuffixed_without_id !== $base_without_id) {
+        $patterns[] = trailingslashit($dir) . $base_unsuffixed_without_id . '.*';
+    }
 
     $candidates = array();
     foreach ($patterns as $pattern) {
