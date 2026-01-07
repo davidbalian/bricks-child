@@ -412,7 +412,8 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
             return false;
         }
 
-        $webp_path = $pathinfo['dirname'] . '/' . $pathinfo['filename'] . '.webp';
+        // Include attachment ID in filename to guarantee uniqueness (prevents collisions when users upload files with same names like 1.jpg, 2.jpg)
+        $webp_path = $pathinfo['dirname'] . '/' . $pathinfo['filename'] . '-' . $attachment_id . '.webp';
         car_image_opt_log("Paths | webp_path: {$webp_path}");
 
         // For PNG files, convert palette images to truecolor first (GD can't encode palette PNGs to WebP)
