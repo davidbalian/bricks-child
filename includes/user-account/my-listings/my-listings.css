@@ -204,10 +204,11 @@
 }
 
 .listing-actions .btn {
-  padding: 0.75rem 1.25rem;
+  padding: 0.4rem 0.9rem;
   border-radius: var(--border-radius-small);
   text-decoration: none !important;
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 500;
   transition: opacity 0.1s ease;
 }
 
