@@ -7,6 +7,20 @@
   padding: 0.25rem 0.75rem !important;
 }
 
+.my-listings-page-link.is-active {
+  background: var(--text-color);
+  color: var(--white) !important;
+  border-color: var(--text-color);
+  cursor: default;
+  pointer-events: none; /* prevents clicking */
+  opacity: 1 !important;
+}
+
+.my-listings-page-link:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .my-listings-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -174,8 +188,13 @@
 }
 
 .my-listings-pagination {
-  margin: 1rem 0;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
 }
+
+
 
 .listing-actions {
   display: flex;
