@@ -306,6 +306,10 @@ class MyListingsAjaxHandler {
         $is_sold = get_field('is_sold', $post_id);
         $post_status = get_post_status($post_id);
 
+        // View counts (cached in post meta by CarViewsDatabase)
+        $total_views_meta  = get_post_meta($post_id, 'total_views_count', true);
+        $total_views  = $total_views_meta !== '' ? (int) $total_views_meta : 0;
+        
         // Create custom frontend delete URL
         $delete_url = add_query_arg(
             array(
@@ -366,6 +370,13 @@ class MyListingsAjaxHandler {
                         ?>
                     </span>
                     <?php
+                    if ($total_views > 0) : ?>
+                        <span class="listing-views">
+                            Views: <?php echo esc_html(number_format_i18n($total_views)); ?>
+                        </span>
+                    <?php
+                    endif;
+
                     // Show refresh status for published listings
                     if ($post_status === 'publish') {
                         echo $refresh_ui->render_refresh_status($post_id);
