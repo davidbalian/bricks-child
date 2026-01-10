@@ -197,6 +197,16 @@ function display_my_listings($atts) {
             
             if ($user_listings->have_posts()) :
             ?>
+                <!-- TOP pagination -->
+                <div class="my-listings-pagination-container my-listings-pagination-top">
+                    <?php
+                    MyListingsAjaxHandler::render_pagination(
+                        (int) $current_page,
+                        (int) $user_listings->max_num_pages
+                    );
+                    ?>
+                </div>
+
                 <div
                     class="listings-grid"
                     data-page="<?php echo esc_attr($current_page); ?>"
