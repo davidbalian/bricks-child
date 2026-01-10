@@ -306,6 +306,18 @@ class MyListingsAjaxHandler {
         $is_sold = get_field('is_sold', $post_id);
         $post_status = get_post_status($post_id);
 
+        // Status & refresh meta
+        $published_date = get_the_date('', $post_id);
+        $status_label = $is_sold ? 'SOLD' : ($post_status === 'publish' ? 'Published' : ucfirst((string) $post_status));
+
+        $refresh_manager = new RefreshListingManager();
+        $last_refresh_raw = $refresh_manager->get_last_refresh_date($post_id);
+        $refresh_count = $refresh_manager->get_refresh_count($post_id);
+
+        $last_refresh_human = $last_refresh_raw
+            ? human_time_diff(strtotime($last_refresh_raw), current_time('timestamp')) . ' ago'
+            : 'Never';
+
         // Create custom frontend delete URL
         $delete_url = add_query_arg(
             array(
@@ -342,70 +354,81 @@ class MyListingsAjaxHandler {
                         €<?php echo number_format(floatval(str_replace(',', '', (string) $price))); ?>
                     </h4>
                 </div>
-                <div class="listing-meta">
-                    <span class="listing-date">
-                        Published: <?php echo esc_html(get_the_date('', $post_id)); ?>
-                    </span>
-                    <span class="listing-status
-                        <?php
-                        if ($is_sold) {
-                            echo ' status-sold';
-                        } elseif ($post_status === 'pending') {
-                            echo ' status-pending';
-                        } elseif ($post_status === 'publish') {
-                            echo ' status-published';
-                        }
-                        ?>">
-                        Status:
-                        <?php
-                        if ($is_sold) {
-                            echo 'SOLD';
-                        } else {
-                            echo $post_status === 'publish' ? 'Published' : esc_html(ucfirst($post_status));
-                        }
-                        ?>
-                    </span>
-                    <?php
-                    // Show refresh status for published listings
-                    if ($post_status === 'publish') {
-                        echo $refresh_ui->render_refresh_status($post_id);
-                    }
-                    ?>
-                </div>
-                <div class="listing-actions">
-                    <a href="<?php echo esc_url(add_query_arg('car_id', $post_id, home_url('/edit-listing/'))); ?>" class="btn btn-primary">
-                        <i class="fas fa-pencil-alt"></i> Edit
-                    </a>
-                    <?php
-                    // Show refresh button for published, unsold listings
-                    if ($post_status === 'publish' && !$is_sold) {
-                        echo $refresh_ui->render_refresh_button($post_id);
-                    }
 
-                    if ($post_status === 'publish') {
-                        $button_text = $is_sold ? ' Mark as Available' : ' Mark as Sold';
-                        $button_class = $is_sold
-                            ? 'btn btn-primary available-button'
-                            : 'btn btn-success sold-button';
-                        $icon_class = $is_sold ? 'fas fa-undo-alt' : 'fas fa-check-circle';
-                        ?>
-                        <button
-                            class="<?php echo esc_attr($button_class); ?>"
-                            data-car-id="<?php echo esc_attr($post_id); ?>"
-                            data-is-sold="<?php echo $is_sold ? '1' : '0'; ?>"
-                        >
-                            <i class="<?php echo esc_attr($icon_class); ?>"></i><?php echo esc_html($button_text); ?>
-                        </button>
+                <div class="listing-meta">
+                    <div class="listing-chips">
+                        <span class="listing-chip listing-chip-muted">
+                            <span class="listing-chip-icon"><i class="far fa-calendar-alt"></i></span>
+                            <span>Published: <?php echo esc_html($published_date); ?></span>
+                        </span>
+
+                        <span class="listing-chip
+                            <?php
+                            if ($is_sold) {
+                                echo ' listing-chip-status-sold';
+                            } elseif ($post_status === 'pending') {
+                                echo ' listing-chip-status-pending';
+                            } elseif ($post_status === 'publish') {
+                                echo ' listing-chip-status-published';
+                            } else {
+                                echo ' listing-chip-status-other';
+                            }
+                            ?>">
+                            <span class="listing-chip-icon"><i class="fas fa-tag"></i></span>
+                            <span>Status: <?php echo esc_html($status_label); ?></span>
+                        </span>
+
+                        <span class="listing-chip listing-chip-muted">
+                            <span class="listing-chip-icon"><i class="fas fa-history"></i></span>
+                            <span>Last refreshed: <?php echo esc_html($last_refresh_human); ?></span>
+                        </span>
+
+                        <span class="listing-chip listing-chip-muted">
+                            <span class="listing-chip-icon"><i class="fas fa-sync-alt"></i></span>
+                            <span>Refreshes: <?php echo esc_html((string) $refresh_count); ?></span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="listing-actions">
+                    <div class="listing-actions-primary">
+                        <a href="<?php echo esc_url(add_query_arg('car_id', $post_id, home_url('/edit-listing/'))); ?>" class="btn btn-primary">
+                            <i class="fas fa-pencil-alt"></i> Edit
+                        </a>
                         <?php
-                    }
-                    ?>
-                    <a
-                        href="<?php echo esc_url($delete_url); ?>"
-                        class="btn btn-danger delete-button"
-                        onclick="return confirm('Are you sure you want to delete this listing? This action cannot be undone.');"
-                    >
-                        <i class="fas fa-trash-alt"></i>
-                    </a>
+                        // Show refresh button for published, unsold listings
+                        if ($post_status === 'publish' && !$is_sold) {
+                            echo $refresh_ui->render_refresh_button($post_id);
+                        }
+
+                        if ($post_status === 'publish') {
+                            $button_text = $is_sold ? ' Mark as Available' : ' Mark as Sold';
+                            $button_class = $is_sold
+                                ? 'btn btn-primary available-button'
+                                : 'btn btn-success sold-button';
+                            $icon_class = $is_sold ? 'fas fa-undo-alt' : 'fas fa-check-circle';
+                            ?>
+                            <button
+                                class="<?php echo esc_attr($button_class); ?>"
+                                data-car-id="<?php echo esc_attr($post_id); ?>"
+                                data-is-sold="<?php echo $is_sold ? '1' : '0'; ?>"
+                            >
+                                <i class="<?php echo esc_attr($icon_class); ?>"></i><?php echo esc_html($button_text); ?>
+                            </button>
+                            <?php
+                        }
+                        ?>
+                    </div>
+                    <div class="listing-actions-secondary">
+                        <a
+                            href="<?php echo esc_url($delete_url); ?>"
+                            class="btn btn-danger delete-button btn-sm"
+                            onclick="return confirm('Are you sure you want to delete this listing? This action cannot be undone.');"
+                            title="Delete listing"
+                        >
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
