@@ -178,10 +178,15 @@
             $loadMoreBtn.hide();
           }
         })
-        .fail(function () {
+        .fail(function (jqXHR, textStatus, errorThrown) {
           if (myListingsData.isDevelopment) {
             // eslint-disable-next-line no-console
-            console.error("Error loading user listings via AJAX");
+            console.error("Error loading user listings via AJAX", {
+              status: jqXHR.status,
+              responseText: jqXHR.responseText,
+              textStatus: textStatus,
+              errorThrown: errorThrown,
+            });
           }
         })
         .always(function () {
