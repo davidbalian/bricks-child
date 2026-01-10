@@ -11,11 +11,6 @@
 
 .my-listings-page-link {
   border-radius: 100rem;
-  padding: 0.25rem !important;
-}
-
-.my-listings-page-link.prev,
-.my-listings-page-link.next {
   padding: 0.25rem 0.75rem !important;
 }
 
@@ -167,6 +162,10 @@
   gap: 0;
   font-size: 0.875rem;
   color: var(--text-color);
+}
+
+.my-listings-pagination {
+  margin: 0 1rem;
 }
 
 .listing-actions {
