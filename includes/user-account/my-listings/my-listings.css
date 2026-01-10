@@ -1,18 +1,22 @@
 .listings-layout {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 2.5fr;
   gap: 1rem;
   align-items: flex-start;
-  justify-content: center;
+}
+
+.listings-layout > * {
+  width: 100%;
 }
 
 .listings-layout .page-numbers {
   border-radius: 100rem;
-  padding: 0.25rem;
+  padding: 0.25rem !important;
 }
 
 .listings-layout .page-numbers.prev,
 .listings-layout .page-numbers.next {
-  padding: 0.25rem 0.75rem;
+  padding: 0.25rem 0.75rem !important;
 }
 
 .my-listings-container {
@@ -223,6 +227,10 @@
 }
 
 @media (max-width: 799.98px) {
+  .listings-layout {
+    grid-template-columns: 1fr;
+  }
+
   .listing-item {
     flex-direction: column;
   }
