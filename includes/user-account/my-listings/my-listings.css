@@ -1,12 +1,5 @@
 .listings-layout {
-  display: grid;
-  grid-template-columns: 1fr 2.5fr;
-  gap: 1rem;
-  align-items: flex-start;
-}
-
-.listings-layout > * {
-  width: 100%;
+  display: block;
 }
 
 .my-listings-page-link {
@@ -15,7 +8,7 @@
 }
 
 .my-listings-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -191,16 +184,7 @@
 }
 
 .listings-area {
-  display: flex;
-  gap: 2rem;
-}
-
-.listings-filter {
-  width: 100%;
-}
-
-.listings-grid {
-  width: 80%;
+  margin-top: 2rem;
 }
 
 @media (max-width: 1199.98px) {
