@@ -305,6 +305,15 @@ function display_my_listings($atts) {
                         </div>
                     <?php endwhile; ?>
                 </div>
+
+                <div class="my-listings-pagination-container">
+                    <?php
+                    MyListingsAjaxHandler::render_pagination(
+                        (int) $current_page,
+                        (int) $user_listings->max_num_pages
+                    );
+                    ?>
+                </div>
             <?php 
             else :
                 echo '<p>You haven\'t created any car listings yet.</p>';

@@ -97,16 +97,16 @@
     var perPage = parseInt($grid.data("per-page"), 10) || myListingsData.perPage || 10;
     var isLoading = false;
 
-    // Loader and "Load more" button
+    var $paginationContainer = $(".my-listings-pagination-container");
+
+    // Loader
     var $loader = $('<div class="my-listings-loader" style="display:none;">Loading...</div>');
-    var $loadMoreBtn = $(
-      '<button type="button" class="btn btn-secondary my-listings-load-more">Load more</button>'
-    );
 
-    $grid.after($loader);
-    $loader.after($loadMoreBtn);
-
-    updateLoadMoreVisibility();
+    if ($paginationContainer.length) {
+      $paginationContainer.before($loader);
+    } else {
+      $grid.after($loader);
+    }
 
     function getFilters() {
       return {
@@ -124,16 +124,17 @@
       var opts = $.extend(
         {
           reset: false,
+          page: null,
         },
         options || {}
       );
 
-      if (opts.reset) {
+      if (typeof opts.page === "number" && !Number.isNaN(opts.page)) {
+        currentPage = opts.page;
+      } else if (opts.page) {
+        currentPage = parseInt(opts.page, 10) || 1;
+      } else if (opts.reset) {
         currentPage = 1;
-      }
-
-      if (currentPage > maxPages && !opts.force) {
-        return;
       }
 
       isLoading = true;
@@ -160,23 +161,21 @@
           }
 
           var html = response.data.html || "";
-          var hasMore = !!response.data.has_more;
+          var paginationHtml = response.data.pagination_html || "";
           maxPages = parseInt(response.data.max_pages, 10) || 1;
 
-          if (opts.reset) {
-            $grid.html(html);
-          } else {
-            $grid.append(html);
-          }
+          $grid.html(html);
 
           $grid.data("page", currentPage);
           $grid.data("max-pages", maxPages);
 
-          if (hasMore && currentPage < maxPages) {
-            $loadMoreBtn.show();
-          } else {
-            $loadMoreBtn.hide();
+          if (!$paginationContainer.length) {
+            $paginationContainer = $(
+              '<div class="my-listings-pagination-container"></div>'
+            ).insertAfter($grid);
           }
+
+          $paginationContainer.html(paginationHtml);
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
           if (myListingsData.isDevelopment) {
@@ -195,45 +194,49 @@
         });
     }
 
-    function updateLoadMoreVisibility() {
-      if (currentPage < maxPages) {
-        $loadMoreBtn.show();
-      } else {
-        $loadMoreBtn.hide();
-      }
-    }
-
     // Event bindings
     var searchTimeout = null;
 
     if ($searchInput.length) {
       $searchInput.on("input", function () {
         window.clearTimeout(searchTimeout);
-        searchTimeout = window.setTimeout(function () {
-          fetchListings({ reset: true });
-        }, 300);
+        searchTimeout = window.setTimeout(
+          function () {
+            fetchListings({ reset: true, page: 1 });
+          },
+          300
+        );
       });
     }
 
     if ($statusFilter.length) {
       $statusFilter.on("change", function (event) {
         event.preventDefault();
-        fetchListings({ reset: true });
+        fetchListings({ reset: true, page: 1 });
       });
     }
 
     if ($sortSelect.length) {
       $sortSelect.on("change", function () {
-        fetchListings({ reset: true });
+        fetchListings({ reset: true, page: 1 });
       });
     }
 
-    $loadMoreBtn.on("click", function () {
-      if (currentPage >= maxPages || isLoading) {
+    // Delegate pagination clicks
+    $container.on("click", ".my-listings-page-link", function (event) {
+      event.preventDefault();
+
+      var $btn = $(this);
+      if ($btn.is("[disabled]")) {
         return;
       }
-      currentPage += 1;
-      fetchListings({ reset: false });
+
+      var page = parseInt($btn.data("page"), 10);
+      if (!page || page === currentPage) {
+        return;
+      }
+
+      fetchListings({ reset: true, page: page });
     });
 
     // Delegate click handling for sold/available buttons in both

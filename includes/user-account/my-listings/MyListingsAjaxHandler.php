@@ -128,14 +128,20 @@ class MyListingsAjaxHandler {
         }
 
         $html = ob_get_clean();
+
+        // Capture pagination HTML
+        ob_start();
+        self::render_pagination($page, (int) $user_listings->max_num_pages);
+        $pagination_html = ob_get_clean();
+
         wp_reset_postdata();
 
         wp_send_json_success(array(
-            'html'         => $html,
-            'has_more'     => $page < (int) $user_listings->max_num_pages,
-            'max_pages'    => (int) $user_listings->max_num_pages,
-            'current_page' => $page,
-            'found_posts'  => (int) $user_listings->found_posts,
+            'html'             => $html,
+            'pagination_html'  => $pagination_html,
+            'max_pages'        => (int) $user_listings->max_num_pages,
+            'current_page'     => $page,
+            'found_posts'      => (int) $user_listings->found_posts,
         ));
     }
 
@@ -223,6 +229,53 @@ class MyListingsAjaxHandler {
         }
 
         return $args;
+    }
+
+    /**
+     * Render numbered pagination for My Listings.
+     *
+     * @param int $current_page Current page number.
+     * @param int $max_pages    Total number of pages.
+     * @return void
+     */
+    public static function render_pagination(int $current_page, int $max_pages): void {
+        if ($max_pages <= 1) {
+            return;
+        }
+
+        $current_page = max(1, $current_page);
+        $max_pages    = max(1, $max_pages);
+        ?>
+        <nav class="my-listings-pagination" aria-label="My listings pagination">
+            <button
+                type="button"
+                class="my-listings-page-link prev"
+                data-page="<?php echo esc_attr(max(1, $current_page - 1)); ?>"
+                <?php disabled($current_page <= 1); ?>
+            >
+                &laquo; Prev
+            </button>
+
+            <?php for ($i = 1; $i <= $max_pages; $i++) : ?>
+                <button
+                    type="button"
+                    class="my-listings-page-link<?php echo $i === $current_page ? ' is-active' : ''; ?>"
+                    data-page="<?php echo esc_attr($i); ?>"
+                >
+                    <?php echo esc_html($i); ?>
+                </button>
+            <?php endfor; ?>
+
+            <button
+                type="button"
+                class="my-listings-page-link next"
+                data-page="<?php echo esc_attr(min($max_pages, $current_page + 1)); ?>"
+                <?php disabled($current_page >= $max_pages); ?>
+            >
+                Next &raquo;
+            </button>
+        </nav>
+        <?php
     }
 
     /**
