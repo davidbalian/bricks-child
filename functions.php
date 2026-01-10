@@ -20,6 +20,7 @@ require_once get_stylesheet_directory() . '/includes/core/google-maps-assets.php
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/listing-details-badge-manager.php';
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/car-submission.php';
 require_once get_stylesheet_directory() . '/includes/user-account/my-account/my-account.php';
+require_once get_stylesheet_directory() . '/includes/user-account/my-listings/MyListingsAjaxHandler.php';
 require_once get_stylesheet_directory() . '/includes/user-account/my-listings/my-listings.php';
 // FAVOURITES PAGE DISABLED - Commented out to disable favourites page functionality
 // require_once get_stylesheet_directory() . '/includes/shortcodes/favourite-listings.php';
