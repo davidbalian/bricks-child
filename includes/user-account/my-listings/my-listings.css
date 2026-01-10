@@ -9,13 +9,13 @@
   width: 100%;
 }
 
-.listings-layout .page-numbers {
+.my-listings-page-link {
   border-radius: 100rem;
   padding: 0.25rem !important;
 }
 
-.listings-layout .page-numbers.prev,
-.listings-layout .page-numbers.next {
+.my-listings-page-link.prev,
+.my-listings-page-link.next {
   padding: 0.25rem 0.75rem !important;
 }
 
