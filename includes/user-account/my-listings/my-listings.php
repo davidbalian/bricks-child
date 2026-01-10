@@ -23,6 +23,9 @@ function display_my_listings($atts) {
     require_once get_stylesheet_directory() . '/includes/user-manage-listings/refresh-listing/RefreshListingManager.php';
     require_once get_stylesheet_directory() . '/includes/user-manage-listings/refresh-listing/RefreshListingUI.php';
     require_once get_stylesheet_directory() . '/includes/user-manage-listings/refresh-listing/RefreshListingAjaxHandler.php';
+
+    // AJAX handler for loading listings
+    require_once get_stylesheet_directory() . '/includes/user-account/my-listings/MyListingsAjaxHandler.php';
     
     $refresh_manager = new RefreshListingManager();
     $refresh_ui = new RefreshListingUI($refresh_manager);
@@ -46,13 +49,31 @@ function display_my_listings($atts) {
         true
     );
     
-    // Prepare localized data
-    $ajax_nonce = wp_create_nonce('toggle_car_status_nonce');
+    // Prepare localized data for refresh listing script
+    $toggle_status_nonce = wp_create_nonce('toggle_car_status_nonce');
     
     wp_localize_script('refresh-listing-js', 'refreshListingData', array(
-        'ajaxUrl' => admin_url('admin-ajax.php'),
-        'ajaxAction' => RefreshListingAjaxHandler::get_ajax_action(),
-        'nonce' => RefreshListingAjaxHandler::create_nonce()
+        'ajaxUrl'   => admin_url('admin-ajax.php'),
+        'ajaxAction'=> RefreshListingAjaxHandler::get_ajax_action(),
+        'nonce'     => RefreshListingAjaxHandler::create_nonce()
+    ));
+
+    // Enqueue My Listings JS for AJAX loading and status toggling
+    wp_enqueue_script(
+        'my-listings-js',
+        get_stylesheet_directory_uri() . '/includes/user-account/my-listings/my-listings.js',
+        array('jquery'),
+        '1.0.0',
+        true
+    );
+
+    wp_localize_script('my-listings-js', 'myListingsData', array(
+        'ajaxUrl'           => admin_url('admin-ajax.php'),
+        'toggleNonce'       => $toggle_status_nonce,
+        'listingsAjaxAction'=> MyListingsAjaxHandler::get_ajax_action(),
+        'listingsNonce'     => MyListingsAjaxHandler::create_nonce(),
+        'perPage'           => MyListingsAjaxHandler::DEFAULT_PER_PAGE,
+        'isDevelopment'     => (defined('WP_DEBUG') && WP_DEBUG),
     ));
     
     // Start output buffering
@@ -83,7 +104,7 @@ function display_my_listings($atts) {
             <div class="listings-filter">
                 <form method="get" class="status-filter-form">
                     <label for="status-filter">Filter by status:</label>
-                    <select name="status" id="status-filter" onchange="this.form.submit()">
+                    <select name="status" id="status-filter">
                         <option value="all" <?php selected($current_filter, 'all'); ?>>All Listings</option>
                         <option value="pending" <?php selected($current_filter, 'pending'); ?>>Pending</option>
                         <option value="publish" <?php selected($current_filter, 'publish'); ?>>Published</option>
@@ -93,10 +114,10 @@ function display_my_listings($atts) {
                 <div class="sort-container">
                     <label for="sort-select">Sort by:</label>
                     <select id="sort-select" class="sort-select">
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                        <option value="price-high">Price: High to Low</option>
-                        <option value="price-low">Price: Low to High</option>
+                        <option value="newest" <?php selected($current_sort, 'newest'); ?>>Newest First</option>
+                        <option value="oldest" <?php selected($current_sort, 'oldest'); ?>>Oldest First</option>
+                        <option value="price-high" <?php selected($current_sort, 'price-high'); ?>>Price: High to Low</option>
+                        <option value="price-low" <?php selected($current_sort, 'price-low'); ?>>Price: Low to High</option>
                     </select>
                 </div>
                 <div class="search-container">
@@ -109,14 +130,18 @@ function display_my_listings($atts) {
             // Get current sort from URL parameter
             $current_sort = isset($_GET['sort']) ? sanitize_text_field($_GET['sort']) : 'newest';
             
-            // Query for user's car listings
+            // Determine current page for initial server-side query
+            $current_page = get_query_var('paged') ? get_query_var('paged') : 1;
+            
+            // Query for user's car listings - only first page to keep initial load fast
             $args = array(
-                'post_type' => 'car',
-                'author' => $current_user->ID,
-                'posts_per_page' => -1,
-                'orderby' => 'date',
-                'order' => 'DESC',
-                'post_status' => array('publish', 'pending')
+                'post_type'      => 'car',
+                'author'         => $current_user->ID,
+                'posts_per_page' => MyListingsAjaxHandler::DEFAULT_PER_PAGE,
+                'paged'          => $current_page,
+                'orderby'        => 'date',
+                'order'          => 'DESC',
+                'post_status'    => array('publish', 'pending')
             );
 
             // Apply sorting
@@ -172,7 +197,12 @@ function display_my_listings($atts) {
             
             if ($user_listings->have_posts()) :
             ?>
-                <div class="listings-grid">
+                <div
+                    class="listings-grid"
+                    data-page="<?php echo esc_attr($current_page); ?>"
+                    data-max-pages="<?php echo esc_attr($user_listings->max_num_pages); ?>"
+                    data-per-page="<?php echo esc_attr(MyListingsAjaxHandler::DEFAULT_PER_PAGE); ?>"
+                >
                     <?php while ($user_listings->have_posts()) : $user_listings->the_post(); 
                         $post_id = get_the_ID();
                         $price = get_field('price', $post_id);
@@ -253,8 +283,11 @@ function display_my_listings($atts) {
                                             : 'btn btn-success sold-button';
                                         $icon_class = $is_sold ? 'fas fa-undo-alt' : 'fas fa-check-circle';
                                         ?>
-                                        <button class="<?php echo esc_attr($button_class); ?>" 
-                                                onclick="toggleCarStatus(<?php echo $post_id; ?>, <?php echo $is_sold ? 'false' : 'true'; ?>)">
+                                        <button
+                                            class="<?php echo esc_attr($button_class); ?>"
+                                            data-car-id="<?php echo esc_attr($post_id); ?>"
+                                            data-is-sold="<?php echo $is_sold ? '1' : '0'; ?>"
+                                        >
                                             <i class="<?php echo esc_attr($icon_class); ?>"></i><?php echo esc_html($button_text); ?>
                                         </button>
                                     <?php } ?>
@@ -282,120 +315,6 @@ function display_my_listings($atts) {
             ?>
         </div>
     </div>
-
-    <script>
-    // PRODUCTION SAFETY: Only log in development environments
-    window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' || 
-                                                   window.location.hostname.includes('staging') ||
-                                                   window.location.search.includes('debug=true'));
-    
-    // Define myListingsData object with localized data
-    const myListingsData = {
-        ajaxurl: '<?php echo admin_url('admin-ajax.php'); ?>',
-        nonce: '<?php echo $ajax_nonce; ?>'
-    };
-    
-    function toggleCarStatus(carId, markAsSold) {
-        if (window.isDevelopment) console.log('Toggle function called with:', { carId, markAsSold });
-        
-        if (!confirm(markAsSold ? 'Are you sure you want to mark this car as sold?' : 'Are you sure you want to mark this car as available?')) {
-            return;
-        }
-
-        const data = {
-            action: 'toggle_car_status',
-            car_id: carId,
-            mark_as_sold: markAsSold,
-            nonce: myListingsData.nonce
-        };
-
-        if (window.isDevelopment) console.log('Sending AJAX request with data:', data);
-
-        jQuery.post(myListingsData.ajaxurl, data, function(response) {
-            if (window.isDevelopment) console.log('AJAX response:', response);
-            if (response.success) {
-                location.reload();
-            } else {
-                alert('Error updating car status. Please try again.');
-            }
-        }).fail(function(jqXHR, textStatus, errorThrown) {
-            if (window.isDevelopment) console.error('AJAX request failed:', { textStatus, errorThrown });
-            alert('Error updating car status. Please try again.');
-        });
-    }
-
-    // Add search and sort functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('listing-search');
-        const sortSelect = document.getElementById('sort-select');
-        const listingsGrid = document.querySelector('.listings-grid');
-        const listingItems = document.querySelectorAll('.listing-item');
-
-        // Set initial sort value from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const sortParam = urlParams.get('sort');
-        if (sortParam) {
-            sortSelect.value = sortParam;
-        }
-
-        // Search functionality
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase().trim();
-            
-            listingItems.forEach(item => {
-                const title = item.querySelector('.listing-title').textContent.toLowerCase();
-                const price = item.querySelector('.listing-title').textContent.toLowerCase();
-                const date = item.querySelector('.listing-date').textContent.toLowerCase();
-                const status = item.querySelector('.listing-status').textContent.toLowerCase();
-                
-                const isVisible = title.includes(searchTerm) || 
-                                price.includes(searchTerm) || 
-                                date.includes(searchTerm) || 
-                                status.includes(searchTerm);
-                
-                item.style.display = isVisible ? '' : 'none';
-            });
-        });
-
-        // Sort functionality
-        sortSelect.addEventListener('change', function() {
-            const sortValue = this.value;
-            const items = Array.from(listingItems);
-            
-            items.sort((a, b) => {
-                switch(sortValue) {
-                    case 'newest':
-                        return new Date(b.querySelector('.listing-date').textContent.split(': ')[1]) - 
-                               new Date(a.querySelector('.listing-date').textContent.split(': ')[1]);
-                    case 'oldest':
-                        return new Date(a.querySelector('.listing-date').textContent.split(': ')[1]) - 
-                               new Date(b.querySelector('.listing-date').textContent.split(': ')[1]);
-                    case 'price-high':
-                    case 'price-low':
-                        const priceTextA = a.querySelector('.listing-price').textContent.match(/€([\d,.]+)/)[1];
-                        const priceTextB = b.querySelector('.listing-price').textContent.match(/€([\d,.]+)/)[1];
-                        const priceA = parseFloat(priceTextA.replace(/,/g, ''));
-                        const priceB = parseFloat(priceTextB.replace(/,/g, ''));
-                        return sortValue === 'price-high' ? priceB - priceA : priceA - priceB;
-                    default:
-                        return 0;
-                }
-            });
-
-            // Reorder items in the DOM
-            items.forEach(item => {
-                if (item.style.display !== 'none') {
-                    listingsGrid.appendChild(item);
-                }
-            });
-
-            // Update URL with sort parameter
-            const url = new URL(window.location.href);
-            url.searchParams.set('sort', sortValue);
-            window.history.pushState({}, '', url);
-        });
-    });
-    </script>
     
     <?php
     // Return the buffered content
