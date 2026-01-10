@@ -404,7 +404,7 @@ class MyListingsAjaxHandler {
                         class="btn btn-danger delete-button"
                         onclick="return confirm('Are you sure you want to delete this listing? This action cannot be undone.');"
                     >
-                        <i class="fas fa-trash-alt"></i>
+                        <i class="fas fa-trash-alt"></i>asddsa
                     </a>
                 </div>
             </div>
