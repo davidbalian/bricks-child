@@ -1,3 +1,20 @@
+.listings-layout {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.listings-layout .page-numbers {
+  border-radius: 100rem;
+  padding: 0.25rem;
+}
+
+.listings-layout .page-numbers.prev,
+.listings-layout .page-numbers.next {
+  padding: 0.25rem 0.75rem;
+}
+
 .my-listings-container {
   max-width: 1200px;
   margin: 0 auto;
