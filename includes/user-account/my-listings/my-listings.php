@@ -103,7 +103,6 @@ function display_my_listings($atts) {
             ?>
             <div class="listings-layout">
 
-                <!-- LEFT: filters -->
                 <div class="listings-filter">
                     <form method="get" class="status-filter-form">
                         <label for="status-filter">Filter by status:</label>
