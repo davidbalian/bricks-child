@@ -341,6 +341,7 @@ function display_my_listings($atts) {
             </div>
         </div>
     </div>
+    </div>
     
     <?php
     // Return the buffered content
