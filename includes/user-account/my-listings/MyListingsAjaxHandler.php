@@ -279,13 +279,15 @@ class MyListingsAjaxHandler {
     }
 
     /**
-     * Render a single listing item
+     * Render a single listing item.
+     *
+     * Used both on initial page load (template) and for AJAX responses.
      *
      * @param int               $post_id     Listing post ID.
      * @param RefreshListingUI  $refresh_ui  Refresh UI helper.
      * @return void
      */
-    private static function render_listing_item(int $post_id, RefreshListingUI $refresh_ui): void {
+    public static function render_listing_item(int $post_id, RefreshListingUI $refresh_ui): void {
         $price = get_field('price', $post_id);
 
         // Get all car images
@@ -402,7 +404,7 @@ class MyListingsAjaxHandler {
                         class="btn btn-danger delete-button"
                         onclick="return confirm('Are you sure you want to delete this listing? This action cannot be undone.');"
                     >
-                        <i class="fas fa-trash-alt"></i> Delete
+                        <i class="fas fa-trash-alt"></i>
                     </a>
                 </div>
             </div>

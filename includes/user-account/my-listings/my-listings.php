@@ -218,107 +218,12 @@ function display_my_listings($atts) {
                         data-max-pages="<?php echo esc_attr($user_listings->max_num_pages); ?>"
                         data-per-page="<?php echo esc_attr(MyListingsAjaxHandler::DEFAULT_PER_PAGE); ?>"
                     >
-                        <?php while ($user_listings->have_posts()) : $user_listings->the_post(); 
-                            $post_id = get_the_ID();
-                            $price = get_field('price', $post_id);
-                            
-                            // Get all car images
-                            $featured_image = get_post_thumbnail_id($post_id);
-                            $additional_images = get_field('car_images', $post_id);
-                            $all_images = array();
-                            
-                            if ($featured_image) {
-                                $all_images[] = $featured_image;
-                            }
-                            
-                            if (is_array($additional_images)) {
-                                $all_images = array_merge($all_images, $additional_images);
-                            }
+                        <?php
+                        while ($user_listings->have_posts()) :
+                            $user_listings->the_post();
+                            MyListingsAjaxHandler::render_listing_item(get_the_ID(), $refresh_ui);
+                        endwhile;
                         ?>
-                            <div class="listing-item">
-                                <div class="listing-image-container">
-                                    <?php if (!empty($all_images)) : 
-                                        $main_image_url = wp_get_attachment_image_url($all_images[0], 'large');
-                                    ?>
-                                        <a href="<?php echo esc_url(get_permalink($post_id)); ?>" class="listing-image-link">
-                                            <img src="<?php echo esc_url($main_image_url); ?>" alt="<?php the_title(); ?>" class="listing-image">
-                                            <div class="image-count">
-                                                <i class="fas fa-camera"></i>
-                                                <span><?php echo count($all_images); ?></span>
-                                            </div>
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="listing-details">
-                                    <div class="title-and-price">
-                                        <a href="<?php echo esc_url(get_permalink($post_id)); ?>" class="listing-title-link">
-                                            <h3 class="listing-title"><?php the_title(); ?></h3>
-                                        </a>
-                                        <h4 class="listing-price">€<?php echo number_format(floatval(str_replace(',', '', $price))); ?></h4>
-                                    </div>
-                                    <div class="listing-meta">
-                                        <span class="listing-date">Published: <?php echo get_the_date(); ?></span>
-                                        <span class="listing-status<?php 
-                                            if (get_field('is_sold', $post_id)) {
-                                                echo ' status-sold';
-                                            } elseif (get_post_status() === 'pending') {
-                                                echo ' status-pending';
-                                            } elseif (get_post_status() === 'publish') {
-                                                echo ' status-published';
-                                            }
-                                        ?>">Status: <?php 
-                                            $is_sold = get_field('is_sold', $post_id);
-                                            if ($is_sold) {
-                                                echo 'SOLD';
-                                            } else {
-                                                echo get_post_status() === 'publish' ? 'Published' : ucfirst(get_post_status());
-                                            }
-                                        ?></span>
-                                        <?php 
-                                        // Show refresh status for published listings
-                                        if (get_post_status() === 'publish') {
-                                            echo $refresh_ui->render_refresh_status($post_id);
-                                        }
-                                        ?>
-                                    </div>
-                                    <div class="listing-actions">
-                                        <a href="<?php echo esc_url(add_query_arg('car_id', $post_id, home_url('/edit-listing/'))); ?>" class="btn btn-primary"><i class="fas fa-pencil-alt"></i> Edit</a>
-                                        <?php 
-                                        // Show refresh button for published, unsold listings
-                                        if (get_post_status() === 'publish' && !get_field('is_sold', $post_id)) {
-                                            echo $refresh_ui->render_refresh_button($post_id);
-                                        }
-                                        ?>
-                                        <?php 
-                                        if (get_post_status() === 'publish') {
-                                            $is_sold = get_field('is_sold', $post_id);
-                                            $button_text = $is_sold ? ' Mark as Available' : ' Mark as Sold';
-                                            $button_class = $is_sold
-                                                ? 'btn btn-primary available-button'
-                                                : 'btn btn-success sold-button';
-                                            $icon_class = $is_sold ? 'fas fa-undo-alt' : 'fas fa-check-circle';
-                                            ?>
-                                            <button
-                                                class="<?php echo esc_attr($button_class); ?>"
-                                                data-car-id="<?php echo esc_attr($post_id); ?>"
-                                                data-is-sold="<?php echo $is_sold ? '1' : '0'; ?>"
-                                            >
-                                                <i class="<?php echo esc_attr($icon_class); ?>"></i><?php echo esc_html($button_text); ?>
-                                            </button>
-                                        <?php } ?>
-                                        <?php 
-                                        // Create custom frontend delete URL
-                                        $delete_url = add_query_arg(array(
-                                            'action' => 'delete_car_listing',
-                                            'car_id' => $post_id,
-                                            '_wpnonce' => wp_create_nonce('delete_car_listing_' . $post_id)
-                                        ), admin_url('admin-post.php'));
-                                        ?>
-                                        <a href="<?php echo esc_url($delete_url); ?>" class="btn btn-danger delete-button" onclick="return confirm('Are you sure you want to delete this listing? This action cannot be undone.');"><i class="fas fa-trash-alt"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endwhile; ?>
                     </div>
 
                     <div class="my-listings-pagination-container">
