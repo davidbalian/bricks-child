@@ -37,6 +37,38 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     // Store the makes data
     const makesData = editListingData.makesData;
     let accumulatedFilesList = []; // For newly added files
+
+    // Keep engine capacity behavior aligned with add listing (lock for electric)
+    const $fuelType = $('#fuel_type');
+    const $engineCapacity = $('#engine_capacity');
+
+    function handleElectricFuelType() {
+        if (!$fuelType.length || !$engineCapacity.length) return;
+
+        const selectedFuelType = $fuelType.val();
+
+        if (selectedFuelType === 'Electric') {
+            if ($engineCapacity.find('option[value="0.0"]').length === 0) {
+                $engineCapacity
+                    .find('option[value=""]')
+                    .after('<option value="0.0">0.0</option>');
+            }
+            $engineCapacity.val('0.0');
+            $engineCapacity.prop('disabled', true);
+            $engineCapacity.addClass('electric-locked');
+        } else {
+            $engineCapacity.prop('disabled', false);
+            $engineCapacity.removeClass('electric-locked');
+
+            if ($engineCapacity.val() === '0.0') {
+                $engineCapacity.val('');
+            }
+            $engineCapacity.find('option[value="0.0"]').remove();
+        }
+    }
+
+    handleElectricFuelType();
+    $fuelType.on('change', handleElectricFuelType);
     
     // Define these early for use in initial count and event handlers
     const fileInput = $('#car_images');
@@ -658,6 +690,11 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             name: 'hp',
             value: rawHp
         }).appendTo(this);
+
+        // Ensure engine capacity value submits even when locked for electric
+        if ($engineCapacity.length && $engineCapacity.prop('disabled')) {
+            $engineCapacity.prop('disabled', false);
+        }
         
         // Disable the original inputs
         $('#mileage, #price, #hp').prop('disabled', true);

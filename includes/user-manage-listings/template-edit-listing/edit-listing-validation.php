@@ -19,8 +19,18 @@ if (!defined('ABSPATH')) {
 function validate_edit_listing_form($data, $car_id) {
     $errors = array();
     $editable_fields = array(
+        'year' => 'Year',
         'mileage' => 'Mileage',
         'price' => 'Price',
+        'engine_capacity' => 'Engine Capacity',
+        'fuel_type' => 'Fuel Type',
+        'transmission' => 'Transmission',
+        'drive_type' => 'Drive Type',
+        'body_type' => 'Body Type',
+        'exterior_color' => 'Exterior Color',
+        'interior_color' => 'Interior Color',
+        'number_of_doors' => 'Number of Doors',
+        'number_of_seats' => 'Number of Seats',
         // 'description' => 'Description', DESCRIPTION NOT MANDATORY ANYMORE
         'availability' => 'Availability',
     );

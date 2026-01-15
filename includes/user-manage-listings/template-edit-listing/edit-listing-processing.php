@@ -17,21 +17,40 @@ if (!defined('ABSPATH')) {
  * @return bool True on success, false on failure
  */
 function process_edit_listing_form($data, $car_id) {
-    $editable_fields = array(
-        'mileage' => 'Mileage',
-        'price' => 'Price',
-        'description' => 'Description',
-        'availability' => 'Availability',
+    $integer_fields = array(
+        'year',
+        'mileage',
+        'price',
+        'number_of_doors',
+        'number_of_seats',
     );
-    
-    // Update only editable fields
-    foreach ($editable_fields as $field_key => $field_label) {
-        if ($field_key === 'description') {
-            // Handle description the same way as add listing - preserve whitespace and line breaks
-            update_field($field_key, wp_kses_post($data[$field_key]), $car_id);
-        } else {
+
+    foreach ($integer_fields as $field_key) {
+        if (isset($data[$field_key])) {
+            $value = trim((string) $data[$field_key]) === '' ? '' : intval($data[$field_key]);
+            update_field($field_key, $value, $car_id);
+        }
+    }
+
+    $text_fields = array(
+        'availability',
+        'engine_capacity',
+        'fuel_type',
+        'transmission',
+        'drive_type',
+        'body_type',
+        'exterior_color',
+        'interior_color',
+    );
+
+    foreach ($text_fields as $field_key) {
+        if (isset($data[$field_key])) {
             update_field($field_key, sanitize_text_field($data[$field_key]), $car_id);
         }
+    }
+
+    if (isset($data['description'])) {
+        update_field('description', wp_kses_post($data['description']), $car_id);
     }
     
     // Update location-related fields
@@ -53,7 +72,8 @@ function process_edit_listing_form($data, $car_id) {
     
     // Update optional fields
     if (isset($data['hp'])) {
-        update_field('hp', sanitize_text_field($data['hp']), $car_id);
+        $hp_value = trim((string) $data['hp']) === '' ? '' : intval($data['hp']);
+        update_field('hp', $hp_value, $car_id);
     }
 
     // Update MOT status (optional)
@@ -67,6 +87,9 @@ function process_edit_listing_form($data, $car_id) {
         $numowners_value = !empty(trim($data['numowners'])) ? intval($data['numowners']) : '';
         update_field('numowners', $numowners_value, $car_id);
     }
+
+    $is_antique = isset($data['isantique']) ? 1 : 0;
+    update_field('isantique', $is_antique, $car_id);
     
     // Process vehicle history
     $vehiclehistory = array();
@@ -80,6 +103,20 @@ function process_edit_listing_form($data, $car_id) {
     // Process extras
     $extras = isset($data['extras']) ? array_map('sanitize_text_field', $data['extras']) : array();
     update_field('extras', $extras, $car_id);
+
+    // Keep post title aligned with add listing format when year changes
+    if (!empty($data['year'])) {
+        $updated_year  = intval($data['year']);
+        $existing_make = get_field('make', $car_id);
+        $existing_model = get_field('model', $car_id);
+
+        if ($updated_year && $existing_make && $existing_model) {
+            wp_update_post(array(
+                'ID' => $car_id,
+                'post_title' => $updated_year . ' ' . $existing_make . ' ' . $existing_model,
+            ));
+        }
+    }
     
     return true;
 }

@@ -52,7 +52,27 @@ if (!defined('ABSPATH')) {
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
                                         <label for="year"><i class="far fa-calendar-alt"></i> <?php esc_html_e('Year', 'bricks-child'); ?></label>
-                                        <input type="text" id="year" name="year" class="form-control" value="<?php echo esc_attr($year); ?>" readonly>
+                                        <select id="year" name="year" class="form-control" required>
+                                            <option value=""><?php esc_html_e('Select Year', 'bricks-child'); ?></option>
+                                            <?php
+                                            for ($year_option = 2025; $year_option >= 1948; $year_option--) {
+                                                printf(
+                                                    '<option value="%1$d" %2$s>%1$d</option>',
+                                                    esc_attr($year_option),
+                                                    selected((int) $year, $year_option, false)
+                                                );
+                                            }
+
+                                            $year_int = (int) $year;
+                                            if ($year_int && ($year_int < 1948 || $year_int > 2025)) {
+                                                printf(
+                                                    '<option value="%1$d" %2$s>%1$d</option>',
+                                                    esc_attr($year_int),
+                                                    selected((int) $year, $year_int, false)
+                                                );
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                     <div class="form-third">
                                         <label for="mileage"><i class="fas fa-road"></i> <?php esc_html_e('Mileage', 'bricks-child'); ?></label>
@@ -92,25 +112,65 @@ if (!defined('ABSPATH')) {
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
                                         <label for="engine_capacity"><i class="fas fa-tachometer-alt"></i> <?php esc_html_e('Engine Capacity', 'bricks-child'); ?></label>
-                                        <div class="input-with-suffix">
-                                            <input type="text" id="engine_capacity" name="engine_capacity" class="form-control" value="<?php echo esc_attr($engine_capacity); ?>" readonly>
-                                            <span class="input-suffix">L</span>
-                                        </div>
+                                        <select id="engine_capacity" name="engine_capacity" class="form-control" required>
+                                            <option value=""><?php esc_html_e('Select Engine Capacity', 'bricks-child'); ?></option>
+                                            <?php
+                                            $formatted_capacity_value = number_format((float) $engine_capacity, 1, '.', '');
+                                            for ($capacity = 0.4; $capacity <= 12.0; $capacity += 0.1) {
+                                                $formatted_capacity = number_format($capacity, 1);
+                                                printf(
+                                                    '<option value="%1$s" %2$s>%1$s</option>',
+                                                    esc_attr($formatted_capacity),
+                                                    selected($formatted_capacity_value, $formatted_capacity, false)
+                                                );
+                                            }
+
+                                            if ($formatted_capacity_value && ((float) $formatted_capacity_value < 0.4 || (float) $formatted_capacity_value > 12.0)) {
+                                                printf(
+                                                    '<option value="%1$s" %2$s>%1$s</option>',
+                                                    esc_attr($formatted_capacity_value),
+                                                    selected($formatted_capacity_value, $formatted_capacity_value, false)
+                                                );
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                     <div class="form-third">
                                         <label for="fuel_type"><i class="fas fa-gas-pump"></i> <?php esc_html_e('Fuel Type', 'bricks-child'); ?></label>
-                                        <input type="text" id="fuel_type" name="fuel_type" class="form-control" value="<?php echo esc_attr($fuel_type); ?>" readonly>
+                                        <select id="fuel_type" name="fuel_type" class="form-control" required>
+                                            <option value=""><?php esc_html_e('Select Fuel Type', 'bricks-child'); ?></option>
+                                            <option value="Petrol" <?php selected($fuel_type, 'Petrol'); ?>><?php esc_html_e('Petrol', 'bricks-child'); ?></option>
+                                            <option value="Diesel" <?php selected($fuel_type, 'Diesel'); ?>><?php esc_html_e('Diesel', 'bricks-child'); ?></option>
+                                            <option value="Electric" <?php selected($fuel_type, 'Electric'); ?>><?php esc_html_e('Electric', 'bricks-child'); ?></option>
+                                            <option value="Petrol hybrid" <?php selected($fuel_type, 'Petrol hybrid'); ?>><?php esc_html_e('Petrol hybrid', 'bricks-child'); ?></option>
+                                            <option value="Diesel hybrid" <?php selected($fuel_type, 'Diesel hybrid'); ?>><?php esc_html_e('Diesel hybrid', 'bricks-child'); ?></option>
+                                            <option value="Plug-in petrol" <?php selected($fuel_type, 'Plug-in petrol'); ?>><?php esc_html_e('Plug-in petrol', 'bricks-child'); ?></option>
+                                            <option value="Plug-in diesel" <?php selected($fuel_type, 'Plug-in diesel'); ?>><?php esc_html_e('Plug-in diesel', 'bricks-child'); ?></option>
+                                            <option value="Bi Fuel" <?php selected($fuel_type, 'Bi Fuel'); ?>><?php esc_html_e('Bi Fuel', 'bricks-child'); ?></option>
+                                            <option value="Hydrogen" <?php selected($fuel_type, 'Hydrogen'); ?>><?php esc_html_e('Hydrogen', 'bricks-child'); ?></option>
+                                            <option value="Natural Gas" <?php selected($fuel_type, 'Natural Gas'); ?>><?php esc_html_e('Natural Gas', 'bricks-child'); ?></option>
+                                        </select>
                                     </div>
                                     <div class="form-third">
                                         <label for="transmission"><i class="fas fa-cogs"></i> <?php esc_html_e('Transmission', 'bricks-child'); ?></label>
-                                        <input type="text" id="transmission" name="transmission" class="form-control" value="<?php echo esc_attr($transmission); ?>" readonly>
+                                        <select id="transmission" name="transmission" class="form-control" required>
+                                            <option value=""><?php esc_html_e('Select Transmission', 'bricks-child'); ?></option>
+                                            <option value="Automatic" <?php selected($transmission, 'Automatic'); ?>><?php esc_html_e('Automatic', 'bricks-child'); ?></option>
+                                            <option value="Manual" <?php selected($transmission, 'Manual'); ?>><?php esc_html_e('Manual', 'bricks-child'); ?></option>
+                                        </select>
                                     </div>
                                 </div>
 
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
                                         <label for="drive_type"><i class="fas fa-car-side"></i> <?php esc_html_e('Drive Type', 'bricks-child'); ?></label>
-                                        <input type="text" id="drive_type" name="drive_type" class="form-control" value="<?php echo esc_attr($drive_type); ?>" readonly>
+                                        <select id="drive_type" name="drive_type" class="form-control" required>
+                                            <option value=""><?php esc_html_e('Select Drive Type', 'bricks-child'); ?></option>
+                                            <option value="Front-Wheel Drive" <?php selected($drive_type, 'Front-Wheel Drive'); ?>><?php esc_html_e('Front-Wheel Drive', 'bricks-child'); ?></option>
+                                            <option value="Rear-Wheel Drive" <?php selected($drive_type, 'Rear-Wheel Drive'); ?>><?php esc_html_e('Rear-Wheel Drive', 'bricks-child'); ?></option>
+                                            <option value="All-Wheel Drive" <?php selected($drive_type, 'All-Wheel Drive'); ?>><?php esc_html_e('All-Wheel Drive', 'bricks-child'); ?></option>
+                                            <option value="4-Wheel Drive" <?php selected($drive_type, '4-Wheel Drive'); ?>><?php esc_html_e('4-Wheel Drive', 'bricks-child'); ?></option>
+                                        </select>
                                     </div>
                                     <div class="form-half">
                                         <label for="hp"><i class="fas fa-horse"></i> <?php esc_html_e('HorsePower (Optional)', 'bricks-child'); ?></label>
@@ -127,26 +187,94 @@ if (!defined('ABSPATH')) {
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
                                         <label for="body_type"><i class="fas fa-car-side"></i> <?php esc_html_e('Body Type', 'bricks-child'); ?></label>
-                                        <input type="text" id="body_type" name="body_type" class="form-control" value="<?php echo esc_attr($body_type); ?>" readonly>
+                                        <select id="body_type" name="body_type" class="form-control" required>
+                                            <option value=""><?php esc_html_e('Select Body Type', 'bricks-child'); ?></option>
+                                            <option value="Hatchback" <?php selected($body_type, 'Hatchback'); ?>><?php esc_html_e('Hatchback', 'bricks-child'); ?></option>
+                                            <option value="Saloon" <?php selected($body_type, 'Saloon'); ?>><?php esc_html_e('Saloon', 'bricks-child'); ?></option>
+                                            <option value="Coupe" <?php selected($body_type, 'Coupe'); ?>><?php esc_html_e('Coupe', 'bricks-child'); ?></option>
+                                            <option value="Convertible" <?php selected($body_type, 'Convertible'); ?>><?php esc_html_e('Convertible', 'bricks-child'); ?></option>
+                                            <option value="Estate" <?php selected($body_type, 'Estate'); ?>><?php esc_html_e('Estate', 'bricks-child'); ?></option>
+                                            <option value="SUV" <?php selected($body_type, 'SUV'); ?>><?php esc_html_e('SUV', 'bricks-child'); ?></option>
+                                            <option value="MPV" <?php selected($body_type, 'MPV'); ?>><?php esc_html_e('MPV', 'bricks-child'); ?></option>
+                                            <option value="Pickup" <?php selected($body_type, 'Pickup'); ?>><?php esc_html_e('Pickup', 'bricks-child'); ?></option>
+                                            <option value="Camper" <?php selected($body_type, 'Camper'); ?>><?php esc_html_e('Camper', 'bricks-child'); ?></option>
+                                            <option value="Minibus" <?php selected($body_type, 'Minibus'); ?>><?php esc_html_e('Minibus', 'bricks-child'); ?></option>
+                                            <option value="Limousine" <?php selected($body_type, 'Limousine'); ?>><?php esc_html_e('Limousine', 'bricks-child'); ?></option>
+                                            <option value="Car Derived Van" <?php selected($body_type, 'Car Derived Van'); ?>><?php esc_html_e('Car Derived Van', 'bricks-child'); ?></option>
+                                            <option value="Combi Van" <?php selected($body_type, 'Combi Van'); ?>><?php esc_html_e('Combi Van', 'bricks-child'); ?></option>
+                                            <option value="Panel Van" <?php selected($body_type, 'Panel Van'); ?>><?php esc_html_e('Panel Van', 'bricks-child'); ?></option>
+                                            <option value="Window Van" <?php selected($body_type, 'Window Van'); ?>><?php esc_html_e('Window Van', 'bricks-child'); ?></option>
+                                        </select>
                                     </div>
                                     <div class="form-third">
                                         <label for="exterior_color"><i class="fas fa-paint-brush"></i> <?php esc_html_e('Exterior Color', 'bricks-child'); ?></label>
-                                        <input type="text" id="exterior_color" name="exterior_color" class="form-control" value="<?php echo esc_attr($exterior_color); ?>" readonly>
+                                        <select id="exterior_color" name="exterior_color" class="form-control" required>
+                                            <option value=""><?php esc_html_e('Select Exterior Color', 'bricks-child'); ?></option>
+                                            <option value="Black" <?php selected($exterior_color, 'Black'); ?>><?php esc_html_e('Black', 'bricks-child'); ?></option>
+                                            <option value="White" <?php selected($exterior_color, 'White'); ?>><?php esc_html_e('White', 'bricks-child'); ?></option>
+                                            <option value="Silver" <?php selected($exterior_color, 'Silver'); ?>><?php esc_html_e('Silver', 'bricks-child'); ?></option>
+                                            <option value="Gray" <?php selected($exterior_color, 'Gray'); ?>><?php esc_html_e('Gray', 'bricks-child'); ?></option>
+                                            <option value="Red" <?php selected($exterior_color, 'Red'); ?>><?php esc_html_e('Red', 'bricks-child'); ?></option>
+                                            <option value="Blue" <?php selected($exterior_color, 'Blue'); ?>><?php esc_html_e('Blue', 'bricks-child'); ?></option>
+                                            <option value="Green" <?php selected($exterior_color, 'Green'); ?>><?php esc_html_e('Green', 'bricks-child'); ?></option>
+                                            <option value="Yellow" <?php selected($exterior_color, 'Yellow'); ?>><?php esc_html_e('Yellow', 'bricks-child'); ?></option>
+                                            <option value="Brown" <?php selected($exterior_color, 'Brown'); ?>><?php esc_html_e('Brown', 'bricks-child'); ?></option>
+                                            <option value="Beige" <?php selected($exterior_color, 'Beige'); ?>><?php esc_html_e('Beige', 'bricks-child'); ?></option>
+                                            <option value="Orange" <?php selected($exterior_color, 'Orange'); ?>><?php esc_html_e('Orange', 'bricks-child'); ?></option>
+                                            <option value="Purple" <?php selected($exterior_color, 'Purple'); ?>><?php esc_html_e('Purple', 'bricks-child'); ?></option>
+                                            <option value="Gold" <?php selected($exterior_color, 'Gold'); ?>><?php esc_html_e('Gold', 'bricks-child'); ?></option>
+                                            <option value="Bronze" <?php selected($exterior_color, 'Bronze'); ?>><?php esc_html_e('Bronze', 'bricks-child'); ?></option>
+                                        </select>
                                     </div>
                                     <div class="form-third">
                                         <label for="interior_color"><i class="fas fa-paint-brush"></i> <?php esc_html_e('Interior Color', 'bricks-child'); ?></label>
-                                        <input type="text" id="interior_color" name="interior_color" class="form-control" value="<?php echo esc_attr($interior_color); ?>" readonly>
+                                        <select id="interior_color" name="interior_color" class="form-control" required>
+                                            <option value=""><?php esc_html_e('Select Interior Color', 'bricks-child'); ?></option>
+                                            <option value="Black" <?php selected($interior_color, 'Black'); ?>><?php esc_html_e('Black', 'bricks-child'); ?></option>
+                                            <option value="Gray" <?php selected($interior_color, 'Gray'); ?>><?php esc_html_e('Gray', 'bricks-child'); ?></option>
+                                            <option value="Beige" <?php selected($interior_color, 'Beige'); ?>><?php esc_html_e('Beige', 'bricks-child'); ?></option>
+                                            <option value="Brown" <?php selected($interior_color, 'Brown'); ?>><?php esc_html_e('Brown', 'bricks-child'); ?></option>
+                                            <option value="White" <?php selected($interior_color, 'White'); ?>><?php esc_html_e('White', 'bricks-child'); ?></option>
+                                            <option value="Red" <?php selected($interior_color, 'Red'); ?>><?php esc_html_e('Red', 'bricks-child'); ?></option>
+                                            <option value="Blue" <?php selected($interior_color, 'Blue'); ?>><?php esc_html_e('Blue', 'bricks-child'); ?></option>
+                                            <option value="Tan" <?php selected($interior_color, 'Tan'); ?>><?php esc_html_e('Tan', 'bricks-child'); ?></option>
+                                            <option value="Cream" <?php selected($interior_color, 'Cream'); ?>><?php esc_html_e('Cream', 'bricks-child'); ?></option>
+                                        </select>
                                     </div>
                                 </div>
 
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
                                         <label for="number_of_doors"><i class="fas fa-door-open"></i> <?php esc_html_e('Number of Doors', 'bricks-child'); ?></label>
-                                        <input type="text" id="number_of_doors" name="number_of_doors" class="form-control" value="<?php echo esc_attr($number_of_doors); ?>" readonly>
+                                        <select id="number_of_doors" name="number_of_doors" class="form-control" required>
+                                            <option value=""><?php esc_html_e('Select Number of Doors', 'bricks-child'); ?></option>
+                                            <?php
+                                            $door_options = array(0, 2, 3, 4, 5, 6, 7);
+                                            foreach ($door_options as $doors) {
+                                                printf(
+                                                    '<option value="%1$d" %2$s>%1$d</option>',
+                                                    esc_attr($doors),
+                                                    selected((int) $number_of_doors, $doors, false)
+                                                );
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                     <div class="form-half">
                                         <label for="number_of_seats"><i class="fas fa-chair"></i> <?php esc_html_e('Number of Seats', 'bricks-child'); ?></label>
-                                        <input type="text" id="number_of_seats" name="number_of_seats" class="form-control" value="<?php echo esc_attr($number_of_seats); ?>" readonly>
+                                        <select id="number_of_seats" name="number_of_seats" class="form-control" required>
+                                            <option value=""><?php esc_html_e('Select Number of Seats', 'bricks-child'); ?></option>
+                                            <?php
+                                            $seat_options = range(1, 8);
+                                            foreach ($seat_options as $seats) {
+                                                printf(
+                                                    '<option value="%1$d" %2$s>%1$d</option>',
+                                                    esc_attr($seats),
+                                                    selected((int) $number_of_seats, $seats, false)
+                                                );
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -188,8 +316,11 @@ if (!defined('ABSPATH')) {
                                 </div>
 
                                 <div class="form-row">
-                                    <label for="isantique"><i class="fas fa-clock"></i> <?php esc_html_e('Written as antique', 'bricks-child'); ?></label>
-                                    <input type="text" id="isantique" name="isantique" class="form-control" value="<?php echo $is_antique ? esc_html__('Yes', 'bricks-child') : esc_html__('No', 'bricks-child'); ?>" readonly>
+                                    <label for="isantique"><i class="fas fa-clock"></i> <?php esc_html_e('Registered as an Antique', 'bricks-child'); ?></label>
+                                    <div class="checkbox-field">
+                                        <input type="checkbox" id="isantique" name="isantique" value="1" <?php checked($is_antique, 1); ?>>
+                                        <span><?php esc_html_e('Mark this listing as registered antique', 'bricks-child'); ?></span>
+                                    </div>
                                 </div>
                             </div>
 
