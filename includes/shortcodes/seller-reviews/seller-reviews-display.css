@@ -4,15 +4,14 @@
   margin: 20px 0;
   padding: 20px;
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--bricks-color-chsdhg);
+  border-radius: 0.75rem;
 }
 
 /* Rating Summary Section */
 .seller-rating-summary {
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 .rating-stars {
@@ -131,9 +130,8 @@
 
 /* Review Form Section */
 .seller-review-form-container {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #e5e5e5;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
 }
 
 .review-form-toggle {

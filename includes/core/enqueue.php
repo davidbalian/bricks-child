@@ -77,17 +77,20 @@ function bricks_child_enqueue_styles() {
     // For debugging - you can temporarily set this to true to always load the script
     // $load_car_listings_script = true;
 
+    // DISABLED: Old car-listings system with undefined functions
+    // The new [car_listings] shortcode in /includes/shortcodes/car-listings/ handles its own assets
+    /*
     if ( $load_car_listings_script ) {
         wp_enqueue_script(
             'car-listings-script',
             get_stylesheet_directory_uri() . '/includes/car-listings/car-listings.js',
-            array('jquery'), 
+            array('jquery'),
             filemtime(get_stylesheet_directory() . '/includes/car-listings/car-listings.js'),
             false // Load in header instead of footer
         );
 
         // Prepare ALL data needed by car-listings.js
-        
+
         // 1. Get all published cars with their meta data for filtering
         $all_cars_data = array();
         $args = array(
@@ -121,7 +124,7 @@ function bricks_child_enqueue_styles() {
             }
             wp_reset_postdata();
         }
-        
+
         // 2. Get filter counts and data using functions from car-listings-data.php
         // $make_data = get_car_makes_with_counts(); // COMMENTED OUT: Function doesn't exist
         // $model_data = get_car_models_by_make_with_counts($make_data['makes']); // COMMENTED OUT: Depends on line above
@@ -154,11 +157,12 @@ function bricks_child_enqueue_styles() {
             'drive_type_counts' => $drive_type_data['counts'],
             'exterior_color_counts' => $color_data['exterior_counts'],
             'interior_color_counts' => $color_data['interior_counts'],
-            // Add min_max_data if your JS needs it: 'min_max' => $min_max_data 
+            // Add min_max_data if your JS needs it: 'min_max' => $min_max_data
         );
-        
+
         wp_localize_script('car-listings-script', 'carListingsData', $localized_data);
     }
+    */
 }
 add_action( 'wp_enqueue_scripts', 'bricks_child_enqueue_styles', 15 );
 

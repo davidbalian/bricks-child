@@ -11,6 +11,22 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Load logo manager for account logo actions.
+require_once get_stylesheet_directory() . '/includes/user-account/my-account/UserLogoManager.php';
+
+/**
+ * Helper to get a shared UserLogoManager instance.
+ */
+function my_account_get_logo_manager(): UserLogoManager {
+    static $instance = null;
+
+    if ($instance === null) {
+        $instance = new UserLogoManager();
+    }
+
+    return $instance;
+}
+
 // Add AJAX handler for updating user name
 add_action('wp_ajax_update_user_name', 'handle_update_user_name');
 function handle_update_user_name() {
@@ -371,4 +387,79 @@ function handle_update_listing_notification_preferences() {
         'activity_notifications' => $activity,
         'reminder_notifications' => $reminders
     ));
+} 
+
+/**
+ * AJAX: Upload or replace account logo.
+ */
+add_action('wp_ajax_upload_account_logo', 'handle_upload_account_logo');
+function handle_upload_account_logo() {
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'upload_account_logo_nonce')) {
+        wp_send_json_error('Invalid nonce');
+        return;
+    }
+
+    if (!is_user_logged_in()) {
+        wp_send_json_error('User not logged in');
+        return;
+    }
+
+    if (!isset($_FILES['account_logo'])) {
+        wp_send_json_error('No file uploaded');
+        return;
+    }
+
+    $user_id = get_current_user_id();
+
+    // 2 MB max size by default.
+    $max_file_size = apply_filters('my_account_logo_max_file_size', 2 * 1024 * 1024);
+
+    // Restrict to standard image types.
+    $allowed_mimes = apply_filters('my_account_logo_allowed_mimes', array(
+        'jpg|jpeg|jpe' => 'image/jpeg',
+        'png'          => 'image/png',
+        'gif'          => 'image/gif',
+        'webp'         => 'image/webp',
+    ));
+
+    $manager = my_account_get_logo_manager();
+    $result  = $manager->saveUserLogoFromUpload($user_id, $_FILES['account_logo'], $max_file_size, $allowed_mimes);
+
+    if (!$result['success']) {
+        wp_send_json_error($result['message']);
+        return;
+    }
+
+    wp_send_json_success(array(
+        'message' => $result['message'],
+        'logoUrl' => isset($result['logoUrl']) ? $result['logoUrl'] : '',
+    ));
+}
+
+/**
+ * AJAX: Remove account logo entirely.
+ */
+add_action('wp_ajax_remove_account_logo', 'handle_remove_account_logo');
+function handle_remove_account_logo() {
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'remove_account_logo_nonce')) {
+        wp_send_json_error('Invalid nonce');
+        return;
+    }
+
+    if (!is_user_logged_in()) {
+        wp_send_json_error('User not logged in');
+        return;
+    }
+
+    $user_id = get_current_user_id();
+    $manager = my_account_get_logo_manager();
+
+    $removed = $manager->removeUserLogo($user_id);
+
+    if (!$removed) {
+        wp_send_json_error('Failed to remove logo');
+        return;
+    }
+
+    wp_send_json_success('Logo removed successfully');
 }

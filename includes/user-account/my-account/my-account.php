@@ -28,11 +28,13 @@ function display_my_account($atts) {
     
     // Localize script with AJAX data
     wp_localize_script('my-account-display-js', 'MyAccountAjax', array(
-        'ajax_url' => admin_url('admin-ajax.php'),
-        'update_user_name_nonce' => wp_create_nonce('update_user_name'),
-        'password_reset_nonce' => wp_create_nonce('password_reset_nonce'),
-        'email_verification_nonce' => wp_create_nonce('email_verification_nonce'),
-        'notification_preferences_nonce' => wp_create_nonce('notification_preferences_nonce')
+        'ajax_url'                       => admin_url('admin-ajax.php'),
+        'update_user_name_nonce'         => wp_create_nonce('update_user_name'),
+        'password_reset_nonce'           => wp_create_nonce('password_reset_nonce'),
+        'email_verification_nonce'       => wp_create_nonce('email_verification_nonce'),
+        'notification_preferences_nonce' => wp_create_nonce('notification_preferences_nonce'),
+        'upload_account_logo_nonce'      => wp_create_nonce('upload_account_logo_nonce'),
+        'remove_account_logo_nonce'      => wp_create_nonce('remove_account_logo_nonce'),
     ));
 
     // Check if we're in password reset flow

@@ -1,0 +1,186 @@
+/**
+ * Car Listings Shortcode Styles
+ * Minimal styles - customize as needed
+ */
+
+/* === Container === */
+.car-listings-container {
+    width: 100%;
+}
+
+/* === Grid Layout === */
+.car-listings-grid .car-listings-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+/* === Vertical Layout === */
+.car-listings-vertical .car-listings-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* === Carousel Layout === */
+.car-listings-carousel .car-listings-wrapper {
+    display: flex;
+    overflow-x: auto;
+    gap: 16px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 8px;
+}
+
+.car-listings-carousel .car-listings-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.car-listings-carousel .car-listings-card {
+    flex: 0 0 300px;
+    scroll-snap-align: start;
+}
+
+/* === Card Base === */
+.car-listings-card {
+    position: relative;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.car-listings-card.is-sold {
+    opacity: 0.7;
+}
+
+.car-listings-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+/* === Card Image === */
+.car-listings-card-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background: #f5f5f5;
+}
+
+.car-listings-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.car-listings-no-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #999;
+    font-size: 14px;
+}
+
+.car-listings-sold-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #dc3545;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* === Card Content === */
+.car-listings-card-content {
+    padding: 16px;
+}
+
+.car-listings-card-title {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #2a3546;
+}
+
+.car-listings-card-meta {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+
+.car-listings-meta-separator {
+    margin: 0 6px;
+    color: #d1d5db;
+}
+
+.car-listings-card-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: #007bff;
+    margin-bottom: 8px;
+}
+
+.car-listings-card-location {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* === Favorite Button Position === */
+.car-listings-card .favorite-btn,
+.car-listings-card .favorite-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+}
+
+/* === Loader === */
+.car-listings-loader {
+    text-align: center;
+    padding: 24px;
+    color: #6b7280;
+}
+
+.loader-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e5e7eb;
+    border-top-color: #007bff;
+    border-radius: 50%;
+    animation: car-listings-spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes car-listings-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* === No Results === */
+.car-listings-no-results {
+    text-align: center;
+    padding: 40px;
+    color: #6b7280;
+    font-size: 16px;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+    .car-listings-grid .car-listings-wrapper {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+    }
+
+    .car-listings-carousel .car-listings-card {
+        flex: 0 0 280px;
+    }
+}

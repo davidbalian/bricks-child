@@ -20,6 +20,7 @@ require_once get_stylesheet_directory() . '/includes/core/google-maps-assets.php
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/listing-details-badge-manager.php';
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/car-submission.php';
 require_once get_stylesheet_directory() . '/includes/user-account/my-account/my-account.php';
+require_once get_stylesheet_directory() . '/includes/user-account/my-listings/MyListingsAjaxHandler.php';
 require_once get_stylesheet_directory() . '/includes/user-account/my-listings/my-listings.php';
 // FAVOURITES PAGE DISABLED - Commented out to disable favourites page functionality
 // require_once get_stylesheet_directory() . '/includes/shortcodes/favourite-listings.php';
@@ -30,6 +31,7 @@ require_once get_stylesheet_directory() . '/includes/auth/registration.php';
 require_once get_stylesheet_directory() . '/includes/auth/roles.php';
 require_once get_stylesheet_directory() . '/includes/auth/forgot-password-ajax.php';
 require_once get_stylesheet_directory() . '/includes/user-account/user-profile.php';
+require_once get_stylesheet_directory() . '/includes/shortcodes/user-logo-shortcode.php';
 require_once get_stylesheet_directory() . '/includes/auth/access-control.php';
 require_once get_stylesheet_directory() . '/includes/auth/login-logout.php';
 require_once get_stylesheet_directory() . '/includes/core/ajax.php';
@@ -346,6 +348,8 @@ require_once get_stylesheet_directory() . '/includes/shortcodes/report-button/re
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-single-call-button/car-single-call-button.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-single-call-button/car-single-whatsapp-button.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/homepage-filters/homepage-filters.php';
+require_once get_stylesheet_directory() . '/includes/shortcodes/car-listings/car-listings.php';
+require_once get_stylesheet_directory() . '/includes/shortcodes/car-filters/car-filters.php';
 
 
 // =========================================================================

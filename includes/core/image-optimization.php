@@ -291,10 +291,23 @@ function delete_non_webp_siblings($webp_path) {
     // Also look for variants without a trailing "-scaled" suffix.
     $base_unsuffixed = str_ends_with($base, '-scaled') ? substr($base, 0, -7) : $base;
 
+    // Handle attachment ID suffix in WebP filename (e.g., "photo-123" -> also look for "photo")
+    // Pattern: basename ends with "-" followed by digits (the attachment ID)
+    $base_without_id = preg_replace('/-\d+$/', '', $base);
+    $base_unsuffixed_without_id = preg_replace('/-\d+$/', '', $base_unsuffixed);
+
     $patterns = array(
         trailingslashit($dir) . $base . '.*',
         trailingslashit($dir) . $base_unsuffixed . '.*',
     );
+
+    // Add patterns for original basename without attachment ID suffix
+    if ($base_without_id !== $base) {
+        $patterns[] = trailingslashit($dir) . $base_without_id . '.*';
+    }
+    if ($base_unsuffixed_without_id !== $base_unsuffixed && $base_unsuffixed_without_id !== $base_without_id) {
+        $patterns[] = trailingslashit($dir) . $base_unsuffixed_without_id . '.*';
+    }
 
     $candidates = array();
     foreach ($patterns as $pattern) {
@@ -325,6 +338,52 @@ function delete_non_webp_siblings($webp_path) {
             }
         }
     }
+}
+
+/**
+ * Convert a palette/indexed PNG to truecolor PNG so GD can encode it as WebP.
+ * 
+ * @param string $file_path Path to the PNG file.
+ * @return bool True if converted (or already truecolor), false on failure.
+ */
+function convert_palette_png_to_truecolor($file_path) {
+    if (!function_exists('imagecreatefrompng') || !function_exists('imagepalettetotruecolor')) {
+        return false;
+    }
+
+    $image = @imagecreatefrompng($file_path);
+    if (!$image) {
+        car_image_opt_log('Failed to load PNG for palette check: ' . $file_path);
+        return false;
+    }
+
+    // Check if image is palette-based (not truecolor)
+    if (!imageistruecolor($image)) {
+        car_image_opt_log('Converting palette PNG to truecolor: ' . $file_path);
+        
+        // Preserve transparency
+        imagealphablending($image, false);
+        imagesavealpha($image, true);
+        
+        // Convert palette to truecolor
+        if (!imagepalettetotruecolor($image)) {
+            car_image_opt_log('Failed to convert palette to truecolor');
+            imagedestroy($image);
+            return false;
+        }
+
+        // Save back to the same file
+        if (!imagepng($image, $file_path, 9)) {
+            car_image_opt_log('Failed to save truecolor PNG');
+            imagedestroy($image);
+            return false;
+        }
+
+        car_image_opt_log('Successfully converted palette PNG to truecolor');
+    }
+
+    imagedestroy($image);
+    return true;
 }
 
 /**
@@ -366,8 +425,14 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
             return false;
         }
 
-        $webp_path = $pathinfo['dirname'] . '/' . $pathinfo['filename'] . '.webp';
+        // Include attachment ID in filename to guarantee uniqueness (prevents collisions when users upload files with same names like 1.jpg, 2.jpg)
+        $webp_path = $pathinfo['dirname'] . '/' . $pathinfo['filename'] . '-' . $attachment_id . '.webp';
         car_image_opt_log("Paths | webp_path: {$webp_path}");
+
+        // For PNG files, convert palette images to truecolor first (GD can't encode palette PNGs to WebP)
+        if ($original_mime === 'image/png') {
+            convert_palette_png_to_truecolor($file_path);
+        }
 
         // Load the image editor
         $image_editor = wp_get_image_editor($file_path);
@@ -404,6 +469,16 @@ function convert_to_webp_with_fallback($attachment_id, $pre_conversion_metadata 
         
         if (is_wp_error($saved)) {
             car_image_opt_log('Error saving WebP: ' . $saved->get_error_message());
+            return false;
+        }
+
+        // Verify WebP file was created and is not empty/corrupted
+        if (!file_exists($webp_path) || filesize($webp_path) < 100) {
+            car_image_opt_log("WebP conversion produced empty/invalid file for attachment {$attachment_id}, keeping original");
+            // Clean up the empty WebP file if it exists
+            if (file_exists($webp_path)) {
+                @unlink($webp_path);
+            }
             return false;
         }
 

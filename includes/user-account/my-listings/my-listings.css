@@ -1,5 +1,28 @@
+.listings-layout {
+  display: block;
+}
+
+.my-listings-page-link {
+  border-radius: 100rem;
+  padding: 0.25rem 0.75rem !important;
+}
+
+.my-listings-page-link.is-active {
+  background: var(--text-color);
+  color: var(--white) !important;
+  border-color: var(--text-color);
+  cursor: default;
+  pointer-events: none; /* prevents clicking */
+  opacity: 1 !important;
+}
+
+.my-listings-page-link:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .my-listings-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -40,13 +63,29 @@
 
 .listings-filter {
   display: flex;
-  flex-direction: column;
-  gap: 2rem;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 1.5rem;
   padding: 1.5rem;
   margin-bottom: 2rem;
   background-color: var(--light-bg);
   border-radius: var(--border-radius-large);
   border: var(--border);
+}
+
+.status-filter-form,
+.sort-container,
+.search-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.status-filter-form select,
+.sort-container select,
+.search-container input {
+  width: 100%;
 }
 
 .listings-filter label {
@@ -148,6 +187,16 @@
   color: var(--text-color);
 }
 
+.my-listings-pagination {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 10px;
+}
+
+
+
 .listing-actions {
   display: flex;
   gap: 1rem;
@@ -155,10 +204,11 @@
 }
 
 .listing-actions .btn {
-  padding: 0.75rem 1.25rem;
+  padding: 0.4rem 0.9rem;
   border-radius: var(--border-radius-small);
   text-decoration: none !important;
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 500;
   transition: opacity 0.1s ease;
 }
 
@@ -171,33 +221,12 @@
 }
 
 .listings-area {
-  display: flex;
-  gap: 2rem;
-}
-
-.listings-filter {
-  width: 20%;
-}
-
-.listings-grid {
-  width: 80%;
+  margin-top: 2rem;
 }
 
 @media (max-width: 1199.98px) {
   .listings-area {
     flex-direction: column;
-  }
-
-  .listings-filter,
-  .listings-grid {
-    width: 100%;
-  }
-
-  .listings-filter {
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 1rem;
   }
 
   .my-listings-container {
@@ -206,6 +235,10 @@
 }
 
 @media (max-width: 799.98px) {
+  .listings-layout {
+    grid-template-columns: 1fr;
+  }
+
   .listing-item {
     flex-direction: column;
   }
