@@ -565,7 +565,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       "new candidate files."
     );
     const maxFiles = 25;
-    const maxFileSize = 5 * 1024 * 1024; // 5MB
+    const maxFileSize = 12 * 1024 * 1024; // 12MB
             const allowedTypes = ["image/jpeg", "image/jfif", "image/pjpeg", "image/jpg", "image/x-jfif", "image/pipeg", "image/png", "image/gif", "image/webp"];
         const allowedExtensions = ["jpg", "jpeg", "jfif", "jpe", "png", "gif", "webp"];
 
@@ -577,7 +577,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       maxWidth: 1920,
       maxHeight: 1080,
       quality: 0.8,
-      maxFileSize: 5120, // 5MB in KB - only process very large files
+      maxFileSize: 12288, // 12MB in KB - only process very large files
       allowedTypes: allowedTypes,
     });
 

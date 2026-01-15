@@ -13,7 +13,7 @@ class ImageOptimizer {
         this.maxWidth = options.maxWidth || 1920;
         this.maxHeight = options.maxHeight || 1080;
         this.quality = options.quality || 0.8;
-        this.maxFileSize = options.maxFileSize || 5120; // 5MB in KB - minimal client processing
+        this.maxFileSize = options.maxFileSize || 12288; // 12MB in KB - minimal client processing
         this.allowedTypes = options.allowedTypes || ['image/jpeg', 'image/jfif', 'image/pjpeg', 'image/png', 'image/webp'];
         
         // Check browser compatibility
@@ -57,7 +57,7 @@ class ImageOptimizer {
 
             // For car listings, skip client-side processing for best quality
             // Only resize very large files to reduce upload time (keeping original format)
-            if (file.size <= (5 * 1024 * 1024)) { // 5MB threshold
+            if (file.size <= (12 * 1024 * 1024)) { // 12MB threshold
                 if (this.isDevelopment) console.log(`[ImageOptimizer] File ${file.name} will be processed on server for best quality`);
                 resolve(file);
                 return;

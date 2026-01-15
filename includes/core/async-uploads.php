@@ -104,7 +104,7 @@ function enqueue_async_upload_scripts() {
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('async_upload_nonce'),
             'userId' => get_current_user_id(),
-            'maxFileSize' => 5 * 1024 * 1024, // 5MB
+            'maxFileSize' => 12 * 1024 * 1024, // 12MB
             'allowedTypes' => array('image/jpeg', 'image/jfif', 'image/pjpeg', 'image/png', 'image/gif', 'image/webp')
         ));
     }
@@ -171,8 +171,8 @@ function handle_async_upload_image() {
         error_log('JFIF Debug - File accepted by extension - MIME: ' . $_FILES['image']['type'] . ', Extension: ' . $file_extension);
     }
     
-    // Validate file size (5MB max)
-    if ($_FILES['image']['size'] > 5 * 1024 * 1024) {
+    // Validate file size (12MB max)
+    if ($_FILES['image']['size'] > 12 * 1024 * 1024) {
         wp_send_json_error(array('message' => 'File too large'));
         return;
     }
