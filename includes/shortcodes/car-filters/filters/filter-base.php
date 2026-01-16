@@ -104,7 +104,14 @@ function car_filter_render_dropdown($args) {
                     <?php echo esc_html($args['placeholder']); ?>
                 </button>
 
-                <?php if (!empty($args['popular'])) : ?>
+                <?php
+                // Build list of popular values to exclude from main list
+                $popular_values = array();
+                if (!empty($args['popular'])) :
+                    foreach ($args['popular'] as $pop) {
+                        $popular_values[] = (string)$pop['value'];
+                    }
+                ?>
                     <div class="car-filter-section-header">Most Popular</div>
                     <?php foreach ($args['popular'] as $option) :
                         $is_selected = (string)$option['value'] === (string)$args['selected'];
@@ -124,6 +131,10 @@ function car_filter_render_dropdown($args) {
                 <?php endif; ?>
 
                 <?php foreach ($args['options'] as $option) :
+                    // Skip options already shown in popular section
+                    if (in_array((string)$option['value'], $popular_values, true)) {
+                        continue;
+                    }
                     $is_selected = (string)$option['value'] === (string)$args['selected'];
                 ?>
                     <button type="button"
