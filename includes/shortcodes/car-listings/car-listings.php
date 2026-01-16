@@ -149,8 +149,44 @@ function car_listings_build_query_args($atts) {
     // === URL PARAMETER FILTERS (for filter integration) ===
     $tax_query = array();
 
+    // Check for pretty URL filter data first
+    $pretty_url_filters = null;
+    if (function_exists('car_filters_get_parsed_url_data')) {
+        $pretty_url_filters = car_filters_get_parsed_url_data();
+    }
+
     // Make/Model filter from URL
-    if (isset($_GET['model']) && !empty($_GET['model'])) {
+    if ($pretty_url_filters && !empty($pretty_url_filters['model'])) {
+        // Pretty URL: model is the full slug (e.g., "bmw-m2")
+        $model_term = get_term_by('slug', $pretty_url_filters['model'], 'car_make');
+        if ($model_term) {
+            $tax_query[] = array(
+                'taxonomy' => 'car_make',
+                'field'    => 'term_id',
+                'terms'    => $model_term->term_id,
+            );
+        }
+    } elseif ($pretty_url_filters && !empty($pretty_url_filters['make'])) {
+        // Pretty URL: make only
+        $make_term = get_term_by('slug', $pretty_url_filters['make'], 'car_make');
+        if ($make_term && $make_term->parent === 0) {
+            // Get all models for this make
+            $models = get_terms(array(
+                'taxonomy' => 'car_make',
+                'parent' => $make_term->term_id,
+                'hide_empty' => true,
+                'fields' => 'ids',
+            ));
+            if (!empty($models) && !is_wp_error($models)) {
+                $tax_query[] = array(
+                    'taxonomy' => 'car_make',
+                    'field'    => 'term_id',
+                    'terms'    => $models,
+                );
+            }
+        }
+    } elseif (isset($_GET['model']) && !empty($_GET['model'])) {
+        // Fallback: Query param model
         $model_param = sanitize_text_field($_GET['model']);
         $model_term = get_term_by('slug', $model_param, 'car_make');
         if ($model_term) {
@@ -161,6 +197,7 @@ function car_listings_build_query_args($atts) {
             );
         }
     } elseif (isset($_GET['make']) && !empty($_GET['make'])) {
+        // Fallback: Query param make
         $make_param = sanitize_text_field($_GET['make']);
         $make_term = get_term_by('slug', $make_param, 'car_make');
         if ($make_term && $make_term->parent === 0) {
@@ -181,74 +218,93 @@ function car_listings_build_query_args($atts) {
         }
     }
 
+    // Helper to get filter value from pretty URL or $_GET
+    $get_filter_value = function($key) use ($pretty_url_filters) {
+        if ($pretty_url_filters && isset($pretty_url_filters[$key]) && $pretty_url_filters[$key] !== null) {
+            return $pretty_url_filters[$key];
+        }
+        if (isset($_GET[$key]) && $_GET[$key] !== '') {
+            return sanitize_text_field($_GET[$key]);
+        }
+        return null;
+    };
+
     // Price range from URL
-    if (isset($_GET['price_min']) && is_numeric($_GET['price_min'])) {
+    $price_min = $get_filter_value('price_min');
+    if ($price_min !== null && is_numeric($price_min)) {
         $meta_query[] = array(
             'key'     => 'price',
-            'value'   => intval($_GET['price_min']),
+            'value'   => intval($price_min),
             'compare' => '>=',
             'type'    => 'NUMERIC',
         );
     }
-    if (isset($_GET['price_max']) && is_numeric($_GET['price_max'])) {
+    $price_max = $get_filter_value('price_max');
+    if ($price_max !== null && is_numeric($price_max)) {
         $meta_query[] = array(
             'key'     => 'price',
-            'value'   => intval($_GET['price_max']),
+            'value'   => intval($price_max),
             'compare' => '<=',
             'type'    => 'NUMERIC',
         );
     }
 
     // Mileage range from URL
-    if (isset($_GET['mileage_min']) && is_numeric($_GET['mileage_min'])) {
+    $mileage_min = $get_filter_value('mileage_min');
+    if ($mileage_min !== null && is_numeric($mileage_min)) {
         $meta_query[] = array(
             'key'     => 'mileage',
-            'value'   => intval($_GET['mileage_min']),
+            'value'   => intval($mileage_min),
             'compare' => '>=',
             'type'    => 'NUMERIC',
         );
     }
-    if (isset($_GET['mileage_max']) && is_numeric($_GET['mileage_max'])) {
+    $mileage_max = $get_filter_value('mileage_max');
+    if ($mileage_max !== null && is_numeric($mileage_max)) {
         $meta_query[] = array(
             'key'     => 'mileage',
-            'value'   => intval($_GET['mileage_max']),
+            'value'   => intval($mileage_max),
             'compare' => '<=',
             'type'    => 'NUMERIC',
         );
     }
 
     // Year range from URL
-    if (isset($_GET['year_min']) && is_numeric($_GET['year_min'])) {
+    $year_min = $get_filter_value('year_min');
+    if ($year_min !== null && is_numeric($year_min)) {
         $meta_query[] = array(
             'key'     => 'year',
-            'value'   => intval($_GET['year_min']),
+            'value'   => intval($year_min),
             'compare' => '>=',
             'type'    => 'NUMERIC',
         );
     }
-    if (isset($_GET['year_max']) && is_numeric($_GET['year_max'])) {
+    $year_max = $get_filter_value('year_max');
+    if ($year_max !== null && is_numeric($year_max)) {
         $meta_query[] = array(
             'key'     => 'year',
-            'value'   => intval($_GET['year_max']),
+            'value'   => intval($year_max),
             'compare' => '<=',
             'type'    => 'NUMERIC',
         );
     }
 
     // Fuel type from URL
-    if (isset($_GET['fuel_type']) && !empty($_GET['fuel_type'])) {
+    $fuel_type = $get_filter_value('fuel_type');
+    if (!empty($fuel_type)) {
         $meta_query[] = array(
             'key'     => 'fuel_type',
-            'value'   => sanitize_text_field($_GET['fuel_type']),
+            'value'   => $fuel_type,
             'compare' => '=',
         );
     }
 
     // Body type from URL
-    if (isset($_GET['body_type']) && !empty($_GET['body_type'])) {
+    $body_type = $get_filter_value('body_type');
+    if (!empty($body_type)) {
         $meta_query[] = array(
             'key'     => 'body_type',
-            'value'   => sanitize_text_field($_GET['body_type']),
+            'value'   => $body_type,
             'compare' => '=',
         );
     }
@@ -503,6 +559,17 @@ function car_listings_ajax_load_more() {
     // Temporarily set $_GET from filters so build_query_args can use them
     // This allows the URL parameter filtering logic to work in AJAX context
     if (!empty($filters) && is_array($filters)) {
+        // Handle make_slug from pretty URLs (resolve to make/model)
+        if (!empty($filters['make_slug']) && function_exists('car_filters_parse_filter_url')) {
+            $resolved = car_filters_parse_filter_url('make:' . $filters['make_slug']);
+            if (!empty($resolved['model'])) {
+                $_GET['model'] = sanitize_text_field($resolved['model']);
+            } elseif (!empty($resolved['make'])) {
+                $_GET['make'] = sanitize_text_field($resolved['make']);
+            }
+            unset($filters['make_slug']);
+        }
+
         foreach ($filters as $key => $value) {
             if (!empty($value)) {
                 $_GET[$key] = sanitize_text_field($value);

@@ -377,3 +377,198 @@ function car_filters_ajax_filter_listings() {
 }
 add_action('wp_ajax_car_filters_filter_listings', 'car_filters_ajax_filter_listings');
 add_action('wp_ajax_nopriv_car_filters_filter_listings', 'car_filters_ajax_filter_listings');
+
+/**
+ * ============================================
+ * PRETTY URL SUPPORT (JetSmartFilters-style)
+ * ============================================
+ *
+ * URL Format: /cars/filter/make:bmw-m2/meta/price!range:10000_50000/
+ */
+
+/**
+ * Add rewrite rules for pretty filter URLs
+ * Pattern: /{page}/filter/{filter_string}/
+ */
+add_action('init', 'car_filters_add_rewrite_rules');
+function car_filters_add_rewrite_rules() {
+    // Match: /any-page/filter/anything/
+    add_rewrite_rule(
+        '([^/]+)/filter/(.+?)/?$',
+        'index.php?pagename=$matches[1]&car_filter=$matches[2]',
+        'top'
+    );
+}
+
+/**
+ * Register custom query var
+ */
+add_filter('query_vars', 'car_filters_query_vars');
+function car_filters_query_vars($vars) {
+    $vars[] = 'car_filter';
+    return $vars;
+}
+
+/**
+ * Parse pretty filter URL into filter parameters
+ *
+ * @param string $filter_string The filter portion of the URL
+ * @return array Parsed filter parameters
+ */
+function car_filters_parse_filter_url($filter_string) {
+    $result = array();
+
+    // Parse make:slug or make:parent-child
+    if (preg_match('/make:([^\/]+)/', $filter_string, $matches)) {
+        $combined_slug = sanitize_text_field($matches[1]);
+
+        // Strategy: Database lookup to determine make vs make-model
+        // 1. Try exact match as a term (could be make or model)
+        $term = get_term_by('slug', $combined_slug, 'car_make');
+
+        if ($term && $term->parent > 0) {
+            // It's a model (child term) - extract parent make
+            $parent = get_term($term->parent, 'car_make');
+            if ($parent && !is_wp_error($parent)) {
+                $result['make'] = $parent->slug;
+                $result['model'] = $combined_slug;
+            }
+        } elseif ($term && $term->parent === 0) {
+            // It's a make (parent term)
+            $result['make'] = $combined_slug;
+        } else {
+            // No exact match - try splitting: find longest parent match
+            // e.g., "mercedes-benz-c-class" -> try "mercedes-benz" + "c-class"
+            $parts = explode('-', $combined_slug);
+            $found = false;
+
+            for ($i = count($parts) - 1; $i > 0; $i--) {
+                $potential_make = implode('-', array_slice($parts, 0, $i));
+                $make_term = get_term_by('slug', $potential_make, 'car_make');
+
+                if ($make_term && $make_term->parent === 0) {
+                    // Verify model is child of this make
+                    $model_term = get_term_by('slug', $combined_slug, 'car_make');
+                    if ($model_term && $model_term->parent === $make_term->term_id) {
+                        $result['make'] = $potential_make;
+                        $result['model'] = $combined_slug;
+                        $found = true;
+                        break;
+                    }
+                }
+            }
+
+            // Fallback: treat as make only
+            if (!$found) {
+                $result['make'] = $combined_slug;
+            }
+        }
+    }
+
+    // Parse meta/field:value;field!range:min_max
+    if (preg_match('/meta\/([^\/]+)/', $filter_string, $matches)) {
+        $meta_parts = explode(';', $matches[1]);
+
+        foreach ($meta_parts as $part) {
+            if (strpos($part, '!range:') !== false) {
+                // Range: price!range:10000_50000
+                $range_split = explode('!range:', $part);
+                if (count($range_split) === 2) {
+                    $field = sanitize_key($range_split[0]);
+                    $values = explode('_', $range_split[1]);
+
+                    if (count($values) === 2) {
+                        $min = intval($values[0]);
+                        $max = intval($values[1]);
+
+                        // Only set if not default placeholder values
+                        if ($min > 0) {
+                            $result[$field . '_min'] = $min;
+                        }
+                        // Check for reasonable max values (not placeholder)
+                        if ($max > 0 && $max < 999999999) {
+                            $result[$field . '_max'] = $max;
+                        }
+                    }
+                }
+            } else if (strpos($part, ':') !== false) {
+                // Simple: fuel_type:Diesel
+                $simple_split = explode(':', $part, 2);
+                if (count($simple_split) === 2) {
+                    $field = sanitize_key($simple_split[0]);
+                    $value = sanitize_text_field($simple_split[1]);
+                    $result[$field] = $value;
+                }
+            }
+        }
+    }
+
+    return $result;
+}
+
+/**
+ * Get parsed filter data from pretty URL
+ * Returns cached result for performance
+ *
+ * @return array|null Parsed filter data or null if not a filter URL
+ */
+function car_filters_get_parsed_url_data() {
+    static $cached_result = null;
+    static $has_checked = false;
+
+    if ($has_checked) {
+        return $cached_result;
+    }
+
+    $has_checked = true;
+    $filter_string = get_query_var('car_filter');
+
+    if (!empty($filter_string)) {
+        $cached_result = car_filters_parse_filter_url($filter_string);
+    }
+
+    return $cached_result;
+}
+
+/**
+ * AJAX handler to resolve make/model slug
+ * Used by JavaScript to determine if a combined slug is make or make-model
+ */
+function car_filters_ajax_resolve_slug() {
+    check_ajax_referer('car_filters_nonce', 'nonce');
+
+    $slug = isset($_POST['slug']) ? sanitize_text_field($_POST['slug']) : '';
+
+    if (empty($slug)) {
+        wp_send_json_error(array('message' => 'No slug provided'));
+        return;
+    }
+
+    $result = array(
+        'make' => null,
+        'model' => null,
+        'make_term_id' => null,
+        'model_term_id' => null
+    );
+
+    $term = get_term_by('slug', $slug, 'car_make');
+
+    if ($term && $term->parent > 0) {
+        // It's a model
+        $parent = get_term($term->parent, 'car_make');
+        if ($parent && !is_wp_error($parent)) {
+            $result['make'] = $parent->slug;
+            $result['make_term_id'] = $parent->term_id;
+            $result['model'] = $slug;
+            $result['model_term_id'] = $term->term_id;
+        }
+    } elseif ($term && $term->parent === 0) {
+        // It's a make
+        $result['make'] = $slug;
+        $result['make_term_id'] = $term->term_id;
+    }
+
+    wp_send_json_success($result);
+}
+add_action('wp_ajax_car_filters_resolve_slug', 'car_filters_ajax_resolve_slug');
+add_action('wp_ajax_nopriv_car_filters_resolve_slug', 'car_filters_ajax_resolve_slug');

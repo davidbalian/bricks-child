@@ -103,31 +103,138 @@
         },
 
         /**
-         * Build URL with filter parameters
-         * Uses current page URL for AJAX mode, redirectUrl for redirect mode
+         * Build URL with filter parameters (JetSmartFilters-style pretty URLs)
+         * Format: /cars/filter/make:bmw-m2/meta/price!range:10000_50000/
          */
         buildUrl: function(group, forRedirect) {
             var state = this.getState(group);
-            var params = new URLSearchParams();
+            var parts = [];
 
-            if (state.make.slug) params.set('make', state.make.slug);
-            if (state.model.slug) params.set('model', state.model.slug);
-            if (state.price_min) params.set('price_min', this.parseNumber(state.price_min));
-            if (state.price_max) params.set('price_max', this.parseNumber(state.price_max));
-            if (state.mileage_min) params.set('mileage_min', this.parseNumber(state.mileage_min));
-            if (state.mileage_max) params.set('mileage_max', this.parseNumber(state.mileage_max));
-            if (state.year_min) params.set('year_min', this.parseNumber(state.year_min));
-            if (state.year_max) params.set('year_max', this.parseNumber(state.year_max));
-            if (state.fuel_type) params.set('fuel_type', state.fuel_type);
-            if (state.body_type) params.set('body_type', state.body_type);
+            // Taxonomy: make (and model combined as parent-child slug)
+            if (state.make.slug) {
+                var makeSlug = state.make.slug;
+                if (state.model.slug) {
+                    // Model slug is the full combined slug (e.g., "bmw-m2")
+                    makeSlug = state.model.slug;
+                }
+                parts.push('make:' + makeSlug);
+            }
 
-            var queryString = params.toString();
+            // Meta filters
+            var metaParts = [];
 
-            // For redirect mode, use the configured redirectUrl
-            // For AJAX mode (pushState), use current page path
-            var baseUrl = forRedirect ? state.redirectUrl : window.location.pathname;
+            // Price range (only if at least one bound is set)
+            var priceMin = this.parseNumber(state.price_min);
+            var priceMax = this.parseNumber(state.price_max);
+            if (priceMin || priceMax) {
+                metaParts.push('price!range:' + (priceMin || 0) + '_' + (priceMax || 999999999));
+            }
 
-            return baseUrl + (queryString ? '?' + queryString : '');
+            // Mileage range
+            var mileageMin = this.parseNumber(state.mileage_min);
+            var mileageMax = this.parseNumber(state.mileage_max);
+            if (mileageMin || mileageMax) {
+                metaParts.push('mileage!range:' + (mileageMin || 0) + '_' + (mileageMax || 999999999));
+            }
+
+            // Year range
+            var yearMin = this.parseNumber(state.year_min);
+            var yearMax = this.parseNumber(state.year_max);
+            if (yearMin || yearMax) {
+                metaParts.push('year!range:' + (yearMin || 1900) + '_' + (yearMax || 2100));
+            }
+
+            // Simple meta filters
+            if (state.fuel_type) metaParts.push('fuel_type:' + state.fuel_type);
+            if (state.body_type) metaParts.push('body_type:' + state.body_type);
+
+            if (metaParts.length) {
+                parts.push('meta/' + metaParts.join(';'));
+            }
+
+            // Base URL: use redirect_url for redirect mode, current page for AJAX
+            var baseUrl = forRedirect ? state.redirectUrl : this.getCurrentBasePath();
+
+            // Ensure baseUrl ends without trailing slash
+            baseUrl = baseUrl.replace(/\/+$/, '');
+
+            // If no filters, return base URL without /filter/
+            if (parts.length === 0) {
+                return baseUrl + '/';
+            }
+
+            return baseUrl + '/filter/' + parts.join('/') + '/';
+        },
+
+        /**
+         * Get current page's base path (e.g., /cars from /cars/filter/make:bmw/)
+         */
+        getCurrentBasePath: function() {
+            var path = window.location.pathname;
+            var match = path.match(/^(\/[^\/]+)\/filter\//);
+            if (match) {
+                return match[1]; // Return base path before /filter/
+            }
+            return path.replace(/\/+$/, ''); // Current path without trailing slash
+        },
+
+        /**
+         * Parse pretty URL into filter state
+         * Format: /cars/filter/make:bmw-m2/meta/price!range:10000_50000/
+         */
+        parseUrl: function() {
+            var path = window.location.pathname;
+            var match = path.match(/\/filter\/(.+?)\/?$/);
+            if (!match) return null;
+
+            var filterString = match[1];
+            var result = {
+                makeSlug: null,
+                price_min: null,
+                price_max: null,
+                mileage_min: null,
+                mileage_max: null,
+                year_min: null,
+                year_max: null,
+                fuel_type: null,
+                body_type: null
+            };
+
+            // Parse make:slug (could be make or make-model combined)
+            var makeMatch = filterString.match(/make:([^\/]+)/);
+            if (makeMatch) {
+                result.makeSlug = makeMatch[1]; // Will be resolved by AJAX lookup
+            }
+
+            // Parse meta/field:value;field!range:min_max
+            var metaMatch = filterString.match(/meta\/([^\/]+)/);
+            if (metaMatch) {
+                var metaParts = metaMatch[1].split(';');
+                metaParts.forEach(function(part) {
+                    if (part.indexOf('!range:') !== -1) {
+                        // Range: price!range:10000_50000
+                        var rangeParts = part.split('!range:');
+                        var field = rangeParts[0];
+                        var values = rangeParts[1].split('_');
+                        var min = parseInt(values[0], 10);
+                        var max = parseInt(values[1], 10);
+
+                        // Only set if not placeholder values
+                        if (min > 0) {
+                            result[field + '_min'] = min;
+                        }
+                        if (max > 0 && max < 999999999 && (field !== 'year' || max < 2100)) {
+                            result[field + '_max'] = max;
+                        }
+                    } else if (part.indexOf(':') !== -1) {
+                        // Simple: fuel_type:Diesel
+                        var simpleParts = part.split(':');
+                        result[simpleParts[0]] = simpleParts[1];
+                    }
+                });
+            }
+
+            return result;
         },
 
         /**
@@ -610,30 +717,153 @@
             }
         });
 
-        // Initialize state from URL parameters
-        var urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.toString()) {
+        // Initialize state from URL (pretty URL or query params fallback)
+        var parsedUrl = CarFilters.parseUrl();
+
+        if (parsedUrl) {
+            // Pretty URL detected - initialize from parsed data
             $('.car-filters-container').each(function() {
                 var group = $(this).data('group');
                 if (!group) return;
 
-                // Set state from URL
-                ['make', 'model', 'fuel_type', 'body_type'].forEach(function(key) {
-                    var param = key === 'make' || key === 'model' ? key : key;
-                    if (urlParams.has(param)) {
-                        CarFilters.setState(group, key, urlParams.get(param), urlParams.get(param));
+                // Set meta filter values
+                ['price', 'mileage', 'year'].forEach(function(key) {
+                    if (parsedUrl[key + '_min']) {
+                        CarFilters.setState(group, key + '_min', String(parsedUrl[key + '_min']));
+                    }
+                    if (parsedUrl[key + '_max']) {
+                        CarFilters.setState(group, key + '_max', String(parsedUrl[key + '_max']));
                     }
                 });
 
+                if (parsedUrl.fuel_type) {
+                    CarFilters.setState(group, 'fuel_type', parsedUrl.fuel_type);
+                }
+                if (parsedUrl.body_type) {
+                    CarFilters.setState(group, 'body_type', parsedUrl.body_type);
+                }
+
+                // Resolve make/model slug via AJAX
+                if (parsedUrl.makeSlug) {
+                    $.ajax({
+                        url: carFiltersConfig.ajaxUrl,
+                        type: 'POST',
+                        data: {
+                            action: 'car_filters_resolve_slug',
+                            nonce: carFiltersConfig.nonce,
+                            slug: parsedUrl.makeSlug
+                        },
+                        success: function(response) {
+                            if (response.success && response.data) {
+                                var data = response.data;
+                                if (data.make) {
+                                    CarFilters.setState(group, 'make', data.make_term_id, data.make);
+
+                                    // Trigger model loading
+                                    $(document).trigger('carFilters:makeChanged', [group, data.make_term_id]);
+
+                                    // If there's a model, set it after models are loaded
+                                    if (data.model) {
+                                        // Wait for models to load, then select model
+                                        setTimeout(function() {
+                                            CarFilters.setState(group, 'model', data.model_term_id, data.model);
+
+                                            // Update model dropdown UI
+                                            var $modelDropdowns = $('.car-filter-model[data-group="' + group + '"] .car-filter-dropdown');
+                                            $modelDropdowns.each(function() {
+                                                var $dropdown = $(this);
+                                                var $option = $dropdown.find('.car-filter-dropdown-option[data-value="' + data.model_term_id + '"]');
+                                                if ($option.length) {
+                                                    $dropdown.find('.car-filter-dropdown-option').removeClass('selected');
+                                                    $option.addClass('selected');
+                                                    $dropdown.find('.car-filter-dropdown-text')
+                                                        .removeClass('placeholder')
+                                                        .text($option.clone().children('.car-filter-count').remove().end().text().trim());
+                                                    $dropdown.find('select').val(data.model_term_id);
+                                                }
+                                            });
+                                        }, 500);
+                                    }
+
+                                    // Update make dropdown UI
+                                    var $makeDropdowns = $('.car-filter-make[data-group="' + group + '"] .car-filter-dropdown');
+                                    $makeDropdowns.each(function() {
+                                        var $dropdown = $(this);
+                                        var $option = $dropdown.find('.car-filter-dropdown-option[data-value="' + data.make_term_id + '"]');
+                                        if ($option.length) {
+                                            $dropdown.find('.car-filter-dropdown-option').removeClass('selected');
+                                            $option.addClass('selected');
+                                            $dropdown.find('.car-filter-dropdown-text')
+                                                .removeClass('placeholder')
+                                                .text($option.clone().children('.car-filter-count').remove().end().text().trim());
+                                            $dropdown.find('select').val(data.make_term_id);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Update range input UIs
                 ['price', 'mileage', 'year'].forEach(function(key) {
-                    if (urlParams.has(key + '_min')) {
-                        CarFilters.setState(group, key + '_min', urlParams.get(key + '_min'));
+                    if (parsedUrl[key + '_min']) {
+                        var $minInputs = $('.car-filter-' + key + '[data-group="' + group + '"] .car-filter-input-min');
+                        $minInputs.val(CarFilters.formatNumber(parsedUrl[key + '_min']));
                     }
-                    if (urlParams.has(key + '_max')) {
-                        CarFilters.setState(group, key + '_max', urlParams.get(key + '_max'));
+                    if (parsedUrl[key + '_max']) {
+                        var $maxInputs = $('.car-filter-' + key + '[data-group="' + group + '"] .car-filter-input-max');
+                        $maxInputs.val(CarFilters.formatNumber(parsedUrl[key + '_max']));
+                    }
+                });
+
+                // Update simple filter dropdown UIs
+                ['fuel_type', 'body_type'].forEach(function(key) {
+                    if (parsedUrl[key]) {
+                        var filterClass = key === 'fuel_type' ? 'fuel' : 'body';
+                        var $dropdowns = $('.car-filter-' + filterClass + '[data-group="' + group + '"] .car-filter-dropdown');
+                        $dropdowns.each(function() {
+                            var $dropdown = $(this);
+                            var $option = $dropdown.find('.car-filter-dropdown-option').filter(function() {
+                                return $(this).data('slug') === parsedUrl[key] || $(this).data('value') === parsedUrl[key];
+                            });
+                            if ($option.length) {
+                                $dropdown.find('.car-filter-dropdown-option').removeClass('selected');
+                                $option.addClass('selected');
+                                $dropdown.find('.car-filter-dropdown-text')
+                                    .removeClass('placeholder')
+                                    .text($option.clone().children('.car-filter-count').remove().end().text().trim());
+                                $dropdown.find('select').val($option.data('value'));
+                            }
+                        });
                     }
                 });
             });
+        } else {
+            // Fallback: Initialize state from query parameters (backward compatibility)
+            var urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.toString()) {
+                $('.car-filters-container').each(function() {
+                    var group = $(this).data('group');
+                    if (!group) return;
+
+                    // Set state from URL
+                    ['make', 'model', 'fuel_type', 'body_type'].forEach(function(key) {
+                        if (urlParams.has(key)) {
+                            CarFilters.setState(group, key, urlParams.get(key), urlParams.get(key));
+                        }
+                    });
+
+                    ['price', 'mileage', 'year'].forEach(function(key) {
+                        if (urlParams.has(key + '_min')) {
+                            CarFilters.setState(group, key + '_min', urlParams.get(key + '_min'));
+                        }
+                        if (urlParams.has(key + '_max')) {
+                            CarFilters.setState(group, key + '_max', urlParams.get(key + '_max'));
+                        }
+                    });
+                });
+            }
         }
     });
 
