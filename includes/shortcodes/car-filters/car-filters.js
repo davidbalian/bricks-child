@@ -611,10 +611,13 @@
                 var $options = $dropdown.find('.car-filter-dropdown-options');
                 var $select = $dropdown.find('select');
 
+                var $search = $dropdown.find('.car-filter-dropdown-search');
+
                 if (!makeId) {
                     // No make selected - disable model dropdown
                     $button.prop('disabled', true).addClass('car-filter-dropdown-disabled');
                     $dropdown.addClass('car-filter-dropdown-disabled');
+                    $search.prop('disabled', true);
                     $options.html('<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="" data-slug="">All Models</button><div class="car-filter-no-results hidden">No matching results</div>');
                     $select.html('<option value="">All Models</option>').prop('disabled', true);
                     $button.find('.car-filter-dropdown-text').addClass('placeholder').text('All Models');
@@ -656,6 +659,7 @@
                             $select.html(selectHtml).prop('disabled', false);
                             $button.prop('disabled', false).removeClass('car-filter-dropdown-disabled');
                             $dropdown.removeClass('car-filter-dropdown-disabled');
+                            $search.prop('disabled', false);
                         }
                     },
                     error: function() {
