@@ -698,6 +698,8 @@ label svg path,
   cursor: pointer;
   user-select: none;
   outline: none;
+  margin: -2rem -2rem 0 -2rem;
+  padding: 2rem;
 }
 
 .collapsible-section .section-header h2 {
