@@ -22,7 +22,6 @@ function handle_add_car_listing() {
     $required_fields = array(
         'make' => 'Make',
         'model' => 'Model',
-        // variant field removed
         'year' => 'Year',
         'mileage' => 'Mileage',
         'price' => 'Price',
@@ -30,12 +29,12 @@ function handle_add_car_listing() {
         'fuel_type' => 'Fuel Type',
         'transmission' => 'Transmission',
         'body_type' => 'Body Type',
-        'drive_type' => 'Drive Type',
+        // drive_type not required anymore
         'exterior_color' => 'Exterior Color',
-        'interior_color' => 'Interior Color',
+        // interior_color not required anymore
         // 'description' => 'Description', DESCRIPTION NOT MANDATORY ANYMORE
-        'number_of_doors' => 'Number of Doors',
-        'number_of_seats' => 'Number of Seats',
+        // number_of_doors not required anymore
+        // number_of_seats not required anymore
         'availability' => 'Availability',
     );
     

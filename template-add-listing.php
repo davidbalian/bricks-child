@@ -306,8 +306,8 @@ get_header(); ?>
 
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
-                                        <label for="drive_type"><?php echo get_svg_icon('tire'); ?> <?php esc_html_e( 'Drive Type', 'bricks-child' ); ?></label>
-                                        <select id="drive_type" name="drive_type" class="form-control" required>
+                                        <label for="drive_type"><?php echo get_svg_icon('tire'); ?> <?php esc_html_e( 'Drive Type (Optional)', 'bricks-child' ); ?></label>
+                                        <select id="drive_type" name="drive_type" class="form-control">
                                             <option value=""><?php esc_html_e( 'Select Drive Type', 'bricks-child' ); ?></option>
                                             <option value="Front-Wheel Drive"><?php esc_html_e( 'Front-Wheel Drive', 'bricks-child' ); ?></option>
                                             <option value="Rear-Wheel Drive"><?php esc_html_e( 'Rear-Wheel Drive', 'bricks-child' ); ?></option>
@@ -350,8 +350,8 @@ get_header(); ?>
                                         </select>
                                     </div>
                                     <div class="form-third">
-                                        <label for="number_of_doors"><?php echo get_svg_icon('car-door'); ?> <?php esc_html_e( 'Number of Doors', 'bricks-child' ); ?></label>
-                                        <select id="number_of_doors" name="number_of_doors" class="form-control" required>
+                                        <label for="number_of_doors"><?php echo get_svg_icon('car-door'); ?> <?php esc_html_e( 'Number of Doors (Optional)', 'bricks-child' ); ?></label>
+                                        <select id="number_of_doors" name="number_of_doors" class="form-control">
                                             <option value=""><?php esc_html_e( 'Select Number of Doors', 'bricks-child' ); ?></option>
                                             <?php
                                             $door_options = array(0, 2, 3, 4, 5, 6, 7);
@@ -362,8 +362,8 @@ get_header(); ?>
                                         </select>
                                     </div>
                                     <div class="form-third">
-                                        <label for="number_of_seats"><?php echo get_svg_icon('car-seat'); ?> <?php esc_html_e( 'Number of Seats', 'bricks-child' ); ?></label>
-                                        <select id="number_of_seats" name="number_of_seats" class="form-control" required>
+                                        <label for="number_of_seats"><?php echo get_svg_icon('car-seat'); ?> <?php esc_html_e( 'Number of Seats (Optional)', 'bricks-child' ); ?></label>
+                                        <select id="number_of_seats" name="number_of_seats" class="form-control">
                                             <option value=""><?php esc_html_e( 'Select Number of Seats', 'bricks-child' ); ?></option>
                                             <?php
                                             $seat_options = array(1, 2, 3, 4, 5, 6, 7, 8);
@@ -397,8 +397,8 @@ get_header(); ?>
                                         </select>
                                     </div>
                                     <div class="form-third">
-                                        <label for="interior_color"><?php echo get_svg_icon('palette'); ?> <?php esc_html_e( 'Interior Color', 'bricks-child' ); ?></label>
-                                        <select id="interior_color" name="interior_color" class="form-control" required>
+                                        <label for="interior_color"><?php echo get_svg_icon('palette'); ?> <?php esc_html_e( 'Interior Color (Optional)', 'bricks-child' ); ?></label>
+                                        <select id="interior_color" name="interior_color" class="form-control">
                                             <option value=""><?php esc_html_e( 'Select Interior Color', 'bricks-child' ); ?></option>
                                             <option value="Black"><?php esc_html_e( 'Black', 'bricks-child' ); ?></option>
                                             <option value="Gray"><?php esc_html_e( 'Gray', 'bricks-child' ); ?></option>
