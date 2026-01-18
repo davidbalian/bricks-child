@@ -348,199 +348,184 @@ get_header(); ?>
                             </div> 
 
                             <div class="form-section engine-performance-section input-wrapper">
-                                <details class="add-listing-details">
-                                    <summary>
-                                        <span>
-                                            <?php echo get_svg_icon('gauge-high'); ?>
-                                            <?php esc_html_e( 'More Details (Optional) - Recommended', 'bricks-child' ); ?>
-                                        </span>
-                                        <span class="summary-arrow">▼</span>
-                                    </summary>
-                                    <div class="details-body">
-                                        <div class="form-row form-row-halves">
-                                            <div class="form-half">
-                                                <label for="drive_type"><?php echo get_svg_icon('tire'); ?> <?php esc_html_e( 'Drive Type (Optional)', 'bricks-child' ); ?></label>
-                                                <select id="drive_type" name="drive_type" class="form-control">
-                                                    <option value=""><?php esc_html_e( 'Select Drive Type', 'bricks-child' ); ?></option>
-                                                    <option value="Front-Wheel Drive"><?php esc_html_e( 'Front-Wheel Drive', 'bricks-child' ); ?></option>
-                                                    <option value="Rear-Wheel Drive"><?php esc_html_e( 'Rear-Wheel Drive', 'bricks-child' ); ?></option>
-                                                    <option value="All-Wheel Drive"><?php esc_html_e( 'All-Wheel Drive', 'bricks-child' ); ?></option>
-                                                    <option value="4-Wheel Drive"><?php esc_html_e( '4-Wheel Drive', 'bricks-child' ); ?></option>
-                                                </select>
-                                            </div>
-                                            <div class="form-half">
-                                                <label for="hp"><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'Horsepower (Optional)', 'bricks-child' ); ?></label>
-                                                <div class="input-with-suffix">
-                                                    <input type="text" id="hp" name="hp" class="form-control" min="0" step="1" placeholder="E.g '100'">
-                                                    <span class="input-suffix">hp</span>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <h2><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'More Details (Optional) - Recommended', 'bricks-child' ); ?></h2>
 
-                                        <div class="form-row form-row-thirds">
-                                            <div class="form-third">
-                                                <label for="number_of_doors"><?php echo get_svg_icon('car-door'); ?> <?php esc_html_e( 'Number of Doors (Optional)', 'bricks-child' ); ?></label>
-                                                <select id="number_of_doors" name="number_of_doors" class="form-control">
-                                                    <option value=""><?php esc_html_e( 'Select Number of Doors', 'bricks-child' ); ?></option>
-                                                    <?php
-                                                    $door_options = array(0, 2, 3, 4, 5, 6, 7);
-                                                    foreach ($door_options as $doors) {
-                                                        echo '<option value="' . esc_attr($doors) . '">' . esc_html($doors) . '</option>';
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </div>
-                                            <div class="form-third">
-                                                <label for="number_of_seats"><?php echo get_svg_icon('car-seat'); ?> <?php esc_html_e( 'Number of Seats (Optional)', 'bricks-child' ); ?></label>
-                                                <select id="number_of_seats" name="number_of_seats" class="form-control">
-                                                    <option value=""><?php esc_html_e( 'Select Number of Seats', 'bricks-child' ); ?></option>
-                                                    <?php
-                                                    $seat_options = array(1, 2, 3, 4, 5, 6, 7, 8);
-                                                    foreach ($seat_options as $seats) {
-                                                        echo '<option value="' . esc_attr($seats) . '">' . esc_html($seats) . '</option>';
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </div>
-                                            <div class="form-third">
-                                                <label for="interior_color"><?php echo get_svg_icon('palette'); ?> <?php esc_html_e( 'Interior Color (Optional)', 'bricks-child' ); ?></label>
-                                                <select id="interior_color" name="interior_color" class="form-control">
-                                                    <option value=""><?php esc_html_e( 'Select Interior Color', 'bricks-child' ); ?></option>
-                                                    <option value="Black"><?php esc_html_e( 'Black', 'bricks-child' ); ?></option>
-                                                    <option value="Gray"><?php esc_html_e( 'Gray', 'bricks-child' ); ?></option>
-                                                    <option value="Beige"><?php esc_html_e( 'Beige', 'bricks-child' ); ?></option>
-                                                    <option value="Brown"><?php esc_html_e( 'Brown', 'bricks-child' ); ?></option>
-                                                    <option value="White"><?php esc_html_e( 'White', 'bricks-child' ); ?></option>
-                                                    <option value="Red"><?php esc_html_e( 'Red', 'bricks-child' ); ?></option>
-                                                    <option value="Blue"><?php esc_html_e( 'Blue', 'bricks-child' ); ?></option>
-                                                    <option value="Tan"><?php esc_html_e( 'Tan', 'bricks-child' ); ?></option>
-                                                    <option value="Cream"><?php esc_html_e( 'Cream', 'bricks-child' ); ?></option>
-                                                </select>
-                                            </div>
+                                <div class="form-row form-row-halves">
+                                    <div class="form-half">
+                                        <label for="drive_type"><?php echo get_svg_icon('tire'); ?> <?php esc_html_e( 'Drive Type (Optional)', 'bricks-child' ); ?></label>
+                                        <select id="drive_type" name="drive_type" class="form-control">
+                                            <option value=""><?php esc_html_e( 'Select Drive Type', 'bricks-child' ); ?></option>
+                                            <option value="Front-Wheel Drive"><?php esc_html_e( 'Front-Wheel Drive', 'bricks-child' ); ?></option>
+                                            <option value="Rear-Wheel Drive"><?php esc_html_e( 'Rear-Wheel Drive', 'bricks-child' ); ?></option>
+                                            <option value="All-Wheel Drive"><?php esc_html_e( 'All-Wheel Drive', 'bricks-child' ); ?></option>
+                                            <option value="4-Wheel Drive"><?php esc_html_e( '4-Wheel Drive', 'bricks-child' ); ?></option>
+                                        </select>
+                                    </div>
+                                    <div class="form-half">
+                                        <label for="hp"><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'Horsepower (Optional)', 'bricks-child' ); ?></label>
+                                        <div class="input-with-suffix">
+                                            <input type="text" id="hp" name="hp" class="form-control" min="0" step="1" placeholder="E.g '100'">
+                                            <span class="input-suffix">hp</span>
                                         </div>
                                     </div>
-                                </details>
+                                </div>
+
+                                <div class="form-row form-row-thirds">
+                                    <div class="form-third">
+                                        <label for="number_of_doors"><?php echo get_svg_icon('car-door'); ?> <?php esc_html_e( 'Number of Doors (Optional)', 'bricks-child' ); ?></label>
+                                        <select id="number_of_doors" name="number_of_doors" class="form-control">
+                                            <option value=""><?php esc_html_e( 'Select Number of Doors', 'bricks-child' ); ?></option>
+                                            <?php
+                                            $door_options = array(0, 2, 3, 4, 5, 6, 7);
+                                            foreach ($door_options as $doors) {
+                                                echo '<option value="' . esc_attr($doors) . '">' . esc_html($doors) . '</option>';
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-third">
+                                        <label for="number_of_seats"><?php echo get_svg_icon('car-seat'); ?> <?php esc_html_e( 'Number of Seats (Optional)', 'bricks-child' ); ?></label>
+                                        <select id="number_of_seats" name="number_of_seats" class="form-control">
+                                            <option value=""><?php esc_html_e( 'Select Number of Seats', 'bricks-child' ); ?></option>
+                                            <?php
+                                            $seat_options = array(1, 2, 3, 4, 5, 6, 7, 8);
+                                            foreach ($seat_options as $seats) {
+                                                echo '<option value="' . esc_attr($seats) . '">' . esc_html($seats) . '</option>';
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="form-third">
+                                        <label for="interior_color"><?php echo get_svg_icon('palette'); ?> <?php esc_html_e( 'Interior Color (Optional)', 'bricks-child' ); ?></label>
+                                        <select id="interior_color" name="interior_color" class="form-control">
+                                            <option value=""><?php esc_html_e( 'Select Interior Color', 'bricks-child' ); ?></option>
+                                            <option value="Black"><?php esc_html_e( 'Black', 'bricks-child' ); ?></option>
+                                            <option value="Gray"><?php esc_html_e( 'Gray', 'bricks-child' ); ?></option>
+                                            <option value="Beige"><?php esc_html_e( 'Beige', 'bricks-child' ); ?></option>
+                                            <option value="Brown"><?php esc_html_e( 'Brown', 'bricks-child' ); ?></option>
+                                            <option value="White"><?php esc_html_e( 'White', 'bricks-child' ); ?></option>
+                                            <option value="Red"><?php esc_html_e( 'Red', 'bricks-child' ); ?></option>
+                                            <option value="Blue"><?php esc_html_e( 'Blue', 'bricks-child' ); ?></option>
+                                            <option value="Tan"><?php esc_html_e( 'Tan', 'bricks-child' ); ?></option>
+                                            <option value="Cream"><?php esc_html_e( 'Cream', 'bricks-child' ); ?></option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                
                             </div>
 
                             <div class="form-section mot-section input-wrapper">
-                                <details class="add-listing-details">
-                                    <summary>
-                                        <span>
-                                            <?php echo get_svg_icon('clipboard-list'); ?>
-                                            <?php esc_html_e( 'History & extras (Optional)', 'bricks-child' ); ?>
-                                        </span>
-                                        <span class="summary-arrow">▼</span>
-                                    </summary>
-                                    <div class="details-body">
-                                        <div class="form-row form-row-halves">
-                                            <div class="form-half">
-                                                <label for="motuntil"><?php echo get_svg_icon('clipboard-check'); ?> <?php esc_html_e( 'MOT Status (Optional)', 'bricks-child' ); ?></label>
-                                                <select id="motuntil" name="motuntil" class="form-control">
-                                                    <option value=""><?php esc_html_e( 'Select MOT Status', 'bricks-child' ); ?></option>
-                                                    <option value="Expired"><?php esc_html_e( 'Expired', 'bricks-child' ); ?></option>
-                                                    <?php
-                                                    // Get current date
-                                                    $current_date = new DateTime();
-                                                    // Set to first day of current month
-                                                    $current_date->modify('first day of this month');
-                                                    // Create end date (2 years from now)
-                                                    $end_date = new DateTime();
-                                                    $end_date->modify('+2 years');
-                                                    $end_date->modify('last day of this month');
+                                <h2><?php echo get_svg_icon('clipboard-list'); ?> <?php esc_html_e( 'History & extras (Optional)', 'bricks-child' ); ?></h2>
+                                <div class="form-row form-row-halves">
+                                    <div class="form-half">
+                                        <label for="motuntil"><?php echo get_svg_icon('clipboard-check'); ?> <?php esc_html_e( 'MOT Status (Optional)', 'bricks-child' ); ?></label>
+                                        <select id="motuntil" name="motuntil" class="form-control">
+                                            <option value=""><?php esc_html_e( 'Select MOT Status', 'bricks-child' ); ?></option>
+                                            <option value="Expired"><?php esc_html_e( 'Expired', 'bricks-child' ); ?></option>
+                                            <?php
+                                            // Get current date
+                                            $current_date = new DateTime();
+                                            // Set to first day of current month
+                                            $current_date->modify('first day of this month');
+                                            // Create end date (2 years from now)
+                                            $end_date = new DateTime();
+                                            $end_date->modify('+2 years');
+                                            $end_date->modify('last day of this month');
 
-                                                    // Generate options
-                                                    while ($current_date <= $end_date) {
-                                                        $value = $current_date->format('Y-m');
-                                                        $display = $current_date->format('F Y');
-                                                        echo '<option value="' . esc_attr($value) . '">' . esc_html($display) . '</option>';
-                                                        $current_date->modify('+1 month');
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </div>
-                                            <div class="form-half">
-                                                <label for="numowners"><?php echo get_svg_icon('users'); ?> <?php esc_html_e( 'Number of Owners (Optional)', 'bricks-child' ); ?></label>
-                                                <input type="number" id="numowners" name="numowners" class="form-control" min="1" max="99" placeholder="E.g '2'">
-                                            </div>
-                                        </div>
-
-                                        <div class="form-row">
-                                            <div class="checkbox-field">
-                                                <input type="checkbox" id="isantique" name="isantique" value="1">
-                                                <label for="isantique"><?php esc_html_e( 'Registered as an Antique', 'bricks-child' ); ?></label>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-row" id="vehicle-history-row">
-                                            <label><?php echo get_svg_icon('clock-rotate-left'); ?> <?php esc_html_e( 'Vehicle History (Optional)', 'bricks-child' ); ?></label>
-                                            <div class="vehicle-history-grid">
-                                                <?php
-                                                $vehicle_history_options = array(
-                                                    'no_accidents' => 'No Accidents',
-                                                    'minor_accidents' => 'Minor Accidents',
-                                                    'major_accidents' => 'Major Accidents',
-                                                    'regular_maintenance' => 'Regular Maintenance',
-                                                    'engine_overhaul' => 'Engine Overhaul',
-                                                    'transmission_replacement' => 'Transmission Replacement',
-                                                    'repainted' => 'Repainted',
-                                                    'bodywork_repair' => 'Bodywork Repair',
-                                                    'rust_treatment' => 'Rust Treatment',
-                                                    'no_modifications' => 'No Modifications',
-                                                    'performance_upgrades' => 'Performance Upgrades',
-                                                    'cosmetic_modifications' => 'Cosmetic Modifications',
-                                                    'flood_damage' => 'Flood Damage',
-                                                    'fire_damage' => 'Fire Damage',
-                                                    'hail_damage' => 'Hail Damage',
-                                                    'clear_title' => 'Clear Title',
-                                                    'no_known_issues' => 'No Known Issues',
-                                                    'odometer_replacement' => 'Odometer Replacement'
-                                                );
-                                                foreach ($vehicle_history_options as $value => $label) {
-                                                    echo '<div class="vehicle-history-option">';
-                                                    echo '<input type="checkbox" id="vehiclehistory_' . esc_attr($value) . '" name="vehiclehistory[]" value="' . esc_attr($value) . '">';
-                                                    echo '<label for="vehiclehistory_' . esc_attr($value) . '">' . esc_html($label) . '</label>';
-                                                    echo '</div>';
-                                                }
-                                                ?>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-row">
-                                            <label><?php echo get_svg_icon('plus'); ?> <?php esc_html_e( 'Extras', 'bricks-child' ); ?></label>
-                                            <div class="extras-grid">
-                                                <?php
-                                                $extras_options = array(
-                                                    'alloy_wheels' => 'Alloy Wheels',
-                                                    'cruise_control' => 'Cruise Control',
-                                                    'disabled_accessible' => 'Disabled Accessible',
-                                                    'keyless_start' => 'Keyless Start',
-                                                    'rear_view_camera' => 'Rear View Camera',
-                                                    'start_stop' => 'Start/Stop',
-                                                    'sunroof' => 'Sunroof',
-                                                    'heated_seats' => 'Heated Seats',
-                                                    'android_auto' => 'Android Auto',
-                                                    'apple_carplay' => 'Apple CarPlay',
-                                                    'folding_mirrors' => 'Folding Mirrors',
-                                                    'leather_seats' => 'Leather Seats',
-                                                    'panoramic_roof' => 'Panoramic Roof',
-                                                    'parking_sensors' => 'Parking Sensors',
-                                                    'camera_360' => '360° Camera',
-                                                    'adaptive_cruise_control' => 'Adaptive Cruise Control',
-                                                    'blind_spot_mirror' => 'Blind Spot Mirror',
-                                                    'lane_assist' => 'Lane Assist',
-                                                    'power_tailgate' => 'Power Tailgate'
-                                                );
-                                                foreach ($extras_options as $value => $label) {
-                                                    echo '<div class="extra-option">';
-                                                    echo '<input type="checkbox" id="extra_' . esc_attr($value) . '" name="extras[]" value="' . esc_attr($value) . '">';
-                                                    echo '<label for="extra_' . esc_attr($value) . '">' . esc_html($label) . '</label>';
-                                                    echo '</div>';
-                                                }
-                                                ?>
-                                            </div>
-                                        </div>
+                                            // Generate options
+                                            while ($current_date <= $end_date) {
+                                                $value = $current_date->format('Y-m');
+                                                $display = $current_date->format('F Y');
+                                                echo '<option value="' . esc_attr($value) . '">' . esc_html($display) . '</option>';
+                                                $current_date->modify('+1 month');
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
-                                </details>
+                                    <div class="form-half">
+                                        <label for="numowners"><?php echo get_svg_icon('users'); ?> <?php esc_html_e( 'Number of Owners (Optional)', 'bricks-child' ); ?></label>
+                                        <input type="number" id="numowners" name="numowners" class="form-control" min="1" max="99" placeholder="E.g '2'">
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="checkbox-field">
+                                        <input type="checkbox" id="isantique" name="isantique" value="1">
+                                        <label for="isantique"><?php esc_html_e( 'Registered as an Antique', 'bricks-child' ); ?></label>
+                                    </div>
+                                </div>
+
+                                <div class="form-row" id="vehicle-history-row">
+                                    <label><?php echo get_svg_icon('clock-rotate-left'); ?> <?php esc_html_e( 'Vehicle History (Optional)', 'bricks-child' ); ?></label>
+                                    <div class="vehicle-history-grid">
+                                        <?php
+                                        $vehicle_history_options = array(
+                                            'no_accidents' => 'No Accidents',
+                                            'minor_accidents' => 'Minor Accidents',
+                                            'major_accidents' => 'Major Accidents',
+                                            'regular_maintenance' => 'Regular Maintenance',
+                                            'engine_overhaul' => 'Engine Overhaul',
+                                            'transmission_replacement' => 'Transmission Replacement',
+                                            'repainted' => 'Repainted',
+                                            'bodywork_repair' => 'Bodywork Repair',
+                                            'rust_treatment' => 'Rust Treatment',
+                                            'no_modifications' => 'No Modifications',
+                                            'performance_upgrades' => 'Performance Upgrades',
+                                            'cosmetic_modifications' => 'Cosmetic Modifications',
+                                            'flood_damage' => 'Flood Damage',
+                                            'fire_damage' => 'Fire Damage',
+                                            'hail_damage' => 'Hail Damage',
+                                            'clear_title' => 'Clear Title',
+                                            'no_known_issues' => 'No Known Issues',
+                                            'odometer_replacement' => 'Odometer Replacement'
+                                        );
+                                        foreach ($vehicle_history_options as $value => $label) {
+                                            echo '<div class="vehicle-history-option">';
+                                            echo '<input type="checkbox" id="vehiclehistory_' . esc_attr($value) . '" name="vehiclehistory[]" value="' . esc_attr($value) . '">';
+                                            echo '<label for="vehiclehistory_' . esc_attr($value) . '">' . esc_html($label) . '</label>';
+                                            echo '</div>';
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <label><?php echo get_svg_icon('plus'); ?> <?php esc_html_e( 'Extras', 'bricks-child' ); ?></label>
+                                    <div class="extras-grid">
+                                        <?php
+                                        $extras_options = array(
+                                            'alloy_wheels' => 'Alloy Wheels',
+                                            'cruise_control' => 'Cruise Control',
+                                            'disabled_accessible' => 'Disabled Accessible',
+                                            'keyless_start' => 'Keyless Start',
+                                            'rear_view_camera' => 'Rear View Camera',
+                                            'start_stop' => 'Start/Stop',
+                                            'sunroof' => 'Sunroof',
+                                            'heated_seats' => 'Heated Seats',
+                                            'android_auto' => 'Android Auto',
+                                            'apple_carplay' => 'Apple CarPlay',
+                                            'folding_mirrors' => 'Folding Mirrors',
+                                            'leather_seats' => 'Leather Seats',
+                                            'panoramic_roof' => 'Panoramic Roof',
+                                            'parking_sensors' => 'Parking Sensors',
+                                            'camera_360' => '360° Camera',
+                                            'adaptive_cruise_control' => 'Adaptive Cruise Control',
+                                            'blind_spot_mirror' => 'Blind Spot Mirror',
+                                            'lane_assist' => 'Lane Assist',
+                                            'power_tailgate' => 'Power Tailgate'
+                                        );
+                                        foreach ($extras_options as $value => $label) {
+                                            echo '<div class="extra-option">';
+                                            echo '<input type="checkbox" id="extra_' . esc_attr($value) . '" name="extras[]" value="' . esc_attr($value) . '">';
+                                            echo '<label for="extra_' . esc_attr($value) . '">' . esc_html($label) . '</label>';
+                                            echo '</div>';
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+
+
                             </div>
                         </div>
                     </div>
