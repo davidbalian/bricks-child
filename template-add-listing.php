@@ -415,13 +415,6 @@ get_header(); ?>
                                 
                             </div>
 
-                            <div class="form-section body-design-section input-wrapper">
-                                <h2><?php echo get_svg_icon('car'); ?> <?php esc_html_e( 'Body & Design', 'bricks-child' ); ?></h2>
-                                
-
-                                
-                            </div>
-
                             <div class="form-section mot-section input-wrapper">
                                 <h2><?php echo get_svg_icon('clipboard-list'); ?> <?php esc_html_e( 'History & extras (Optional)', 'bricks-child' ); ?></h2>
                                 <div class="form-row form-row-halves">
@@ -533,11 +526,6 @@ get_header(); ?>
                                 </div>
 
 
-                            </div>
-
-                            <div class="form-section extras-section input-wrapper">
-                                <h2><?php echo get_svg_icon('plus'); ?> <?php esc_html_e( 'Extras (Optional)', 'bricks-child' ); ?></h2>
-                                
                             </div>
                         </div>
                     </div>
