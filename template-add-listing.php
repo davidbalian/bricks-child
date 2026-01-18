@@ -347,9 +347,12 @@ get_header(); ?>
                                 
                             </div> 
 
-                            <div class="form-section engine-performance-section input-wrapper">
-                                <h2><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'More Details (Optional) - Recommended', 'bricks-child' ); ?></h2>
-
+                            <div class="form-section engine-performance-section input-wrapper optional-collapsible">
+                                <h2 class="collapsible-section-title">
+                                    <?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'More Details (Optional) - Recommended', 'bricks-child' ); ?>
+                                    <span class="toggle-arrow">▼</span>
+                                </h2>
+                                <div class="collapsible-section-content" style="display: none;">
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
                                         <label for="drive_type"><?php echo get_svg_icon('tire'); ?> <?php esc_html_e( 'Drive Type (Optional)', 'bricks-child' ); ?></label>
@@ -411,12 +414,16 @@ get_header(); ?>
                                         </select>
                                     </div>
                                 </div>
-
+                                </div>
                                 
                             </div>
 
-                            <div class="form-section mot-section input-wrapper">
-                                <h2><?php echo get_svg_icon('clipboard-list'); ?> <?php esc_html_e( 'History & extras (Optional)', 'bricks-child' ); ?></h2>
+                            <div class="form-section mot-section input-wrapper optional-collapsible">
+                                <h2 class="collapsible-section-title">
+                                    <?php echo get_svg_icon('clipboard-list'); ?> <?php esc_html_e( 'History & extras (Optional)', 'bricks-child' ); ?>
+                                    <span class="toggle-arrow">▼</span>
+                                </h2>
+                                <div class="collapsible-section-content" style="display: none;">
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
                                         <label for="motuntil"><?php echo get_svg_icon('clipboard-check'); ?> <?php esc_html_e( 'MOT Status (Optional)', 'bricks-child' ); ?></label>
@@ -524,7 +531,7 @@ get_header(); ?>
                                         ?>
                                     </div>
                                 </div>
-
+                                </div>
 
                             </div>
                         </div>
