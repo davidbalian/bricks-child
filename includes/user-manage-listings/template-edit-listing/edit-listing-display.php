@@ -89,7 +89,7 @@ if (!defined('ABSPATH')) {
 
                                 <div class="form-row">
                                     <label for="location"><i class="fas fa-map-pin"></i> <?php esc_html_e('Location', 'bricks-child'); ?></label>
-                                    <input type="text" id="location" name="location" class="form-control" value="<?php echo esc_attr($location); ?>" required>
+                                    <input type="text" id="location" name="location" class="form-control" value="<?php echo esc_attr($location); ?>" readonly>
                                     <button type="button" class="btn btn-secondary choose-location-btn">Choose Location ></button>
                                     <input type="hidden" name="car_city" id="car_city" value="<?php echo esc_attr(get_field('car_city', $car_id)); ?>">
                                     <input type="hidden" name="car_district" id="car_district" value="<?php echo esc_attr(get_field('car_district', $car_id)); ?>">
@@ -163,8 +163,8 @@ if (!defined('ABSPATH')) {
 
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
-                                        <label for="drive_type"><i class="fas fa-car-side"></i> <?php esc_html_e('Drive Type', 'bricks-child'); ?></label>
-                                        <select id="drive_type" name="drive_type" class="form-control" required>
+                                        <label for="drive_type"><i class="fas fa-car-side"></i> <?php esc_html_e('Drive Type (Optional)', 'bricks-child'); ?></label>
+                                        <select id="drive_type" name="drive_type" class="form-control">
                                             <option value=""><?php esc_html_e('Select Drive Type', 'bricks-child'); ?></option>
                                             <option value="Front-Wheel Drive" <?php selected($drive_type, 'Front-Wheel Drive'); ?>><?php esc_html_e('Front-Wheel Drive', 'bricks-child'); ?></option>
                                             <option value="Rear-Wheel Drive" <?php selected($drive_type, 'Rear-Wheel Drive'); ?>><?php esc_html_e('Rear-Wheel Drive', 'bricks-child'); ?></option>
@@ -227,8 +227,8 @@ if (!defined('ABSPATH')) {
                                         </select>
                                     </div>
                                     <div class="form-third">
-                                        <label for="interior_color"><i class="fas fa-paint-brush"></i> <?php esc_html_e('Interior Color', 'bricks-child'); ?></label>
-                                        <select id="interior_color" name="interior_color" class="form-control" required>
+                                        <label for="interior_color"><i class="fas fa-paint-brush"></i> <?php esc_html_e('Interior Color (Optional)', 'bricks-child'); ?></label>
+                                        <select id="interior_color" name="interior_color" class="form-control">
                                             <option value=""><?php esc_html_e('Select Interior Color', 'bricks-child'); ?></option>
                                             <option value="Black" <?php selected($interior_color, 'Black'); ?>><?php esc_html_e('Black', 'bricks-child'); ?></option>
                                             <option value="Gray" <?php selected($interior_color, 'Gray'); ?>><?php esc_html_e('Gray', 'bricks-child'); ?></option>
@@ -245,8 +245,8 @@ if (!defined('ABSPATH')) {
 
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
-                                        <label for="number_of_doors"><i class="fas fa-door-open"></i> <?php esc_html_e('Number of Doors', 'bricks-child'); ?></label>
-                                        <select id="number_of_doors" name="number_of_doors" class="form-control" required>
+                                        <label for="number_of_doors"><i class="fas fa-door-open"></i> <?php esc_html_e('Number of Doors (Optional)', 'bricks-child'); ?></label>
+                                        <select id="number_of_doors" name="number_of_doors" class="form-control">
                                             <option value=""><?php esc_html_e('Select Number of Doors', 'bricks-child'); ?></option>
                                             <?php
                                             $door_options = array(0, 2, 3, 4, 5, 6, 7);
@@ -261,8 +261,8 @@ if (!defined('ABSPATH')) {
                                         </select>
                                     </div>
                                     <div class="form-half">
-                                        <label for="number_of_seats"><i class="fas fa-chair"></i> <?php esc_html_e('Number of Seats', 'bricks-child'); ?></label>
-                                        <select id="number_of_seats" name="number_of_seats" class="form-control" required>
+                                        <label for="number_of_seats"><i class="fas fa-chair"></i> <?php esc_html_e('Number of Seats (Optional)', 'bricks-child'); ?></label>
+                                        <select id="number_of_seats" name="number_of_seats" class="form-control">
                                             <option value=""><?php esc_html_e('Select Number of Seats', 'bricks-child'); ?></option>
                                             <?php
                                             $seat_options = range(1, 8);

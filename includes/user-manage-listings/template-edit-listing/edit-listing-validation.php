@@ -25,12 +25,12 @@ function validate_edit_listing_form($data, $car_id) {
         'engine_capacity' => 'Engine Capacity',
         'fuel_type' => 'Fuel Type',
         'transmission' => 'Transmission',
-        'drive_type' => 'Drive Type',
         'body_type' => 'Body Type',
         'exterior_color' => 'Exterior Color',
-        'interior_color' => 'Interior Color',
-        'number_of_doors' => 'Number of Doors',
-        'number_of_seats' => 'Number of Seats',
+        // drive_type not required anymore
+        // interior_color not required anymore
+        // number_of_doors not required anymore
+        // number_of_seats not required anymore
         // 'description' => 'Description', DESCRIPTION NOT MANDATORY ANYMORE
         'availability' => 'Availability',
     );
@@ -41,6 +41,28 @@ function validate_edit_listing_form($data, $car_id) {
         if (!isset($data[$field_key]) || empty(trim($data[$field_key]))) {
             $missing_fields[] = $field_key;
         }
+    }
+
+    /**
+     * Validate location for edit flow
+     *
+     * Location is driven by hidden fields populated via the map picker:
+     *  - car_city
+     *  - car_district
+     *  - car_latitude
+     *  - car_longitude
+     *  - car_address
+     *
+     * Users can modify the visible location input in dev tools, but we only
+     * trust these hidden fields on the backend, and require a complete set.
+     */
+    $city      = isset($data['car_city']) ? trim($data['car_city']) : '';
+    $address   = isset($data['car_address']) ? trim($data['car_address']) : '';
+    $latitude  = isset($data['car_latitude']) ? floatval($data['car_latitude']) : 0;
+    $longitude = isset($data['car_longitude']) ? floatval($data['car_longitude']) : 0;
+
+    if (empty($city) || empty($address) || $latitude === 0.0 || $longitude === 0.0) {
+        $missing_fields[] = 'location';
     }
     
     if (!empty($missing_fields)) {
