@@ -423,7 +423,7 @@ get_header(); ?>
                             </div>
 
                             <div class="form-section mot-section input-wrapper">
-                                <h2><?php echo get_svg_icon('clipboard-list'); ?> <?php esc_html_e( 'Registration & Background Info', 'bricks-child' ); ?></h2>
+                                <h2><?php echo get_svg_icon('clipboard-list'); ?> <?php esc_html_e( 'History & extras (Optional)', 'bricks-child' ); ?></h2>
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
                                         <label for="motuntil"><?php echo get_svg_icon('clipboard-check'); ?> <?php esc_html_e( 'MOT Status (Optional)', 'bricks-child' ); ?></label>
@@ -496,10 +496,7 @@ get_header(); ?>
                                         ?>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="form-section extras-section input-wrapper">
-                                <h2><?php echo get_svg_icon('plus'); ?> <?php esc_html_e( 'Extras (Optional)', 'bricks-child' ); ?></h2>
                                 <div class="form-row">
                                     <div class="extras-grid">
                                         <?php
@@ -533,6 +530,11 @@ get_header(); ?>
                                         ?>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div class="form-section extras-section input-wrapper">
+                                <h2><?php echo get_svg_icon('plus'); ?> <?php esc_html_e( 'Extras (Optional)', 'bricks-child' ); ?></h2>
+                                
                             </div>
                         </div>
                     </div>
