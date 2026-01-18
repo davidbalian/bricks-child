@@ -300,6 +300,52 @@ get_header(); ?>
                                         </select>
                                     </div>
                                 </div>
+
+                                <div class="form-third">
+                                    <div class="form-third">
+                                            <label for="body_type"><?php echo get_svg_icon('car-side'); ?> <?php esc_html_e( 'Body Type', 'bricks-child' ); ?></label>
+                                            <select id="body_type" name="body_type" class="form-control" required>
+                                                <option value=""><?php esc_html_e( 'Select Body Type', 'bricks-child' ); ?></option>
+                                                <option value="Hatchback"><?php esc_html_e( 'Hatchback', 'bricks-child' ); ?></option>
+                                                <option value="Saloon"><?php esc_html_e( 'Saloon', 'bricks-child' ); ?></option>
+                                                <option value="Coupe"><?php esc_html_e( 'Coupe', 'bricks-child' ); ?></option>
+                                                <option value="Convertible"><?php esc_html_e( 'Convertible', 'bricks-child' ); ?></option>
+                                                <option value="Estate"><?php esc_html_e( 'Estate', 'bricks-child' ); ?></option>
+                                                <option value="SUV"><?php esc_html_e( 'SUV', 'bricks-child' ); ?></option>
+                                                <option value="MPV"><?php esc_html_e( 'MPV', 'bricks-child' ); ?></option>
+                                                <option value="Pickup"><?php esc_html_e( 'Pickup', 'bricks-child' ); ?></option>
+                                                <option value="Camper"><?php esc_html_e( 'Camper', 'bricks-child' ); ?></option>
+                                                <option value="Minibus"><?php esc_html_e( 'Minibus', 'bricks-child' ); ?></option>
+                                                <option value="Limousine"><?php esc_html_e( 'Limousine', 'bricks-child' ); ?></option>
+                                                <option value="Car Derived Van"><?php esc_html_e( 'Car Derived Van', 'bricks-child' ); ?></option>
+                                                <option value="Combi Van"><?php esc_html_e( 'Combi Van', 'bricks-child' ); ?></option>
+                                                <option value="Panel Van"><?php esc_html_e( 'Panel Van', 'bricks-child' ); ?></option>
+                                                <option value="Window Van"><?php esc_html_e( 'Window Van', 'bricks-child' ); ?></option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-third">
+                                            <label for="exterior_color"><?php echo get_svg_icon('paintbrush'); ?> <?php esc_html_e( 'Exterior Color', 'bricks-child' ); ?></label>
+                                            <select id="exterior_color" name="exterior_color" class="form-control" required>
+                                                <option value=""><?php esc_html_e( 'Select Exterior Color', 'bricks-child' ); ?></option>
+                                                <option value="Black"><?php esc_html_e( 'Black', 'bricks-child' ); ?></option>
+                                                <option value="White"><?php esc_html_e( 'White', 'bricks-child' ); ?></option>
+                                                <option value="Silver"><?php esc_html_e( 'Silver', 'bricks-child' ); ?></option>
+                                                <option value="Gray"><?php esc_html_e( 'Gray', 'bricks-child' ); ?></option>
+                                                <option value="Red"><?php esc_html_e( 'Red', 'bricks-child' ); ?></option>
+                                                <option value="Blue"><?php esc_html_e( 'Blue', 'bricks-child' ); ?></option>
+                                                <option value="Green"><?php esc_html_e( 'Green', 'bricks-child' ); ?></option>
+                                                <option value="Yellow"><?php esc_html_e( 'Yellow', 'bricks-child' ); ?></option>
+                                                <option value="Brown"><?php esc_html_e( 'Brown', 'bricks-child' ); ?></option>
+                                                <option value="Beige"><?php esc_html_e( 'Beige', 'bricks-child' ); ?></option>
+                                                <option value="Orange"><?php esc_html_e( 'Orange', 'bricks-child' ); ?></option>
+                                                <option value="Purple"><?php esc_html_e( 'Purple', 'bricks-child' ); ?></option>
+                                                <option value="Gold"><?php esc_html_e( 'Gold', 'bricks-child' ); ?></option>
+                                                <option value="Bronze"><?php esc_html_e( 'Bronze', 'bricks-child' ); ?></option>
+                                            </select>
+                                        </div>
+                                </div>
+                                
                             </div> 
 
                             <div class="form-section engine-performance-section input-wrapper">
@@ -329,27 +375,6 @@ get_header(); ?>
                             <div class="form-section body-design-section input-wrapper">
                                 <h2><?php echo get_svg_icon('car'); ?> <?php esc_html_e( 'Body & Design', 'bricks-child' ); ?></h2>
                                 <div class="form-row form-row-thirds">
-                                    <div class="form-third">
-                                        <label for="body_type"><?php echo get_svg_icon('car-side'); ?> <?php esc_html_e( 'Body Type', 'bricks-child' ); ?></label>
-                                        <select id="body_type" name="body_type" class="form-control" required>
-                                            <option value=""><?php esc_html_e( 'Select Body Type', 'bricks-child' ); ?></option>
-                                            <option value="Hatchback"><?php esc_html_e( 'Hatchback', 'bricks-child' ); ?></option>
-                                            <option value="Saloon"><?php esc_html_e( 'Saloon', 'bricks-child' ); ?></option>
-                                            <option value="Coupe"><?php esc_html_e( 'Coupe', 'bricks-child' ); ?></option>
-                                            <option value="Convertible"><?php esc_html_e( 'Convertible', 'bricks-child' ); ?></option>
-                                            <option value="Estate"><?php esc_html_e( 'Estate', 'bricks-child' ); ?></option>
-                                            <option value="SUV"><?php esc_html_e( 'SUV', 'bricks-child' ); ?></option>
-                                            <option value="MPV"><?php esc_html_e( 'MPV', 'bricks-child' ); ?></option>
-                                            <option value="Pickup"><?php esc_html_e( 'Pickup', 'bricks-child' ); ?></option>
-                                            <option value="Camper"><?php esc_html_e( 'Camper', 'bricks-child' ); ?></option>
-                                            <option value="Minibus"><?php esc_html_e( 'Minibus', 'bricks-child' ); ?></option>
-                                            <option value="Limousine"><?php esc_html_e( 'Limousine', 'bricks-child' ); ?></option>
-                                            <option value="Car Derived Van"><?php esc_html_e( 'Car Derived Van', 'bricks-child' ); ?></option>
-                                            <option value="Combi Van"><?php esc_html_e( 'Combi Van', 'bricks-child' ); ?></option>
-                                            <option value="Panel Van"><?php esc_html_e( 'Panel Van', 'bricks-child' ); ?></option>
-                                            <option value="Window Van"><?php esc_html_e( 'Window Van', 'bricks-child' ); ?></option>
-                                        </select>
-                                    </div>
                                     <div class="form-third">
                                         <label for="number_of_doors"><?php echo get_svg_icon('car-door'); ?> <?php esc_html_e( 'Number of Doors (Optional)', 'bricks-child' ); ?></label>
                                         <select id="number_of_doors" name="number_of_doors" class="form-control">
