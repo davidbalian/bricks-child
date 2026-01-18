@@ -403,6 +403,17 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       );
     }
 
+    const locationField = $("#location");
+    if (!locationField.val().trim()) {
+      e.preventDefault();
+      alert("Please choose a location.");
+      // optional: bring attention to the button/field
+      $("#location-row").addClass("has-error");
+      $(".choose-location-btn").focus();
+      return false;
+    }
+
+
     // Validate image count - either async uploaded or traditional
     let totalImages = 0;
 

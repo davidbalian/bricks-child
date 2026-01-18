@@ -248,7 +248,7 @@ get_header(); ?>
                                 <div class="form-row" id="location-row">
                                     <label for="location"><?php echo get_svg_icon('location-dot'); ?> <?php esc_html_e( 'Location', 'bricks-child' ); ?></label>
                                     <div class="location-input-wrapper">
-                                        <input type="text" id="location" name="location" class="form-control" required readonly>
+                                        <input type="text" id="location" name="location" class="form-control" readonly>
                                         <button type="button" class="btn btn-secondary choose-location-btn">Choose Location <?php echo get_svg_icon('map-location-dot'); ?></button>
                                     </div>
                                 </div>
