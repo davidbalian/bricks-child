@@ -347,8 +347,12 @@ get_header(); ?>
                                 
                             </div> 
 
-                            <div class="form-section engine-performance-section input-wrapper">
-                                <h2><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'More Details (Optional) - Recommended', 'bricks-child' ); ?></h2>
+                            <div class="form-section engine-performance-section input-wrapper collapsible-section collapsed">
+                                <div class="section-header" role="button" tabindex="0" aria-expanded="false">
+                                    <h2><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'More Details (Optional) - Recommended', 'bricks-child' ); ?></h2>
+                                    <span class="collapse-arrow"><?php echo get_svg_icon('chevron-down'); ?></span>
+                                </div>
+                                <div class="section-content">
 
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
@@ -412,11 +416,16 @@ get_header(); ?>
                                     </div>
                                 </div>
 
-                                
+
+                                </div><!-- .section-content -->
                             </div>
 
-                            <div class="form-section mot-section input-wrapper">
-                                <h2><?php echo get_svg_icon('clipboard-list'); ?> <?php esc_html_e( 'History & extras (Optional)', 'bricks-child' ); ?></h2>
+                            <div class="form-section mot-section input-wrapper collapsible-section collapsed">
+                                <div class="section-header" role="button" tabindex="0" aria-expanded="false">
+                                    <h2><?php echo get_svg_icon('clipboard-list'); ?> <?php esc_html_e( 'History & extras (Optional)', 'bricks-child' ); ?></h2>
+                                    <span class="collapse-arrow"><?php echo get_svg_icon('chevron-down'); ?></span>
+                                </div>
+                                <div class="section-content">
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
                                         <label for="motuntil"><?php echo get_svg_icon('clipboard-check'); ?> <?php esc_html_e( 'MOT Status (Optional)', 'bricks-child' ); ?></label>
@@ -525,18 +534,23 @@ get_header(); ?>
                                     </div>
                                 </div>
 
-
+                                </div><!-- .section-content -->
                             </div>
                         </div>
                     </div>
 
-                    <div class="add-listing-description-section input-wrapper">
-                        <h2><?php echo get_svg_icon('align-left'); ?> <?php esc_html_e( 'Description', 'bricks-child' ); ?></h2>
+                    <div class="add-listing-description-section input-wrapper collapsible-section collapsed">
+                        <div class="section-header" role="button" tabindex="0" aria-expanded="false">
+                            <h2><?php echo get_svg_icon('align-left'); ?> <?php esc_html_e( 'Description', 'bricks-child' ); ?></h2>
+                            <span class="collapse-arrow"><?php echo get_svg_icon('chevron-down'); ?></span>
+                        </div>
+                        <div class="section-content">
                         <p class="description-guidelines-green"><?php esc_html_e( 'Focus on condition, upgrades, or unique features.', 'bricks-child' ); ?></p>
-                        
+
                         <div class="form-row">
                             <textarea id="description" name="description" class="form-control" rows="5" placeholder="Enter your description here..."></textarea>
                         </div>
+                        </div><!-- .section-content -->
                     </div>
 
                     <div class="form-row">

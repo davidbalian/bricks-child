@@ -686,6 +686,64 @@ label svg path,
   gap: 2.5rem;
 }
 
+/* Collapsible Section Styles */
+.collapsible-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 0;
+}
+
+.collapsible-section .section-header h2 {
+  margin: 0;
+}
+
+.collapsible-section .collapse-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.collapsible-section .collapse-arrow svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--text-color);
+}
+
+.collapsible-section.collapsed .collapse-arrow {
+  transform: rotate(-90deg);
+}
+
+.collapsible-section .section-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+  max-height: 2000px;
+  opacity: 1;
+  margin-top: 2.5rem;
+}
+
+.collapsible-section.collapsed .section-content {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+}
+
+.collapsible-section .section-header:hover .collapse-arrow svg {
+  color: var(--dark-blue);
+}
+
+.collapsible-section .section-header:focus {
+  outline: 2px solid var(--dark-blue);
+  outline-offset: 2px;
+  border-radius: var(--border-radius-medium);
+}
+
 .location-input-wrapper {
   display: grid;
   grid-auto-flow: row;

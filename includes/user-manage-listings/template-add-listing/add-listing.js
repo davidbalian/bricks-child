@@ -1,10 +1,36 @@
 jQuery(document).ready(function ($) {
   // PRODUCTION SAFETY: Only log in development environments
-window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' || 
+window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' ||
                                                window.location.hostname.includes('staging') ||
                                                window.location.search.includes('debug=true'));
-  
+
   if (isDevelopment) console.log("[Add Listing] jQuery ready");
+
+  // Collapsible sections functionality
+  function initCollapsibleSections() {
+    $(".collapsible-section .section-header").on("click", function () {
+      const $section = $(this).closest(".collapsible-section");
+      const isCollapsed = $section.hasClass("collapsed");
+
+      $section.toggleClass("collapsed");
+      $(this).attr("aria-expanded", isCollapsed ? "true" : "false");
+
+      if (isDevelopment) console.log("[Add Listing] Section toggled:", $section.find("h2").text().trim(), "Collapsed:", !isCollapsed);
+    });
+
+    // Keyboard accessibility - toggle on Enter or Space
+    $(".collapsible-section .section-header").on("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        $(this).trigger("click");
+      }
+    });
+
+    if (isDevelopment) console.log("[Add Listing] Collapsible sections initialized");
+  }
+
+  // Initialize collapsible sections
+  initCollapsibleSections();
 
   // Initialize async upload manager if available
   let asyncUploadManager = null;
