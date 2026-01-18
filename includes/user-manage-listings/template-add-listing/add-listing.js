@@ -1164,24 +1164,4 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
     if (isDevelopment) console.log("[Add Listing] Image removed from async system:", fileKey);
   }
-
-  /**
-   * Simple collapsible sections for optional groups
-   * (More Details, History & extras) – default closed.
-   */
-  $(".collapsible-section-title").on("click", function () {
-    const $title = $(this);
-    const $content = $title.next(".collapsible-section-content");
-    if (!$content.length) return;
-
-    const isOpen = $title.hasClass("is-open");
-    $title.toggleClass("is-open", !isOpen);
-
-    $content.stop(true, true).slideToggle(200);
-
-    const $arrow = $title.find(".toggle-arrow");
-    if ($arrow.length) {
-      $arrow.text(!isOpen ? "▲" : "▼");
-    }
-  });
 });
