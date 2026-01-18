@@ -1131,3 +1131,60 @@ label svg path,
     right: 8px;
   }
 }
+
+/* ===========================
+ * Add Listing – Optional Sections
+ * =========================== */
+
+.car-listing-form details.add-listing-details {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  background-color: #fafafa;
+}
+
+.car-listing-form details.add-listing-details summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.car-listing-form details.add-listing-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.car-listing-form details.add-listing-details .summary-arrow {
+  font-size: 0.85rem;
+  margin-left: 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+.car-listing-form details.add-listing-details[open] .summary-arrow {
+  transform: rotate(180deg);
+}
+
+.car-listing-form details.add-listing-details .details-body {
+  margin-top: 0.75rem;
+}
+
+/* Slightly smaller controls globally on add-listing form */
+.car-listing-form .form-control,
+.car-listing-form select,
+.car-listing-form textarea {
+  font-size: 0.9rem;
+  padding: 6px 8px;
+}
+
+.car-listing-form .form-row {
+  margin-bottom: 0.75rem;
+}
+
+.car-listing-form label {
+  font-size: 0.9rem;
+}
