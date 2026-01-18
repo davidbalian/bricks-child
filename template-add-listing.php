@@ -403,26 +403,6 @@ get_header(); ?>
 
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
-                                        <label for="exterior_color"><?php echo get_svg_icon('paintbrush'); ?> <?php esc_html_e( 'Exterior Color', 'bricks-child' ); ?></label>
-                                        <select id="exterior_color" name="exterior_color" class="form-control" required>
-                                            <option value=""><?php esc_html_e( 'Select Exterior Color', 'bricks-child' ); ?></option>
-                                            <option value="Black"><?php esc_html_e( 'Black', 'bricks-child' ); ?></option>
-                                            <option value="White"><?php esc_html_e( 'White', 'bricks-child' ); ?></option>
-                                            <option value="Silver"><?php esc_html_e( 'Silver', 'bricks-child' ); ?></option>
-                                            <option value="Gray"><?php esc_html_e( 'Gray', 'bricks-child' ); ?></option>
-                                            <option value="Red"><?php esc_html_e( 'Red', 'bricks-child' ); ?></option>
-                                            <option value="Blue"><?php esc_html_e( 'Blue', 'bricks-child' ); ?></option>
-                                            <option value="Green"><?php esc_html_e( 'Green', 'bricks-child' ); ?></option>
-                                            <option value="Yellow"><?php esc_html_e( 'Yellow', 'bricks-child' ); ?></option>
-                                            <option value="Brown"><?php esc_html_e( 'Brown', 'bricks-child' ); ?></option>
-                                            <option value="Beige"><?php esc_html_e( 'Beige', 'bricks-child' ); ?></option>
-                                            <option value="Orange"><?php esc_html_e( 'Orange', 'bricks-child' ); ?></option>
-                                            <option value="Purple"><?php esc_html_e( 'Purple', 'bricks-child' ); ?></option>
-                                            <option value="Gold"><?php esc_html_e( 'Gold', 'bricks-child' ); ?></option>
-                                            <option value="Bronze"><?php esc_html_e( 'Bronze', 'bricks-child' ); ?></option>
-                                        </select>
-                                    </div>
-                                    <div class="form-third">
                                         <label for="interior_color"><?php echo get_svg_icon('palette'); ?> <?php esc_html_e( 'Interior Color (Optional)', 'bricks-child' ); ?></label>
                                         <select id="interior_color" name="interior_color" class="form-control">
                                             <option value=""><?php esc_html_e( 'Select Interior Color', 'bricks-child' ); ?></option>
