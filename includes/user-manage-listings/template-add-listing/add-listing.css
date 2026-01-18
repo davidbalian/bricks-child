@@ -727,7 +727,7 @@ label svg path,
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
-  overflow: hidden;
+  overflow: visible;
   transition: max-height 0.3s ease, opacity 0.3s ease, padding-top 0.3s ease;
   max-height: 2000px;
   opacity: 1;
@@ -738,6 +738,7 @@ label svg path,
   max-height: 0;
   opacity: 0;
   padding-top: 0;
+  overflow: hidden;
 }
 
 .collapsible-section .section-header:hover .collapse-arrow svg {
