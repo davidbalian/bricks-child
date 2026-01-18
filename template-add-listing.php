@@ -347,8 +347,14 @@ get_header(); ?>
                                 
                             </div> 
 
-                            <div class="form-section engine-performance-section input-wrapper">
+                            <details class="form-section engine-performance-section input-wrapper collapsible-section">
                                 <h2><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'More Details (Optional) - Recommended', 'bricks-child' ); ?></h2>
+                                <summary class="collapsible-summary">
+                                    <?php echo get_svg_icon('gauge-high'); ?>
+                                    <?php esc_html_e( 'More Details (Optional) - Recommended', 'bricks-child' ); ?>
+                                    <span class="collapsible-chevron" aria-hidden="true"></span>
+                                </summary>
+
 
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
@@ -413,7 +419,8 @@ get_header(); ?>
                                 </div>
 
                                 
-                            </div>
+                            </details>
+
 
                             <div class="form-section mot-section input-wrapper">
                                 <h2><?php echo get_svg_icon('clipboard-list'); ?> <?php esc_html_e( 'History & extras (Optional)', 'bricks-child' ); ?></h2>
