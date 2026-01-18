@@ -217,10 +217,6 @@ get_header(); ?>
                                             <option value=""><?php esc_html_e( 'Select Model', 'bricks-child' ); ?></option>
                                         </select>
                                     </div>
-                                    <!-- variant field removed -->
-                                </div>
-
-                                <div class="form-row form-row-thirds">
                                     <div class="form-third">
                                         <label for="year"><?php echo get_svg_icon('calendar'); ?> <?php esc_html_e( 'Year', 'bricks-child' ); ?></label>
                                         <select id="year" name="year" class="form-control" required>
@@ -232,6 +228,9 @@ get_header(); ?>
                                             ?>
                                         </select>
                                     </div>
+                                </div>
+
+                                <div class="form-row form-row-thirds">
                                     <div class="form-third">
                                         <label for="mileage"><?php echo get_svg_icon('road'); ?> <?php esc_html_e( 'Mileage', 'bricks-child' ); ?></label>
                                         <div class="input-with-suffix">
@@ -243,6 +242,14 @@ get_header(); ?>
                                         <label for="price"><?php echo get_svg_icon('euro-sign'); ?> <?php esc_html_e( 'Price', 'bricks-child' ); ?></label>
                                         <input type="text" id="price" name="price" class="form-control" required placeholder="E.g '10,000'">
                                     </div>
+                                    <div class="form-third">
+                                    <label for="availability"><?php echo get_svg_icon('circle-check'); ?> <?php esc_html_e( 'Availability', 'bricks-child' ); ?></label>
+                                    <select id="availability" name="availability" class="form-control" required>
+                                        <option value=""><?php esc_html_e( 'Select Availability', 'bricks-child' ); ?></option>
+                                        <option value="In Stock"><?php esc_html_e( 'In Stock', 'bricks-child' ); ?></option>
+                                        <option value="In Transit"><?php esc_html_e( 'In Transit', 'bricks-child' ); ?></option>
+                                    </select>
+                                </div>
                                 </div>
 
                                 <div class="form-row" id="location-row">
@@ -252,6 +259,7 @@ get_header(); ?>
                                         <button type="button" class="btn btn-secondary choose-location-btn">Choose Location <?php echo get_svg_icon('map-location-dot'); ?></button>
                                     </div>
                                 </div>
+
 
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
@@ -333,15 +341,6 @@ get_header(); ?>
                                                 <option value="Purple"><?php esc_html_e( 'Purple', 'bricks-child' ); ?></option>
                                                 <option value="Gold"><?php esc_html_e( 'Gold', 'bricks-child' ); ?></option>
                                                 <option value="Bronze"><?php esc_html_e( 'Bronze', 'bricks-child' ); ?></option>
-                                            </select>
-                                        </div>
-
-                                        <div class="form-third">
-                                            <label for="availability"><?php echo get_svg_icon('circle-check'); ?> <?php esc_html_e( 'Availability', 'bricks-child' ); ?></label>
-                                            <select id="availability" name="availability" class="form-control" required>
-                                                <option value=""><?php esc_html_e( 'Select Availability', 'bricks-child' ); ?></option>
-                                                <option value="In Stock"><?php esc_html_e( 'In Stock', 'bricks-child' ); ?></option>
-                                                <option value="In Transit"><?php esc_html_e( 'In Transit', 'bricks-child' ); ?></option>
                                             </select>
                                         </div>
                                 </div>
