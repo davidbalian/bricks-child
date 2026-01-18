@@ -351,44 +351,57 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
   // Handle fuel type change to lock/unlock engine capacity for electric vehicles
   function handleElectricFuelType() {
-    const selectedFuelType = $("#fuel_type").val();
-    const engineCapacitySelect = $("#engine_capacity");
+    const $fuelTypeSelect = $("#add-listing-fuel-type");
+    const selectedFuelType = $fuelTypeSelect.val();
+    const $engineCapacityDropdown = $("#add-listing-engine-capacity-wrapper");
+    const $engineCapacitySelect = $("#add-listing-engine-capacity");
+    const $engineCapacityButton = $engineCapacityDropdown.find(".car-filter-dropdown-button");
+    const $engineCapacityOptions = $engineCapacityDropdown.find(".car-filter-dropdown-options");
 
     if (selectedFuelType === "Electric") {
-      // Add 0.0 option if it doesn't exist and select it
-      if (engineCapacitySelect.find('option[value="0.0"]').length === 0) {
-        // Insert 0.0 option after the placeholder option
-        engineCapacitySelect
-          .find('option[value=""]')
-          .after('<option value="0.0">0.0</option>');
+      // Add 0.0 option if it doesn't exist
+      if ($engineCapacitySelect.find('option[value="0.0"]').length === 0) {
+        $engineCapacitySelect.find('option[value=""]').after('<option value="0.0">0.0L</option>');
+        $engineCapacityOptions.find('.car-filter-dropdown-option[data-value=""]').after(
+          '<button type="button" class="car-filter-dropdown-option" role="option" data-value="0.0">0.0L</button>'
+        );
       }
-      engineCapacitySelect.val("0.0");
-      engineCapacitySelect.prop("disabled", true);
-      engineCapacitySelect.addClass("electric-locked");
-      if (isDevelopment) console.log(
-        "[Add Listing] Engine capacity locked to 0.0 for electric vehicle"
-      );
+
+      // Select 0.0 and update UI
+      $engineCapacitySelect.val("0.0");
+      $engineCapacityDropdown.find(".car-filter-dropdown-option").removeClass("selected");
+      $engineCapacityDropdown.find('.car-filter-dropdown-option[data-value="0.0"]').addClass("selected");
+      $engineCapacityButton.find(".car-filter-dropdown-text").removeClass("placeholder").text("0.0L");
+
+      // Disable the dropdown
+      $engineCapacityButton.prop("disabled", true);
+      $engineCapacityDropdown.addClass("car-filter-dropdown-disabled electric-locked");
+
+      if (isDevelopment) console.log("[Add Listing] Engine capacity locked to 0.0 for electric vehicle");
     } else {
-      // Re-enable the engine capacity field
-      engineCapacitySelect.prop("disabled", false);
-      engineCapacitySelect.removeClass("electric-locked");
+      // Re-enable the engine capacity dropdown
+      $engineCapacityButton.prop("disabled", false);
+      $engineCapacityDropdown.removeClass("car-filter-dropdown-disabled electric-locked");
 
       // Remove the 0.0 option and reset selection if it was 0.0
-      if (engineCapacitySelect.val() === "0.0") {
-        engineCapacitySelect.val("");
+      if ($engineCapacitySelect.val() === "0.0") {
+        $engineCapacitySelect.val("");
+        $engineCapacityButton.find(".car-filter-dropdown-text").addClass("placeholder").text("Select Engine Capacity");
+        $engineCapacityDropdown.find(".car-filter-dropdown-option").removeClass("selected");
+        $engineCapacityDropdown.find('.car-filter-dropdown-option[data-value=""]').addClass("selected");
       }
-      engineCapacitySelect.find('option[value="0.0"]').remove();
-      if (isDevelopment) console.log(
-        "[Add Listing] Engine capacity unlocked for non-electric vehicle"
-      );
+      $engineCapacitySelect.find('option[value="0.0"]').remove();
+      $engineCapacityDropdown.find('.car-filter-dropdown-option[data-value="0.0"]').remove();
+
+      if (isDevelopment) console.log("[Add Listing] Engine capacity unlocked for non-electric vehicle");
     }
   }
 
   // Initialize electric fuel type handling on page load
   handleElectricFuelType();
 
-  // Handle fuel type changes
-  $("#fuel_type").on("change", handleElectricFuelType);
+  // Handle fuel type changes - listen to the hidden select's change event
+  $("#add-listing-fuel-type").on("change", handleElectricFuelType);
 
   const fileInput = $("#car_images");
   const fileUploadArea = $("#file-upload-area");
@@ -648,10 +661,11 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
   // Handle form submission
   $("#add-car-listing-form").on("submit", function (e) {
     // Re-enable engine capacity field temporarily for form submission if it's locked for electric
-    const engineCapacitySelect = $("#engine_capacity");
-    const wasElectricLocked = engineCapacitySelect.hasClass("electric-locked");
+    const $engineCapacityDropdown = $("#add-listing-engine-capacity-wrapper");
+    const $engineCapacitySelect = $("#add-listing-engine-capacity");
+    const wasElectricLocked = $engineCapacityDropdown.hasClass("electric-locked");
     if (wasElectricLocked) {
-      engineCapacitySelect.prop("disabled", false);
+      $engineCapacitySelect.prop("disabled", false);
       if (isDevelopment) console.log(
         "[Add Listing] Temporarily re-enabled engine capacity field for form submission"
       );

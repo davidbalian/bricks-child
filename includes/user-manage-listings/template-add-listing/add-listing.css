@@ -847,6 +847,72 @@ label svg path,
 
 /* gradient button styles handled globally */
 
+/* Text Input Styling to Match Filter Style */
+#add-car-listing-form input[type="text"],
+#add-car-listing-form input[type="number"],
+#add-car-listing-form textarea {
+  width: 100%;
+  padding: 0.75rem 0.5rem;
+  border: 2px solid #dfe2e6;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  color: #2a3546;
+  font-size: 16px;
+  font-weight: 500;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#add-car-listing-form input[type="text"]:hover,
+#add-car-listing-form input[type="number"]:hover,
+#add-car-listing-form textarea:hover {
+  border-color: #dfe2e6;
+}
+
+#add-car-listing-form input[type="text"]:focus,
+#add-car-listing-form input[type="number"]:focus,
+#add-car-listing-form textarea:focus {
+  outline: none;
+  border-color: #dfe2e6;
+  box-shadow: 0 0 0 3px rgba(13, 134, 227, 0.1);
+}
+
+#add-car-listing-form input[type="text"]::placeholder,
+#add-car-listing-form input[type="number"]::placeholder,
+#add-car-listing-form textarea::placeholder {
+  color: rgba(42, 53, 70, 0.5);
+}
+
+#add-car-listing-form textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* Input with suffix styling */
+#add-car-listing-form .input-with-suffix {
+  position: relative;
+}
+
+#add-car-listing-form .input-with-suffix input {
+  padding-right: 3rem;
+}
+
+#add-car-listing-form .input-suffix {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+/* Location input readonly styling */
+#add-car-listing-form input[readonly] {
+  background-color: #f9fafb;
+  cursor: default;
+}
+
 .extras-section {
   gap: 0 !important;
 }
