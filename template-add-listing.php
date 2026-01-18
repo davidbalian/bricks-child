@@ -301,7 +301,7 @@ get_header(); ?>
                                     </div>
                                 </div>
 
-                                <div class="form-third">
+                                <div class="form-row form-row-thirds">
                                     <div class="form-third">
                                             <label for="body_type"><?php echo get_svg_icon('car-side'); ?> <?php esc_html_e( 'Body Type', 'bricks-child' ); ?></label>
                                             <select id="body_type" name="body_type" class="form-control" required>
