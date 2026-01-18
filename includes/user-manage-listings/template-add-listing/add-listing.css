@@ -702,18 +702,8 @@ label svg path,
   padding: 2rem;
 }
 
-.collapsible-section .section-header h2,
-.collapsible-section .section-header h3 {
+.collapsible-section .section-header h2 {
   margin: 0;
-}
-
-.collapsible-section .section-header h3 {
-  font-size: 1.1rem;
-}
-
-.collapsible-section .section-header h3 svg {
-  width: 0.9em;
-  height: 0.9em;
 }
 
 .collapsible-section .collapse-arrow {

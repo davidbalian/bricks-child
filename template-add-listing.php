@@ -428,7 +428,7 @@ get_header(); ?>
 
                             <div class="form-section engine-performance-section input-wrapper collapsible-section collapsed">
                                 <div class="section-header" role="button" tabindex="0" aria-expanded="false">
-                                    <h3><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'More Details (Optional) - Recommended', 'bricks-child' ); ?></h3>
+                                    <h2><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'More Details (Optional) - Recommended', 'bricks-child' ); ?></h2>
                                     <span class="collapse-arrow"><?php echo get_svg_icon('chevron-down'); ?></span>
                                 </div>
                                 <div class="section-content">
@@ -531,7 +531,7 @@ get_header(); ?>
 
                             <div class="form-section mot-section input-wrapper collapsible-section collapsed">
                                 <div class="section-header" role="button" tabindex="0" aria-expanded="false">
-                                    <h3><?php echo get_svg_icon('clipboard-list'); ?> <?php esc_html_e( 'History & extras (Optional)', 'bricks-child' ); ?></h3>
+                                    <h2><?php echo get_svg_icon('clipboard-list'); ?> <?php esc_html_e( 'History & extras (Optional)', 'bricks-child' ); ?></h2>
                                     <span class="collapse-arrow"><?php echo get_svg_icon('chevron-down'); ?></span>
                                 </div>
                                 <div class="section-content">
@@ -658,7 +658,7 @@ get_header(); ?>
 
                     <div class="add-listing-description-section input-wrapper collapsible-section collapsed">
                         <div class="section-header" role="button" tabindex="0" aria-expanded="false">
-                            <h3><?php echo get_svg_icon('align-left'); ?> <?php esc_html_e( 'Description', 'bricks-child' ); ?></h3>
+                            <h2><?php echo get_svg_icon('align-left'); ?> <?php esc_html_e( 'Description', 'bricks-child' ); ?></h2>
                             <span class="collapse-arrow"><?php echo get_svg_icon('chevron-down'); ?></span>
                         </div>
                         <div class="section-content">
