@@ -700,6 +700,16 @@ label svg path,
   outline: none;
   margin: -2rem -2rem 0 -2rem;
   padding: 2rem;
+  padding-bottom: 0;
+}
+
+.collapsible-section.collapsed {
+  padding-bottom: 0;
+}
+
+.collapsible-section.collapsed .section-header {
+  padding-bottom: 2rem;
+  margin-bottom: -2rem;
 }
 
 .collapsible-section .section-header h2 {
