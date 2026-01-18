@@ -498,6 +498,7 @@ get_header(); ?>
                                 </div>
 
                                 <div class="form-row">
+                                    <label><?php echo get_svg_icon('plus'); ?> <?php esc_html_e( 'Extras', 'bricks-child' ); ?></label>
                                     <div class="extras-grid">
                                         <?php
                                         $extras_options = array(
@@ -530,6 +531,8 @@ get_header(); ?>
                                         ?>
                                     </div>
                                 </div>
+
+
                             </div>
 
                             <div class="form-section extras-section input-wrapper">
