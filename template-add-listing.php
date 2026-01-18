@@ -348,7 +348,7 @@ get_header(); ?>
                             </div> 
 
                             <div class="form-section engine-performance-section input-wrapper">
-                                <h2><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'Engine & Performance', 'bricks-child' ); ?></h2>
+                                <h2><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'More Details (Optional) - Recommended', 'bricks-child' ); ?></h2>
 
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
@@ -369,10 +369,7 @@ get_header(); ?>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="form-section body-design-section input-wrapper">
-                                <h2><?php echo get_svg_icon('car'); ?> <?php esc_html_e( 'Body & Design', 'bricks-child' ); ?></h2>
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
                                         <label for="number_of_doors"><?php echo get_svg_icon('car-door'); ?> <?php esc_html_e( 'Number of Doors (Optional)', 'bricks-child' ); ?></label>
@@ -398,9 +395,6 @@ get_header(); ?>
                                             ?>
                                         </select>
                                     </div>
-                                </div>
-
-                                <div class="form-row form-row-thirds">
                                     <div class="form-third">
                                         <label for="interior_color"><?php echo get_svg_icon('palette'); ?> <?php esc_html_e( 'Interior Color (Optional)', 'bricks-child' ); ?></label>
                                         <select id="interior_color" name="interior_color" class="form-control">
@@ -417,6 +411,15 @@ get_header(); ?>
                                         </select>
                                     </div>
                                 </div>
+
+                                
+                            </div>
+
+                            <div class="form-section body-design-section input-wrapper">
+                                <h2><?php echo get_svg_icon('car'); ?> <?php esc_html_e( 'Body & Design', 'bricks-child' ); ?></h2>
+                                
+
+                                
                             </div>
 
                             <div class="form-section mot-section input-wrapper">
