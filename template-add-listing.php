@@ -261,12 +261,8 @@ get_header(); ?>
                                         <option value="In Transit"><?php esc_html_e( 'In Transit', 'bricks-child' ); ?></option>
                                     </select>
                                 </div>
-                            </div>
 
-                            <div class="form-section engine-performance-section input-wrapper">
-                                <h2><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'Engine & Performance', 'bricks-child' ); ?></h2>
-                                <div class="form-row form-row-thirds">
-                                    <div class="form-third">
+                                <div class="form-third">
                                         <label for="engine_capacity"><?php echo get_svg_icon('engine'); ?> <?php esc_html_e( 'Engine Capacity', 'bricks-child' ); ?></label>
                                         <select id="engine_capacity" name="engine_capacity" class="form-control" required>
                                             <option value=""><?php esc_html_e( 'Select Engine Capacity', 'bricks-child' ); ?></option>
@@ -302,6 +298,12 @@ get_header(); ?>
                                             <option value="Manual"><?php esc_html_e( 'Manual', 'bricks-child' ); ?></option>
                                         </select>
                                     </div>
+                            </div>
+
+                            <div class="form-section engine-performance-section input-wrapper">
+                                <h2><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'Engine & Performance', 'bricks-child' ); ?></h2>
+                                <div class="form-row form-row-thirds">
+                                    
                                 </div>
 
                                 <div class="form-row form-row-halves">
