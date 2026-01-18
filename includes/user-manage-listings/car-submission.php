@@ -96,21 +96,49 @@ function handle_add_car_listing() {
         wp_redirect(add_query_arg('error', 'no_images', wp_get_referer()));
         exit;
     }
+
+    /**
+     * Validate and process location
+     *
+     * Location is selected via the map/location picker which injects hidden fields:
+     *  - car_city
+     *  - car_district
+     *  - car_latitude
+     *  - car_longitude
+     *  - car_address
+     *
+     * A user can remove the readonly attribute on the visible "location" field
+     * in dev tools, but on the backend we only trust these hidden fields.
+     */
+    $city = isset($_POST['car_city']) ? sanitize_text_field($_POST['car_city']) : '';
+    $district = isset($_POST['car_district']) ? sanitize_text_field($_POST['car_district']) : '';
+    $latitude = isset($_POST['car_latitude']) ? floatval($_POST['car_latitude']) : 0;
+    $longitude = isset($_POST['car_longitude']) ? floatval($_POST['car_longitude']) : 0;
+    $address = isset($_POST['car_address']) ? sanitize_text_field($_POST['car_address']) : '';
+
+    // Require a valid location selection from the picker:
+    //  - non-empty city
+    //  - non-empty address
+    //  - non-zero latitude & longitude
+    if (empty($city) || empty($address) || $latitude === 0.0 || $longitude === 0.0) {
+        $redirect_url = add_query_arg(
+            array(
+                'error'  => 'validation',
+                'fields' => 'location'
+            ),
+            wp_get_referer()
+        );
+        wp_redirect($redirect_url);
+        exit;
+    }
     
-    // Sanitize form data
+    // Sanitize remaining form data
     $make = sanitize_text_field($_POST['make']);
     $model = sanitize_text_field($_POST['model']);
     // variant field removed
     $year = intval($_POST['year']);
     $mileage = intval($_POST['mileage']);
     $price = intval($_POST['price']);
-    
-    // Process location fields
-    $city = isset($_POST['car_city']) ? sanitize_text_field($_POST['car_city']) : '';
-    $district = isset($_POST['car_district']) ? sanitize_text_field($_POST['car_district']) : '';
-    $latitude = isset($_POST['car_latitude']) ? floatval($_POST['car_latitude']) : 0;
-    $longitude = isset($_POST['car_longitude']) ? floatval($_POST['car_longitude']) : 0;
-    $address = isset($_POST['car_address']) ? sanitize_text_field($_POST['car_address']) : '';
     
     $engine_capacity = sanitize_text_field($_POST['engine_capacity']);
     $fuel_type = sanitize_text_field($_POST['fuel_type']);
