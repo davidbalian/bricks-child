@@ -835,6 +835,53 @@ function get_models_for_make() {
 add_action('wp_ajax_get_models_for_make', 'get_models_for_make');
 add_action('wp_ajax_nopriv_get_models_for_make', 'get_models_for_make');
 
+/**
+ * AJAX handler to get models for a selected make by term ID
+ * Used by the custom dropdown in add listing form
+ */
+function get_models_for_make_by_term_id() {
+    // Verify nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'add_car_listing_nonce')) {
+        wp_send_json_error('Invalid nonce');
+        return;
+    }
+
+    $make_term_id = intval($_POST['make_term_id']);
+
+    if (empty($make_term_id)) {
+        wp_send_json_error('Make term ID is required');
+        return;
+    }
+
+    // Get all child terms (models) for this make
+    $model_terms = get_terms(array(
+        'taxonomy' => 'car_make',
+        'hide_empty' => false,
+        'parent' => $make_term_id,
+        'orderby' => 'name',
+        'order' => 'ASC'
+    ));
+
+    if (is_wp_error($model_terms)) {
+        wp_send_json_error('Error fetching models');
+        return;
+    }
+
+    $models = array();
+    foreach ($model_terms as $model_term) {
+        $models[] = array(
+            'term_id' => $model_term->term_id,
+            'name' => $model_term->name,
+            'slug' => $model_term->slug,
+        );
+    }
+
+    wp_send_json_success($models);
+}
+
+add_action('wp_ajax_get_models_for_make_by_term_id', 'get_models_for_make_by_term_id');
+add_action('wp_ajax_nopriv_get_models_for_make_by_term_id', 'get_models_for_make_by_term_id');
+
 // =========================================================================
 
 // =========================================================================

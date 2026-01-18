@@ -744,6 +744,20 @@ label svg path,
   color: var(--dark-blue);
 }
 
+/* Custom Dropdown Styles for Add Listing */
+#add-car-listing-form .car-filter-dropdown {
+  width: 100%;
+}
+
+#add-car-listing-form .car-filter-dropdown-button {
+  width: 100%;
+  min-height: 44px;
+}
+
+#add-car-listing-form .car-filter-dropdown-menu {
+  z-index: 1001;
+}
+
 .location-input-wrapper {
   display: grid;
   grid-auto-flow: row;

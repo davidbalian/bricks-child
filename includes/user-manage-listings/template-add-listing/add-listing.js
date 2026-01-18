@@ -63,60 +63,288 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     );
   }
 
-  // Handle make selection change
-  $("#make").on("change", function () {
-    const selectedMake = $(this).val();
-    if (isDevelopment) console.log("[Add Listing] Selected make:", selectedMake);
+  /**
+   * Custom Dropdown Controller for Add Listing page
+   */
+  var AddListingDropdown = {
+    init: function() {
+      this.bindEvents();
+      if (isDevelopment) console.log("[Add Listing] Custom dropdown controller initialized");
+    },
 
-    const modelSelect = $("#model");
+    bindEvents: function() {
+      var self = this;
 
-    // Clear existing options
-    modelSelect.empty().append('<option value="">Select Model</option>');
+      // Toggle dropdown
+      $(document).on('click', '.car-filter-dropdown-button', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
 
-    if (selectedMake) {
-      // Show loading state
-      modelSelect.append(
-        '<option value="" disabled>Loading models...</option>'
-      );
+        if ($(this).prop('disabled')) return;
 
-      // Fetch models via AJAX
-      $.ajax({
-        url: addListingData.ajaxurl,
-        type: "POST",
-        data: {
-          action: "get_models_for_make",
-          make: selectedMake,
-          nonce: addListingData.nonce,
-        },
-        success: function (response) {
-          if (response.success) {
-            // Remove loading option
-            modelSelect.find("option[disabled]").remove();
-
-            // Add model options
-            response.data.forEach((model) => {
-              modelSelect.append(`<option value="${model}">${model}</option>`);
-            });
-
-            if (isDevelopment) console.log(
-              "[Add Listing] Loaded",
-              response.data.length,
-              "models for",
-              selectedMake
-            );
-          } else {
-            if (isDevelopment) console.error("[Add Listing] Error loading models:", response.data);
-            modelSelect.find("option[disabled]").text("Error loading models");
-          }
-        },
-        error: function (xhr, status, error) {
-          if (isDevelopment) console.error("[Add Listing] AJAX error:", error);
-          modelSelect.find("option[disabled]").text("Error loading models");
-        },
+        var $dropdown = $(this).closest('.car-filter-dropdown');
+        self.toggle($dropdown);
       });
-    } else {
-      if (isDevelopment) console.log("[Add Listing] No make selected");
+
+      // Select option
+      $(document).on('click', '.car-filter-dropdown-option', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var $dropdown = $(this).closest('.car-filter-dropdown');
+        self.selectOption($dropdown, $(this));
+      });
+
+      // Search input
+      $(document).on('input', '.car-filter-dropdown-search', function() {
+        var $dropdown = $(this).closest('.car-filter-dropdown');
+        self.filterOptions($dropdown, $(this).val());
+      });
+
+      // Close on outside click
+      $(document).on('click', function(e) {
+        if (!$(e.target).closest('.car-filter-dropdown').length) {
+          self.closeAll();
+        }
+      });
+
+      // Keyboard navigation
+      $(document).on('keydown', '.car-filter-dropdown', function(e) {
+        self.handleKeyboard($(this), e);
+      });
+    },
+
+    toggle: function($dropdown) {
+      var isOpen = $dropdown.hasClass('open');
+      this.closeAll();
+
+      if (!isOpen) {
+        $dropdown.addClass('open');
+        $dropdown.find('.car-filter-dropdown-button').attr('aria-expanded', 'true');
+        $dropdown.find('.car-filter-dropdown-search').focus();
+      }
+    },
+
+    closeAll: function() {
+      $('.car-filter-dropdown.open').removeClass('open')
+        .find('.car-filter-dropdown-button').attr('aria-expanded', 'false');
+    },
+
+    selectOption: function($dropdown, $option) {
+      var value = $option.data('value');
+      var label = $option.clone().children('.car-filter-count').remove().end().text().trim();
+      var filterType = $dropdown.data('filter-type');
+
+      // Update hidden select
+      var $select = $dropdown.find('select');
+      $select.val(value).trigger('change');
+
+      // Update button text
+      var $button = $dropdown.find('.car-filter-dropdown-button');
+      var $text = $button.find('.car-filter-dropdown-text');
+
+      if (value === '' || value === null || value === undefined) {
+        $text.addClass('placeholder').text($select.find('option:first').text());
+      } else {
+        $text.removeClass('placeholder').text(label);
+      }
+
+      // Update selected state
+      $dropdown.find('.car-filter-dropdown-option').removeClass('selected');
+      $option.addClass('selected');
+
+      // Close dropdown
+      this.closeAll();
+
+      // Clear search
+      $dropdown.find('.car-filter-dropdown-search').val('');
+      this.filterOptions($dropdown, '');
+
+      // Trigger custom event for make/model dependency
+      if (filterType === 'make') {
+        $(document).trigger('addListing:makeChanged', [value]);
+      }
+    },
+
+    filterOptions: function($dropdown, query) {
+      var $options = $dropdown.find('.car-filter-dropdown-option');
+      var $noResults = $dropdown.find('.car-filter-no-results');
+      var hasVisible = false;
+
+      query = query.toLowerCase().trim();
+
+      $options.each(function() {
+        var text = $(this).text().toLowerCase();
+        var matches = !query || text.indexOf(query) !== -1;
+
+        $(this).toggleClass('hidden', !matches);
+        if (matches) hasVisible = true;
+      });
+
+      // Show/hide section headers and separators
+      $dropdown.find('.car-filter-section-header, .car-filter-separator').toggleClass('hidden', !!query);
+
+      // Show no results message
+      $noResults.toggleClass('hidden', hasVisible);
+    },
+
+    handleKeyboard: function($dropdown, e) {
+      if (!$dropdown.hasClass('open')) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.toggle($dropdown);
+        }
+        return;
+      }
+
+      var $options = $dropdown.find('.car-filter-dropdown-option:not(.hidden)');
+      var $focused = $options.filter('.focused');
+      var index = $options.index($focused);
+
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          index = Math.min(index + 1, $options.length - 1);
+          $options.removeClass('focused');
+          $options.eq(index).addClass('focused');
+          break;
+
+        case 'ArrowUp':
+          e.preventDefault();
+          index = Math.max(index - 1, 0);
+          $options.removeClass('focused');
+          $options.eq(index).addClass('focused');
+          break;
+
+        case 'Enter':
+          e.preventDefault();
+          if ($focused.length) {
+            this.selectOption($dropdown, $focused);
+          }
+          break;
+
+        case 'Escape':
+          e.preventDefault();
+          this.closeAll();
+          break;
+      }
+    },
+
+    // Update dropdown options dynamically (for model dropdown)
+    updateOptions: function($dropdown, options, placeholder) {
+      var $options = $dropdown.find('.car-filter-dropdown-options');
+      var $select = $dropdown.find('select');
+      var $button = $dropdown.find('.car-filter-dropdown-button');
+      var $search = $dropdown.find('.car-filter-dropdown-search');
+
+      // Build options HTML
+      var html = '<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="">' + placeholder + '</button>';
+      var selectHtml = '<option value="">' + placeholder + '</option>';
+
+      options.forEach(function(opt) {
+        html += '<button type="button" class="car-filter-dropdown-option" role="option" data-value="' + opt.value + '">' + opt.label + '</button>';
+        selectHtml += '<option value="' + opt.value + '">' + opt.label + '</option>';
+      });
+
+      html += '<div class="car-filter-no-results hidden">No matching results</div>';
+
+      $options.html(html);
+      $select.html(selectHtml);
+
+      // Reset button text to placeholder
+      $button.find('.car-filter-dropdown-text').addClass('placeholder').text(placeholder);
+
+      // Enable/disable based on options
+      if (options.length > 0) {
+        $button.prop('disabled', false);
+        $dropdown.removeClass('car-filter-dropdown-disabled');
+        $search.prop('disabled', false);
+      } else {
+        $button.prop('disabled', true);
+        $dropdown.addClass('car-filter-dropdown-disabled');
+        $search.prop('disabled', true);
+      }
+    },
+
+    // Set dropdown to loading state
+    setLoading: function($dropdown, isLoading) {
+      var $options = $dropdown.find('.car-filter-dropdown-options');
+      var $button = $dropdown.find('.car-filter-dropdown-button');
+
+      if (isLoading) {
+        $button.prop('disabled', true);
+        $options.html('<div class="car-filter-loading" style="padding: 0.75rem; color: #6b7280; text-align: center;">Loading...</div>');
+      }
+    },
+
+    // Disable dropdown
+    disable: function($dropdown, placeholder) {
+      var $button = $dropdown.find('.car-filter-dropdown-button');
+      var $search = $dropdown.find('.car-filter-dropdown-search');
+      var $options = $dropdown.find('.car-filter-dropdown-options');
+      var $select = $dropdown.find('select');
+
+      $button.prop('disabled', true);
+      $dropdown.addClass('car-filter-dropdown-disabled');
+      $search.prop('disabled', true);
+      $button.find('.car-filter-dropdown-text').addClass('placeholder').text(placeholder);
+
+      var html = '<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="">' + placeholder + '</button>';
+      html += '<div class="car-filter-no-results hidden">No matching results</div>';
+      $options.html(html);
+      $select.html('<option value="">' + placeholder + '</option>');
     }
+  };
+
+  // Initialize dropdown controller
+  AddListingDropdown.init();
+
+  // Handle make selection change (for model dependency)
+  $(document).on('addListing:makeChanged', function(e, makeTermId) {
+    if (isDevelopment) console.log("[Add Listing] Make changed:", makeTermId);
+
+    var $modelDropdown = $('#add-listing-model-wrapper');
+
+    if (!makeTermId) {
+      // No make selected - disable model dropdown
+      AddListingDropdown.disable($modelDropdown, 'Select Model');
+      return;
+    }
+
+    // Show loading state
+    AddListingDropdown.setLoading($modelDropdown, true);
+
+    // Fetch models via AJAX
+    $.ajax({
+      url: addListingData.ajaxurl,
+      type: "POST",
+      data: {
+        action: "get_models_for_make_by_term_id",
+        make_term_id: makeTermId,
+        nonce: addListingData.nonce,
+      },
+      success: function(response) {
+        if (response.success && response.data) {
+          var options = response.data.map(function(model) {
+            return {
+              value: model.term_id,
+              label: model.name
+            };
+          });
+
+          AddListingDropdown.updateOptions($modelDropdown, options, 'Select Model');
+
+          if (isDevelopment) console.log("[Add Listing] Loaded", options.length, "models");
+        } else {
+          if (isDevelopment) console.error("[Add Listing] Error loading models:", response);
+          AddListingDropdown.disable($modelDropdown, 'Error loading models');
+        }
+      },
+      error: function(xhr, status, error) {
+        if (isDevelopment) console.error("[Add Listing] AJAX error:", error);
+        AddListingDropdown.disable($modelDropdown, 'Error loading models');
+      }
+    });
   });
 
   // variant handling removed

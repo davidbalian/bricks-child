@@ -24,10 +24,10 @@ if ( ! is_user_logged_in() ) {
     exit;
 }
 
-// Get Makes data using PHP before the form
-$add_listing_makes = [];
+// Include filter base functions for custom dropdown rendering
+require_once get_stylesheet_directory() . '/includes/shortcodes/car-filters/filters/filter-base.php';
 
-// Get all top-level terms (makes) from car_make taxonomy
+// Get all makes (parent terms) from car_make taxonomy for the custom dropdown
 $make_terms = get_terms(array(
     'taxonomy' => 'car_make',
     'hide_empty' => false,
@@ -36,29 +36,28 @@ $make_terms = get_terms(array(
     'order' => 'ASC'
 ));
 
+// Format makes for the custom dropdown
+$add_listing_make_options = array();
 if (!is_wp_error($make_terms) && !empty($make_terms)) {
     foreach ($make_terms as $make_term) {
-        // Get all child terms (models) for this make
-        $model_terms = get_terms(array(
-            'taxonomy' => 'car_make',
-            'hide_empty' => false,
-            'parent' => $make_term->term_id,
-            'orderby' => 'name',
-            'order' => 'ASC'
-        ));
-        
-        if (!is_wp_error($model_terms)) {
-            $models = array();
-            foreach ($model_terms as $model_term) {
-                $models[] = $model_term->name;
-            }
-            $add_listing_makes[$make_term->name] = $models;
-        }
+        $add_listing_make_options[] = array(
+            'value' => $make_term->term_id,
+            'label' => $make_term->name,
+            'slug'  => $make_term->slug,
+        );
     }
 }
 
 // Ensure jQuery is loaded
 wp_enqueue_script('jquery');
+
+// Enqueue car-filters CSS for custom dropdown styling
+wp_enqueue_style(
+    'car-filters-css',
+    get_stylesheet_directory_uri() . '/includes/shortcodes/car-filters/car-filters.css',
+    array(),
+    filemtime(get_stylesheet_directory() . '/includes/shortcodes/car-filters/car-filters.css')
+);
 
 // Font Awesome is now loaded globally in enqueue.php
 // wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css', array(), '6.7.2', 'all');
@@ -201,21 +200,39 @@ get_header(); ?>
                                 <h2><?php echo get_svg_icon('circle-info'); ?> <?php esc_html_e( 'Basic Details', 'bricks-child' ); ?></h2>
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
-                                        <label for="make"><?php echo get_svg_icon('car-side'); ?> <?php esc_html_e( 'Make', 'bricks-child' ); ?></label>
-                                        <select id="make" name="make" class="form-control" required>
-                                            <option value=""><?php esc_html_e( 'Select Make', 'bricks-child' ); ?></option>
-                                            <?php
-                                            foreach ( $add_listing_makes as $make_name => $models ) {
-                                                echo '<option value="' . esc_attr( $make_name ) . '">' . esc_html( $make_name ) . '</option>';
-                                            }
-                                            ?>
-                                        </select>
+                                        <label><?php echo get_svg_icon('car-side'); ?> <?php esc_html_e( 'Make', 'bricks-child' ); ?></label>
+                                        <?php
+                                        car_filter_render_dropdown(array(
+                                            'id'          => 'add-listing-make',
+                                            'name'        => 'make',
+                                            'placeholder' => __('Select Make', 'bricks-child'),
+                                            'options'     => $add_listing_make_options,
+                                            'selected'    => '',
+                                            'show_count'  => false,
+                                            'searchable'  => true,
+                                            'data_attrs'  => array(
+                                                'filter-type' => 'make',
+                                            ),
+                                        ));
+                                        ?>
                                     </div>
                                     <div class="form-third">
-                                        <label for="model"><?php echo get_svg_icon('car'); ?> <?php esc_html_e( 'Model', 'bricks-child' ); ?></label>
-                                        <select id="model" name="model" class="form-control" required>
-                                            <option value=""><?php esc_html_e( 'Select Model', 'bricks-child' ); ?></option>
-                                        </select>
+                                        <label><?php echo get_svg_icon('car'); ?> <?php esc_html_e( 'Model', 'bricks-child' ); ?></label>
+                                        <?php
+                                        car_filter_render_dropdown(array(
+                                            'id'          => 'add-listing-model',
+                                            'name'        => 'model',
+                                            'placeholder' => __('Select Model', 'bricks-child'),
+                                            'options'     => array(),
+                                            'selected'    => '',
+                                            'disabled'    => true,
+                                            'show_count'  => false,
+                                            'searchable'  => true,
+                                            'data_attrs'  => array(
+                                                'filter-type' => 'model',
+                                            ),
+                                        ));
+                                        ?>
                                     </div>
                                     <div class="form-third">
                                         <label for="year"><?php echo get_svg_icon('calendar'); ?> <?php esc_html_e( 'Year', 'bricks-child' ); ?></label>
