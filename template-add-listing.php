@@ -243,13 +243,13 @@ get_header(); ?>
                                         <input type="text" id="price" name="price" class="form-control" required placeholder="E.g '10,000'">
                                     </div>
                                     <div class="form-third">
-                                    <label for="availability"><?php echo get_svg_icon('circle-check'); ?> <?php esc_html_e( 'Availability', 'bricks-child' ); ?></label>
-                                    <select id="availability" name="availability" class="form-control" required>
-                                        <option value=""><?php esc_html_e( 'Select Availability', 'bricks-child' ); ?></option>
-                                        <option value="In Stock"><?php esc_html_e( 'In Stock', 'bricks-child' ); ?></option>
-                                        <option value="In Transit"><?php esc_html_e( 'In Transit', 'bricks-child' ); ?></option>
-                                    </select>
-                                </div>
+                                        <label for="availability"><?php echo get_svg_icon('circle-check'); ?> <?php esc_html_e( 'Availability', 'bricks-child' ); ?></label>
+                                        <select id="availability" name="availability" class="form-control" required>
+                                            <option value=""><?php esc_html_e( 'Select Availability', 'bricks-child' ); ?></option>
+                                            <option value="In Stock"><?php esc_html_e( 'In Stock', 'bricks-child' ); ?></option>
+                                            <option value="In Transit"><?php esc_html_e( 'In Transit', 'bricks-child' ); ?></option>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <div class="form-row" id="location-row">
