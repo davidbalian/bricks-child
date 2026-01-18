@@ -37,13 +37,15 @@ $make_terms = get_terms(array(
 ));
 
 // Format makes for the custom dropdown
+// IMPORTANT: Use name as value (not term_id) because backend expects name for taxonomy lookup
 $add_listing_make_options = array();
 if (!is_wp_error($make_terms) && !empty($make_terms)) {
     foreach ($make_terms as $make_term) {
         $add_listing_make_options[] = array(
-            'value' => $make_term->term_id,
-            'label' => $make_term->name,
-            'slug'  => $make_term->slug,
+            'value'   => $make_term->name,
+            'label'   => $make_term->name,
+            'slug'    => $make_term->slug,
+            'term_id' => $make_term->term_id,
         );
     }
 }

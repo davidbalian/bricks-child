@@ -300,12 +300,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
   AddListingDropdown.init();
 
   // Handle make selection change (for model dependency)
-  $(document).on('addListing:makeChanged', function(e, makeTermId) {
-    if (isDevelopment) console.log("[Add Listing] Make changed:", makeTermId);
+  $(document).on('addListing:makeChanged', function(e, makeName) {
+    if (isDevelopment) console.log("[Add Listing] Make changed:", makeName);
 
     var $modelDropdown = $('#add-listing-model-wrapper');
 
-    if (!makeTermId) {
+    if (!makeName) {
       // No make selected - disable model dropdown
       AddListingDropdown.disable($modelDropdown, 'Select Model');
       return;
@@ -314,21 +314,22 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     // Show loading state
     AddListingDropdown.setLoading($modelDropdown, true);
 
-    // Fetch models via AJAX
+    // Fetch models via AJAX (using make name, returns model names)
     $.ajax({
       url: addListingData.ajaxurl,
       type: "POST",
       data: {
-        action: "get_models_for_make_by_term_id",
-        make_term_id: makeTermId,
+        action: "get_models_for_make",
+        make: makeName,
         nonce: addListingData.nonce,
       },
       success: function(response) {
         if (response.success && response.data) {
-          var options = response.data.map(function(model) {
+          // response.data is an array of model names
+          var options = response.data.map(function(modelName) {
             return {
-              value: model.term_id,
-              label: model.name
+              value: modelName,
+              label: modelName
             };
           });
 

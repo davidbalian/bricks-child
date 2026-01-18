@@ -745,13 +745,18 @@ label svg path,
 }
 
 /* Custom Dropdown Styles for Add Listing */
+#add-car-listing-form {
+  --input-height: 48px;
+}
+
 #add-car-listing-form .car-filter-dropdown {
   width: 100%;
 }
 
 #add-car-listing-form .car-filter-dropdown-button {
   width: 100%;
-  min-height: 44px;
+  height: var(--input-height);
+  box-sizing: border-box;
 }
 
 #add-car-listing-form .car-filter-dropdown-menu {
@@ -849,17 +854,33 @@ label svg path,
 
 /* Text Input Styling to Match Filter Style */
 #add-car-listing-form input[type="text"],
-#add-car-listing-form input[type="number"],
-#add-car-listing-form textarea {
+#add-car-listing-form input[type="number"] {
   width: 100%;
-  padding: 0.75rem 0.5rem;
+  height: var(--input-height);
+  padding: 0 0.75rem;
   border: 2px solid #dfe2e6;
   border-radius: 0.5rem;
   background-color: #ffffff;
   color: #2a3546;
   font-size: 16px;
   font-weight: 500;
+  box-sizing: border-box;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#add-car-listing-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #dfe2e6;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  color: #2a3546;
+  font-size: 16px;
+  font-weight: 500;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  resize: vertical;
+  min-height: 120px;
 }
 
 #add-car-listing-form input[type="text"]:hover,
@@ -880,11 +901,6 @@ label svg path,
 #add-car-listing-form input[type="number"]::placeholder,
 #add-car-listing-form textarea::placeholder {
   color: rgba(42, 53, 70, 0.5);
-}
-
-#add-car-listing-form textarea {
-  resize: vertical;
-  min-height: 120px;
 }
 
 /* Input with suffix styling */
