@@ -793,12 +793,16 @@ label svg path,
 .location-selector-wrapper .choose-location-btn {
   flex-shrink: 0;
   white-space: nowrap;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Clear location button */
 .clear-location-btn {
   position: absolute;
-  right: 40px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
@@ -820,6 +824,16 @@ label svg path,
 .clear-location-btn svg {
   width: 16px;
   height: 16px;
+}
+
+/* Hide dropdown arrow when clear button is visible */
+.saved-locations-container.has-location .car-filter-dropdown-arrow {
+  display: none;
+}
+
+/* Adjust button text padding when clear button is visible */
+.saved-locations-container.has-location .car-filter-dropdown-button {
+  padding-right: 40px;
 }
 
 /* Hide saved locations and OR when no saved locations exist */

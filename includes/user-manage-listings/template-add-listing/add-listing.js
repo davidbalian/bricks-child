@@ -1566,8 +1566,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         .addClass("location-selected")
         .text(label);
 
-      // Show clear button
+      // Show clear button and hide dropdown arrow
       $("#clear-location-btn").show();
+      $("#saved-locations-wrapper").addClass("has-location");
 
       // Close dropdown
       $dropdownWrapper.find(".car-filter-dropdown").removeClass("open");
@@ -1615,8 +1616,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     // Remove error state from location row if present
     $("#location-row").removeClass("has-error");
 
-    // Show clear button
+    // Show clear button and hide dropdown arrow
     $("#clear-location-btn").show();
+    $("#saved-locations-wrapper").addClass("has-location");
 
     if (isDevelopment) console.log("[Add Listing] Saved location applied successfully");
   }
@@ -1641,8 +1643,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     $options.find('.car-filter-dropdown-option[data-value=""]').addClass("selected");
     $select.val("");
 
-    // Show clear button
+    // Show clear button and hide dropdown arrow
     $("#clear-location-btn").show();
+    $dropdownWrapper.addClass("has-location");
   }
 
   /**
@@ -1683,8 +1686,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     // Remove hidden location fields from form
     $form.find('input[name="car_city"], input[name="car_district"], input[name="car_latitude"], input[name="car_longitude"], input[name="car_address"]').remove();
 
-    // Hide clear button
+    // Hide clear button and show dropdown arrow
     $("#clear-location-btn").hide();
+    $dropdownWrapper.removeClass("has-location");
 
     if (isDevelopment) console.log("[Add Listing] Location cleared");
   }
