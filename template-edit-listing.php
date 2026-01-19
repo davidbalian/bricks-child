@@ -170,7 +170,8 @@ wp_localize_script('edit-listing-script', 'editListingData', array(
     'selectedModel' => esc_js($model),
             // variant data removed
     'ajaxurl' => admin_url('admin-ajax.php'),
-    'nonce' => wp_create_nonce('edit_car_listing_nonce')
+    'nonce' => wp_create_nonce('edit_car_listing_nonce'),
+    'savedLocationsNonce' => wp_create_nonce('add_car_listing_nonce')
 ));
 
 // Include the separated display file

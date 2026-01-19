@@ -1168,7 +1168,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             type: "POST",
             data: {
                 action: "get_user_saved_locations",
-                nonce: editListingData.nonce,
+                nonce: editListingData.savedLocationsNonce,
             },
             success: function (response) {
                 if (response.success && response.data && response.data.length > 0) {
