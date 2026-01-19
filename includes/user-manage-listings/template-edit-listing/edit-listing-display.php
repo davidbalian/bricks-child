@@ -87,10 +87,38 @@ if (!defined('ABSPATH')) {
                                     </div>
                                 </div>
 
-                                <div class="form-row">
-                                    <label for="location"><i class="fas fa-map-pin"></i> <?php esc_html_e('Location', 'bricks-child'); ?></label>
-                                    <input type="text" id="location" name="location" class="form-control" value="<?php echo esc_attr($location); ?>" readonly>
-                                    <button type="button" class="btn btn-secondary choose-location-btn">Choose Location ></button>
+                                <div class="form-row" id="location-row">
+                                    <label for="location"><?php echo get_svg_icon('location-dot'); ?> <?php esc_html_e('Location', 'bricks-child'); ?></label>
+
+                                    <div class="location-selector-wrapper">
+                                        <!-- Saved Locations Dropdown -->
+                                        <div class="saved-locations-container" id="saved-locations-wrapper">
+                                            <?php
+                                            car_filter_render_dropdown(array(
+                                                'id'          => 'saved-locations',
+                                                'name'        => 'saved_location_select',
+                                                'placeholder' => __('Recently used locations', 'bricks-child'),
+                                                'options'     => array(),
+                                                'selected'    => '',
+                                                'show_count'  => false,
+                                                'searchable'  => true,
+                                                'data_attrs'  => array(
+                                                    'filter-type' => 'saved-location',
+                                                ),
+                                            ));
+                                            ?>
+                                            <button type="button" class="clear-location-btn" id="clear-location-btn" style="<?php echo !empty($location) ? '' : 'display: none;'; ?>" title="Clear location">
+                                                <?php echo get_svg_icon('xmark'); ?>
+                                            </button>
+                                        </div>
+
+                                        <span class="location-or-separator">OR</span>
+
+                                        <button type="button" class="btn btn-secondary choose-location-btn">Choose Location <?php echo get_svg_icon('map-location-dot'); ?></button>
+                                    </div>
+
+                                    <!-- Hidden field to store location for form submission -->
+                                    <input type="hidden" id="location" name="location" value="<?php echo esc_attr($location); ?>">
                                     <input type="hidden" name="car_city" id="car_city" value="<?php echo esc_attr(get_field('car_city', $car_id)); ?>">
                                     <input type="hidden" name="car_district" id="car_district" value="<?php echo esc_attr(get_field('car_district', $car_id)); ?>">
                                     <input type="hidden" name="car_latitude" id="car_latitude" value="<?php echo esc_attr(get_field('car_latitude', $car_id)); ?>">

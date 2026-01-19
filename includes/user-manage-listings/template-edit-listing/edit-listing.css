@@ -452,3 +452,108 @@ input[readonly]:hover {
     justify-content: center;
   }
 }
+
+/* Location selector layout */
+.location-selector-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.saved-locations-container {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.saved-locations-container .car-filter-dropdown {
+  flex: 1;
+}
+
+.location-or-separator {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-light, #6b7280);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.location-selector-wrapper .choose-location-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Clear location button */
+.clear-location-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  cursor: pointer;
+  color: var(--text-light, #6b7280);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  transition: color 0.2s ease;
+}
+
+.clear-location-btn:hover {
+  color: var(--primary-red, #dc3545);
+}
+
+.clear-location-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Hide dropdown arrow when clear button is visible */
+.saved-locations-container.has-location .car-filter-dropdown-arrow {
+  display: none;
+}
+
+/* Adjust button text padding when clear button is visible */
+.saved-locations-container.has-location .car-filter-dropdown-button {
+  padding-right: 40px;
+}
+
+/* Hide saved locations and OR when no saved locations exist */
+.location-selector-wrapper.no-saved-locations .saved-locations-container,
+.location-selector-wrapper.no-saved-locations .location-or-separator {
+  display: none;
+}
+
+.location-selector-wrapper.no-saved-locations .choose-location-btn {
+  width: 100%;
+}
+
+/* Location selected state - dropdown text styling */
+.saved-locations-container .car-filter-dropdown-text.location-selected {
+  color: var(--text-color, #363636);
+  font-weight: 400;
+}
+
+/* Responsive adjustments for location selector */
+@media (max-width: 640px) {
+  .location-selector-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .location-or-separator {
+    text-align: center;
+  }
+
+  .location-selector-wrapper .choose-location-btn {
+    width: 100%;
+  }
+}

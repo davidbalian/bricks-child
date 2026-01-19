@@ -961,12 +961,444 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             accumulatedFilesList.splice(fileIndex, 1);
             updateActualFileInput();
         }
-        
+
         // Remove preview element
         $(`.image-preview[data-async-key="${fileKey}"]`).fadeOut(() => {
             $(`.image-preview[data-async-key="${fileKey}"]`).remove();
         });
-        
+
         if (isDevelopment) console.log('[Edit Listing] Image removed from async system:', fileKey);
     }
+
+    // =====================================================
+    // SAVED LOCATIONS DROPDOWN CONTROLLER
+    // =====================================================
+
+    /**
+     * Custom Dropdown Controller for Edit Listing page
+     */
+    var EditListingDropdown = {
+        init: function() {
+            this.bindEvents();
+            if (isDevelopment) console.log("[Edit Listing] Custom dropdown controller initialized");
+        },
+
+        bindEvents: function() {
+            var self = this;
+
+            // Toggle dropdown
+            $(document).on('click', '.car-filter-dropdown-button', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if ($(this).prop('disabled')) return;
+
+                var $dropdown = $(this).closest('.car-filter-dropdown');
+                self.toggle($dropdown);
+            });
+
+            // Select option
+            $(document).on('click', '.car-filter-dropdown-option', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var $dropdown = $(this).closest('.car-filter-dropdown');
+                self.selectOption($dropdown, $(this));
+            });
+
+            // Search input
+            $(document).on('input', '.car-filter-dropdown-search', function() {
+                var $dropdown = $(this).closest('.car-filter-dropdown');
+                self.filterOptions($dropdown, $(this).val());
+            });
+
+            // Close on outside click
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.car-filter-dropdown').length) {
+                    self.closeAll();
+                }
+            });
+
+            // Keyboard navigation
+            $(document).on('keydown', '.car-filter-dropdown', function(e) {
+                self.handleKeyboard($(this), e);
+            });
+        },
+
+        toggle: function($dropdown) {
+            var isOpen = $dropdown.hasClass('open');
+            this.closeAll();
+
+            if (!isOpen) {
+                $dropdown.addClass('open');
+                $dropdown.find('.car-filter-dropdown-button').attr('aria-expanded', 'true');
+                $dropdown.find('.car-filter-dropdown-search').focus();
+            }
+        },
+
+        closeAll: function() {
+            $('.car-filter-dropdown.open').removeClass('open')
+                .find('.car-filter-dropdown-button').attr('aria-expanded', 'false');
+        },
+
+        selectOption: function($dropdown, $option) {
+            var value = $option.data('value');
+            var label = $option.clone().children('.car-filter-count').remove().end().text().trim();
+            var filterType = $dropdown.data('filter-type');
+
+            // Update hidden select
+            var $select = $dropdown.find('select');
+            $select.val(value).trigger('change');
+
+            // Update button text
+            var $button = $dropdown.find('.car-filter-dropdown-button');
+            var $text = $button.find('.car-filter-dropdown-text');
+
+            if (value === '' || value === null || value === undefined) {
+                $text.addClass('placeholder').text($select.find('option:first').text());
+            } else {
+                $text.removeClass('placeholder').text(label);
+            }
+
+            // Update selected state
+            $dropdown.find('.car-filter-dropdown-option').removeClass('selected');
+            $option.addClass('selected');
+
+            // Close dropdown
+            this.closeAll();
+
+            // Clear search
+            $dropdown.find('.car-filter-dropdown-search').val('');
+            this.filterOptions($dropdown, '');
+        },
+
+        filterOptions: function($dropdown, query) {
+            var $options = $dropdown.find('.car-filter-dropdown-option');
+            var $noResults = $dropdown.find('.car-filter-no-results');
+            var hasVisible = false;
+
+            query = query.toLowerCase().trim();
+
+            $options.each(function() {
+                var text = $(this).text().toLowerCase();
+                var matches = !query || text.indexOf(query) !== -1;
+
+                $(this).toggleClass('hidden', !matches);
+                if (matches) hasVisible = true;
+            });
+
+            // Show/hide section headers and separators
+            $dropdown.find('.car-filter-section-header, .car-filter-separator').toggleClass('hidden', !!query);
+
+            // Show no results message
+            $noResults.toggleClass('hidden', hasVisible);
+        },
+
+        handleKeyboard: function($dropdown, e) {
+            if (!$dropdown.hasClass('open')) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.toggle($dropdown);
+                }
+                return;
+            }
+
+            var $options = $dropdown.find('.car-filter-dropdown-option:not(.hidden)');
+            var $focused = $options.filter('.focused');
+            var index = $options.index($focused);
+
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    index = Math.min(index + 1, $options.length - 1);
+                    $options.removeClass('focused');
+                    $options.eq(index).addClass('focused');
+                    break;
+
+                case 'ArrowUp':
+                    e.preventDefault();
+                    index = Math.max(index - 1, 0);
+                    $options.removeClass('focused');
+                    $options.eq(index).addClass('focused');
+                    break;
+
+                case 'Enter':
+                    e.preventDefault();
+                    if ($focused.length) {
+                        this.selectOption($dropdown, $focused);
+                    }
+                    break;
+
+                case 'Escape':
+                    e.preventDefault();
+                    this.closeAll();
+                    break;
+            }
+        }
+    };
+
+    // Initialize dropdown controller
+    EditListingDropdown.init();
+
+    // =====================================================
+    // SAVED LOCATIONS FUNCTIONALITY
+    // =====================================================
+
+    // Store saved locations data for reference
+    let savedLocationsData = [];
+
+    /**
+     * Fetch and display user's saved locations from past listings
+     */
+    function initSavedLocations() {
+        const $wrapper = $("#saved-locations-wrapper");
+        const $selectorWrapper = $(".location-selector-wrapper");
+
+        if (!$wrapper.length) {
+            if (isDevelopment) console.log("[Edit Listing] Saved locations wrapper not found");
+            return;
+        }
+
+        // Get current location value
+        const currentLocation = $("#location").val();
+
+        // Fetch saved locations via AJAX
+        $.ajax({
+            url: editListingData.ajaxurl,
+            type: "POST",
+            data: {
+                action: "get_user_saved_locations",
+                nonce: editListingData.nonce,
+            },
+            success: function (response) {
+                if (response.success && response.data && response.data.length > 0) {
+                    savedLocationsData = response.data;
+
+                    // Build options array for the dropdown
+                    const options = savedLocationsData.map(function (loc, index) {
+                        return {
+                            value: index.toString(),
+                            label: loc.address,
+                            locationData: JSON.stringify(loc),
+                        };
+                    });
+
+                    // Update dropdown options
+                    updateSavedLocationsDropdown(options);
+
+                    // If there's a current location, show it in the dropdown
+                    if (currentLocation) {
+                        showLocationInDropdown(currentLocation);
+                    }
+
+                    if (isDevelopment) console.log("[Edit Listing] Loaded", savedLocationsData.length, "saved locations");
+                } else {
+                    if (isDevelopment) console.log("[Edit Listing] No saved locations found");
+                    // Add class to hide dropdown and OR, show only button
+                    $selectorWrapper.addClass("no-saved-locations");
+
+                    // If there's a current location, still show the clear button
+                    if (currentLocation) {
+                        showLocationInDropdown(currentLocation);
+                    }
+                }
+            },
+            error: function (xhr, status, error) {
+                if (isDevelopment) console.error("[Edit Listing] Error fetching saved locations:", error);
+                $selectorWrapper.addClass("no-saved-locations");
+
+                // If there's a current location, still show the clear button
+                if (currentLocation) {
+                    showLocationInDropdown(currentLocation);
+                }
+            },
+        });
+
+        // Initialize clear button handler
+        initClearLocationButton();
+    }
+
+    /**
+     * Update the saved locations dropdown with options
+     */
+    function updateSavedLocationsDropdown(options) {
+        const $dropdownWrapper = $("#saved-locations-wrapper");
+        const $options = $dropdownWrapper.find(".car-filter-dropdown-options");
+        const $select = $dropdownWrapper.find("select");
+        const $button = $dropdownWrapper.find(".car-filter-dropdown-button");
+        const $search = $dropdownWrapper.find(".car-filter-dropdown-search");
+
+        const placeholder = "Recently used locations";
+
+        // Build options HTML
+        let html = '<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="">' + placeholder + "</button>";
+        let selectHtml = '<option value="">' + placeholder + "</option>";
+
+        options.forEach(function (opt) {
+            html += '<button type="button" class="car-filter-dropdown-option" role="option" data-value="' +
+                opt.value + '" data-location=\'' + opt.locationData + '\'>' + opt.label + "</button>";
+            selectHtml += '<option value="' + opt.value + '" data-location=\'' + opt.locationData + '\'>' + opt.label + "</option>";
+        });
+
+        html += '<div class="car-filter-no-results hidden">No matching results</div>';
+
+        $options.html(html);
+        $select.html(selectHtml);
+
+        // Reset button text
+        $button.find(".car-filter-dropdown-text").addClass("placeholder").text(placeholder);
+
+        // Enable dropdown
+        $button.prop("disabled", false);
+        $select.prop("disabled", false);
+        $dropdownWrapper.find(".car-filter-dropdown").removeClass("car-filter-dropdown-disabled");
+        $search.prop("disabled", false);
+
+        // Bind click handler for saved location options
+        $options.off("click.savedLocation").on("click.savedLocation", ".car-filter-dropdown-option", function () {
+            const $option = $(this);
+            const locationDataStr = $option.data("location");
+            const value = $option.data("value");
+
+            if (locationDataStr) {
+                const locationData = typeof locationDataStr === "string" ? JSON.parse(locationDataStr) : locationDataStr;
+                applySavedLocation(locationData);
+            } else {
+                // Placeholder selected - clear location
+                clearLocation();
+                return;
+            }
+
+            // Update dropdown UI
+            const label = $option.text().trim();
+
+            $select.val(value);
+            $options.find(".car-filter-dropdown-option").removeClass("selected");
+            $option.addClass("selected");
+
+            $button.find(".car-filter-dropdown-text")
+                .removeClass("placeholder")
+                .addClass("location-selected")
+                .text(label);
+
+            // Show clear button and hide dropdown arrow
+            $("#clear-location-btn").show();
+            $("#saved-locations-wrapper").addClass("has-location");
+
+            // Close dropdown
+            $dropdownWrapper.find(".car-filter-dropdown").removeClass("open");
+            $button.attr("aria-expanded", "false");
+        });
+    }
+
+    /**
+     * Apply selected saved location to the form
+     */
+    function applySavedLocation(locationData) {
+        if (!locationData) return;
+
+        if (isDevelopment) console.log("[Edit Listing] Applying saved location:", locationData);
+
+        // Update hidden location field
+        const $locationField = $("#location");
+        if ($locationField.length) {
+            $locationField.val(locationData.address);
+        }
+
+        // Round coordinates to 6 decimal places
+        const roundCoord = (num) => parseFloat(Number(num).toFixed(6));
+
+        // Update the existing hidden fields
+        $("#car_city").val(locationData.city || "");
+        $("#car_district").val(locationData.district || locationData.city || "");
+        $("#car_latitude").val(roundCoord(locationData.latitude || 0));
+        $("#car_longitude").val(roundCoord(locationData.longitude || 0));
+        $("#car_address").val(locationData.address || "");
+
+        // Remove error state from location row if present
+        $("#location-row").removeClass("has-error");
+
+        // Show clear button and hide dropdown arrow
+        $("#clear-location-btn").show();
+        $("#saved-locations-wrapper").addClass("has-location");
+
+        if (isDevelopment) console.log("[Edit Listing] Saved location applied successfully");
+    }
+
+    /**
+     * Update dropdown to show location selected via map picker or existing location
+     */
+    function showLocationInDropdown(address) {
+        const $dropdownWrapper = $("#saved-locations-wrapper");
+        const $button = $dropdownWrapper.find(".car-filter-dropdown-button");
+        const $options = $dropdownWrapper.find(".car-filter-dropdown-options");
+        const $select = $dropdownWrapper.find("select");
+
+        // Update button text to show the selected address
+        $button.find(".car-filter-dropdown-text")
+            .removeClass("placeholder")
+            .addClass("location-selected")
+            .text(address);
+
+        // Deselect all options (since this might be a custom location from map or existing)
+        $options.find(".car-filter-dropdown-option").removeClass("selected");
+        $options.find('.car-filter-dropdown-option[data-value=""]').addClass("selected");
+        $select.val("");
+
+        // Show clear button and hide dropdown arrow
+        $("#clear-location-btn").show();
+        $dropdownWrapper.addClass("has-location");
+    }
+
+    /**
+     * Initialize clear location button
+     */
+    function initClearLocationButton() {
+        $("#clear-location-btn").off("click").on("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            clearLocation();
+        });
+    }
+
+    /**
+     * Clear the selected location
+     */
+    function clearLocation() {
+        const $dropdownWrapper = $("#saved-locations-wrapper");
+        const $button = $dropdownWrapper.find(".car-filter-dropdown-button");
+        const $options = $dropdownWrapper.find(".car-filter-dropdown-options");
+        const $select = $dropdownWrapper.find("select");
+
+        // Reset dropdown to placeholder
+        $button.find(".car-filter-dropdown-text")
+            .addClass("placeholder")
+            .removeClass("location-selected")
+            .text("Recently used locations");
+
+        // Reset selection
+        $options.find(".car-filter-dropdown-option").removeClass("selected");
+        $options.find('.car-filter-dropdown-option[data-value=""]').addClass("selected");
+        $select.val("");
+
+        // Clear hidden location fields
+        $("#location").val("");
+        $("#car_city").val("");
+        $("#car_district").val("");
+        $("#car_latitude").val("");
+        $("#car_longitude").val("");
+        $("#car_address").val("");
+
+        // Hide clear button and show dropdown arrow
+        $("#clear-location-btn").hide();
+        $dropdownWrapper.removeClass("has-location");
+
+        if (isDevelopment) console.log("[Edit Listing] Location cleared");
+    }
+
+    // Make showLocationInDropdown available globally for location-picker.js
+    window.showLocationInDropdown = showLocationInDropdown;
+
+    // Initialize saved locations on page load
+    initSavedLocations();
 }); 

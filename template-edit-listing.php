@@ -17,6 +17,9 @@ if (!is_user_logged_in()) {
     exit;
 }
 
+// Include filter base functions for custom dropdown rendering
+require_once get_stylesheet_directory() . '/includes/shortcodes/car-filters/filters/filter-base.php';
+
 // Get the car ID from the URL parameter
 $car_id = isset($_GET['car_id']) ? intval($_GET['car_id']) : 0;
 
@@ -138,6 +141,15 @@ get_header();
 
 // Enqueue assets
 wp_enqueue_style('edit-listing-style', get_stylesheet_directory_uri() . '/includes/user-manage-listings/template-edit-listing/edit-listing.css', array(), '1.0.1');
+
+// Enqueue car-filters CSS for custom dropdown styling
+wp_enqueue_style(
+    'car-filters-css',
+    get_stylesheet_directory_uri() . '/includes/shortcodes/car-filters/car-filters.css',
+    array(),
+    filemtime(get_stylesheet_directory() . '/includes/shortcodes/car-filters/car-filters.css')
+);
+
 wp_enqueue_script('jquery');
 
 // Enqueue image optimization script (shared with add listing)
