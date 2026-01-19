@@ -297,7 +297,7 @@ get_header(); ?>
                                             car_filter_render_dropdown(array(
                                                 'id'          => 'saved-locations',
                                                 'name'        => 'saved_location_select',
-                                                'placeholder' => __('Select location', 'bricks-child'),
+                                                'placeholder' => __('Recently used locations', 'bricks-child'),
                                                 'options'     => array(),
                                                 'selected'    => '',
                                                 'show_count'  => false,

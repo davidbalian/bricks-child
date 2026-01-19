@@ -1513,7 +1513,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     const $button = $dropdownWrapper.find(".car-filter-dropdown-button");
     const $search = $dropdownWrapper.find(".car-filter-dropdown-search");
 
-    const placeholder = "Select location";
+    const placeholder = "Recently used locations";
 
     // Build options HTML
     let html = '<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="">' + placeholder + "</button>";
