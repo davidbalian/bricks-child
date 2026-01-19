@@ -39,11 +39,11 @@ if (!defined('ABSPATH')) {
                                 <h2><?php esc_html_e('Basic Details', 'bricks-child'); ?></h2>
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
-                                        <label for="make"><i class="fas fa-car-side"></i> <?php esc_html_e('Make', 'bricks-child'); ?></label>
+                                        <label for="make"><?php echo get_svg_icon('car-side'); ?> <?php esc_html_e('Make', 'bricks-child'); ?></label>
                                         <input type="text" id="make" name="make" class="form-control" value="<?php echo esc_attr($make); ?>" readonly>
                                     </div>
                                     <div class="form-third">
-                                        <label for="model"><i class="fas fa-car"></i> <?php esc_html_e('Model', 'bricks-child'); ?></label>
+                                        <label for="model"><?php echo get_svg_icon('car'); ?> <?php esc_html_e('Model', 'bricks-child'); ?></label>
                                         <input type="text" id="model" name="model" class="form-control" value="<?php echo esc_attr($model); ?>" readonly>
                                     </div>
                                     <!-- variant field removed -->
@@ -51,7 +51,7 @@ if (!defined('ABSPATH')) {
 
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
-                                        <label for="year"><i class="far fa-calendar-alt"></i> <?php esc_html_e('Year', 'bricks-child'); ?></label>
+                                        <label for="year"><?php echo get_svg_icon('calendar'); ?> <?php esc_html_e('Year', 'bricks-child'); ?></label>
                                         <select id="year" name="year" class="form-control" required>
                                             <option value=""><?php esc_html_e('Select Year', 'bricks-child'); ?></option>
                                             <?php
@@ -75,14 +75,14 @@ if (!defined('ABSPATH')) {
                                         </select>
                                     </div>
                                     <div class="form-third">
-                                        <label for="mileage"><i class="fas fa-road"></i> <?php esc_html_e('Mileage', 'bricks-child'); ?></label>
+                                        <label for="mileage"><?php echo get_svg_icon('road'); ?> <?php esc_html_e('Mileage', 'bricks-child'); ?></label>
                                         <div class="input-with-suffix">
                                             <input type="text" id="mileage" name="mileage" class="form-control" value="<?php echo esc_attr($mileage); ?>" required>
                                             <span class="input-suffix">km</span>
                                         </div>
                                     </div>
                                     <div class="form-third">
-                                        <label for="price"><i class="fas fa-euro-sign"></i> <?php esc_html_e('Price', 'bricks-child'); ?></label>
+                                        <label for="price"><?php echo get_svg_icon('euro-sign'); ?> <?php esc_html_e('Price', 'bricks-child'); ?></label>
                                         <input type="text" id="price" name="price" class="form-control" value="<?php echo esc_attr($price); ?>" required>
                                     </div>
                                 </div>
@@ -127,7 +127,7 @@ if (!defined('ABSPATH')) {
                                 </div>
                                 
                                 <div class="form-row">
-                                    <label for="availability"><i class="fas fa-check-circle"></i> <?php esc_html_e('Availability', 'bricks-child'); ?></label>
+                                    <label for="availability"><?php echo get_svg_icon('circle-check'); ?> <?php esc_html_e('Availability', 'bricks-child'); ?></label>
                                     <select id="availability" name="availability" class="form-control" required>
                                         <option value="In Stock" <?php selected($availability, 'In Stock'); ?>><?php esc_html_e('In Stock', 'bricks-child'); ?></option>
                                         <option value="In Transit" <?php selected($availability, 'In Transit'); ?>><?php esc_html_e('In Transit', 'bricks-child'); ?></option>
@@ -139,7 +139,7 @@ if (!defined('ABSPATH')) {
                                 <h2><?php esc_html_e('Engine & Performance', 'bricks-child'); ?></h2>
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
-                                        <label for="engine_capacity"><i class="fas fa-tachometer-alt"></i> <?php esc_html_e('Engine Capacity', 'bricks-child'); ?></label>
+                                        <label for="engine_capacity"><?php echo get_svg_icon('engine'); ?> <?php esc_html_e('Engine Capacity', 'bricks-child'); ?></label>
                                         <select id="engine_capacity" name="engine_capacity" class="form-control" required>
                                             <option value=""><?php esc_html_e('Select Engine Capacity', 'bricks-child'); ?></option>
                                             <?php
@@ -164,7 +164,7 @@ if (!defined('ABSPATH')) {
                                         </select>
                                     </div>
                                     <div class="form-third">
-                                        <label for="fuel_type"><i class="fas fa-gas-pump"></i> <?php esc_html_e('Fuel Type', 'bricks-child'); ?></label>
+                                        <label for="fuel_type"><?php echo get_svg_icon('gas-pump'); ?> <?php esc_html_e('Fuel Type', 'bricks-child'); ?></label>
                                         <select id="fuel_type" name="fuel_type" class="form-control" required>
                                             <option value=""><?php esc_html_e('Select Fuel Type', 'bricks-child'); ?></option>
                                             <option value="Petrol" <?php selected($fuel_type, 'Petrol'); ?>><?php esc_html_e('Petrol', 'bricks-child'); ?></option>
@@ -180,7 +180,7 @@ if (!defined('ABSPATH')) {
                                         </select>
                                     </div>
                                     <div class="form-third">
-                                        <label for="transmission"><i class="fas fa-cogs"></i> <?php esc_html_e('Transmission', 'bricks-child'); ?></label>
+                                        <label for="transmission"><?php echo get_svg_icon('car-chassis'); ?> <?php esc_html_e('Transmission', 'bricks-child'); ?></label>
                                         <select id="transmission" name="transmission" class="form-control" required>
                                             <option value=""><?php esc_html_e('Select Transmission', 'bricks-child'); ?></option>
                                             <option value="Automatic" <?php selected($transmission, 'Automatic'); ?>><?php esc_html_e('Automatic', 'bricks-child'); ?></option>
@@ -191,7 +191,7 @@ if (!defined('ABSPATH')) {
 
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
-                                        <label for="drive_type"><i class="fas fa-car-side"></i> <?php esc_html_e('Drive Type (Optional)', 'bricks-child'); ?></label>
+                                        <label for="drive_type"><?php echo get_svg_icon('tire'); ?> <?php esc_html_e('Drive Type (Optional)', 'bricks-child'); ?></label>
                                         <select id="drive_type" name="drive_type" class="form-control">
                                             <option value=""><?php esc_html_e('Select Drive Type', 'bricks-child'); ?></option>
                                             <option value="Front-Wheel Drive" <?php selected($drive_type, 'Front-Wheel Drive'); ?>><?php esc_html_e('Front-Wheel Drive', 'bricks-child'); ?></option>
@@ -201,7 +201,7 @@ if (!defined('ABSPATH')) {
                                         </select>
                                     </div>
                                     <div class="form-half">
-                                        <label for="hp"><i class="fas fa-horse"></i> <?php esc_html_e('HorsePower (Optional)', 'bricks-child'); ?></label>
+                                        <label for="hp"><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e('HorsePower (Optional)', 'bricks-child'); ?></label>
                                         <div class="input-with-suffix">
                                             <input type="text" id="hp" name="hp" class="form-control" value="<?php echo esc_attr($hp); ?>">
                                             <span class="input-suffix">HP</span>
@@ -214,7 +214,7 @@ if (!defined('ABSPATH')) {
                                 <h2><?php esc_html_e('Body & Design', 'bricks-child'); ?></h2>
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
-                                        <label for="body_type"><i class="fas fa-car-side"></i> <?php esc_html_e('Body Type', 'bricks-child'); ?></label>
+                                        <label for="body_type"><?php echo get_svg_icon('car-side'); ?> <?php esc_html_e('Body Type', 'bricks-child'); ?></label>
                                         <select id="body_type" name="body_type" class="form-control" required>
                                             <option value=""><?php esc_html_e('Select Body Type', 'bricks-child'); ?></option>
                                             <option value="Hatchback" <?php selected($body_type, 'Hatchback'); ?>><?php esc_html_e('Hatchback', 'bricks-child'); ?></option>
@@ -235,7 +235,7 @@ if (!defined('ABSPATH')) {
                                         </select>
                                     </div>
                                     <div class="form-third">
-                                        <label for="exterior_color"><i class="fas fa-paint-brush"></i> <?php esc_html_e('Exterior Color', 'bricks-child'); ?></label>
+                                        <label for="exterior_color"><?php echo get_svg_icon('paintbrush'); ?> <?php esc_html_e('Exterior Color', 'bricks-child'); ?></label>
                                         <select id="exterior_color" name="exterior_color" class="form-control" required>
                                             <option value=""><?php esc_html_e('Select Exterior Color', 'bricks-child'); ?></option>
                                             <option value="Black" <?php selected($exterior_color, 'Black'); ?>><?php esc_html_e('Black', 'bricks-child'); ?></option>
@@ -255,7 +255,7 @@ if (!defined('ABSPATH')) {
                                         </select>
                                     </div>
                                     <div class="form-third">
-                                        <label for="interior_color"><i class="fas fa-paint-brush"></i> <?php esc_html_e('Interior Color (Optional)', 'bricks-child'); ?></label>
+                                        <label for="interior_color"><?php echo get_svg_icon('palette'); ?> <?php esc_html_e('Interior Color (Optional)', 'bricks-child'); ?></label>
                                         <select id="interior_color" name="interior_color" class="form-control">
                                             <option value=""><?php esc_html_e('Select Interior Color', 'bricks-child'); ?></option>
                                             <option value="Black" <?php selected($interior_color, 'Black'); ?>><?php esc_html_e('Black', 'bricks-child'); ?></option>
@@ -273,7 +273,7 @@ if (!defined('ABSPATH')) {
 
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
-                                        <label for="number_of_doors"><i class="fas fa-door-open"></i> <?php esc_html_e('Number of Doors (Optional)', 'bricks-child'); ?></label>
+                                        <label for="number_of_doors"><?php echo get_svg_icon('car-door'); ?> <?php esc_html_e('Number of Doors (Optional)', 'bricks-child'); ?></label>
                                         <select id="number_of_doors" name="number_of_doors" class="form-control">
                                             <option value=""><?php esc_html_e('Select Number of Doors', 'bricks-child'); ?></option>
                                             <?php
@@ -289,7 +289,7 @@ if (!defined('ABSPATH')) {
                                         </select>
                                     </div>
                                     <div class="form-half">
-                                        <label for="number_of_seats"><i class="fas fa-chair"></i> <?php esc_html_e('Number of Seats (Optional)', 'bricks-child'); ?></label>
+                                        <label for="number_of_seats"><?php echo get_svg_icon('car-seat'); ?> <?php esc_html_e('Number of Seats (Optional)', 'bricks-child'); ?></label>
                                         <select id="number_of_seats" name="number_of_seats" class="form-control">
                                             <option value=""><?php esc_html_e('Select Number of Seats', 'bricks-child'); ?></option>
                                             <?php
@@ -311,7 +311,7 @@ if (!defined('ABSPATH')) {
                                 <h2><?php esc_html_e('Registration & Background Info', 'bricks-child'); ?></h2>
 
                                 <div class="form-row">
-                                    <label for="motuntil"><i class="fas fa-clipboard-check"></i> <?php esc_html_e('MOT Status (Optional)', 'bricks-child'); ?></label>
+                                    <label for="motuntil"><?php echo get_svg_icon('clipboard-check'); ?> <?php esc_html_e('MOT Status (Optional)', 'bricks-child'); ?></label>
                                     <select id="motuntil" name="motuntil" class="form-control">
                                         <option value=""><?php esc_html_e('Select MOT Status', 'bricks-child'); ?></option>
                                         <option value="Expired" <?php selected($mot_status, 'Expired'); ?>><?php esc_html_e('Expired', 'bricks-child'); ?></option>
@@ -339,12 +339,12 @@ if (!defined('ABSPATH')) {
                                 </div>
 
                                 <div class="form-row">
-                                    <label for="numowners"><i class="fas fa-users"></i> <?php esc_html_e('Number of Owners', 'bricks-child'); ?></label>
+                                    <label for="numowners"><?php echo get_svg_icon('users'); ?> <?php esc_html_e('Number of Owners', 'bricks-child'); ?></label>
                                     <input type="text" id="numowners" name="numowners" class="form-control" value="<?php echo esc_attr($num_owners); ?>">
                                 </div>
 
                                 <div class="form-row">
-                                    <label for="isantique"><i class="fas fa-clock"></i> <?php esc_html_e('Registered as an Antique', 'bricks-child'); ?></label>
+                                    <label for="isantique"><?php echo get_svg_icon('clock-rotate-left'); ?> <?php esc_html_e('Registered as an Antique', 'bricks-child'); ?></label>
                                     <div class="checkbox-field">
                                         <input type="checkbox" id="isantique" name="isantique" value="1" <?php checked($is_antique, 1); ?>>
                                         <span><?php esc_html_e('Mark this listing as registered antique', 'bricks-child'); ?></span>
@@ -450,7 +450,7 @@ if (!defined('ABSPATH')) {
                             <div class="form-section description-section">
                                 <h2><?php esc_html_e('Description', 'bricks-child'); ?></h2>
                                 <div class="form-row">
-                                    <label for="description"><i class="fas fa-align-left"></i> <?php esc_html_e('Description', 'bricks-child'); ?></label>
+                                    <label for="description"><?php echo get_svg_icon('align-left'); ?> <?php esc_html_e('Description', 'bricks-child'); ?></label>
                                     <textarea id="description" name="description" class="form-control" rows="6"><?php 
                                         // Convert HTML back to plain text with proper line breaks for textarea editing
                                         $clean_description = $description;
@@ -473,7 +473,7 @@ if (!defined('ABSPATH')) {
                                 <div class="image-upload-container">
                                     <div class="file-upload-area" id="file-upload-area" role="button" tabindex="0">
                                         <div class="upload-message">
-                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <?php echo get_svg_icon('cloud-arrow-up'); ?>
                                             <p><?php esc_html_e('Drag & Drop Images Here', 'bricks-child'); ?></p>
                                             <p class="small"><?php esc_html_e('or click to select files', 'bricks-child'); ?></p>
                                         </div>

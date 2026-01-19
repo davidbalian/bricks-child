@@ -453,10 +453,18 @@ input[readonly]:hover {
   }
 }
 
-/* Location label icon sizing */
-#location-row label svg {
+/* Label icon sizing for all form labels */
+.page-edit-listing label svg {
   width: 1em;
   height: 1em;
+  vertical-align: middle;
+}
+
+/* Upload area icon sizing */
+.file-upload-area .upload-message svg {
+  width: 48px;
+  height: 48px;
+  color: var(--text-light, #6b7280);
 }
 
 /* Location selector layout */
