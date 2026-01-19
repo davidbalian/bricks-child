@@ -92,7 +92,7 @@ if (!defined('ABSPATH')) {
 
                                     <div class="location-selector-wrapper">
                                         <!-- Saved Locations Dropdown -->
-                                        <div class="saved-locations-container" id="saved-locations-wrapper">
+                                        <div class="saved-locations-container<?php echo !empty($location) ? ' has-location' : ''; ?>" id="saved-locations-wrapper">
                                             <?php
                                             car_filter_render_dropdown(array(
                                                 'id'          => 'saved-locations',

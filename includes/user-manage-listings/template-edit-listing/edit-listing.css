@@ -453,6 +453,12 @@ input[readonly]:hover {
   }
 }
 
+/* Location label icon sizing */
+#location-row label svg {
+  width: 1em;
+  height: 1em;
+}
+
 /* Location selector layout */
 .location-selector-wrapper {
   display: flex;
@@ -517,8 +523,9 @@ input[readonly]:hover {
 }
 
 /* Hide dropdown arrow when clear button is visible */
-.saved-locations-container.has-location .car-filter-dropdown-arrow {
-  display: none;
+.saved-locations-container.has-location .car-filter-dropdown-arrow,
+.saved-locations-container.has-location .car-filter-dropdown-button::after {
+  display: none !important;
 }
 
 /* Adjust button text padding when clear button is visible */
