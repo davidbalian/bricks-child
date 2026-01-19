@@ -1194,21 +1194,25 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                     if (isDevelopment) console.log("[Edit Listing] Loaded", savedLocationsData.length, "saved locations");
                 } else {
                     if (isDevelopment) console.log("[Edit Listing] No saved locations found");
-                    // Add class to hide dropdown and OR, show only button
-                    $selectorWrapper.addClass("no-saved-locations");
 
-                    // If there's a current location, still show the clear button
-                    if (currentLocation) {
+                    // Only hide dropdown if there's also no current location
+                    if (!currentLocation) {
+                        $selectorWrapper.addClass("no-saved-locations");
+                    } else {
+                        // There's a current location but no saved locations
+                        // Show the dropdown with just the current location displayed
                         showLocationInDropdown(currentLocation);
                     }
                 }
             },
             error: function (xhr, status, error) {
                 if (isDevelopment) console.error("[Edit Listing] Error fetching saved locations:", error);
-                $selectorWrapper.addClass("no-saved-locations");
 
-                // If there's a current location, still show the clear button
-                if (currentLocation) {
+                // Only hide dropdown if there's also no current location
+                if (!currentLocation) {
+                    $selectorWrapper.addClass("no-saved-locations");
+                } else {
+                    // There's a current location, show it
                     showLocationInDropdown(currentLocation);
                 }
             },
