@@ -494,6 +494,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     form.appendChild(input);
                 });
             }
+
+            // Update the saved locations dropdown to show the selected address
+            if (typeof window.showLocationInDropdown === 'function') {
+                window.showLocationInDropdown(finalAddress);
+            }
         }
 
         locationModal.style.display = 'none';
