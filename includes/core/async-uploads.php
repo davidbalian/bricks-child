@@ -13,6 +13,42 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Log messages for async upload debugging
+ *
+ * @param string $message The message to log
+ * @param string $level   Log level: 'info', 'warning', 'error'
+ * @param array  $context Additional context data
+ */
+function async_upload_log($message, $level = 'info', $context = array()) {
+    $prefix = '[ASYNC_UPLOAD]';
+    $level_label = strtoupper($level);
+    $user_id = get_current_user_id();
+    $timestamp = current_time('Y-m-d H:i:s');
+
+    $log_entry = sprintf(
+        '%s [%s] [User:%d] [%s] %s',
+        $prefix,
+        $timestamp,
+        $user_id,
+        $level_label,
+        is_array($message) || is_object($message) ? print_r($message, true) : $message
+    );
+
+    if (!empty($context)) {
+        $log_entry .= ' | Context: ' . json_encode($context, JSON_UNESCAPED_SLASHES);
+    }
+
+    error_log($log_entry);
+}
+
+/**
+ * Log errors for async uploads
+ */
+function async_upload_error($message, $context = array()) {
+    async_upload_log($message, 'error', $context);
+}
+
+/**
  * Initialize async upload system
  */
 function init_async_upload_system() {
@@ -116,18 +152,28 @@ function enqueue_async_upload_scripts() {
 function handle_async_upload_image() {
     // Verify nonce
     if (!wp_verify_nonce($_POST['nonce'], 'async_upload_nonce')) {
+        async_upload_error('Nonce verification failed', array(
+            'nonce_present' => isset($_POST['nonce'])
+        ));
         wp_send_json_error(array('message' => 'Security check failed'));
         return;
     }
-    
+
     // Check if user is logged in
     if (!is_user_logged_in()) {
+        async_upload_error('User not logged in for async upload');
         wp_send_json_error(array('message' => 'User not logged in'));
         return;
     }
-    
+
     // Check if file was uploaded
     if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+        $upload_error_code = isset($_FILES['image']) ? $_FILES['image']['error'] : 'no_file';
+        async_upload_error('File upload error', array(
+            'error_code' => $upload_error_code,
+            'file_present' => isset($_FILES['image']),
+            'session_id' => isset($_POST['session_id']) ? $_POST['session_id'] : 'not_set'
+        ));
         wp_send_json_error(array('message' => 'File upload error'));
         return;
     }
@@ -162,17 +208,32 @@ function handle_async_upload_image() {
     $is_valid_extension = in_array($file_extension, $allowed_extensions);
     
     if (!$is_valid_mime && !$is_valid_extension) {
-        error_log('JFIF Debug - File rejected - MIME: ' . $_FILES['image']['type'] . ', Extension: ' . $file_extension);
+        async_upload_error('Invalid file type rejected', array(
+            'mime_type' => $_FILES['image']['type'],
+            'extension' => $file_extension,
+            'filename' => $original_filename,
+            'session_id' => $session_id
+        ));
         wp_send_json_error(array('message' => 'Invalid file type: ' . $_FILES['image']['type'] . ' (.' . $file_extension . ')'));
         return;
     }
-    
+
     if (!$is_valid_mime) {
-        error_log('JFIF Debug - File accepted by extension - MIME: ' . $_FILES['image']['type'] . ', Extension: ' . $file_extension);
+        async_upload_log('File accepted by extension fallback', 'warning', array(
+            'mime_type' => $_FILES['image']['type'],
+            'extension' => $file_extension,
+            'filename' => $original_filename
+        ));
     }
-    
+
     // Validate file size (12MB max)
     if ($_FILES['image']['size'] > 12 * 1024 * 1024) {
+        async_upload_error('File too large', array(
+            'file_size' => $_FILES['image']['size'],
+            'max_size' => 12 * 1024 * 1024,
+            'filename' => $original_filename,
+            'session_id' => $session_id
+        ));
         wp_send_json_error(array('message' => 'File too large'));
         return;
     }
@@ -186,14 +247,20 @@ function handle_async_upload_image() {
     $attachment_id = media_handle_upload('image', 0); // 0 = no post parent initially
     
     if (is_wp_error($attachment_id)) {
+        async_upload_error('Media upload failed', array(
+            'error_code' => $attachment_id->get_error_code(),
+            'error_message' => $attachment_id->get_error_message(),
+            'filename' => $original_filename,
+            'session_id' => $session_id
+        ));
         wp_send_json_error(array('message' => $attachment_id->get_error_message()));
         return;
     }
-    
+
     // Track upload in database
     global $wpdb;
     $table_name = $wpdb->prefix . 'temp_uploads';
-    
+
     $result = $wpdb->insert(
         $table_name,
         array(
@@ -206,13 +273,25 @@ function handle_async_upload_image() {
         ),
         array('%s', '%d', '%d', '%s', '%s', '%s')
     );
-    
+
     if ($result === false) {
+        async_upload_error('Database insert failed', array(
+            'db_error' => $wpdb->last_error,
+            'attachment_id' => $attachment_id,
+            'session_id' => $session_id,
+            'filename' => $original_filename
+        ));
         // If database insert failed, clean up the uploaded file
         wp_delete_attachment($attachment_id, true);
         wp_send_json_error(array('message' => 'Database error: ' . $wpdb->last_error));
         return;
     }
+
+    async_upload_log('Image uploaded successfully', 'info', array(
+        'attachment_id' => $attachment_id,
+        'session_id' => $session_id,
+        'filename' => $original_filename
+    ));
     
     // Get attachment URL for preview
     $attachment_url = wp_get_attachment_image_url($attachment_id, 'medium');
@@ -234,12 +313,14 @@ function handle_async_upload_image() {
 function handle_delete_async_image() {
     // Verify nonce
     if (!wp_verify_nonce($_POST['nonce'], 'async_upload_nonce')) {
+        async_upload_error('Delete image nonce verification failed');
         wp_send_json_error(array('message' => 'Security check failed'));
         return;
     }
-    
+
     // Check if user is logged in
     if (!is_user_logged_in()) {
+        async_upload_error('User not logged in for delete operation');
         wp_send_json_error(array('message' => 'User not logged in'));
         return;
     }
@@ -281,14 +362,19 @@ function handle_delete_async_image() {
         }
         
         if (!$upload_record) {
+            async_upload_error('Upload record not found for deletion', array(
+                'attachment_id' => $attachment_id,
+                'session_id' => $session_id,
+                'user_id' => $user_id
+            ));
             wp_send_json_error(array('message' => 'Upload not found or access denied'));
             return;
         }
     }
-    
+
     // Delete the attachment file
     $deleted = wp_delete_attachment($attachment_id, true);
-    
+
     if ($deleted) {
         // Remove from tracking table
         $delete_result = $wpdb->delete(
@@ -299,9 +385,17 @@ function handle_delete_async_image() {
             ),
             array('%d', '%d')
         );
-        
+
+        async_upload_log('Image deleted successfully', 'info', array(
+            'attachment_id' => $attachment_id,
+            'session_id' => $session_id
+        ));
         wp_send_json_success(array('message' => 'Image deleted successfully'));
     } else {
+        async_upload_error('Failed to delete attachment', array(
+            'attachment_id' => $attachment_id,
+            'session_id' => $session_id
+        ));
         wp_send_json_error(array('message' => 'Failed to delete image'));
     }
 }
@@ -312,12 +406,14 @@ function handle_delete_async_image() {
 function handle_cleanup_upload_session() {
     // Verify nonce
     if (!wp_verify_nonce($_POST['nonce'], 'async_upload_nonce')) {
+        async_upload_error('Cleanup session nonce verification failed');
         wp_send_json_error(array('message' => 'Security check failed'));
         return;
     }
-    
+
     // Check if user is logged in
     if (!is_user_logged_in()) {
+        async_upload_error('User not logged in for cleanup operation');
         wp_send_json_error(array('message' => 'User not logged in'));
         return;
     }
@@ -350,7 +446,12 @@ function handle_cleanup_upload_session() {
         ),
         array('%s', '%d')
     );
-    
+
+    async_upload_log('Session cleanup completed', 'info', array(
+        'session_id' => $session_id,
+        'deleted_count' => $deleted_count
+    ));
+
     wp_send_json_success(array(
         'message' => "Cleaned up {$deleted_count} uploads",
         'deleted_count' => $deleted_count
@@ -445,7 +546,9 @@ function cleanup_orphaned_uploads() {
     );
     
     if ($cleaned_count > 0) {
-        error_log("Async uploads: Cleaned up {$cleaned_count} orphaned uploads");
+        async_upload_log('Orphaned uploads cleanup completed', 'info', array(
+            'cleaned_count' => $cleaned_count
+        ));
     }
 }
 

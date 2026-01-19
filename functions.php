@@ -791,25 +791,28 @@ require_once get_stylesheet_directory() . '/includes/admin/csv-car-import.php';
 function get_models_for_make() {
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'add_car_listing_nonce')) {
+        error_log('[ADD_LISTING] [' . current_time('Y-m-d H:i:s') . '] [User:' . get_current_user_id() . '] [ERROR] get_models_for_make: Nonce verification failed');
         wp_send_json_error('Invalid nonce');
         return;
     }
-    
+
     $make_name = sanitize_text_field($_POST['make']);
-    
+
     if (empty($make_name)) {
+        error_log('[ADD_LISTING] [' . current_time('Y-m-d H:i:s') . '] [User:' . get_current_user_id() . '] [ERROR] get_models_for_make: Make name is empty');
         wp_send_json_error('Make name is required');
         return;
     }
-    
+
     // Find the make term
     $make_term = get_term_by('name', $make_name, 'car_make');
-    
+
     if (!$make_term || is_wp_error($make_term)) {
+        error_log('[ADD_LISTING] [' . current_time('Y-m-d H:i:s') . '] [User:' . get_current_user_id() . '] [ERROR] get_models_for_make: Make not found | Context: {"make_name":"' . $make_name . '"}');
         wp_send_json_error('Make not found');
         return;
     }
-    
+
     // Get all child terms (models) for this make
     $model_terms = get_terms(array(
         'taxonomy' => 'car_make',
@@ -818,17 +821,18 @@ function get_models_for_make() {
         'orderby' => 'name',
         'order' => 'ASC'
     ));
-    
+
     if (is_wp_error($model_terms)) {
+        error_log('[ADD_LISTING] [' . current_time('Y-m-d H:i:s') . '] [User:' . get_current_user_id() . '] [ERROR] get_models_for_make: Error fetching models | Context: {"make_name":"' . $make_name . '","error":"' . $model_terms->get_error_message() . '"}');
         wp_send_json_error('Error fetching models');
         return;
     }
-    
+
     $models = array();
     foreach ($model_terms as $model_term) {
         $models[] = $model_term->name;
     }
-    
+
     wp_send_json_success($models);
 }
 
@@ -842,6 +846,7 @@ add_action('wp_ajax_nopriv_get_models_for_make', 'get_models_for_make');
 function get_models_for_make_by_term_id() {
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'add_car_listing_nonce')) {
+        error_log('[ADD_LISTING] [' . current_time('Y-m-d H:i:s') . '] [User:' . get_current_user_id() . '] [ERROR] get_models_for_make_by_term_id: Nonce verification failed');
         wp_send_json_error('Invalid nonce');
         return;
     }
@@ -849,6 +854,7 @@ function get_models_for_make_by_term_id() {
     $make_term_id = intval($_POST['make_term_id']);
 
     if (empty($make_term_id)) {
+        error_log('[ADD_LISTING] [' . current_time('Y-m-d H:i:s') . '] [User:' . get_current_user_id() . '] [ERROR] get_models_for_make_by_term_id: Make term ID is empty');
         wp_send_json_error('Make term ID is required');
         return;
     }
@@ -863,6 +869,7 @@ function get_models_for_make_by_term_id() {
     ));
 
     if (is_wp_error($model_terms)) {
+        error_log('[ADD_LISTING] [' . current_time('Y-m-d H:i:s') . '] [User:' . get_current_user_id() . '] [ERROR] get_models_for_make_by_term_id: Error fetching models | Context: {"make_term_id":' . $make_term_id . ',"error":"' . $model_terms->get_error_message() . '"}');
         wp_send_json_error('Error fetching models');
         return;
     }

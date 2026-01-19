@@ -40,6 +40,10 @@ function handle_add_car_listing() {
     
     // Verify nonce
     if (!isset($_POST['add_car_listing_nonce']) || !wp_verify_nonce($_POST['add_car_listing_nonce'], 'add_car_listing_nonce')) {
+        car_submission_error('Nonce verification failed', array(
+            'nonce_present' => isset($_POST['add_car_listing_nonce']),
+            'referer' => wp_get_referer()
+        ));
         wp_redirect(add_query_arg('listing_error', 'nonce_failed', wp_get_referer()));
         exit;
     }
@@ -53,6 +57,10 @@ function handle_add_car_listing() {
     }
     
     if (!empty($missing_fields)) {
+        car_submission_error('Required fields validation failed', array(
+            'missing_fields' => $missing_fields,
+            'submitted_keys' => array_keys($_POST)
+        ));
         // Redirect back with error message
         $redirect_url = add_query_arg(
             array(
@@ -93,6 +101,11 @@ function handle_add_car_listing() {
     }
     
     if (!$has_images) {
+        car_submission_error('No images provided', array(
+            'async_session_id' => $async_session_id,
+            'async_images_count' => count($async_images),
+            'files_present' => isset($_FILES['car_images'])
+        ));
         wp_redirect(add_query_arg('error', 'no_images', wp_get_referer()));
         exit;
     }
@@ -121,6 +134,13 @@ function handle_add_car_listing() {
     //  - non-empty address
     //  - non-zero latitude & longitude
     if (empty($city) || empty($address) || $latitude === 0.0 || $longitude === 0.0) {
+        car_submission_error('Location validation failed', array(
+            'city' => $city,
+            'address' => $address,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'district' => $district
+        ));
         $redirect_url = add_query_arg(
             array(
                 'error'  => 'validation',
@@ -192,7 +212,14 @@ function handle_add_car_listing() {
     
     // Check if post creation was successful
     if (is_wp_error($post_id)) {
-        error_log('Error creating car listing: ' . $post_id->get_error_message());
+        car_submission_error('Post creation failed', array(
+            'error_code' => $post_id->get_error_code(),
+            'error_message' => $post_id->get_error_message(),
+            'post_title' => $post_title,
+            'make' => $make,
+            'model' => $model,
+            'year' => $year
+        ));
         wp_redirect(add_query_arg('error', 'post_creation', wp_get_referer()));
         exit;
     }
@@ -367,7 +394,12 @@ function handle_add_car_listing() {
     
     // If image processing failed
     if (is_wp_error($image_ids)) {
-        error_log('Error processing car images: ' . $image_ids->get_error_message());
+        car_submission_error('Traditional image upload failed', array(
+            'post_id' => $post_id,
+            'error_code' => $image_ids->get_error_code(),
+            'error_message' => $image_ids->get_error_message(),
+            'files_count' => isset($_FILES['car_images']) ? count($_FILES['car_images']['name']) : 0
+        ));
         // Delete the post since images are required
         wp_delete_post($post_id, true);
         wp_redirect(add_query_arg('error', 'image_upload', wp_get_referer()));
@@ -576,18 +608,55 @@ function generate_optimized_car_image_sizes($attachment_ids) {
 }
 
 /**
- * Log errors to WordPress debug log
- * 
- * @param string $message The error message to log
+ * Log messages to WordPress debug log for car submission debugging
+ *
+ * @param string $message The message to log
+ * @param string $level   Log level: 'info', 'warning', 'error'
+ * @param array  $context Additional context data to log
  */
-function car_submission_log($message) {
-    if (WP_DEBUG === true) {
-        if (is_array($message) || is_object($message)) {
-            error_log(print_r($message, true));
-        } else {
-            error_log($message);
-        }
+function car_submission_log($message, $level = 'info', $context = array()) {
+    // Always log for debugging purposes
+    $prefix = '[ADD_LISTING]';
+    $level_label = strtoupper($level);
+    $user_id = get_current_user_id();
+    $timestamp = current_time('Y-m-d H:i:s');
+
+    // Build log entry
+    $log_entry = sprintf(
+        '%s [%s] [User:%d] [%s] %s',
+        $prefix,
+        $timestamp,
+        $user_id,
+        $level_label,
+        is_array($message) || is_object($message) ? print_r($message, true) : $message
+    );
+
+    // Add context if provided
+    if (!empty($context)) {
+        $log_entry .= ' | Context: ' . json_encode($context, JSON_UNESCAPED_SLASHES);
     }
+
+    error_log($log_entry);
+}
+
+/**
+ * Log errors specifically for car submission
+ *
+ * @param string $message Error message
+ * @param array  $context Additional context
+ */
+function car_submission_error($message, $context = array()) {
+    car_submission_log($message, 'error', $context);
+}
+
+/**
+ * Log warnings for car submission
+ *
+ * @param string $message Warning message
+ * @param array  $context Additional context
+ */
+function car_submission_warning($message, $context = array()) {
+    car_submission_log($message, 'warning', $context);
 }
 
 /**
