@@ -889,6 +889,81 @@ function get_models_for_make_by_term_id() {
 add_action('wp_ajax_get_models_for_make_by_term_id', 'get_models_for_make_by_term_id');
 add_action('wp_ajax_nopriv_get_models_for_make_by_term_id', 'get_models_for_make_by_term_id');
 
+/**
+ * AJAX handler to get user's saved locations from past listings
+ * Returns unique locations from the user's last 10 car listings
+ */
+function get_user_saved_locations() {
+    // Verify nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'add_car_listing_nonce')) {
+        wp_send_json_error('Invalid nonce');
+        return;
+    }
+
+    // Check if user is logged in
+    if (!is_user_logged_in()) {
+        wp_send_json_error('User not logged in');
+        return;
+    }
+
+    $user_id = get_current_user_id();
+
+    // Get user's car listings with location data
+    $args = array(
+        'post_type'      => 'car',
+        'post_status'    => array('publish', 'pending', 'draft'),
+        'author'         => $user_id,
+        'posts_per_page' => 20, // Fetch more to ensure we get 10 unique locations
+        'orderby'        => 'date',
+        'order'          => 'DESC',
+        'meta_query'     => array(
+            array(
+                'key'     => 'car_address',
+                'value'   => '',
+                'compare' => '!=',
+            ),
+        ),
+    );
+
+    $listings = get_posts($args);
+
+    if (empty($listings)) {
+        wp_send_json_success(array());
+        return;
+    }
+
+    $locations = array();
+    $seen_addresses = array();
+
+    foreach ($listings as $listing) {
+        $address = get_field('car_address', $listing->ID);
+
+        // Skip if no address or already seen (deduplicate)
+        if (empty($address) || in_array($address, $seen_addresses)) {
+            continue;
+        }
+
+        $seen_addresses[] = $address;
+
+        $locations[] = array(
+            'address'   => $address,
+            'city'      => get_field('car_city', $listing->ID) ?: '',
+            'district'  => get_field('car_district', $listing->ID) ?: '',
+            'latitude'  => get_field('car_latitude', $listing->ID) ?: 0,
+            'longitude' => get_field('car_longitude', $listing->ID) ?: 0,
+        );
+
+        // Limit to 10 unique locations
+        if (count($locations) >= 10) {
+            break;
+        }
+    }
+
+    wp_send_json_success($locations);
+}
+
+add_action('wp_ajax_get_user_saved_locations', 'get_user_saved_locations');
+
 // =========================================================================
 
 // =========================================================================

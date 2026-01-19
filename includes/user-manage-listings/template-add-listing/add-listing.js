@@ -1442,4 +1442,173 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
     if (isDevelopment) console.log("[Add Listing] Image removed from async system:", fileKey);
   }
+
+  // =====================================================
+  // SAVED LOCATIONS FUNCTIONALITY
+  // =====================================================
+
+  /**
+   * Fetch and display user's saved locations from past listings
+   */
+  function initSavedLocations() {
+    const $wrapper = $("#saved-locations-wrapper");
+    const $dropdown = $("#saved-locations-wrapper");
+
+    if (!$wrapper.length) {
+      if (isDevelopment) console.log("[Add Listing] Saved locations wrapper not found");
+      return;
+    }
+
+    // Fetch saved locations via AJAX
+    $.ajax({
+      url: addListingData.ajaxurl,
+      type: "POST",
+      data: {
+        action: "get_user_saved_locations",
+        nonce: addListingData.nonce,
+      },
+      success: function (response) {
+        if (response.success && response.data && response.data.length > 0) {
+          const locations = response.data;
+
+          // Build options array for the dropdown
+          const options = locations.map(function (loc, index) {
+            return {
+              value: index.toString(),
+              label: loc.address,
+              // Store full location data as JSON in data attribute
+              locationData: JSON.stringify(loc),
+            };
+          });
+
+          // Update dropdown options
+          updateSavedLocationsDropdown(options);
+
+          // Show the dropdown wrapper
+          $wrapper.show();
+
+          if (isDevelopment) console.log("[Add Listing] Loaded", locations.length, "saved locations");
+        } else {
+          if (isDevelopment) console.log("[Add Listing] No saved locations found");
+          $wrapper.hide();
+        }
+      },
+      error: function (xhr, status, error) {
+        if (isDevelopment) console.error("[Add Listing] Error fetching saved locations:", error);
+        $wrapper.hide();
+      },
+    });
+  }
+
+  /**
+   * Update the saved locations dropdown with options
+   */
+  function updateSavedLocationsDropdown(options) {
+    const $dropdownWrapper = $("#saved-locations-wrapper");
+    const $options = $dropdownWrapper.find(".car-filter-dropdown-options");
+    const $select = $dropdownWrapper.find("select");
+    const $button = $dropdownWrapper.find(".car-filter-dropdown-button");
+    const $search = $dropdownWrapper.find(".car-filter-dropdown-search");
+
+    const placeholder = "Select from saved locations";
+
+    // Build options HTML
+    let html = '<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="">' + placeholder + "</button>";
+    let selectHtml = '<option value="">' + placeholder + "</option>";
+
+    options.forEach(function (opt) {
+      html += '<button type="button" class="car-filter-dropdown-option" role="option" data-value="' +
+        opt.value + '" data-location=\'' + opt.locationData + '\'>' + opt.label + "</button>";
+      selectHtml += '<option value="' + opt.value + '" data-location=\'' + opt.locationData + '\'>' + opt.label + "</option>";
+    });
+
+    html += '<div class="car-filter-no-results hidden">No matching results</div>';
+
+    $options.html(html);
+    $select.html(selectHtml);
+
+    // Reset button text
+    $button.find(".car-filter-dropdown-text").addClass("placeholder").text(placeholder);
+
+    // Enable dropdown
+    $button.prop("disabled", false);
+    $select.prop("disabled", false);
+    $dropdownWrapper.find(".car-filter-dropdown").removeClass("car-filter-dropdown-disabled");
+    $search.prop("disabled", false);
+
+    // Bind click handler for saved location options
+    $options.off("click.savedLocation").on("click.savedLocation", ".car-filter-dropdown-option", function () {
+      const $option = $(this);
+      const locationDataStr = $option.data("location");
+
+      if (locationDataStr) {
+        const locationData = typeof locationDataStr === "string" ? JSON.parse(locationDataStr) : locationDataStr;
+        applySavedLocation(locationData);
+      }
+
+      // Update dropdown UI
+      const value = $option.data("value");
+      const label = $option.text().trim();
+
+      $select.val(value);
+      $options.find(".car-filter-dropdown-option").removeClass("selected");
+      $option.addClass("selected");
+
+      if (value === "" || value === null || value === undefined) {
+        $button.find(".car-filter-dropdown-text").addClass("placeholder").text(placeholder);
+      } else {
+        $button.find(".car-filter-dropdown-text").removeClass("placeholder").text(label);
+      }
+
+      // Close dropdown
+      $dropdownWrapper.find(".car-filter-dropdown").removeClass("open");
+      $button.attr("aria-expanded", "false");
+    });
+  }
+
+  /**
+   * Apply selected saved location to the form
+   */
+  function applySavedLocation(locationData) {
+    if (!locationData) return;
+
+    if (isDevelopment) console.log("[Add Listing] Applying saved location:", locationData);
+
+    // Update visible location field
+    const $locationField = $("#location");
+    if ($locationField.length) {
+      $locationField.val(locationData.address);
+    }
+
+    // Get or create the form reference
+    const $form = $("#add-car-listing-form");
+
+    // Remove any existing hidden location fields
+    $form.find('input[name="car_city"], input[name="car_district"], input[name="car_latitude"], input[name="car_longitude"], input[name="car_address"]').remove();
+
+    // Round coordinates to 6 decimal places
+    const roundCoord = (num) => parseFloat(Number(num).toFixed(6));
+
+    // Create hidden fields with location data
+    const fields = {
+      car_city: locationData.city || "",
+      car_district: locationData.district || locationData.city || "",
+      car_latitude: roundCoord(locationData.latitude || 0),
+      car_longitude: roundCoord(locationData.longitude || 0),
+      car_address: locationData.address || "",
+    };
+
+    Object.entries(fields).forEach(function ([name, value]) {
+      const $input = $('<input type="hidden">').attr("name", name).val(value);
+      $form.append($input);
+    });
+
+    // Remove error state from location row if present
+    $("#location-row").removeClass("has-error");
+
+    if (isDevelopment) console.log("[Add Listing] Saved location applied successfully");
+  }
+
+  // Initialize saved locations on page load
+  initSavedLocations();
 });

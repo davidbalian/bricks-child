@@ -289,6 +289,25 @@ get_header(); ?>
 
                                 <div class="form-row" id="location-row">
                                     <label for="location"><?php echo get_svg_icon('location-dot'); ?> <?php esc_html_e( 'Location', 'bricks-child' ); ?></label>
+
+                                    <!-- Saved Locations Dropdown -->
+                                    <div class="saved-locations-wrapper" id="saved-locations-wrapper" style="display: none; margin-bottom: 10px;">
+                                        <?php
+                                        car_filter_render_dropdown(array(
+                                            'id'          => 'saved-locations',
+                                            'name'        => 'saved_location_select',
+                                            'placeholder' => __('Select from saved locations', 'bricks-child'),
+                                            'options'     => array(), // Will be populated via JavaScript
+                                            'selected'    => '',
+                                            'show_count'  => false,
+                                            'searchable'  => true,
+                                            'data_attrs'  => array(
+                                                'filter-type' => 'saved-location',
+                                            ),
+                                        ));
+                                        ?>
+                                    </div>
+
                                     <div class="location-input-wrapper">
                                         <input type="text" id="location" name="location" class="form-control" readonly>
                                         <button type="button" class="btn btn-secondary choose-location-btn">Choose Location <?php echo get_svg_icon('map-location-dot'); ?></button>
