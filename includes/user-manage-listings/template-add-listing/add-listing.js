@@ -664,19 +664,10 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
   // Handle form submission
   $("#add-car-listing-form").on("submit", function (e) {
-    // DEBUG: Log all form field values before submission
-    console.log("[Add Listing] === FORM SUBMISSION DEBUG ===");
-    console.log("[Add Listing] Make value:", $("#add-listing-make").val());
-    console.log("[Add Listing] Model value:", $("#add-listing-model").val());
-    console.log("[Add Listing] Year value:", $("#add-listing-year").val());
-    console.log("[Add Listing] Model dropdown disabled:", $("#add-listing-model").prop("disabled"));
-    console.log("[Add Listing] Model hidden select HTML:", $("#add-listing-model")[0]?.outerHTML);
-
-    // IMPORTANT: Re-enable model dropdown before submission (disabled fields don't submit)
+    // Re-enable model dropdown before submission (disabled fields don't submit)
     const $modelSelect = $("#add-listing-model");
     if ($modelSelect.prop("disabled")) {
       $modelSelect.prop("disabled", false);
-      console.log("[Add Listing] Re-enabled model dropdown for form submission");
     }
 
     // Re-enable engine capacity field temporarily for form submission if it's locked for electric
