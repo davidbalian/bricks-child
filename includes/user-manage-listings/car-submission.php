@@ -17,6 +17,15 @@ if (!defined('WPINC')) {
  * Process form submission for adding a new car listing
  */
 function handle_add_car_listing() {
+    // Log all submitted form data for debugging
+    car_submission_log('=== FORM SUBMISSION STARTED ===');
+    car_submission_log('POST data received', 'info', array(
+        'make' => isset($_POST['make']) ? $_POST['make'] : 'NOT SET',
+        'model' => isset($_POST['model']) ? $_POST['model'] : 'NOT SET',
+        'year' => isset($_POST['year']) ? $_POST['year'] : 'NOT SET',
+        'all_post_keys' => array_keys($_POST)
+    ));
+
     // Initialize variables for error tracking
     $errors = array();
     $required_fields = array(
@@ -615,11 +624,15 @@ function generate_optimized_car_image_sizes($attachment_ids) {
  * @param array  $context Additional context data to log
  */
 function car_submission_log($message, $level = 'info', $context = array()) {
-    // Always log for debugging purposes
+    // Always log - write to debug.log regardless of WP_DEBUG setting
     $prefix = '[ADD_LISTING]';
     $level_label = strtoupper($level);
     $user_id = get_current_user_id();
     $timestamp = current_time('Y-m-d H:i:s');
+
+    // Force logging to work even if WP_DEBUG is off
+    ini_set('log_errors', 1);
+    ini_set('error_log', WP_CONTENT_DIR . '/debug.log');
 
     // Build log entry
     $log_entry = sprintf(

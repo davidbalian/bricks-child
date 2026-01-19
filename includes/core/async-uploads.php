@@ -20,6 +20,10 @@ if (!defined('ABSPATH')) {
  * @param array  $context Additional context data
  */
 function async_upload_log($message, $level = 'info', $context = array()) {
+    // Force logging to work even if WP_DEBUG is off
+    ini_set('log_errors', 1);
+    ini_set('error_log', WP_CONTENT_DIR . '/debug.log');
+
     $prefix = '[ASYNC_UPLOAD]';
     $level_label = strtoupper($level);
     $user_id = get_current_user_id();

@@ -257,10 +257,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       // Enable/disable based on options
       if (options.length > 0) {
         $button.prop('disabled', false);
+        $select.prop('disabled', false);  // Enable the hidden select for form submission
         $dropdown.removeClass('car-filter-dropdown-disabled');
         $search.prop('disabled', false);
       } else {
         $button.prop('disabled', true);
+        $select.prop('disabled', true);
         $dropdown.addClass('car-filter-dropdown-disabled');
         $search.prop('disabled', true);
       }
@@ -285,6 +287,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       var $select = $dropdown.find('select');
 
       $button.prop('disabled', true);
+      $select.prop('disabled', true);  // Disable the hidden select too
       $dropdown.addClass('car-filter-dropdown-disabled');
       $search.prop('disabled', true);
       $button.find('.car-filter-dropdown-text').addClass('placeholder').text(placeholder);
@@ -661,6 +664,21 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
   // Handle form submission
   $("#add-car-listing-form").on("submit", function (e) {
+    // DEBUG: Log all form field values before submission
+    console.log("[Add Listing] === FORM SUBMISSION DEBUG ===");
+    console.log("[Add Listing] Make value:", $("#add-listing-make").val());
+    console.log("[Add Listing] Model value:", $("#add-listing-model").val());
+    console.log("[Add Listing] Year value:", $("#add-listing-year").val());
+    console.log("[Add Listing] Model dropdown disabled:", $("#add-listing-model").prop("disabled"));
+    console.log("[Add Listing] Model hidden select HTML:", $("#add-listing-model")[0]?.outerHTML);
+
+    // IMPORTANT: Re-enable model dropdown before submission (disabled fields don't submit)
+    const $modelSelect = $("#add-listing-model");
+    if ($modelSelect.prop("disabled")) {
+      $modelSelect.prop("disabled", false);
+      console.log("[Add Listing] Re-enabled model dropdown for form submission");
+    }
+
     // Re-enable engine capacity field temporarily for form submission if it's locked for electric
     const $engineCapacityDropdown = $("#add-listing-engine-capacity-wrapper");
     const $engineCapacitySelect = $("#add-listing-engine-capacity");
