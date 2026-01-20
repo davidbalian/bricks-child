@@ -66,6 +66,32 @@ function car_filter_render_dropdown($args) {
     foreach ($args['data_attrs'] as $key => $value) {
         $data_str .= ' data-' . esc_attr($key) . '="' . esc_attr($value) . '"';
     }
+
+    // Find the selected option's label for display
+    $selected_label = $args['placeholder'];
+    $has_selection = false;
+    if (!empty($args['selected'])) {
+        // Check popular options first
+        if (!empty($args['popular'])) {
+            foreach ($args['popular'] as $option) {
+                if ((string)$option['value'] === (string)$args['selected']) {
+                    $selected_label = $option['label'];
+                    $has_selection = true;
+                    break;
+                }
+            }
+        }
+        // Check regular options if not found in popular
+        if (!$has_selection) {
+            foreach ($args['options'] as $option) {
+                if ((string)$option['value'] === (string)$args['selected']) {
+                    $selected_label = $option['label'];
+                    $has_selection = true;
+                    break;
+                }
+            }
+        }
+    }
     ?>
     <div class="car-filter-dropdown<?php echo esc_attr($disabled_class); ?>"
          id="<?php echo esc_attr($args['id']); ?>-wrapper"
@@ -77,7 +103,7 @@ function car_filter_render_dropdown($args) {
                 aria-haspopup="listbox"
                 aria-expanded="false"
                 <?php echo $disabled_attr; ?>>
-            <span class="car-filter-dropdown-text placeholder"><?php echo esc_html($args['placeholder']); ?></span>
+            <span class="car-filter-dropdown-text<?php echo $has_selection ? '' : ' placeholder'; ?>"><?php echo esc_html($selected_label); ?></span>
             <span class="car-filter-dropdown-arrow">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M19 9l-7 7-7-7"></path>
