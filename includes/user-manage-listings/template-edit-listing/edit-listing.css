@@ -73,17 +73,8 @@ input[readonly]:hover {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #eee;
-}
-
-.add-listing-images-section h2 {
-  margin-bottom: 1.5rem;
-}
-
-/* Collapsible sections don't need border on h2 since they have expand/collapse UI */
-.collapsible-section h2 {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
+  color: var(--text-color);
+  font-size: 1.5rem;
 }
 
 /* Collapsible Section Styles (matching add-listing.css) */
@@ -104,6 +95,8 @@ input[readonly]:hover {
 
 .collapsible-section .section-header h2 {
   margin: 0;
+  padding: 0;
+  border: none;
 }
 
 .collapsible-section .collapse-arrow {
