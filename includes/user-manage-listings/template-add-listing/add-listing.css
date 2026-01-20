@@ -4,6 +4,10 @@
   padding-bottom: 2rem;
 }
 
+.page-id-68 .bricks-container {
+  width: 100%;
+}
+
 .login-required-message {
   padding: 2rem;
   background: var(--white);
@@ -865,6 +869,14 @@ label svg path,
 
   .location-selector-wrapper .choose-location-btn {
     width: 100%;
+  }
+
+  .form-row-halves {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row-thirds {
+    flex-direction: column;
   }
 }
 
