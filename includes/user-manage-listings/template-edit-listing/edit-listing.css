@@ -227,25 +227,6 @@ input[readonly]:hover {
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-#edit-car-listing-form select {
-  width: 100%;
-  height: var(--input-height);
-  padding: 0 0.75rem;
-  border: 2px solid #dfe2e6;
-  border-radius: 0.5rem;
-  background-color: #ffffff;
-  color: #2a3546;
-  font-size: 16px;
-  font-weight: 500;
-  box-sizing: border-box;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232a3546' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  padding-right: 2.5rem;
-}
 
 #edit-car-listing-form textarea {
   width: 100%;
@@ -264,14 +245,12 @@ input[readonly]:hover {
 
 #edit-car-listing-form input[type="text"]:hover,
 #edit-car-listing-form input[type="number"]:hover,
-#edit-car-listing-form select:hover,
 #edit-car-listing-form textarea:hover {
   border-color: #dfe2e6;
 }
 
 #edit-car-listing-form input[type="text"]:focus,
 #edit-car-listing-form input[type="number"]:focus,
-#edit-car-listing-form select:focus,
 #edit-car-listing-form textarea:focus {
   outline: none;
   border-color: #dfe2e6;
@@ -348,6 +327,21 @@ input[readonly]:hover {
   flex-wrap: wrap;
   gap: 1rem;
   margin-top: 1rem;
+}
+
+/* Custom dropdown styling to match add-listing */
+#edit-car-listing-form .car-filter-dropdown {
+  width: 100%;
+}
+
+#edit-car-listing-form .car-filter-dropdown-button {
+  width: 100%;
+  height: var(--input-height);
+  box-sizing: border-box;
+}
+
+#edit-car-listing-form .car-filter-dropdown-menu {
+  z-index: 1001;
 }
 
 /* Responsive adjustments for form fields */

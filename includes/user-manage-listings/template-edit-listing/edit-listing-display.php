@@ -84,28 +84,22 @@ if (!defined('ABSPATH')) {
 
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
-                                        <label for="year"><?php echo get_svg_icon('calendar'); ?> <?php esc_html_e('Year', 'bricks-child'); ?></label>
-                                        <select id="year" name="year" class="form-control" required>
-                                            <option value=""><?php esc_html_e('Select Year', 'bricks-child'); ?></option>
-                                            <?php
-                                            for ($year_option = 2025; $year_option >= 1948; $year_option--) {
-                                                printf(
-                                                    '<option value="%1$d" %2$s>%1$d</option>',
-                                                    esc_attr($year_option),
-                                                    selected((int) $year, $year_option, false)
-                                                );
-                                            }
-
-                                            $year_int = (int) $year;
-                                            if ($year_int && ($year_int < 1948 || $year_int > 2025)) {
-                                                printf(
-                                                    '<option value="%1$d" %2$s>%1$d</option>',
-                                                    esc_attr($year_int),
-                                                    selected((int) $year, $year_int, false)
-                                                );
-                                            }
-                                            ?>
-                                        </select>
+                                        <label><?php echo get_svg_icon('calendar'); ?> <?php esc_html_e('Year', 'bricks-child'); ?></label>
+                                        <?php
+                                        $year_options = array();
+                                        for ($y = 2025; $y >= 1948; $y--) {
+                                            $year_options[] = array('value' => $y, 'label' => $y);
+                                        }
+                                        car_filter_render_dropdown(array(
+                                            'id'          => 'edit-listing-year',
+                                            'name'        => 'year',
+                                            'placeholder' => __('Select Year', 'bricks-child'),
+                                            'options'     => $year_options,
+                                            'selected'    => $year,
+                                            'show_count'  => false,
+                                            'searchable'  => true,
+                                        ));
+                                        ?>
                                     </div>
                                     <div class="form-third">
                                         <label for="mileage"><?php echo get_svg_icon('road'); ?> <?php esc_html_e('Mileage', 'bricks-child'); ?></label>
@@ -160,11 +154,21 @@ if (!defined('ABSPATH')) {
                                 </div>
                                 
                                 <div class="form-row">
-                                    <label for="availability"><?php echo get_svg_icon('circle-check'); ?> <?php esc_html_e('Availability', 'bricks-child'); ?></label>
-                                    <select id="availability" name="availability" class="form-control" required>
-                                        <option value="In Stock" <?php selected($availability, 'In Stock'); ?>><?php esc_html_e('In Stock', 'bricks-child'); ?></option>
-                                        <option value="In Transit" <?php selected($availability, 'In Transit'); ?>><?php esc_html_e('In Transit', 'bricks-child'); ?></option>
-                                    </select>
+                                    <label><?php echo get_svg_icon('circle-check'); ?> <?php esc_html_e('Availability', 'bricks-child'); ?></label>
+                                    <?php
+                                    car_filter_render_dropdown(array(
+                                        'id'          => 'edit-listing-availability',
+                                        'name'        => 'availability',
+                                        'placeholder' => __('Select Availability', 'bricks-child'),
+                                        'options'     => array(
+                                            array('value' => 'In Stock', 'label' => __('In Stock', 'bricks-child')),
+                                            array('value' => 'In Transit', 'label' => __('In Transit', 'bricks-child')),
+                                        ),
+                                        'selected'    => $availability,
+                                        'show_count'  => false,
+                                        'searchable'  => false,
+                                    ));
+                                    ?>
                                 </div>
                             </div>
 
@@ -172,66 +176,89 @@ if (!defined('ABSPATH')) {
                                 <h2><?php esc_html_e('Engine & Performance', 'bricks-child'); ?></h2>
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
-                                        <label for="engine_capacity"><?php echo get_svg_icon('engine'); ?> <?php esc_html_e('Engine Capacity', 'bricks-child'); ?></label>
-                                        <select id="engine_capacity" name="engine_capacity" class="form-control" required>
-                                            <option value=""><?php esc_html_e('Select Engine Capacity', 'bricks-child'); ?></option>
-                                            <?php
-                                            $formatted_capacity_value = number_format((float) $engine_capacity, 1, '.', '');
-                                            for ($capacity = 0.4; $capacity <= 12.0; $capacity += 0.1) {
-                                                $formatted_capacity = number_format($capacity, 1);
-                                                printf(
-                                                    '<option value="%1$s" %2$s>%1$s</option>',
-                                                    esc_attr($formatted_capacity),
-                                                    selected($formatted_capacity_value, $formatted_capacity, false)
-                                                );
-                                            }
-
-                                            if ($formatted_capacity_value && ((float) $formatted_capacity_value < 0.4 || (float) $formatted_capacity_value > 12.0)) {
-                                                printf(
-                                                    '<option value="%1$s" %2$s>%1$s</option>',
-                                                    esc_attr($formatted_capacity_value),
-                                                    selected($formatted_capacity_value, $formatted_capacity_value, false)
-                                                );
-                                            }
-                                            ?>
-                                        </select>
+                                        <label><?php echo get_svg_icon('engine'); ?> <?php esc_html_e('Engine Capacity', 'bricks-child'); ?></label>
+                                        <?php
+                                        $engine_options = array();
+                                        for ($capacity = 0.4; $capacity <= 12.0; $capacity += 0.1) {
+                                            $formatted_capacity = number_format($capacity, 1);
+                                            $engine_options[] = array('value' => $formatted_capacity, 'label' => $formatted_capacity . 'L');
+                                        }
+                                        $formatted_engine_capacity = $engine_capacity ? number_format((float) $engine_capacity, 1, '.', '') : '';
+                                        car_filter_render_dropdown(array(
+                                            'id'          => 'edit-listing-engine-capacity',
+                                            'name'        => 'engine_capacity',
+                                            'placeholder' => __('Select Engine Capacity', 'bricks-child'),
+                                            'options'     => $engine_options,
+                                            'selected'    => $formatted_engine_capacity,
+                                            'show_count'  => false,
+                                            'searchable'  => true,
+                                        ));
+                                        ?>
                                     </div>
                                     <div class="form-third">
-                                        <label for="fuel_type"><?php echo get_svg_icon('gas-pump'); ?> <?php esc_html_e('Fuel Type', 'bricks-child'); ?></label>
-                                        <select id="fuel_type" name="fuel_type" class="form-control" required>
-                                            <option value=""><?php esc_html_e('Select Fuel Type', 'bricks-child'); ?></option>
-                                            <option value="Petrol" <?php selected($fuel_type, 'Petrol'); ?>><?php esc_html_e('Petrol', 'bricks-child'); ?></option>
-                                            <option value="Diesel" <?php selected($fuel_type, 'Diesel'); ?>><?php esc_html_e('Diesel', 'bricks-child'); ?></option>
-                                            <option value="Electric" <?php selected($fuel_type, 'Electric'); ?>><?php esc_html_e('Electric', 'bricks-child'); ?></option>
-                                            <option value="Petrol hybrid" <?php selected($fuel_type, 'Petrol hybrid'); ?>><?php esc_html_e('Petrol hybrid', 'bricks-child'); ?></option>
-                                            <option value="Diesel hybrid" <?php selected($fuel_type, 'Diesel hybrid'); ?>><?php esc_html_e('Diesel hybrid', 'bricks-child'); ?></option>
-                                            <option value="Plug-in petrol" <?php selected($fuel_type, 'Plug-in petrol'); ?>><?php esc_html_e('Plug-in petrol', 'bricks-child'); ?></option>
-                                            <option value="Plug-in diesel" <?php selected($fuel_type, 'Plug-in diesel'); ?>><?php esc_html_e('Plug-in diesel', 'bricks-child'); ?></option>
-                                            <option value="Bi Fuel" <?php selected($fuel_type, 'Bi Fuel'); ?>><?php esc_html_e('Bi Fuel', 'bricks-child'); ?></option>
-                                            <option value="Hydrogen" <?php selected($fuel_type, 'Hydrogen'); ?>><?php esc_html_e('Hydrogen', 'bricks-child'); ?></option>
-                                            <option value="Natural Gas" <?php selected($fuel_type, 'Natural Gas'); ?>><?php esc_html_e('Natural Gas', 'bricks-child'); ?></option>
-                                        </select>
+                                        <label><?php echo get_svg_icon('gas-pump'); ?> <?php esc_html_e('Fuel Type', 'bricks-child'); ?></label>
+                                        <?php
+                                        car_filter_render_dropdown(array(
+                                            'id'          => 'edit-listing-fuel-type',
+                                            'name'        => 'fuel_type',
+                                            'placeholder' => __('Select Fuel Type', 'bricks-child'),
+                                            'options'     => array(
+                                                array('value' => 'Petrol', 'label' => __('Petrol', 'bricks-child')),
+                                                array('value' => 'Diesel', 'label' => __('Diesel', 'bricks-child')),
+                                                array('value' => 'Electric', 'label' => __('Electric', 'bricks-child')),
+                                                array('value' => 'Petrol hybrid', 'label' => __('Petrol hybrid', 'bricks-child')),
+                                                array('value' => 'Diesel hybrid', 'label' => __('Diesel hybrid', 'bricks-child')),
+                                                array('value' => 'Plug-in petrol', 'label' => __('Plug-in petrol', 'bricks-child')),
+                                                array('value' => 'Plug-in diesel', 'label' => __('Plug-in diesel', 'bricks-child')),
+                                                array('value' => 'Bi Fuel', 'label' => __('Bi Fuel', 'bricks-child')),
+                                                array('value' => 'Hydrogen', 'label' => __('Hydrogen', 'bricks-child')),
+                                                array('value' => 'Natural Gas', 'label' => __('Natural Gas', 'bricks-child')),
+                                            ),
+                                            'selected'    => $fuel_type,
+                                            'show_count'  => false,
+                                            'searchable'  => true,
+                                            'data_attrs'  => array('filter-type' => 'fuel_type'),
+                                        ));
+                                        ?>
                                     </div>
                                     <div class="form-third">
-                                        <label for="transmission"><?php echo get_svg_icon('car-chassis'); ?> <?php esc_html_e('Transmission', 'bricks-child'); ?></label>
-                                        <select id="transmission" name="transmission" class="form-control" required>
-                                            <option value=""><?php esc_html_e('Select Transmission', 'bricks-child'); ?></option>
-                                            <option value="Automatic" <?php selected($transmission, 'Automatic'); ?>><?php esc_html_e('Automatic', 'bricks-child'); ?></option>
-                                            <option value="Manual" <?php selected($transmission, 'Manual'); ?>><?php esc_html_e('Manual', 'bricks-child'); ?></option>
-                                        </select>
+                                        <label><?php echo get_svg_icon('car-chassis'); ?> <?php esc_html_e('Transmission', 'bricks-child'); ?></label>
+                                        <?php
+                                        car_filter_render_dropdown(array(
+                                            'id'          => 'edit-listing-transmission',
+                                            'name'        => 'transmission',
+                                            'placeholder' => __('Select Transmission', 'bricks-child'),
+                                            'options'     => array(
+                                                array('value' => 'Automatic', 'label' => __('Automatic', 'bricks-child')),
+                                                array('value' => 'Manual', 'label' => __('Manual', 'bricks-child')),
+                                            ),
+                                            'selected'    => $transmission,
+                                            'show_count'  => false,
+                                            'searchable'  => false,
+                                        ));
+                                        ?>
                                     </div>
                                 </div>
 
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
-                                        <label for="drive_type"><?php echo get_svg_icon('tire'); ?> <?php esc_html_e('Drive Type (Optional)', 'bricks-child'); ?></label>
-                                        <select id="drive_type" name="drive_type" class="form-control">
-                                            <option value=""><?php esc_html_e('Select Drive Type', 'bricks-child'); ?></option>
-                                            <option value="Front-Wheel Drive" <?php selected($drive_type, 'Front-Wheel Drive'); ?>><?php esc_html_e('Front-Wheel Drive', 'bricks-child'); ?></option>
-                                            <option value="Rear-Wheel Drive" <?php selected($drive_type, 'Rear-Wheel Drive'); ?>><?php esc_html_e('Rear-Wheel Drive', 'bricks-child'); ?></option>
-                                            <option value="All-Wheel Drive" <?php selected($drive_type, 'All-Wheel Drive'); ?>><?php esc_html_e('All-Wheel Drive', 'bricks-child'); ?></option>
-                                            <option value="4-Wheel Drive" <?php selected($drive_type, '4-Wheel Drive'); ?>><?php esc_html_e('4-Wheel Drive', 'bricks-child'); ?></option>
-                                        </select>
+                                        <label><?php echo get_svg_icon('tire'); ?> <?php esc_html_e('Drive Type (Optional)', 'bricks-child'); ?></label>
+                                        <?php
+                                        car_filter_render_dropdown(array(
+                                            'id'          => 'edit-listing-drive-type',
+                                            'name'        => 'drive_type',
+                                            'placeholder' => __('Select Drive Type', 'bricks-child'),
+                                            'options'     => array(
+                                                array('value' => 'Front-Wheel Drive', 'label' => __('Front-Wheel Drive', 'bricks-child')),
+                                                array('value' => 'Rear-Wheel Drive', 'label' => __('Rear-Wheel Drive', 'bricks-child')),
+                                                array('value' => 'All-Wheel Drive', 'label' => __('All-Wheel Drive', 'bricks-child')),
+                                                array('value' => '4-Wheel Drive', 'label' => __('4-Wheel Drive', 'bricks-child')),
+                                            ),
+                                            'selected'    => $drive_type,
+                                            'show_count'  => false,
+                                            'searchable'  => false,
+                                        ));
+                                        ?>
                                     </div>
                                     <div class="form-half">
                                         <label for="hp"><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e('HorsePower (Optional)', 'bricks-child'); ?></label>
@@ -247,95 +274,126 @@ if (!defined('ABSPATH')) {
                                 <h2><?php esc_html_e('Body & Design', 'bricks-child'); ?></h2>
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
-                                        <label for="body_type"><?php echo get_svg_icon('car-side'); ?> <?php esc_html_e('Body Type', 'bricks-child'); ?></label>
-                                        <select id="body_type" name="body_type" class="form-control" required>
-                                            <option value=""><?php esc_html_e('Select Body Type', 'bricks-child'); ?></option>
-                                            <option value="Hatchback" <?php selected($body_type, 'Hatchback'); ?>><?php esc_html_e('Hatchback', 'bricks-child'); ?></option>
-                                            <option value="Saloon" <?php selected($body_type, 'Saloon'); ?>><?php esc_html_e('Saloon', 'bricks-child'); ?></option>
-                                            <option value="Coupe" <?php selected($body_type, 'Coupe'); ?>><?php esc_html_e('Coupe', 'bricks-child'); ?></option>
-                                            <option value="Convertible" <?php selected($body_type, 'Convertible'); ?>><?php esc_html_e('Convertible', 'bricks-child'); ?></option>
-                                            <option value="Estate" <?php selected($body_type, 'Estate'); ?>><?php esc_html_e('Estate', 'bricks-child'); ?></option>
-                                            <option value="SUV" <?php selected($body_type, 'SUV'); ?>><?php esc_html_e('SUV', 'bricks-child'); ?></option>
-                                            <option value="MPV" <?php selected($body_type, 'MPV'); ?>><?php esc_html_e('MPV', 'bricks-child'); ?></option>
-                                            <option value="Pickup" <?php selected($body_type, 'Pickup'); ?>><?php esc_html_e('Pickup', 'bricks-child'); ?></option>
-                                            <option value="Camper" <?php selected($body_type, 'Camper'); ?>><?php esc_html_e('Camper', 'bricks-child'); ?></option>
-                                            <option value="Minibus" <?php selected($body_type, 'Minibus'); ?>><?php esc_html_e('Minibus', 'bricks-child'); ?></option>
-                                            <option value="Limousine" <?php selected($body_type, 'Limousine'); ?>><?php esc_html_e('Limousine', 'bricks-child'); ?></option>
-                                            <option value="Car Derived Van" <?php selected($body_type, 'Car Derived Van'); ?>><?php esc_html_e('Car Derived Van', 'bricks-child'); ?></option>
-                                            <option value="Combi Van" <?php selected($body_type, 'Combi Van'); ?>><?php esc_html_e('Combi Van', 'bricks-child'); ?></option>
-                                            <option value="Panel Van" <?php selected($body_type, 'Panel Van'); ?>><?php esc_html_e('Panel Van', 'bricks-child'); ?></option>
-                                            <option value="Window Van" <?php selected($body_type, 'Window Van'); ?>><?php esc_html_e('Window Van', 'bricks-child'); ?></option>
-                                        </select>
+                                        <label><?php echo get_svg_icon('car-side'); ?> <?php esc_html_e('Body Type', 'bricks-child'); ?></label>
+                                        <?php
+                                        car_filter_render_dropdown(array(
+                                            'id'          => 'edit-listing-body-type',
+                                            'name'        => 'body_type',
+                                            'placeholder' => __('Select Body Type', 'bricks-child'),
+                                            'options'     => array(
+                                                array('value' => 'Hatchback', 'label' => __('Hatchback', 'bricks-child')),
+                                                array('value' => 'Saloon', 'label' => __('Saloon', 'bricks-child')),
+                                                array('value' => 'Coupe', 'label' => __('Coupe', 'bricks-child')),
+                                                array('value' => 'Convertible', 'label' => __('Convertible', 'bricks-child')),
+                                                array('value' => 'Estate', 'label' => __('Estate', 'bricks-child')),
+                                                array('value' => 'SUV', 'label' => __('SUV', 'bricks-child')),
+                                                array('value' => 'MPV', 'label' => __('MPV', 'bricks-child')),
+                                                array('value' => 'Pickup', 'label' => __('Pickup', 'bricks-child')),
+                                                array('value' => 'Camper', 'label' => __('Camper', 'bricks-child')),
+                                                array('value' => 'Minibus', 'label' => __('Minibus', 'bricks-child')),
+                                                array('value' => 'Limousine', 'label' => __('Limousine', 'bricks-child')),
+                                                array('value' => 'Car Derived Van', 'label' => __('Car Derived Van', 'bricks-child')),
+                                                array('value' => 'Combi Van', 'label' => __('Combi Van', 'bricks-child')),
+                                                array('value' => 'Panel Van', 'label' => __('Panel Van', 'bricks-child')),
+                                                array('value' => 'Window Van', 'label' => __('Window Van', 'bricks-child')),
+                                            ),
+                                            'selected'    => $body_type,
+                                            'show_count'  => false,
+                                            'searchable'  => true,
+                                        ));
+                                        ?>
                                     </div>
                                     <div class="form-third">
-                                        <label for="exterior_color"><?php echo get_svg_icon('paintbrush'); ?> <?php esc_html_e('Exterior Color', 'bricks-child'); ?></label>
-                                        <select id="exterior_color" name="exterior_color" class="form-control" required>
-                                            <option value=""><?php esc_html_e('Select Exterior Color', 'bricks-child'); ?></option>
-                                            <option value="Black" <?php selected($exterior_color, 'Black'); ?>><?php esc_html_e('Black', 'bricks-child'); ?></option>
-                                            <option value="White" <?php selected($exterior_color, 'White'); ?>><?php esc_html_e('White', 'bricks-child'); ?></option>
-                                            <option value="Silver" <?php selected($exterior_color, 'Silver'); ?>><?php esc_html_e('Silver', 'bricks-child'); ?></option>
-                                            <option value="Gray" <?php selected($exterior_color, 'Gray'); ?>><?php esc_html_e('Gray', 'bricks-child'); ?></option>
-                                            <option value="Red" <?php selected($exterior_color, 'Red'); ?>><?php esc_html_e('Red', 'bricks-child'); ?></option>
-                                            <option value="Blue" <?php selected($exterior_color, 'Blue'); ?>><?php esc_html_e('Blue', 'bricks-child'); ?></option>
-                                            <option value="Green" <?php selected($exterior_color, 'Green'); ?>><?php esc_html_e('Green', 'bricks-child'); ?></option>
-                                            <option value="Yellow" <?php selected($exterior_color, 'Yellow'); ?>><?php esc_html_e('Yellow', 'bricks-child'); ?></option>
-                                            <option value="Brown" <?php selected($exterior_color, 'Brown'); ?>><?php esc_html_e('Brown', 'bricks-child'); ?></option>
-                                            <option value="Beige" <?php selected($exterior_color, 'Beige'); ?>><?php esc_html_e('Beige', 'bricks-child'); ?></option>
-                                            <option value="Orange" <?php selected($exterior_color, 'Orange'); ?>><?php esc_html_e('Orange', 'bricks-child'); ?></option>
-                                            <option value="Purple" <?php selected($exterior_color, 'Purple'); ?>><?php esc_html_e('Purple', 'bricks-child'); ?></option>
-                                            <option value="Gold" <?php selected($exterior_color, 'Gold'); ?>><?php esc_html_e('Gold', 'bricks-child'); ?></option>
-                                            <option value="Bronze" <?php selected($exterior_color, 'Bronze'); ?>><?php esc_html_e('Bronze', 'bricks-child'); ?></option>
-                                        </select>
+                                        <label><?php echo get_svg_icon('paintbrush'); ?> <?php esc_html_e('Exterior Color', 'bricks-child'); ?></label>
+                                        <?php
+                                        car_filter_render_dropdown(array(
+                                            'id'          => 'edit-listing-exterior-color',
+                                            'name'        => 'exterior_color',
+                                            'placeholder' => __('Select Exterior Color', 'bricks-child'),
+                                            'options'     => array(
+                                                array('value' => 'Black', 'label' => __('Black', 'bricks-child')),
+                                                array('value' => 'White', 'label' => __('White', 'bricks-child')),
+                                                array('value' => 'Silver', 'label' => __('Silver', 'bricks-child')),
+                                                array('value' => 'Gray', 'label' => __('Gray', 'bricks-child')),
+                                                array('value' => 'Red', 'label' => __('Red', 'bricks-child')),
+                                                array('value' => 'Blue', 'label' => __('Blue', 'bricks-child')),
+                                                array('value' => 'Green', 'label' => __('Green', 'bricks-child')),
+                                                array('value' => 'Yellow', 'label' => __('Yellow', 'bricks-child')),
+                                                array('value' => 'Brown', 'label' => __('Brown', 'bricks-child')),
+                                                array('value' => 'Beige', 'label' => __('Beige', 'bricks-child')),
+                                                array('value' => 'Orange', 'label' => __('Orange', 'bricks-child')),
+                                                array('value' => 'Purple', 'label' => __('Purple', 'bricks-child')),
+                                                array('value' => 'Gold', 'label' => __('Gold', 'bricks-child')),
+                                                array('value' => 'Bronze', 'label' => __('Bronze', 'bricks-child')),
+                                            ),
+                                            'selected'    => $exterior_color,
+                                            'show_count'  => false,
+                                            'searchable'  => true,
+                                        ));
+                                        ?>
                                     </div>
                                     <div class="form-third">
-                                        <label for="interior_color"><?php echo get_svg_icon('palette'); ?> <?php esc_html_e('Interior Color (Optional)', 'bricks-child'); ?></label>
-                                        <select id="interior_color" name="interior_color" class="form-control">
-                                            <option value=""><?php esc_html_e('Select Interior Color', 'bricks-child'); ?></option>
-                                            <option value="Black" <?php selected($interior_color, 'Black'); ?>><?php esc_html_e('Black', 'bricks-child'); ?></option>
-                                            <option value="Gray" <?php selected($interior_color, 'Gray'); ?>><?php esc_html_e('Gray', 'bricks-child'); ?></option>
-                                            <option value="Beige" <?php selected($interior_color, 'Beige'); ?>><?php esc_html_e('Beige', 'bricks-child'); ?></option>
-                                            <option value="Brown" <?php selected($interior_color, 'Brown'); ?>><?php esc_html_e('Brown', 'bricks-child'); ?></option>
-                                            <option value="White" <?php selected($interior_color, 'White'); ?>><?php esc_html_e('White', 'bricks-child'); ?></option>
-                                            <option value="Red" <?php selected($interior_color, 'Red'); ?>><?php esc_html_e('Red', 'bricks-child'); ?></option>
-                                            <option value="Blue" <?php selected($interior_color, 'Blue'); ?>><?php esc_html_e('Blue', 'bricks-child'); ?></option>
-                                            <option value="Tan" <?php selected($interior_color, 'Tan'); ?>><?php esc_html_e('Tan', 'bricks-child'); ?></option>
-                                            <option value="Cream" <?php selected($interior_color, 'Cream'); ?>><?php esc_html_e('Cream', 'bricks-child'); ?></option>
-                                        </select>
+                                        <label><?php echo get_svg_icon('palette'); ?> <?php esc_html_e('Interior Color (Optional)', 'bricks-child'); ?></label>
+                                        <?php
+                                        car_filter_render_dropdown(array(
+                                            'id'          => 'edit-listing-interior-color',
+                                            'name'        => 'interior_color',
+                                            'placeholder' => __('Select Interior Color', 'bricks-child'),
+                                            'options'     => array(
+                                                array('value' => 'Black', 'label' => __('Black', 'bricks-child')),
+                                                array('value' => 'Gray', 'label' => __('Gray', 'bricks-child')),
+                                                array('value' => 'Beige', 'label' => __('Beige', 'bricks-child')),
+                                                array('value' => 'Brown', 'label' => __('Brown', 'bricks-child')),
+                                                array('value' => 'White', 'label' => __('White', 'bricks-child')),
+                                                array('value' => 'Red', 'label' => __('Red', 'bricks-child')),
+                                                array('value' => 'Blue', 'label' => __('Blue', 'bricks-child')),
+                                                array('value' => 'Tan', 'label' => __('Tan', 'bricks-child')),
+                                                array('value' => 'Cream', 'label' => __('Cream', 'bricks-child')),
+                                            ),
+                                            'selected'    => $interior_color,
+                                            'show_count'  => false,
+                                            'searchable'  => true,
+                                        ));
+                                        ?>
                                     </div>
                                 </div>
 
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
-                                        <label for="number_of_doors"><?php echo get_svg_icon('car-door'); ?> <?php esc_html_e('Number of Doors (Optional)', 'bricks-child'); ?></label>
-                                        <select id="number_of_doors" name="number_of_doors" class="form-control">
-                                            <option value=""><?php esc_html_e('Select Number of Doors', 'bricks-child'); ?></option>
-                                            <?php
-                                            $door_options = array(0, 2, 3, 4, 5, 6, 7);
-                                            foreach ($door_options as $doors) {
-                                                printf(
-                                                    '<option value="%1$d" %2$s>%1$d</option>',
-                                                    esc_attr($doors),
-                                                    selected((int) $number_of_doors, $doors, false)
-                                                );
-                                            }
-                                            ?>
-                                        </select>
+                                        <label><?php echo get_svg_icon('car-door'); ?> <?php esc_html_e('Number of Doors (Optional)', 'bricks-child'); ?></label>
+                                        <?php
+                                        $door_opts = array();
+                                        foreach (array(0, 2, 3, 4, 5, 6, 7) as $doors) {
+                                            $door_opts[] = array('value' => $doors, 'label' => $doors);
+                                        }
+                                        car_filter_render_dropdown(array(
+                                            'id'          => 'edit-listing-doors',
+                                            'name'        => 'number_of_doors',
+                                            'placeholder' => __('Select Number of Doors', 'bricks-child'),
+                                            'options'     => $door_opts,
+                                            'selected'    => $number_of_doors,
+                                            'show_count'  => false,
+                                            'searchable'  => false,
+                                        ));
+                                        ?>
                                     </div>
                                     <div class="form-half">
-                                        <label for="number_of_seats"><?php echo get_svg_icon('car-seat'); ?> <?php esc_html_e('Number of Seats (Optional)', 'bricks-child'); ?></label>
-                                        <select id="number_of_seats" name="number_of_seats" class="form-control">
-                                            <option value=""><?php esc_html_e('Select Number of Seats', 'bricks-child'); ?></option>
-                                            <?php
-                                            $seat_options = range(1, 8);
-                                            foreach ($seat_options as $seats) {
-                                                printf(
-                                                    '<option value="%1$d" %2$s>%1$d</option>',
-                                                    esc_attr($seats),
-                                                    selected((int) $number_of_seats, $seats, false)
-                                                );
-                                            }
-                                            ?>
-                                        </select>
+                                        <label><?php echo get_svg_icon('car-seat'); ?> <?php esc_html_e('Number of Seats (Optional)', 'bricks-child'); ?></label>
+                                        <?php
+                                        $seat_opts = array();
+                                        foreach (array(1, 2, 3, 4, 5, 6, 7, 8) as $seats) {
+                                            $seat_opts[] = array('value' => $seats, 'label' => $seats);
+                                        }
+                                        car_filter_render_dropdown(array(
+                                            'id'          => 'edit-listing-seats',
+                                            'name'        => 'number_of_seats',
+                                            'placeholder' => __('Select Number of Seats', 'bricks-child'),
+                                            'options'     => $seat_opts,
+                                            'selected'    => $number_of_seats,
+                                            'show_count'  => false,
+                                            'searchable'  => false,
+                                        ));
+                                        ?>
                                     </div>
                                 </div>
                             </div>
@@ -344,31 +402,37 @@ if (!defined('ABSPATH')) {
                                 <h2><?php esc_html_e('Registration & Background Info', 'bricks-child'); ?></h2>
 
                                 <div class="form-row">
-                                    <label for="motuntil"><?php echo get_svg_icon('clipboard-check'); ?> <?php esc_html_e('MOT Status (Optional)', 'bricks-child'); ?></label>
-                                    <select id="motuntil" name="motuntil" class="form-control">
-                                        <option value=""><?php esc_html_e('Select MOT Status', 'bricks-child'); ?></option>
-                                        <option value="Expired" <?php selected($mot_status, 'Expired'); ?>><?php esc_html_e('Expired', 'bricks-child'); ?></option>
-                                        <?php
-                                        // Generate month options from current month up to 2 years ahead
-                                        try {
-                                            $current_date = new DateTime('first day of this month');
-                                            $end_date     = new DateTime('last day of +2 years');
+                                    <label><?php echo get_svg_icon('clipboard-check'); ?> <?php esc_html_e('MOT Status (Optional)', 'bricks-child'); ?></label>
+                                    <?php
+                                    // Build MOT options
+                                    $mot_options = array();
+                                    $mot_options[] = array('value' => 'Expired', 'label' => __('Expired', 'bricks-child'));
 
-                                            while ($current_date <= $end_date) {
-                                                $value   = $current_date->format('Y-m');
-                                                $display = $current_date->format('F Y');
-                                                ?>
-                                                <option value="<?php echo esc_attr($value); ?>" <?php selected($mot_status, $value); ?>>
-                                                    <?php echo esc_html($display); ?>
-                                                </option>
-                                                <?php
-                                                $current_date->modify('+1 month');
-                                            }
-                                        } catch (Exception $e) {
-                                            // Fail silently if DateTime is not available or errors occur.
-                                        }
-                                        ?>
-                                    </select>
+                                    // Get current date
+                                    $current_date = new DateTime();
+                                    $current_date->modify('first day of this month');
+                                    $end_date = new DateTime();
+                                    $end_date->modify('+2 years');
+                                    $end_date->modify('last day of this month');
+
+                                    while ($current_date <= $end_date) {
+                                        $mot_options[] = array(
+                                            'value' => $current_date->format('Y-m'),
+                                            'label' => $current_date->format('F Y')
+                                        );
+                                        $current_date->modify('+1 month');
+                                    }
+
+                                    car_filter_render_dropdown(array(
+                                        'id'          => 'edit-listing-mot',
+                                        'name'        => 'motuntil',
+                                        'placeholder' => __('Select MOT Status', 'bricks-child'),
+                                        'options'     => $mot_options,
+                                        'selected'    => $mot_status,
+                                        'show_count'  => false,
+                                        'searchable'  => true,
+                                    ));
+                                    ?>
                                 </div>
 
                                 <div class="form-row">
