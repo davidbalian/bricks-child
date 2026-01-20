@@ -461,7 +461,7 @@ get_header(); ?>
 
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
-                                        <label><?php echo get_svg_icon('tire'); ?> <?php esc_html_e( 'Drive Type (Optional)', 'bricks-child' ); ?></label>
+                                        <label><?php echo get_svg_icon('tire'); ?> <?php esc_html_e( 'Drive Type', 'bricks-child' ); ?></label>
                                         <?php
                                         car_filter_render_dropdown(array(
                                             'id'          => 'add-listing-drive-type',
@@ -480,7 +480,7 @@ get_header(); ?>
                                         ?>
                                     </div>
                                     <div class="form-half">
-                                        <label for="hp"><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'Horsepower (Optional)', 'bricks-child' ); ?></label>
+                                        <label for="hp"><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'Horsepower', 'bricks-child' ); ?></label>
                                         <div class="input-with-suffix">
                                             <input type="text" id="hp" name="hp" class="form-control" min="0" step="1" placeholder="E.g '100'">
                                             <span class="input-suffix">hp</span>
@@ -490,7 +490,7 @@ get_header(); ?>
 
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
-                                        <label><?php echo get_svg_icon('car-door'); ?> <?php esc_html_e( 'Number of Doors (Optional)', 'bricks-child' ); ?></label>
+                                        <label><?php echo get_svg_icon('car-door'); ?> <?php esc_html_e( 'Number of Doors', 'bricks-child' ); ?></label>
                                         <?php
                                         $door_options = array();
                                         foreach (array(0, 2, 3, 4, 5, 6, 7) as $doors) {
@@ -508,7 +508,7 @@ get_header(); ?>
                                         ?>
                                     </div>
                                     <div class="form-third">
-                                        <label><?php echo get_svg_icon('car-seat'); ?> <?php esc_html_e( 'Number of Seats (Optional)', 'bricks-child' ); ?></label>
+                                        <label><?php echo get_svg_icon('car-seat'); ?> <?php esc_html_e( 'Number of Seats', 'bricks-child' ); ?></label>
                                         <?php
                                         $seat_options = array();
                                         foreach (array(1, 2, 3, 4, 5, 6, 7, 8) as $seats) {
@@ -526,7 +526,7 @@ get_header(); ?>
                                         ?>
                                     </div>
                                     <div class="form-third">
-                                        <label><?php echo get_svg_icon('palette'); ?> <?php esc_html_e( 'Interior Color (Optional)', 'bricks-child' ); ?></label>
+                                        <label><?php echo get_svg_icon('palette'); ?> <?php esc_html_e( 'Interior Color', 'bricks-child' ); ?></label>
                                         <?php
                                         car_filter_render_dropdown(array(
                                             'id'          => 'add-listing-interior-color',
@@ -563,7 +563,7 @@ get_header(); ?>
                                 <div class="section-content">
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
-                                        <label><?php echo get_svg_icon('clipboard-check'); ?> <?php esc_html_e( 'MOT Status (Optional)', 'bricks-child' ); ?></label>
+                                        <label><?php echo get_svg_icon('clipboard-check'); ?> <?php esc_html_e( 'MOT Status', 'bricks-child' ); ?></label>
                                         <?php
                                         // Build MOT options
                                         $mot_options = array();
@@ -596,7 +596,7 @@ get_header(); ?>
                                         ?>
                                     </div>
                                     <div class="form-half">
-                                        <label for="numowners"><?php echo get_svg_icon('users'); ?> <?php esc_html_e( 'Number of Owners (Optional)', 'bricks-child' ); ?></label>
+                                        <label for="numowners"><?php echo get_svg_icon('users'); ?> <?php esc_html_e( 'Number of Owners', 'bricks-child' ); ?></label>
                                         <input type="number" id="numowners" name="numowners" class="form-control" min="1" max="99" placeholder="E.g '2'">
                                     </div>
                                 </div>
@@ -609,7 +609,7 @@ get_header(); ?>
                                 </div>
 
                                 <div class="form-row" id="vehicle-history-row">
-                                    <label><?php echo get_svg_icon('clock-rotate-left'); ?> <?php esc_html_e( 'Vehicle History (Optional)', 'bricks-child' ); ?></label>
+                                    <label><?php echo get_svg_icon('clock-rotate-left'); ?> <?php esc_html_e( 'Vehicle History', 'bricks-child' ); ?></label>
                                     <div class="vehicle-history-grid">
                                         <?php
                                         $vehicle_history_options = array(
