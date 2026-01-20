@@ -1385,6 +1385,10 @@ label svg path,
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
+  .collapsible-section .section-header h2 {
+    font-size: 1.7rem;
+  }
+
   .upload-progress {
     padding: 4px;
     font-size: 11px;
