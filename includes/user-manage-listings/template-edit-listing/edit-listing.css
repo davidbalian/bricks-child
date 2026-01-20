@@ -55,21 +55,84 @@ input[readonly]:hover {
   color: #666 !important;
 }
 
-/* Styles for collapsible sections */
-.collapsible-section-title {
-  cursor: pointer;
+/* Input wrapper styling (matching add-listing.css) */
+.input-wrapper {
+  padding: 2rem;
+  border: var(--border);
+  border-radius: var(--border-radius-large);
+}
+
+/* Form section styling (matching add-listing.css) */
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* Collapsible Section Styles (matching add-listing.css) */
+.collapsible-section {
+  gap: 0 !important;
+}
+
+.collapsible-section .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  margin: -2rem;
+  padding: 2rem;
 }
 
-.collapsible-section-title .toggle-arrow {
-  font-size: 0.8em;
+.collapsible-section .section-header h2 {
+  margin: 0;
+}
+
+.collapsible-section .collapse-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: transform 0.3s ease;
 }
 
-.collapsible-section-title.active .toggle-arrow {
-  transform: rotate(180deg);
+.collapsible-section .collapse-arrow svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--text-color);
+}
+
+.collapsible-section.collapsed .collapse-arrow {
+  transform: rotate(-90deg);
+}
+
+.collapsible-section .section-content-wrapper {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.3s ease, opacity 0.3s ease;
+  opacity: 1;
+}
+
+.collapsible-section.collapsed .section-content-wrapper {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.collapsible-section .section-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  overflow: hidden;
+  min-height: 0;
+  padding-top: 2.5rem;
+}
+
+.collapsible-section.collapsed .section-content {
+  padding-top: 0;
+}
+
+.collapsible-section .section-header:hover .collapse-arrow svg {
+  color: var(--dark-blue);
 }
 
 /* Single column layout */

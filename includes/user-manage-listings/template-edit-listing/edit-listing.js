@@ -821,19 +821,19 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         }
     });
 
-    // Collapsible sections
-    $('.collapsible-section-title').on('click', function() {
-        $(this).toggleClass('active');
-        var content = $(this).next('.collapsible-section-content');
-        content.slideToggle(300); // Use slideToggle for a smooth animation
-        
-        // Optional: Change arrow direction if you want to swap between ▼ and ▲
-        // var arrow = $(this).find('.toggle-arrow');
-        // if ($(this).hasClass('active')) {
-        //     arrow.text('▲');
-        // } else {
-        //     arrow.text('▼');
-        // }
+    // Collapsible sections (matching add-listing.js)
+    $(".collapsible-section .section-header").on("click", function () {
+        const $section = $(this).closest(".collapsible-section");
+        $section.toggleClass("collapsed");
+        const isExpanded = !$section.hasClass("collapsed");
+        $(this).attr("aria-expanded", isExpanded);
+    });
+
+    $(".collapsible-section .section-header").on("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            $(this).trigger("click");
+        }
     });
 
     // Helper functions for optimization feedback

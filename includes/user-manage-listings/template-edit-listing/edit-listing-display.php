@@ -68,7 +68,7 @@ if (!defined('ABSPATH')) {
 
                 <div class="add-listing-main-row">
                     <div class="add-listing-main-info-column">
-                            <div class="form-section basic-details-section">
+                            <div class="form-section basic-details-section input-wrapper">
                                 <h2><?php esc_html_e('Basic Details', 'bricks-child'); ?></h2>
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
@@ -168,7 +168,7 @@ if (!defined('ABSPATH')) {
                                 </div>
                             </div>
 
-                            <div class="form-section engine-performance-section">
+                            <div class="form-section engine-performance-section input-wrapper">
                                 <h2><?php esc_html_e('Engine & Performance', 'bricks-child'); ?></h2>
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
@@ -243,7 +243,7 @@ if (!defined('ABSPATH')) {
                                 </div>
                             </div>
 
-                            <div class="form-section body-design-section">
+                            <div class="form-section body-design-section input-wrapper">
                                 <h2><?php esc_html_e('Body & Design', 'bricks-child'); ?></h2>
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
@@ -340,7 +340,7 @@ if (!defined('ABSPATH')) {
                                 </div>
                             </div>
 
-                            <div class="form-section mot-section">
+                            <div class="form-section mot-section input-wrapper">
                                 <h2><?php esc_html_e('Registration & Background Info', 'bricks-child'); ?></h2>
 
                                 <div class="form-row">
@@ -385,102 +385,112 @@ if (!defined('ABSPATH')) {
                                 </div>
                             </div>
 
-                            <div class="form-section vehicle-history-section">
-                                <h2 class="collapsible-section-title"><?php esc_html_e('Vehicle History', 'bricks-child'); ?> <span class="toggle-arrow">▼</span></h2>
-                                <div class="collapsible-section-content" style="display: none;">
-                                    <div class="form-row">
-                                        <div class="vehicle-history-grid">
-                                            <?php
-                                            $vehicle_history_options = array(
-                                                'no_accidents' => 'No Accidents',
-                                                'minor_accidents' => 'Minor Accidents',
-                                                'major_accidents' => 'Major Accidents',
-                                                'regular_maintenance' => 'Regular Maintenance',
-                                                'engine_overhaul' => 'Engine Overhaul',
-                                                'transmission_replacement' => 'Transmission Replacement',
-                                                'repainted' => 'Repainted',
-                                                'bodywork_repair' => 'Bodywork Repair',
-                                                'rust_treatment' => 'Rust Treatment',
-                                                'no_modifications' => 'No Modifications',
-                                                'performance_upgrades' => 'Performance Upgrades',
-                                                'cosmetic_modifications' => 'Cosmetic Modifications',
-                                                'flood_damage' => 'Flood Damage',
-                                                'fire_damage' => 'Fire Damage',
-                                                'hail_damage' => 'Hail Damage',
-                                                'clear_title' => 'Clear Title',
-                                                'no_known_issues' => 'No Known Issues',
-                                                'odometer_replacement' => 'Odometer Replacement'
-                                            );
-                                            
-                                            foreach ($vehicle_history_options as $value => $label) {
-                                                ?>
-                                                <div class="vehicle-history-option">
-                                                    <input type="checkbox" 
-                                                           id="vehiclehistory_<?php echo esc_attr($value); ?>" 
-                                                           name="vehiclehistory[]" 
-                                                           value="<?php echo esc_attr($value); ?>" 
-                                                           <?php checked(in_array($value, (array)$vehicle_history), true); ?>>
-                                                    <label for="vehiclehistory_<?php echo esc_attr($value); ?>">
-                                                        <?php echo esc_html($label); ?>
-                                                    </label>
-                                                </div>
+                            <div class="form-section vehicle-history-section input-wrapper collapsible-section collapsed">
+                                <div class="section-header" role="button" tabindex="0" aria-expanded="false">
+                                    <h2><?php esc_html_e('Vehicle History', 'bricks-child'); ?></h2>
+                                    <span class="collapse-arrow"><?php echo get_svg_icon('chevron-down'); ?></span>
+                                </div>
+                                <div class="section-content-wrapper">
+                                    <div class="section-content">
+                                        <div class="form-row">
+                                            <div class="vehicle-history-grid">
                                                 <?php
-                                            }
-                                            ?>
+                                                $vehicle_history_options = array(
+                                                    'no_accidents' => 'No Accidents',
+                                                    'minor_accidents' => 'Minor Accidents',
+                                                    'major_accidents' => 'Major Accidents',
+                                                    'regular_maintenance' => 'Regular Maintenance',
+                                                    'engine_overhaul' => 'Engine Overhaul',
+                                                    'transmission_replacement' => 'Transmission Replacement',
+                                                    'repainted' => 'Repainted',
+                                                    'bodywork_repair' => 'Bodywork Repair',
+                                                    'rust_treatment' => 'Rust Treatment',
+                                                    'no_modifications' => 'No Modifications',
+                                                    'performance_upgrades' => 'Performance Upgrades',
+                                                    'cosmetic_modifications' => 'Cosmetic Modifications',
+                                                    'flood_damage' => 'Flood Damage',
+                                                    'fire_damage' => 'Fire Damage',
+                                                    'hail_damage' => 'Hail Damage',
+                                                    'clear_title' => 'Clear Title',
+                                                    'no_known_issues' => 'No Known Issues',
+                                                    'odometer_replacement' => 'Odometer Replacement'
+                                                );
+
+                                                foreach ($vehicle_history_options as $value => $label) {
+                                                    ?>
+                                                    <div class="vehicle-history-option">
+                                                        <input type="checkbox"
+                                                               id="vehiclehistory_<?php echo esc_attr($value); ?>"
+                                                               name="vehiclehistory[]"
+                                                               value="<?php echo esc_attr($value); ?>"
+                                                               <?php checked(in_array($value, (array)$vehicle_history), true); ?>>
+                                                        <label for="vehiclehistory_<?php echo esc_attr($value); ?>">
+                                                            <?php echo esc_html($label); ?>
+                                                        </label>
+                                                    </div>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="form-section extras-section">
-                                <h2 class="collapsible-section-title"><?php esc_html_e('Extras & Features', 'bricks-child'); ?> <span class="toggle-arrow">▼</span></h2>
-                                <div class="collapsible-section-content" style="display: none;">
-                                    <div class="form-row">
-                                        <div class="vehicle-history-grid">
-                                            <?php
-                                            $extras_options = array(
-                                                'alloy_wheels' => 'Alloy Wheels',
-                                                'cruise_control' => 'Cruise Control',
-                                                'disabled_accessible' => 'Disabled Accessible',
-                                                'keyless_start' => 'Keyless Start',
-                                                'rear_view_camera' => 'Rear View Camera',
-                                                'start_stop' => 'Start/Stop',
-                                                'sunroof' => 'Sunroof',
-                                                'heated_seats' => 'Heated Seats',
-                                                'android_auto' => 'Android Auto',
-                                                'apple_carplay' => 'Apple CarPlay',
-                                                'folding_mirrors' => 'Folding Mirrors',
-                                                'leather_seats' => 'Leather Seats',
-                                                'panoramic_roof' => 'Panoramic Roof',
-                                                'parking_sensors' => 'Parking Sensors',
-                                                'camera_360' => '360° Camera',
-                                                'adaptive_cruise_control' => 'Adaptive Cruise Control',
-                                                'blind_spot_mirror' => 'Blind Spot Mirror',
-                                                'lane_assist' => 'Lane Assist',
-                                                'power_tailgate' => 'Power Tailgate'
-                                            );
-                                            
-                                            foreach ($extras_options as $value => $label) {
-                                                ?>
-                                                <div class="vehicle-history-option">
-                                                    <input type="checkbox" 
-                                                           id="extra_<?php echo esc_attr($value); ?>" 
-                                                           name="extras[]" 
-                                                           value="<?php echo esc_attr($value); ?>" 
-                                                           <?php checked(in_array($value, (array)$extras), true); ?>>
-                                                    <label for="extra_<?php echo esc_attr($value); ?>">
-                                                        <?php echo esc_html($label); ?>
-                                                    </label>
-                                                </div>
+                            <div class="form-section extras-section input-wrapper collapsible-section collapsed">
+                                <div class="section-header" role="button" tabindex="0" aria-expanded="false">
+                                    <h2><?php esc_html_e('Extras & Features', 'bricks-child'); ?></h2>
+                                    <span class="collapse-arrow"><?php echo get_svg_icon('chevron-down'); ?></span>
+                                </div>
+                                <div class="section-content-wrapper">
+                                    <div class="section-content">
+                                        <div class="form-row">
+                                            <div class="vehicle-history-grid">
                                                 <?php
-                                            }
-                                            ?>
+                                                $extras_options = array(
+                                                    'alloy_wheels' => 'Alloy Wheels',
+                                                    'cruise_control' => 'Cruise Control',
+                                                    'disabled_accessible' => 'Disabled Accessible',
+                                                    'keyless_start' => 'Keyless Start',
+                                                    'rear_view_camera' => 'Rear View Camera',
+                                                    'start_stop' => 'Start/Stop',
+                                                    'sunroof' => 'Sunroof',
+                                                    'heated_seats' => 'Heated Seats',
+                                                    'android_auto' => 'Android Auto',
+                                                    'apple_carplay' => 'Apple CarPlay',
+                                                    'folding_mirrors' => 'Folding Mirrors',
+                                                    'leather_seats' => 'Leather Seats',
+                                                    'panoramic_roof' => 'Panoramic Roof',
+                                                    'parking_sensors' => 'Parking Sensors',
+                                                    'camera_360' => '360° Camera',
+                                                    'adaptive_cruise_control' => 'Adaptive Cruise Control',
+                                                    'blind_spot_mirror' => 'Blind Spot Mirror',
+                                                    'lane_assist' => 'Lane Assist',
+                                                    'power_tailgate' => 'Power Tailgate'
+                                                );
+
+                                                foreach ($extras_options as $value => $label) {
+                                                    ?>
+                                                    <div class="vehicle-history-option">
+                                                        <input type="checkbox"
+                                                               id="extra_<?php echo esc_attr($value); ?>"
+                                                               name="extras[]"
+                                                               value="<?php echo esc_attr($value); ?>"
+                                                               <?php checked(in_array($value, (array)$extras), true); ?>>
+                                                        <label for="extra_<?php echo esc_attr($value); ?>">
+                                                            <?php echo esc_html($label); ?>
+                                                        </label>
+                                                    </div>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="form-section description-section">
+                            <div class="form-section description-section input-wrapper">
                                 <h2><?php esc_html_e('Description', 'bricks-child'); ?></h2>
                                 <div class="form-row">
                                     <label for="description"><?php echo get_svg_icon('align-left'); ?> <?php esc_html_e('Description', 'bricks-child'); ?></label>
