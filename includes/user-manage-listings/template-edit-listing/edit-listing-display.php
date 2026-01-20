@@ -33,6 +33,39 @@ if (!defined('ABSPATH')) {
                 <!-- This hidden array will be populated by JS to reflect the final image order -->
                 <div id="image-order-container"></div>
 
+                <div class="add-listing-images-section input-wrapper">
+                    <h2><?php esc_html_e('Upload Images', 'bricks-child'); ?></h2>
+                    <p class="image-upload-info"><?php esc_html_e('Hold CTRL to choose several photos. Minimum 2 images per listing. Maximum 25 images per listing. Maximum file size is 12MB, the formats are .jpg, .jpeg, .png, .gif, .webp.', 'bricks-child'); ?></p>
+                    <p class="image-upload-note"><?php esc_html_e('Note: ads with good photos get more attention', 'bricks-child'); ?></p>
+                    <div class="image-upload-container">
+                        <div class="file-upload-area" id="file-upload-area" role="button" tabindex="0">
+                            <div class="upload-message">
+                                <?php echo get_svg_icon('cloud-arrow-up'); ?>
+                                <p><?php esc_html_e('Drag & Drop Images Here', 'bricks-child'); ?></p>
+                                <p class="small"><?php esc_html_e('or click to select files', 'bricks-child'); ?></p>
+                            </div>
+                        </div>
+                        <input type="file" id="car_images" name="car_images[]" multiple accept="image/jpeg,image/jfif,image/jpg,image/png,image/gif,image/webp,.jfif,.jpe" style="display: none;">
+                        <div id="image-preview" class="image-preview">
+                            <?php
+                            if (!empty($all_images)) {
+                                foreach ($all_images as $image_id) {
+                                    $image_url = wp_get_attachment_image_url($image_id, 'thumbnail');
+                                    if ($image_url) {
+                                        ?>
+                                        <div class="image-preview-item">
+                                            <img src="<?php echo esc_url($image_url); ?>" alt="Car image">
+                                            <button type="button" class="remove-image" data-image-id="<?php echo esc_attr($image_id); ?>">&times;</button>
+                                        </div>
+                                        <?php
+                                    }
+                                }
+                            }
+                            ?>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="add-listing-main-row">
                     <div class="add-listing-main-info-column">
                             <div class="form-section basic-details-section">
@@ -461,41 +494,6 @@ if (!defined('ABSPATH')) {
                                         $clean_description = trim($clean_description);
                                         echo esc_textarea($clean_description); 
                                     ?></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="add-listing-image-column">
-                            <div class="add-listing-images-section">
-                                <h2><?php esc_html_e('Upload Images', 'bricks-child'); ?></h2>
-                                <p class="image-upload-info"><?php esc_html_e('Hold CTRL to choose several photos. Minimum 2 images per listing. Maximum 25 images per listing. Maximum file size is 12MB, the formats are .jpg, .jpeg, .png, .gif, .webp.', 'bricks-child'); ?></p>
-                                <p class="image-upload-note"><?php esc_html_e('Note: ads with good photos get more attention', 'bricks-child'); ?></p>
-                                <div class="image-upload-container">
-                                    <div class="file-upload-area" id="file-upload-area" role="button" tabindex="0">
-                                        <div class="upload-message">
-                                            <?php echo get_svg_icon('cloud-arrow-up'); ?>
-                                            <p><?php esc_html_e('Drag & Drop Images Here', 'bricks-child'); ?></p>
-                                            <p class="small"><?php esc_html_e('or click to select files', 'bricks-child'); ?></p>
-                                        </div>
-                                    </div>
-                                    <input type="file" id="car_images" name="car_images[]" multiple accept="image/jpeg,image/jfif,image/jpg,image/png,image/gif,image/webp,.jfif,.jpe" style="display: none;">
-                                    <div id="image-preview" class="image-preview">
-                                        <?php
-                                        if (!empty($all_images)) {
-                                            foreach ($all_images as $image_id) {
-                                                $image_url = wp_get_attachment_image_url($image_id, 'thumbnail');
-                                                if ($image_url) {
-                                                    ?>
-                                                    <div class="image-preview-item">
-                                                        <img src="<?php echo esc_url($image_url); ?>" alt="Car image">
-                                                        <button type="button" class="remove-image" data-image-id="<?php echo esc_attr($image_id); ?>">&times;</button>
-                                                    </div>
-                                                    <?php
-                                                }
-                                            }
-                                        }
-                                        ?>
-                                    </div>
                                 </div>
                             </div>
                         </div>

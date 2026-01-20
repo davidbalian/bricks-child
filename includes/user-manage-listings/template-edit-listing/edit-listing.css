@@ -1,3 +1,8 @@
+/* Full width container */
+.page-edit-listing .bricks-container {
+  width: 100%;
+}
+
 /* Page Edit Listing Container */
 .page-edit-listing {
   padding: 3rem 1rem;
@@ -67,47 +72,17 @@ input[readonly]:hover {
   transform: rotate(180deg);
 }
 
-/* Styles for scrollable left column */
+/* Single column layout */
 .add-listing-main-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-/* Responsive: single column on mobile */
-@media (max-width: 768px) {
-  .add-listing-main-row {
-    grid-template-columns: 1fr;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 .add-listing-main-info-column {
-  /* flex: 2; */ /* Removed to allow theme's grid to control width */
-  max-height: calc(100vh - 280px);
-  overflow-y: auto;
-  padding-right: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 4rem;
-}
-
-/* Basic scrollbar styling for webkit browsers (Chrome, Safari, Edge) */
-.add-listing-main-info-column::-webkit-scrollbar {
-  width: 8px;
-}
-
-.add-listing-main-info-column::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-.add-listing-main-info-column::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 10px;
-}
-
-.add-listing-main-info-column::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
+  gap: 2rem;
 }
 
 /* Image optimization styles */
@@ -557,7 +532,7 @@ input[readonly]:hover {
   font-weight: 400;
 }
 
-/* Responsive adjustments for location selector */
+/* Responsive adjustments for location selector and form fields */
 @media (max-width: 640px) {
   .location-selector-wrapper {
     flex-direction: column;
@@ -570,5 +545,14 @@ input[readonly]:hover {
 
   .location-selector-wrapper .choose-location-btn {
     width: 100%;
+  }
+
+  /* Stack form fields vertically on mobile */
+  .form-row-halves {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row-thirds {
+    flex-direction: column;
   }
 }

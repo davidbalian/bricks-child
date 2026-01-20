@@ -727,22 +727,29 @@ label svg path,
   transform: rotate(-90deg);
 }
 
+.collapsible-section .section-content-wrapper {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.3s ease, opacity 0.3s ease;
+  opacity: 1;
+}
+
+.collapsible-section.collapsed .section-content-wrapper {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
 .collapsible-section .section-content {
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
-  overflow: visible;
-  transition: max-height 0.3s ease, opacity 0.3s ease, padding-top 0.3s ease;
-  max-height: 2000px;
-  opacity: 1;
+  overflow: hidden;
+  min-height: 0;
   padding-top: 2.5rem;
 }
 
 .collapsible-section.collapsed .section-content {
-  max-height: 0;
-  opacity: 0;
   padding-top: 0;
-  overflow: hidden;
 }
 
 .collapsible-section .section-header:hover .collapse-arrow svg {
