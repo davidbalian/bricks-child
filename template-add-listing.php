@@ -457,6 +457,7 @@ get_header(); ?>
                                     <h2><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'More Details (Optional) - Recommended', 'bricks-child' ); ?></h2>
                                     <span class="collapse-arrow"><?php echo get_svg_icon('chevron-down'); ?></span>
                                 </div>
+                                <div class="section-content-wrapper">
                                 <div class="section-content">
 
                                 <div class="form-row form-row-halves">
@@ -553,6 +554,7 @@ get_header(); ?>
 
 
                                 </div><!-- .section-content -->
+                                </div><!-- .section-content-wrapper -->
                             </div>
 
                             <div class="form-section mot-section input-wrapper collapsible-section collapsed">
@@ -560,6 +562,7 @@ get_header(); ?>
                                     <h2><?php echo get_svg_icon('clipboard-list'); ?> <?php esc_html_e( 'History & extras (Optional)', 'bricks-child' ); ?></h2>
                                     <span class="collapse-arrow"><?php echo get_svg_icon('chevron-down'); ?></span>
                                 </div>
+                                <div class="section-content-wrapper">
                                 <div class="section-content">
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
@@ -678,6 +681,7 @@ get_header(); ?>
                                 </div>
 
                                 </div><!-- .section-content -->
+                                </div><!-- .section-content-wrapper -->
                             </div>
                         </div>
                     </div>
@@ -687,6 +691,7 @@ get_header(); ?>
                             <h2><?php echo get_svg_icon('align-left'); ?> <?php esc_html_e( 'Description', 'bricks-child' ); ?></h2>
                             <span class="collapse-arrow"><?php echo get_svg_icon('chevron-down'); ?></span>
                         </div>
+                        <div class="section-content-wrapper">
                         <div class="section-content">
                         <p class="description-guidelines-green"><?php esc_html_e( 'Focus on condition, upgrades, or unique features.', 'bricks-child' ); ?></p>
 
@@ -694,6 +699,7 @@ get_header(); ?>
                             <textarea id="description" name="description" class="form-control" rows="5" placeholder="Enter your description here..."></textarea>
                         </div>
                         </div><!-- .section-content -->
+                        </div><!-- .section-content-wrapper -->
                     </div>
 
                     <div class="form-row">
