@@ -740,6 +740,11 @@ input[readonly]:hover {
 }
 
 /* Images Error */
+.images-section-has-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15);
+}
+
 .images-section-error {
   color: #ef4444;
   font-size: 0.875rem;

@@ -134,6 +134,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     function validateAllFields() {
         const errors = [];
 
+        // Check images first (minimum 2) - they're at the top of the page
+        const imageCount = getImageCount();
+        if (imageCount < 2) {
+            errors.push({ fieldId: 'image-preview', label: 'Images (minimum 2)', type: 'images' });
+        }
+
         // Check all required fields
         for (const [fieldId, config] of Object.entries(requiredFields)) {
             if (!isFieldValid(fieldId, config)) {
@@ -145,12 +151,6 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         const locationValue = $('#location').val();
         if (!locationValue || locationValue.trim() === '') {
             errors.push({ fieldId: 'location-row', label: 'Location', type: 'location' });
-        }
-
-        // Check images (minimum 2)
-        const imageCount = getImageCount();
-        if (imageCount < 2) {
-            errors.push({ fieldId: 'image-preview', label: 'Images (minimum 2)', type: 'images' });
         }
 
         return {
@@ -179,8 +179,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         } else if (fieldId === 'location-row') {
             $container = $('#location-row');
         } else if (fieldId === 'image-preview') {
-            // Images section
+            // Images section - add error class and message
             const $imagesSection = $('.add-listing-images-section');
+            $imagesSection.addClass('images-section-has-error');
             if (!$imagesSection.find('.images-section-error').length) {
                 $imagesSection.append('<p class="images-section-error">Please ensure at least 2 images</p>');
             }
@@ -211,6 +212,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         } else if (fieldId === 'location-row') {
             $container = $('#location-row');
         } else if (fieldId === 'image-preview') {
+            $('.add-listing-images-section').removeClass('images-section-has-error');
             $('.add-listing-images-section .images-section-error').remove();
             return;
         } else {
@@ -229,6 +231,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     function clearAllFieldErrors() {
         $('.field-has-error').removeClass('field-has-error');
         $('.field-error-message').remove();
+        $('.images-section-has-error').removeClass('images-section-has-error');
         $('.images-section-error').remove();
         $('#location-row').removeClass('has-error');
     }
