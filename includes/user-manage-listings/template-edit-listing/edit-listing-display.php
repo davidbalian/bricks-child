@@ -25,7 +25,7 @@ if (!defined('ABSPATH')) {
             ?>
             <h1><?php esc_html_e('Edit Car Listing', 'bricks-child'); ?></h1>
             
-            <form id="edit-car-listing-form" class="car-listing-form" method="post" enctype="multipart/form-data" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+            <form id="edit-car-listing-form" class="car-listing-form" method="post" enctype="multipart/form-data" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" novalidate>
                 <?php wp_nonce_field('edit_car_listing_nonce', 'edit_car_listing_nonce'); ?>
                 <input type="hidden" name="action" value="edit_car_listing">
                 <input type="hidden" name="car_id" value="<?php echo esc_attr($car_id); ?>">
@@ -104,13 +104,13 @@ if (!defined('ABSPATH')) {
                                     <div class="form-third">
                                         <label for="mileage"><?php echo get_svg_icon('road'); ?> <?php esc_html_e('Mileage', 'bricks-child'); ?></label>
                                         <div class="input-with-suffix">
-                                            <input type="text" id="mileage" name="mileage" class="form-control" value="<?php echo esc_attr($mileage); ?>" required>
+                                            <input type="text" id="mileage" name="mileage" class="form-control" value="<?php echo esc_attr($mileage); ?>">
                                             <span class="input-suffix">km</span>
                                         </div>
                                     </div>
                                     <div class="form-third">
                                         <label for="price"><?php echo get_svg_icon('euro-sign'); ?> <?php esc_html_e('Price', 'bricks-child'); ?></label>
-                                        <input type="text" id="price" name="price" class="form-control" value="<?php echo esc_attr($price); ?>" required>
+                                        <input type="text" id="price" name="price" class="form-control" value="<?php echo esc_attr($price); ?>">
                                     </div>
                                 </div>
 
