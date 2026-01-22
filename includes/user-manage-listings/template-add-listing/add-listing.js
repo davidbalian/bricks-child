@@ -570,10 +570,18 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
   AddListingDropdown.init();
 
   // Handle make selection change (for model dependency)
+  var modelLoadingInterval = null; // Store interval reference for cleanup
+
   $(document).on('addListing:makeChanged', function(e, makeName) {
     if (isDevelopment) console.log("[Add Listing] Make changed:", makeName);
 
     var $modelDropdown = $('#add-listing-model-wrapper');
+
+    // Clear any existing loading interval
+    if (modelLoadingInterval) {
+      clearInterval(modelLoadingInterval);
+      modelLoadingInterval = null;
+    }
 
     if (!makeName) {
       // No make selected - disable model dropdown
@@ -581,8 +589,23 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       return;
     }
 
-    // Show loading state
-    AddListingDropdown.setLoading($modelDropdown, true);
+    // Show loading state with animated dots
+    var $button = $modelDropdown.find('.car-filter-dropdown-button');
+    var $options = $modelDropdown.find('.car-filter-dropdown-options');
+    var $buttonText = $button.find('.car-filter-dropdown-text');
+
+    $button.prop('disabled', true);
+    $options.html('<div class="car-filter-loading" style="padding: 0.75rem; color: #6b7280; text-align: center;">Loading.</div>');
+    $buttonText.text('Loading.');
+
+    // Start loading animation
+    var loadingDots = 1;
+    modelLoadingInterval = setInterval(function() {
+      loadingDots = (loadingDots % 3) + 1;
+      var loadingText = 'Loading' + '.'.repeat(loadingDots);
+      $options.find('.car-filter-loading').text(loadingText);
+      $buttonText.text(loadingText);
+    }, 400);
 
     // Fetch models via AJAX (using make name, returns model names)
     $.ajax({
@@ -594,6 +617,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         nonce: addListingData.nonce,
       },
       success: function(response) {
+        // Clear loading animation
+        if (modelLoadingInterval) {
+          clearInterval(modelLoadingInterval);
+          modelLoadingInterval = null;
+        }
+
         if (response.success && response.data) {
           // response.data is an array of model names
           var options = response.data.map(function(modelName) {
@@ -612,6 +641,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         }
       },
       error: function(xhr, status, error) {
+        // Clear loading animation
+        if (modelLoadingInterval) {
+          clearInterval(modelLoadingInterval);
+          modelLoadingInterval = null;
+        }
+
         if (isDevelopment) console.error("[Add Listing] AJAX error:", error);
         AddListingDropdown.disable($modelDropdown, 'Error loading models');
       }

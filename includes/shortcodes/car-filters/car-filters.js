@@ -627,9 +627,20 @@
                     return;
                 }
 
-                // Show loading state
+                // Show loading state with animated dots
                 $button.prop('disabled', true);
-                $options.html('<div class="car-filter-loading">Loading models...</div>');
+                var $buttonText = $button.find('.car-filter-dropdown-text');
+                $options.html('<div class="car-filter-loading">Loading.</div>');
+                $buttonText.text('Loading.');
+
+                // Start loading animation
+                var loadingDots = 1;
+                var loadingInterval = setInterval(function() {
+                    loadingDots = (loadingDots % 3) + 1;
+                    var loadingText = 'Loading' + '.'.repeat(loadingDots);
+                    $options.find('.car-filter-loading').text(loadingText);
+                    $buttonText.text(loadingText);
+                }, 400);
 
                 // Fetch models via AJAX
                 $.ajax({
@@ -641,6 +652,7 @@
                         make_term_id: makeId
                     },
                     success: function(response) {
+                        clearInterval(loadingInterval);
                         if (response.success && response.data) {
                             var html = '<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="" data-slug="">All Models</button>';
                             var selectHtml = '<option value="">All Models</option>';
@@ -658,12 +670,15 @@
                             $options.html(html);
                             $select.html(selectHtml).prop('disabled', false);
                             $button.prop('disabled', false).removeClass('car-filter-dropdown-disabled');
+                            $buttonText.addClass('placeholder').text('Select Model');
                             $dropdown.removeClass('car-filter-dropdown-disabled');
                             $search.prop('disabled', false);
                         }
                     },
                     error: function() {
+                        clearInterval(loadingInterval);
                         $options.html('<div class="car-filter-error">Failed to load models</div>');
+                        $buttonText.addClass('placeholder').text('Select Model');
                     }
                 });
             });
