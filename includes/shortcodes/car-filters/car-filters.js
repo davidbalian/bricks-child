@@ -634,8 +634,13 @@
                 $buttonText.text('Loading.');
 
                 // Start loading animation
+                var isLoading = true; // Track loading state to prevent race conditions
                 var loadingDots = 1;
                 var loadingInterval = setInterval(function() {
+                    // Check if still loading and loading element exists to prevent race condition
+                    if (!isLoading || !$options.find('.car-filter-loading').length) {
+                        return;
+                    }
                     loadingDots = (loadingDots % 3) + 1;
                     var loadingText = 'Loading' + '.'.repeat(loadingDots);
                     $options.find('.car-filter-loading').text(loadingText);
@@ -652,6 +657,8 @@
                         make_term_id: makeId
                     },
                     success: function(response) {
+                        // Stop loading state and clear animation BEFORE updating DOM
+                        isLoading = false;
                         clearInterval(loadingInterval);
                         if (response.success && response.data) {
                             var html = '<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="" data-slug="">All Models</button>';
@@ -676,6 +683,8 @@
                         }
                     },
                     error: function() {
+                        // Stop loading state and clear animation BEFORE updating DOM
+                        isLoading = false;
                         clearInterval(loadingInterval);
                         $options.html('<div class="car-filter-error">Failed to load models</div>');
                         $buttonText.addClass('placeholder').text('Select Model');

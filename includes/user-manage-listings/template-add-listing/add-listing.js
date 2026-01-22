@@ -571,6 +571,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
   // Handle make selection change (for model dependency)
   var modelLoadingInterval = null; // Store interval reference for cleanup
+  var isLoadingModels = false; // Track loading state to prevent race conditions
 
   $(document).on('addListing:makeChanged', function(e, makeName) {
     if (isDevelopment) console.log("[Add Listing] Make changed:", makeName);
@@ -581,6 +582,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     if (modelLoadingInterval) {
       clearInterval(modelLoadingInterval);
       modelLoadingInterval = null;
+      isLoadingModels = false;
     }
 
     if (!makeName) {
@@ -599,8 +601,13 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     $buttonText.text('Loading.');
 
     // Start loading animation
+    isLoadingModels = true;
     var loadingDots = 1;
     modelLoadingInterval = setInterval(function() {
+      // Check if still loading and loading element exists to prevent race condition
+      if (!isLoadingModels || !$options.find('.car-filter-loading').length) {
+        return;
+      }
       loadingDots = (loadingDots % 3) + 1;
       var loadingText = 'Loading' + '.'.repeat(loadingDots);
       $options.find('.car-filter-loading').text(loadingText);
@@ -617,7 +624,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         nonce: addListingData.nonce,
       },
       success: function(response) {
-        // Clear loading animation
+        // Stop loading state and clear animation BEFORE updating DOM
+        isLoadingModels = false;
         if (modelLoadingInterval) {
           clearInterval(modelLoadingInterval);
           modelLoadingInterval = null;
@@ -641,7 +649,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         }
       },
       error: function(xhr, status, error) {
-        // Clear loading animation
+        // Stop loading state and clear animation BEFORE updating DOM
+        isLoadingModels = false;
         if (modelLoadingInterval) {
           clearInterval(modelLoadingInterval);
           modelLoadingInterval = null;
