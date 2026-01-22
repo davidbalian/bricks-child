@@ -133,6 +133,7 @@ input[readonly]:hover {
 .collapsible-section.collapsed .section-content-wrapper {
   grid-template-rows: 0fr;
   opacity: 0;
+  pointer-events: none;
 }
 
 .collapsible-section .section-content {
@@ -703,13 +704,12 @@ input[readonly]:hover {
   margin-top: 2rem;
 }
 
-/* Disabled Submit Button */
+/* Disabled Submit Button - kept for backwards compatibility but not used */
 .btn-primary-gradient.btn-disabled,
 .btn-primary-gradient:disabled {
   background: linear-gradient(135deg, #9ca3af, #6b7280) !important;
   cursor: not-allowed;
   opacity: 0.7;
-  pointer-events: none;
 }
 
 /* Field Error State */
