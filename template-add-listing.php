@@ -173,7 +173,7 @@ get_header(); ?>
                 
                 // Display the add listing form
                 ?>
-                <form id="add-car-listing-form" class="car-listing-form" method="post" enctype="multipart/form-data" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                <form id="add-car-listing-form" class="car-listing-form" method="post" enctype="multipart/form-data" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" novalidate>
                     <?php wp_nonce_field( 'add_car_listing_nonce', 'add_car_listing_nonce' ); ?>
                     <input type="hidden" name="action" value="add_new_car_listing">
                     <input type="hidden" name="post_type" value="car">
@@ -260,13 +260,13 @@ get_header(); ?>
                                     <div class="form-third">
                                         <label for="mileage"><?php echo get_svg_icon('road'); ?> <?php esc_html_e( 'Mileage', 'bricks-child' ); ?><span class="required">*</span></label>
                                         <div class="input-with-suffix">
-                                            <input type="text" id="mileage" name="mileage" class="form-control" required placeholder="E.g '180,000'">
+                                            <input type="text" id="mileage" name="mileage" class="form-control" placeholder="E.g '180,000'">
                                             <span class="input-suffix">km</span>
                                         </div>
                                     </div>
                                     <div class="form-third">
                                         <label for="price"><?php echo get_svg_icon('euro-sign'); ?> <?php esc_html_e( 'Price', 'bricks-child' ); ?><span class="required">*</span></label>
-                                        <input type="text" id="price" name="price" class="form-control" required placeholder="E.g '10,000'">
+                                        <input type="text" id="price" name="price" class="form-control" placeholder="E.g '10,000'">
                                     </div>
                                     <div class="form-third">
                                         <label><?php echo get_svg_icon('circle-check'); ?> <?php esc_html_e( 'Availability', 'bricks-child' ); ?><span class="required">*</span></label>
