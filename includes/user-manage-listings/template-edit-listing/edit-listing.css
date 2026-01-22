@@ -696,6 +696,48 @@ input[readonly]:hover {
   margin-top: 2rem;
 }
 
+/* Disabled Submit Button */
+.btn-primary-gradient.btn-disabled,
+.btn-primary-gradient:disabled {
+  background: linear-gradient(135deg, #9ca3af, #6b7280) !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Field Error State */
+.field-has-error .car-filter-dropdown-button,
+.field-has-error input[type="text"],
+.field-has-error input[type="number"] {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15);
+}
+
+/* Inline Error Message */
+.field-error-message {
+  display: block;
+  color: #ef4444;
+  font-size: 0.8125rem;
+  margin-top: 0.375rem;
+}
+
+/* Location Error */
+#location-row.has-error .choose-location-btn {
+  border-color: #ef4444 !important;
+}
+
+#location-row.has-error .car-filter-dropdown-button {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15);
+}
+
+/* Images Error */
+.images-section-error {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
   .collapsible-section .section-header h2 {

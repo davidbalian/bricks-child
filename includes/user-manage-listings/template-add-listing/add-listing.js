@@ -6,6 +6,26 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
   if (isDevelopment) console.log("[Add Listing] jQuery ready");
 
+  // =====================================================
+  // FORM VALIDATION CONFIGURATION
+  // =====================================================
+  const requiredFields = {
+    'add-listing-make': { type: 'dropdown', label: 'Make' },
+    'add-listing-model': { type: 'dropdown', label: 'Model' },
+    'add-listing-year': { type: 'dropdown', label: 'Year' },
+    'add-listing-availability': { type: 'dropdown', label: 'Availability' },
+    'add-listing-engine-capacity': { type: 'dropdown', label: 'Engine Capacity' },
+    'add-listing-fuel-type': { type: 'dropdown', label: 'Fuel Type' },
+    'add-listing-transmission': { type: 'dropdown', label: 'Transmission' },
+    'add-listing-body-type': { type: 'dropdown', label: 'Body Type' },
+    'add-listing-exterior-color': { type: 'dropdown', label: 'Exterior Color' },
+    'mileage': { type: 'text', label: 'Mileage' },
+    'price': { type: 'text', label: 'Price' }
+  };
+
+  const SUBMIT_TEXT_VALID = 'Submit Listing';
+  const SUBMIT_TEXT_INVALID = 'Fill all required fields';
+
   // Collapsible sections functionality
   function initCollapsibleSections() {
     $(".collapsible-section .section-header").on("click", function () {
@@ -31,6 +51,265 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
   // Initialize collapsible sections
   initCollapsibleSections();
+
+  // =====================================================
+  // FORM VALIDATION FUNCTIONS
+  // =====================================================
+
+  /**
+   * Get the current total image count
+   */
+  function getImageCount() {
+    if (typeof asyncUploadManager !== 'undefined' && asyncUploadManager) {
+      return asyncUploadManager.getUploadedAttachmentIds().length;
+    }
+    return accumulatedFilesList ? accumulatedFilesList.length : 0;
+  }
+
+  /**
+   * Check if a specific field is valid
+   */
+  function isFieldValid(fieldId, config) {
+    if (config.type === 'dropdown') {
+      const $wrapper = $('#' + fieldId + '-wrapper');
+      const $select = $wrapper.find('select');
+
+      // Skip model validation if dropdown is disabled (no make selected)
+      if (fieldId === 'add-listing-model' && $select.prop('disabled')) {
+        return false; // Model is required but make not selected yet
+      }
+
+      // Skip engine capacity validation for electric vehicles
+      if (fieldId === 'add-listing-engine-capacity') {
+        const fuelType = $('#add-listing-fuel-type').val();
+        if (fuelType === 'Electric') {
+          return true; // Electric vehicles auto-fill 0.0
+        }
+      }
+
+      const value = $select.val();
+      return value !== '' && value !== null && value !== undefined;
+    } else if (config.type === 'text') {
+      const $input = $('#' + fieldId);
+      const value = $input.val().trim();
+      return value !== '';
+    }
+    return false;
+  }
+
+  /**
+   * Validate all required fields and return validation result
+   */
+  function validateAllFields() {
+    const errors = [];
+
+    // Check all required fields
+    for (const [fieldId, config] of Object.entries(requiredFields)) {
+      if (!isFieldValid(fieldId, config)) {
+        errors.push({ fieldId, label: config.label, type: config.type });
+      }
+    }
+
+    // Check location
+    const locationValue = $('#location').val();
+    if (!locationValue || locationValue.trim() === '') {
+      errors.push({ fieldId: 'location-row', label: 'Location', type: 'location' });
+    }
+
+    // Check images (minimum 2)
+    const imageCount = getImageCount();
+    if (imageCount < 2) {
+      errors.push({ fieldId: 'image-preview', label: 'Images (minimum 2)', type: 'images' });
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors: errors
+    };
+  }
+
+  /**
+   * Update submit button state based on form validity
+   */
+  function updateSubmitButtonState() {
+    const $submitBtn = $('#add-car-listing-form button[type="submit"]');
+    const validation = validateAllFields();
+
+    if (validation.isValid) {
+      $submitBtn.prop('disabled', false)
+        .removeClass('btn-disabled')
+        .text(SUBMIT_TEXT_VALID);
+    } else {
+      $submitBtn.prop('disabled', true)
+        .addClass('btn-disabled')
+        .text(SUBMIT_TEXT_INVALID);
+    }
+
+    if (isDevelopment) console.log('[Add Listing] Form validation:', validation.isValid ? 'VALID' : 'INVALID', validation.errors.length, 'errors');
+  }
+
+  /**
+   * Show error state for a specific field
+   */
+  function showFieldError(fieldId, label) {
+    let $container;
+
+    if (fieldId.startsWith('add-listing-')) {
+      // Dropdown field
+      $container = $('#' + fieldId + '-wrapper').closest('.form-third, .form-half, .form-row');
+    } else if (fieldId === 'location-row') {
+      $container = $('#location-row');
+    } else if (fieldId === 'image-preview') {
+      // Images section
+      const $imagesSection = $('.add-listing-images-section');
+      if (!$imagesSection.find('.images-section-error').length) {
+        $imagesSection.append('<p class="images-section-error">Please upload at least 2 images</p>');
+      }
+      return;
+    } else {
+      // Text input
+      $container = $('#' + fieldId).closest('.form-third, .form-half, .form-row');
+    }
+
+    if ($container.length) {
+      $container.addClass('field-has-error');
+
+      // Add error message if not already present
+      if (!$container.find('.field-error-message').length) {
+        $container.append('<span class="field-error-message">This field is required</span>');
+      }
+    }
+  }
+
+  /**
+   * Clear error state for a specific field
+   */
+  function clearFieldError(fieldId) {
+    let $container;
+
+    if (fieldId.startsWith('add-listing-')) {
+      $container = $('#' + fieldId + '-wrapper').closest('.form-third, .form-half, .form-row');
+    } else if (fieldId === 'location-row') {
+      $container = $('#location-row');
+    } else if (fieldId === 'image-preview') {
+      $('.add-listing-images-section .images-section-error').remove();
+      return;
+    } else {
+      $container = $('#' + fieldId).closest('.form-third, .form-half, .form-row');
+    }
+
+    if ($container.length) {
+      $container.removeClass('field-has-error');
+      $container.find('.field-error-message').remove();
+    }
+  }
+
+  /**
+   * Clear all field errors
+   */
+  function clearAllFieldErrors() {
+    $('.field-has-error').removeClass('field-has-error');
+    $('.field-error-message').remove();
+    $('.images-section-error').remove();
+    $('#location-row').removeClass('has-error');
+  }
+
+  /**
+   * Show all validation errors and scroll to first error
+   */
+  function showAllValidationErrors(errors) {
+    // First clear all existing errors
+    clearAllFieldErrors();
+
+    // Show each error
+    errors.forEach(error => {
+      showFieldError(error.fieldId, error.label);
+    });
+
+    // Scroll to first error
+    if (errors.length > 0) {
+      let $firstError;
+      const firstErrorId = errors[0].fieldId;
+
+      if (firstErrorId === 'image-preview') {
+        $firstError = $('.add-listing-images-section');
+      } else if (firstErrorId === 'location-row') {
+        $firstError = $('#location-row');
+      } else if (firstErrorId.startsWith('add-listing-')) {
+        $firstError = $('#' + firstErrorId + '-wrapper');
+      } else {
+        $firstError = $('#' + firstErrorId);
+      }
+
+      if ($firstError.length) {
+        $('html, body').animate({
+          scrollTop: $firstError.offset().top - 100
+        }, 300);
+      }
+    }
+  }
+
+  /**
+   * Bind validation events to form fields
+   */
+  function bindValidationEvents() {
+    // Dropdown changes - listen to hidden select change events
+    Object.keys(requiredFields).forEach(fieldId => {
+      const config = requiredFields[fieldId];
+
+      if (config.type === 'dropdown') {
+        const $select = $('#' + fieldId);
+        $select.on('change', function() {
+          // Clear error for this field if now valid
+          if (isFieldValid(fieldId, config)) {
+            clearFieldError(fieldId);
+          }
+          updateSubmitButtonState();
+        });
+      } else if (config.type === 'text') {
+        const $input = $('#' + fieldId);
+        $input.on('input blur', function() {
+          if (isFieldValid(fieldId, config)) {
+            clearFieldError(fieldId);
+          }
+          updateSubmitButtonState();
+        });
+      }
+    });
+
+    // Location field - observe hidden field value changes
+    const locationObserver = new MutationObserver(function() {
+      const hasLocation = $('#location').val().trim() !== '';
+      if (hasLocation) {
+        clearFieldError('location-row');
+        $('#location-row').removeClass('has-error');
+      }
+      updateSubmitButtonState();
+    });
+
+    const $locationField = document.getElementById('location');
+    if ($locationField) {
+      locationObserver.observe($locationField, { attributes: true, attributeFilter: ['value'] });
+
+      // Also listen to direct value changes
+      $('#location').on('change', function() {
+        const hasLocation = $(this).val().trim() !== '';
+        if (hasLocation) {
+          clearFieldError('location-row');
+          $('#location-row').removeClass('has-error');
+        }
+        updateSubmitButtonState();
+      });
+    }
+
+    if (isDevelopment) console.log('[Add Listing] Validation events bound');
+  }
+
+  // Initialize validation after a short delay to ensure DOM is ready
+  setTimeout(function() {
+    bindValidationEvents();
+    updateSubmitButtonState();
+  }, 100);
 
   // Initialize async upload manager if available
   let asyncUploadManager = null;
@@ -664,6 +943,17 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
   // Handle form submission
   $("#add-car-listing-form").on("submit", function (e) {
+    // Run full validation and show all errors
+    const validation = validateAllFields();
+
+    if (!validation.isValid) {
+      e.preventDefault();
+      showAllValidationErrors(validation.errors);
+
+      if (isDevelopment) console.log('[Add Listing] Form submission blocked - validation failed:', validation.errors);
+      return false;
+    }
+
     // Re-enable model dropdown before submission (disabled fields don't submit)
     const $modelSelect = $("#add-listing-model");
     if ($modelSelect.prop("disabled")) {
@@ -684,10 +974,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     const locationField = $("#location");
     if (!locationField.val().trim()) {
       e.preventDefault();
-      alert("Please choose a location.");
-      // optional: bring attention to the button/field
-      $("#location-row").addClass("has-error");
-      $(".choose-location-btn").focus();
+      showAllValidationErrors([{ fieldId: 'location-row', label: 'Location', type: 'location' }]);
       return false;
     }
 
@@ -1071,6 +1358,10 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         "[Add Listing] Processed batch. Accumulated files count:",
         accumulatedFilesList.length
       );
+
+      // Update validation state after files are added
+      clearFieldError('image-preview');
+      updateSubmitButtonState();
     } catch (error) {
       if (isDevelopment) console.error("[Add Listing] Error in batch processing:", error);
     } finally {
@@ -1275,6 +1566,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       "[Add Listing] File removed. Accumulated files count:",
       accumulatedFilesList.length
     );
+
+    // Update validation state after image removal
+    updateSubmitButtonState();
   }
 
   function updateActualFileInput() {
@@ -1382,6 +1676,10 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       );
 
       updateAsyncImageOrderField();
+
+      // Update validation state after image upload completes
+      clearFieldError('image-preview');
+      updateSubmitButtonState();
     }
   }
 
@@ -1441,6 +1739,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     });
 
     if (isDevelopment) console.log("[Add Listing] Image removed from async system:", fileKey);
+
+    // Update validation state after image removal
+    updateSubmitButtonState();
   }
 
   // =====================================================

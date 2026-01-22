@@ -703,7 +703,7 @@ get_header(); ?>
                     </div>
 
                     <div class="form-row">
-                        <button type="submit" class="btn btn-primary-gradient btn-lg"><?php esc_html_e( 'Submit Listing', 'bricks-child' ); ?></button>
+                        <button type="submit" class="btn btn-primary-gradient btn-lg btn-disabled" disabled><?php esc_html_e( 'Fill all required fields', 'bricks-child' ); ?></button>
                     </div>
                 </form>
                 <?php
