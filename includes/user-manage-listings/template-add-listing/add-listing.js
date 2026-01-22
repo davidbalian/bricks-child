@@ -648,6 +648,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       $engineCapacityButton.prop("disabled", true);
       $engineCapacityDropdown.addClass("car-filter-dropdown-disabled electric-locked");
 
+      // Clear any validation error since field is now auto-filled
+      clearFieldError('add-listing-engine-capacity');
+
       if (isDevelopment) console.log("[Add Listing] Engine capacity locked to 0.0 for electric vehicle");
     } else {
       // Re-enable the engine capacity dropdown

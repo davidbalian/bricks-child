@@ -71,6 +71,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             $engineCapacity.val('0.0');
             $engineCapacity.prop('disabled', true);
             $engineCapacity.addClass('electric-locked');
+
+            // Clear any validation error since field is now auto-filled
+            clearFieldError('edit-listing-engine-capacity');
         } else {
             $engineCapacity.prop('disabled', false);
             $engineCapacity.removeClass('electric-locked');
