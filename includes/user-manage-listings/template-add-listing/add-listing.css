@@ -865,8 +865,23 @@ label svg path,
   display: none;
 }
 
+/* CRITICAL: Always show location bar when a location is selected, even if no saved locations exist */
+.location-selector-wrapper.no-saved-locations .saved-locations-container.has-location {
+  display: flex !important;
+}
+
+/* Show OR separator when location is selected even if no saved locations */
+.location-selector-wrapper.no-saved-locations .saved-locations-container.has-location ~ .location-or-separator {
+  display: block !important;
+}
+
 .location-selector-wrapper.no-saved-locations .choose-location-btn {
   width: 100%;
+}
+
+/* When location is selected in no-saved-locations state, reset button width */
+.location-selector-wrapper.no-saved-locations .saved-locations-container.has-location ~ .choose-location-btn {
+  width: auto;
 }
 
 /* Location selected state - dropdown text styling */
@@ -887,6 +902,21 @@ label svg path,
   }
 
   .location-selector-wrapper .choose-location-btn {
+    width: 100%;
+  }
+  
+  /* CRITICAL: Ensure location bar is visible on mobile when location is selected */
+  .saved-locations-container.has-location {
+    display: flex !important;
+    min-height: 48px;
+  }
+  
+  .saved-locations-container.has-location .car-filter-dropdown {
+    width: 100%;
+  }
+  
+  .saved-locations-container.has-location .car-filter-dropdown-button {
+    display: flex !important;
     width: 100%;
   }
 

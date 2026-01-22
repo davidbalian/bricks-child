@@ -1789,6 +1789,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       return;
     }
 
+    // Check if a location is already selected
+    const hasSelectedLocation = $("#location").val() || $wrapper.hasClass("has-location");
+
     // Fetch saved locations via AJAX
     $.ajax({
       url: addListingData.ajaxurl,
@@ -1816,13 +1819,18 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
           if (isDevelopment) console.log("[Add Listing] Loaded", savedLocationsData.length, "saved locations");
         } else {
           if (isDevelopment) console.log("[Add Listing] No saved locations found");
-          // Add class to hide dropdown and OR, show only button
-          $selectorWrapper.addClass("no-saved-locations");
+          // Only hide dropdown if there's no selected location
+          if (!hasSelectedLocation) {
+            $selectorWrapper.addClass("no-saved-locations");
+          }
         }
       },
       error: function (xhr, status, error) {
         if (isDevelopment) console.error("[Add Listing] Error fetching saved locations:", error);
-        $selectorWrapper.addClass("no-saved-locations");
+        // Only hide dropdown if there's no selected location
+        if (!hasSelectedLocation) {
+          $selectorWrapper.addClass("no-saved-locations");
+        }
       },
     });
 
@@ -1955,6 +1963,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
    */
   function showLocationInDropdown(address) {
     const $dropdownWrapper = $("#saved-locations-wrapper");
+    const $selectorWrapper = $(".location-selector-wrapper");
     const $button = $dropdownWrapper.find(".car-filter-dropdown-button");
     const $options = $dropdownWrapper.find(".car-filter-dropdown-options");
     const $select = $dropdownWrapper.find("select");
@@ -1973,6 +1982,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     // Show clear button and hide dropdown arrow
     $("#clear-location-btn").show();
     $dropdownWrapper.addClass("has-location");
+    
+    // Remove no-saved-locations class to ensure the location bar is visible
+    $selectorWrapper.removeClass("no-saved-locations");
   }
 
   /**
@@ -1991,6 +2003,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
    */
   function clearLocation() {
     const $dropdownWrapper = $("#saved-locations-wrapper");
+    const $selectorWrapper = $(".location-selector-wrapper");
     const $button = $dropdownWrapper.find(".car-filter-dropdown-button");
     const $options = $dropdownWrapper.find(".car-filter-dropdown-options");
     const $select = $dropdownWrapper.find("select");
@@ -2016,6 +2029,11 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     // Hide clear button and show dropdown arrow
     $("#clear-location-btn").hide();
     $dropdownWrapper.removeClass("has-location");
+    
+    // Only add no-saved-locations class if there are no saved locations
+    if (!savedLocationsData || savedLocationsData.length === 0) {
+      $selectorWrapper.addClass("no-saved-locations");
+    }
 
     if (isDevelopment) console.log("[Add Listing] Location cleared");
   }

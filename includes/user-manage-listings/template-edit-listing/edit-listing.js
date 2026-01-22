@@ -1628,6 +1628,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
      */
     function showLocationInDropdown(address) {
         const $dropdownWrapper = $("#saved-locations-wrapper");
+        const $selectorWrapper = $(".location-selector-wrapper");
         const $button = $dropdownWrapper.find(".car-filter-dropdown-button");
         const $options = $dropdownWrapper.find(".car-filter-dropdown-options");
         const $select = $dropdownWrapper.find("select");
@@ -1646,6 +1647,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         // Show clear button and hide dropdown arrow
         $("#clear-location-btn").show();
         $dropdownWrapper.addClass("has-location");
+        
+        // Remove no-saved-locations class to ensure the location bar is visible
+        $selectorWrapper.removeClass("no-saved-locations");
     }
 
     /**
@@ -1664,6 +1668,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
      */
     function clearLocation() {
         const $dropdownWrapper = $("#saved-locations-wrapper");
+        const $selectorWrapper = $(".location-selector-wrapper");
         const $button = $dropdownWrapper.find(".car-filter-dropdown-button");
         const $options = $dropdownWrapper.find(".car-filter-dropdown-options");
         const $select = $dropdownWrapper.find("select");
@@ -1690,6 +1695,11 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         // Hide clear button and show dropdown arrow
         $("#clear-location-btn").hide();
         $dropdownWrapper.removeClass("has-location");
+        
+        // Only add no-saved-locations class if there are no saved locations
+        if (!savedLocationsData || savedLocationsData.length === 0) {
+            $selectorWrapper.addClass("no-saved-locations");
+        }
 
         if (isDevelopment) console.log("[Edit Listing] Location cleared");
     }
