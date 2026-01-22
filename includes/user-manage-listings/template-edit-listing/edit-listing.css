@@ -19,6 +19,13 @@
   color: #363636;
 }
 
+/* Required field asterisk */
+.required {
+  color: #ef4444;
+  margin-left: 0.25rem;
+  font-weight: 600;
+}
+
 /* Remove bottom margin from labels in checkbox grids */
 .page-edit-listing .vehicle-history-grid label,
 .page-edit-listing .vehicle-history-option label {

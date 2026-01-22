@@ -202,7 +202,7 @@ get_header(); ?>
                                 <h2><?php echo get_svg_icon('circle-info'); ?> <?php esc_html_e( 'Basic Details', 'bricks-child' ); ?></h2>
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
-                                        <label><?php echo get_svg_icon('car-side'); ?> <?php esc_html_e( 'Make', 'bricks-child' ); ?></label>
+                                        <label><?php echo get_svg_icon('car-side'); ?> <?php esc_html_e( 'Make', 'bricks-child' ); ?><span class="required">*</span></label>
                                         <?php
                                         car_filter_render_dropdown(array(
                                             'id'          => 'add-listing-make',
@@ -219,7 +219,7 @@ get_header(); ?>
                                         ?>
                                     </div>
                                     <div class="form-third">
-                                        <label><?php echo get_svg_icon('car'); ?> <?php esc_html_e( 'Model', 'bricks-child' ); ?></label>
+                                        <label><?php echo get_svg_icon('car'); ?> <?php esc_html_e( 'Model', 'bricks-child' ); ?><span class="required">*</span></label>
                                         <?php
                                         car_filter_render_dropdown(array(
                                             'id'          => 'add-listing-model',
@@ -237,7 +237,7 @@ get_header(); ?>
                                         ?>
                                     </div>
                                     <div class="form-third">
-                                        <label><?php echo get_svg_icon('calendar'); ?> <?php esc_html_e( 'Year', 'bricks-child' ); ?></label>
+                                        <label><?php echo get_svg_icon('calendar'); ?> <?php esc_html_e( 'Year', 'bricks-child' ); ?><span class="required">*</span></label>
                                         <?php
                                         $year_options = array();
                                         for ($year = 2025; $year >= 1948; $year--) {
@@ -258,18 +258,18 @@ get_header(); ?>
 
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
-                                        <label for="mileage"><?php echo get_svg_icon('road'); ?> <?php esc_html_e( 'Mileage', 'bricks-child' ); ?></label>
+                                        <label for="mileage"><?php echo get_svg_icon('road'); ?> <?php esc_html_e( 'Mileage', 'bricks-child' ); ?><span class="required">*</span></label>
                                         <div class="input-with-suffix">
                                             <input type="text" id="mileage" name="mileage" class="form-control" required placeholder="E.g '180,000'">
                                             <span class="input-suffix">km</span>
                                         </div>
                                     </div>
                                     <div class="form-third">
-                                        <label for="price"><?php echo get_svg_icon('euro-sign'); ?> <?php esc_html_e( 'Price', 'bricks-child' ); ?></label>
+                                        <label for="price"><?php echo get_svg_icon('euro-sign'); ?> <?php esc_html_e( 'Price', 'bricks-child' ); ?><span class="required">*</span></label>
                                         <input type="text" id="price" name="price" class="form-control" required placeholder="E.g '10,000'">
                                     </div>
                                     <div class="form-third">
-                                        <label><?php echo get_svg_icon('circle-check'); ?> <?php esc_html_e( 'Availability', 'bricks-child' ); ?></label>
+                                        <label><?php echo get_svg_icon('circle-check'); ?> <?php esc_html_e( 'Availability', 'bricks-child' ); ?><span class="required">*</span></label>
                                         <?php
                                         car_filter_render_dropdown(array(
                                             'id'          => 'add-listing-availability',
@@ -288,7 +288,7 @@ get_header(); ?>
                                 </div>
 
                                 <div class="form-row" id="location-row">
-                                    <label for="location"><?php echo get_svg_icon('location-dot'); ?> <?php esc_html_e( 'Location', 'bricks-child' ); ?></label>
+                                    <label for="location"><?php echo get_svg_icon('location-dot'); ?> <?php esc_html_e( 'Location', 'bricks-child' ); ?><span class="required">*</span></label>
 
                                     <div class="location-selector-wrapper">
                                         <!-- Saved Locations Dropdown -->
@@ -324,7 +324,7 @@ get_header(); ?>
 
                                 <div class="form-row form-row-thirds">
                                     <div class="form-third">
-                                        <label><?php echo get_svg_icon('engine'); ?> <?php esc_html_e( 'Engine Capacity', 'bricks-child' ); ?></label>
+                                        <label><?php echo get_svg_icon('engine'); ?> <?php esc_html_e( 'Engine Capacity', 'bricks-child' ); ?><span class="required">*</span></label>
                                         <?php
                                         $engine_options = array();
                                         for ($capacity = 0.4; $capacity <= 12.0; $capacity += 0.1) {
@@ -343,7 +343,7 @@ get_header(); ?>
                                         ?>
                                     </div>
                                     <div class="form-third">
-                                        <label><?php echo get_svg_icon('gas-pump'); ?> <?php esc_html_e( 'Fuel Type', 'bricks-child' ); ?></label>
+                                        <label><?php echo get_svg_icon('gas-pump'); ?> <?php esc_html_e( 'Fuel Type', 'bricks-child' ); ?><span class="required">*</span></label>
                                         <?php
                                         car_filter_render_dropdown(array(
                                             'id'          => 'add-listing-fuel-type',
@@ -369,7 +369,7 @@ get_header(); ?>
                                         ?>
                                     </div>
                                     <div class="form-third">
-                                        <label><?php echo get_svg_icon('car-chassis'); ?> <?php esc_html_e( 'Transmission', 'bricks-child' ); ?></label>
+                                        <label><?php echo get_svg_icon('car-chassis'); ?> <?php esc_html_e( 'Transmission', 'bricks-child' ); ?><span class="required">*</span></label>
                                         <?php
                                         car_filter_render_dropdown(array(
                                             'id'          => 'add-listing-transmission',
@@ -389,7 +389,7 @@ get_header(); ?>
 
                                 <div class="form-row form-row-halves">
                                     <div class="form-half">
-                                        <label><?php echo get_svg_icon('car-side'); ?> <?php esc_html_e( 'Body Type', 'bricks-child' ); ?></label>
+                                        <label><?php echo get_svg_icon('car-side'); ?> <?php esc_html_e( 'Body Type', 'bricks-child' ); ?><span class="required">*</span></label>
                                         <?php
                                         car_filter_render_dropdown(array(
                                             'id'          => 'add-listing-body-type',
@@ -420,7 +420,7 @@ get_header(); ?>
                                     </div>
 
                                     <div class="form-half">
-                                        <label><?php echo get_svg_icon('paintbrush'); ?> <?php esc_html_e( 'Exterior Color', 'bricks-child' ); ?></label>
+                                        <label><?php echo get_svg_icon('paintbrush'); ?> <?php esc_html_e( 'Exterior Color', 'bricks-child' ); ?><span class="required">*</span></label>
                                         <?php
                                         car_filter_render_dropdown(array(
                                             'id'          => 'add-listing-exterior-color',
@@ -703,7 +703,7 @@ get_header(); ?>
                     </div>
 
                     <div class="form-row">
-                        <button type="submit" class="btn btn-primary-gradient btn-lg btn-disabled" disabled><?php esc_html_e( 'Fill all required fields', 'bricks-child' ); ?></button>
+                        <button type="submit" class="btn btn-primary-gradient btn-lg"><?php esc_html_e( 'Submit Listing', 'bricks-child' ); ?></button>
                     </div>
                 </form>
                 <?php

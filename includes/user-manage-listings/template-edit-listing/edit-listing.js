@@ -19,9 +19,6 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         'price': { type: 'text', label: 'Price' }
     };
 
-    const SUBMIT_TEXT_VALID = 'Update Listing';
-    const SUBMIT_TEXT_INVALID = 'Fill all required fields';
-
     // Initialize Async Upload Manager (ADDED FROM ADD LISTING PAGE)
     let asyncUploadManager = null;
     if (typeof AsyncUploadManager !== 'undefined') {
@@ -163,23 +160,11 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     }
 
     /**
-     * Update submit button state based on form validity
+     * Clear errors for valid fields (called on field change)
+     * Note: Button always stays enabled - validation happens on submit
      */
     function updateSubmitButtonState() {
-        const $submitBtn = $('#edit-car-listing-form button[type="submit"]');
-        const validation = validateAllFields();
-
-        if (validation.isValid) {
-            $submitBtn.prop('disabled', false)
-                .removeClass('btn-disabled')
-                .text(SUBMIT_TEXT_VALID);
-        } else {
-            $submitBtn.prop('disabled', true)
-                .addClass('btn-disabled')
-                .text(SUBMIT_TEXT_INVALID);
-        }
-
-        if (isDevelopment) console.log('[Edit Listing] Form validation:', validation.isValid ? 'VALID' : 'INVALID', validation.errors.length, 'errors');
+        // No-op: button always stays enabled, validation happens on submit click
     }
 
     /**

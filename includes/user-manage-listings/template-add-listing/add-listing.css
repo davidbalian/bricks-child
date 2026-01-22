@@ -44,6 +44,13 @@
   color: #c53030;
 }
 
+/* Required field asterisk */
+.required {
+  color: #ef4444;
+  margin-left: 0.25rem;
+  font-weight: 600;
+}
+
 #file-upload-area {
   background: var(--light-bg);
   border: var(--border);
