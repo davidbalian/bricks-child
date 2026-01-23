@@ -114,6 +114,7 @@ function process_edit_listing_form($data, $car_id) {
             wp_update_post(array(
                 'ID' => $car_id,
                 'post_title' => $updated_year . ' ' . $existing_make . ' ' . $existing_model,
+                'post_status' => 'pending',
             ));
         }
     }
