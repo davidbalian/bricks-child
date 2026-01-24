@@ -33,10 +33,23 @@ function car_single_call_button_shortcode($atts) {
 
     if ($user_object) {
         $author_username = $user_object->user_login;
-        $tel_link_number = preg_replace('/[^0-9+]/', '', $author_username);
-        $tel_link_number = preg_replace('/^(.{3})(.+)/', '$1 $2', $tel_link_number);
-        $tel_link = 'tel:+' . $tel_link_number;
-        $button_display_text = '+' . $tel_link_number;
+        $tel_link_number = $author_username;
+        $tel_link_number_secondary = '';
+        if (function_exists('get_field')) {
+            $tel_link_number_secondary = (string) get_field('secondary_phone', 'user_' . $post_author_id);
+        }
+        if(!empty($tel_link_number_secondary)) {
+            $raw_phone = $tel_link_number_secondary;
+            $display_phone = preg_replace('/[^0-9+]/', '', $tel_link_number_secondary);
+            $display_phone = preg_replace('/^(.{3})(.+)/', '$1 $2', $display_phone);
+        }
+        else {
+            $raw_phone = $tel_link_number;
+            $display_phone = preg_replace('/[^0-9+]/', '', $tel_link_number);
+            $display_phone = preg_replace('/^(.{3})(.+)/', '$1 $2', $display_phone);
+        }
+        $tel_link = 'tel:+' . $raw_phone;
+        $button_display_text = '+' . $display_phone;
         ?>
         <a href="<?php echo esc_attr($tel_link); ?>" 
            class="brx-button car-call-button" 
