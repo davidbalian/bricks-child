@@ -102,6 +102,11 @@ function display_my_account_main($current_user) {
                     <button class="btn btn-primary send-verification-btn">Send Verification Email</button>
                     <button class="btn btn-secondary cancel-email-btn">Cancel</button>
                 </div>
+                <div class="info-row secondary-phone-row">
+                    <span class="label">Secondary Phone Number:</span>
+                    <span class="value"><?php echo esc_html($current_user->secondary_phone); ?></span>
+                    <button class="btn btn-primary edit-secondary-phone-btn">Edit</button>
+                </div>
                 <div class="info-row">
                     <span class="label">Role:</span>
                     <span class="value"><?php 
