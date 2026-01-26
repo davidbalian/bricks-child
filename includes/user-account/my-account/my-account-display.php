@@ -102,10 +102,54 @@ function display_my_account_main($current_user) {
                     <button class="btn btn-primary send-verification-btn">Send Verification Email</button>
                     <button class="btn btn-secondary cancel-email-btn">Cancel</button>
                 </div>
+                <?php
+                // Prepare secondary phone number pieces for display and editing
+                $secondary_phone_country_code = '357';
+                $raw_secondary_phone         = get_user_meta($current_user->ID, 'secondary_phone', true);
+                $secondary_phone_digits      = preg_replace('/\D+/', '', (string) $raw_secondary_phone);
+                $secondary_phone_local       = '';
+
+                if ($secondary_phone_digits !== '') {
+                    if (strpos($secondary_phone_digits, $secondary_phone_country_code) === 0) {
+                        $secondary_phone_local = substr($secondary_phone_digits, strlen($secondary_phone_country_code));
+                    } else {
+                        $secondary_phone_local = $secondary_phone_digits;
+                    }
+                }
+
+                $secondary_phone_display = '';
+                if ($secondary_phone_digits !== '') {
+                    $secondary_phone_display = '+' . $secondary_phone_country_code . ' ' . $secondary_phone_local;
+                }
+                ?>
                 <div class="info-row secondary-phone-row">
                     <span class="label">Secondary Phone Number:</span>
-                    <span class="value"><?php echo esc_html($current_user->secondary_phone); ?></span>
+                    <span
+                        class="value"
+                        id="display-secondary-phone"
+                        data-full-phone="<?php echo esc_attr($secondary_phone_digits); ?>"
+                    >
+                        <?php echo esc_html($secondary_phone_display); ?>
+                    </span>
                     <button class="btn btn-primary edit-secondary-phone-btn">Edit</button>
+                </div>
+                <div class="info-row secondary-phone-edit-row" style="display: none;">
+                    <span class="label">Secondary Phone Number:</span>
+                    <div class="secondary-phone-input-wrapper">
+                        <span class="country-code-prefix">+<?php echo esc_html($secondary_phone_country_code); ?></span>
+                        <input
+                            type="tel"
+                            id="secondary-phone-local"
+                            class="secondary-phone-input"
+                            value="<?php echo esc_attr($secondary_phone_local); ?>"
+                            placeholder="Enter phone without country code"
+                        >
+                    </div>
+                </div>
+                <div class="info-row secondary-phone-edit-row" style="display: none;">
+                    <span class="label"></span>
+                    <button class="btn btn-primary save-secondary-phone-btn">Save Changes</button>
+                    <button class="btn btn-secondary cancel-secondary-phone-btn">Cancel</button>
                 </div>
                 <div class="info-row">
                     <span class="label">Role:</span>

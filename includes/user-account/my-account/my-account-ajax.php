@@ -58,6 +58,47 @@ function handle_update_user_name() {
     wp_send_json_success('Name updated successfully');
 }
 
+// Add AJAX handler for updating secondary phone number
+add_action('wp_ajax_update_secondary_phone', 'handle_update_secondary_phone');
+function handle_update_secondary_phone() {
+    // Verify nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_secondary_phone')) {
+        wp_send_json_error('Invalid nonce');
+        return;
+    }
+
+    // Check if user is logged in
+    if (!is_user_logged_in()) {
+        wp_send_json_error('User not logged in');
+        return;
+    }
+
+    $user_id = get_current_user_id();
+
+    // Get and sanitize input
+    $secondary_phone_raw = isset($_POST['secondary_phone']) ? sanitize_text_field($_POST['secondary_phone']) : '';
+
+    // Keep only digits
+    $secondary_phone_digits = preg_replace('/\D+/', '', $secondary_phone_raw);
+
+    if ($secondary_phone_digits === '') {
+        wp_send_json_error('Please provide a valid phone number');
+        return;
+    }
+
+    // Ensure the phone is saved with the country code (without the +)
+    $country_code = '357';
+    if (strpos($secondary_phone_digits, $country_code) !== 0) {
+        $secondary_phone_digits = $country_code . $secondary_phone_digits;
+    }
+
+    update_user_meta($user_id, 'secondary_phone', $secondary_phone_digits);
+
+    wp_send_json_success(array(
+        'secondary_phone' => $secondary_phone_digits,
+    ));
+}
+
 // Add AJAX handler for initiating password reset
 add_action('wp_ajax_initiate_password_reset', 'handle_initiate_password_reset');
 function handle_initiate_password_reset() {
