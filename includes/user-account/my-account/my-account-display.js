@@ -169,6 +169,10 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         saveSecondaryPhoneBtn.addEventListener('click', function (e) {
             e.preventDefault();
 
+            if(secondaryPhoneInput.length != 8){
+                alert('Please enter a valid phone number');
+            }
+            
             var localPart = (secondaryPhoneInput.value || '').replace(/\D+/g, '');
 
             if (!localPart) {

@@ -27,6 +27,27 @@ function my_account_get_logo_manager(): UserLogoManager {
     return $instance;
 }
 
+/**
+ * Determine if a user can manage dealership-specific profile fields
+ * such as secondary phone number and account logo.
+ *
+ * Only users with the "dealership" or "administrator" roles are allowed.
+ *
+ * @param int $user_id
+ * @return bool
+ */
+function my_account_user_can_manage_dealership_fields($user_id) {
+    $user = get_user_by('ID', $user_id);
+
+    if (!$user instanceof WP_User) {
+        return false;
+    }
+
+    $roles = (array) $user->roles;
+
+    return in_array('dealership', $roles, true) || in_array('administrator', $roles, true);
+}
+
 // Add AJAX handler for updating user name
 add_action('wp_ajax_update_user_name', 'handle_update_user_name');
 function handle_update_user_name() {
@@ -74,6 +95,11 @@ function handle_update_secondary_phone() {
     }
 
     $user_id = get_current_user_id();
+
+    if (!my_account_user_can_manage_dealership_fields($user_id)) {
+        wp_send_json_error('Not allowed');
+        return;
+    }
 
     // Get and sanitize input
     $secondary_phone_raw = isset($_POST['secondary_phone']) ? sanitize_text_field($_POST['secondary_phone']) : '';
@@ -452,6 +478,11 @@ function handle_upload_account_logo() {
 
     $user_id = get_current_user_id();
 
+    if (!my_account_user_can_manage_dealership_fields($user_id)) {
+        wp_send_json_error('Not allowed');
+        return;
+    }
+
     // 2 MB max size by default.
     $max_file_size = apply_filters('my_account_logo_max_file_size', 2 * 1024 * 1024);
 
@@ -493,6 +524,11 @@ function handle_remove_account_logo() {
     }
 
     $user_id = get_current_user_id();
+
+    if (!my_account_user_can_manage_dealership_fields($user_id)) {
+        wp_send_json_error('Not allowed');
+        return;
+    }
     $manager = my_account_get_logo_manager();
 
     $removed = $manager->removeUserLogo($user_id);

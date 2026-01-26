@@ -58,6 +58,10 @@ function display_my_account_main($current_user) {
 
             <div class="account-section">
                 <h3>Personal Details</h3>
+                <?php
+                $user_roles = (array) $current_user->roles;
+                $is_dealership_or_admin = in_array('dealership', $user_roles, true) || in_array('administrator', $user_roles, true);
+                ?>
                 <div class="info-row name-row">
                     <span class="label">Name:</span>
                     <span class="value" id="display-name"><?php echo esc_html(trim($current_user->first_name . ' ' . $current_user->last_name)); ?></span>
@@ -102,59 +106,60 @@ function display_my_account_main($current_user) {
                     <button class="btn btn-primary send-verification-btn">Send Verification Email</button>
                     <button class="btn btn-secondary cancel-email-btn">Cancel</button>
                 </div>
-                <?php
-                // Prepare secondary phone number pieces for display and editing
-                $secondary_phone_country_code = '357';
-                $raw_secondary_phone         = get_user_meta($current_user->ID, 'secondary_phone', true);
-                $secondary_phone_digits      = preg_replace('/\D+/', '', (string) $raw_secondary_phone);
-                $secondary_phone_local       = '';
+                <?php if ($is_dealership_or_admin) : ?>
+                    <?php
+                    // Prepare secondary phone number pieces for display and editing
+                    $secondary_phone_country_code = '357';
+                    $raw_secondary_phone         = get_user_meta($current_user->ID, 'secondary_phone', true);
+                    $secondary_phone_digits      = preg_replace('/\D+/', '', (string) $raw_secondary_phone);
+                    $secondary_phone_local       = '';
 
-                if ($secondary_phone_digits !== '') {
-                    if (strpos($secondary_phone_digits, $secondary_phone_country_code) === 0) {
-                        $secondary_phone_local = substr($secondary_phone_digits, strlen($secondary_phone_country_code));
-                    } else {
-                        $secondary_phone_local = $secondary_phone_digits;
+                    if ($secondary_phone_digits !== '') {
+                        if (strpos($secondary_phone_digits, $secondary_phone_country_code) === 0) {
+                            $secondary_phone_local = substr($secondary_phone_digits, strlen($secondary_phone_country_code));
+                        } else {
+                            $secondary_phone_local = $secondary_phone_digits;
+                        }
                     }
-                }
 
-                $secondary_phone_display = '';
-                if ($secondary_phone_digits !== '') {
-                    $secondary_phone_display = '+' . $secondary_phone_country_code . ' ' . $secondary_phone_local;
-                }
-                ?>
-                <div class="info-row secondary-phone-row">
-                    <span class="label">Secondary Phone Number:</span>
-                    <span
-                        class="value"
-                        id="display-secondary-phone"
-                        data-full-phone="<?php echo esc_attr($secondary_phone_digits); ?>"
-                    >
-                        <?php echo esc_html($secondary_phone_display); ?>
-                    </span>
-                    <button class="btn btn-primary edit-secondary-phone-btn">Edit</button>
-                </div>
-                <div class="info-row secondary-phone-edit-row" style="display: none;">
-                    <span class="label">Secondary Phone Number:</span>
-                    <div class="secondary-phone-input-wrapper">
-                        <span class="country-code-prefix">+<?php echo esc_html($secondary_phone_country_code); ?></span>
-                        <input
-                            type="tel"
-                            id="secondary-phone-local"
-                            class="secondary-phone-input"
-                            value="<?php echo esc_attr($secondary_phone_local); ?>"
-                            placeholder="Enter phone without country code"
+                    $secondary_phone_display = '';
+                    if ($secondary_phone_digits !== '') {
+                        $secondary_phone_display = '+' . $secondary_phone_country_code . ' ' . $secondary_phone_local;
+                    }
+                    ?>
+                    <div class="info-row secondary-phone-row">
+                        <span class="label">Secondary Phone Number:</span>
+                        <span
+                            class="value"
+                            id="display-secondary-phone"
+                            data-full-phone="<?php echo esc_attr($secondary_phone_digits); ?>"
                         >
+                            <?php echo esc_html($secondary_phone_display); ?>
+                        </span>
+                        <button class="btn btn-primary edit-secondary-phone-btn">Edit</button>
                     </div>
-                </div>
-                <div class="info-row secondary-phone-edit-row" style="display: none;">
-                    <span class="label"></span>
-                    <button class="btn btn-primary save-secondary-phone-btn">Save Changes</button>
-                    <button class="btn btn-secondary cancel-secondary-phone-btn">Cancel</button>
-                </div>
+                    <div class="info-row secondary-phone-edit-row" style="display: none;">
+                        <span class="label">Secondary Phone Number:</span>
+                        <div class="secondary-phone-input-wrapper">
+                            <span class="country-code-prefix">+<?php echo esc_html($secondary_phone_country_code); ?></span>
+                            <input
+                                type="tel"
+                                id="secondary-phone-local"
+                                class="secondary-phone-input"
+                                value="<?php echo esc_attr($secondary_phone_local); ?>"
+                                placeholder="Enter phone without country code"
+                            >
+                        </div>
+                    </div>
+                    <div class="info-row secondary-phone-edit-row" style="display: none;">
+                        <span class="label"></span>
+                        <button class="btn btn-primary save-secondary-phone-btn">Save Changes</button>
+                        <button class="btn btn-secondary cancel-secondary-phone-btn">Cancel</button>
+                    </div>
+                <?php endif; ?>
                 <div class="info-row">
                     <span class="label">Role:</span>
                     <span class="value"><?php 
-                        $user_roles = $current_user->roles;
                         echo esc_html(implode(', ', $user_roles)); 
                     ?></span>
                 </div>
@@ -168,39 +173,41 @@ function display_my_account_main($current_user) {
             $notification_disabled = ($email_verified !== '1');
             ?>
 
-            <div class="account-section account-logo-section">
-                <h3>Account Logo</h3>
-                <div class="account-logo-wrapper">
-                    <?php
-                    $logo_manager = new UserLogoManager();
-                    $logo_url = $logo_manager->getUserLogoUrl($current_user->ID, 'thumbnail');
-                    ?>
-                    <div class="account-logo-preview">
-                        <?php if (!empty($logo_url)) : ?>
-                            <img src="<?php echo esc_url($logo_url); ?>" alt="Account logo" id="account-logo-image">
-                        <?php else : ?>
-                            <div class="account-logo-placeholder" id="account-logo-placeholder">
-                                <span>No logo uploaded</span>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    <div class="account-logo-actions">
-                        <input type="file" id="account-logo-input" accept="image/*" style="display:none;">
-                        <button type="button" class="btn btn-primary" id="upload-account-logo-btn">
-                            <?php echo !empty($logo_url) ? 'Change Logo' : 'Upload Logo'; ?>
-                        </button>
-                        <?php if (!empty($logo_url)) : ?>
-                            <button type="button" class="btn btn-secondary" id="remove-account-logo-btn">
-                                Remove Logo
+            <?php if ($is_dealership_or_admin) : ?>
+                <div class="account-section account-logo-section">
+                    <h3>Account Logo</h3>
+                    <div class="account-logo-wrapper">
+                        <?php
+                        $logo_manager = new UserLogoManager();
+                        $logo_url = $logo_manager->getUserLogoUrl($current_user->ID, 'thumbnail');
+                        ?>
+                        <div class="account-logo-preview">
+                            <?php if (!empty($logo_url)) : ?>
+                                <img src="<?php echo esc_url($logo_url); ?>" alt="Account logo" id="account-logo-image">
+                            <?php else : ?>
+                                <div class="account-logo-placeholder" id="account-logo-placeholder">
+                                    <span>No logo uploaded</span>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="account-logo-actions">
+                            <input type="file" id="account-logo-input" accept="image/*" style="display:none;">
+                            <button type="button" class="btn btn-primary" id="upload-account-logo-btn">
+                                <?php echo !empty($logo_url) ? 'Change Logo' : 'Upload Logo'; ?>
                             </button>
-                        <?php endif; ?>
-                        <p class="account-logo-help-text">
-                            Recommended: square image, max 2 MB.
-                        </p>
-                        <div id="account-logo-feedback" class="account-logo-feedback" aria-live="polite"></div>
+                            <?php if (!empty($logo_url)) : ?>
+                                <button type="button" class="btn btn-secondary" id="remove-account-logo-btn">
+                                    Remove Logo
+                                </button>
+                            <?php endif; ?>
+                            <p class="account-logo-help-text">
+                                Recommended: square image, max 2 MB.
+                            </p>
+                            <div id="account-logo-feedback" class="account-logo-feedback" aria-live="polite"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <?php endif; ?>
 
             <div class="account-section notification-preferences-section">
                 <h3>Email Notifications</h3>
