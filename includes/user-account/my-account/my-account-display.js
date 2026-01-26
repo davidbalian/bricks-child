@@ -169,14 +169,11 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         saveSecondaryPhoneBtn.addEventListener('click', function (e) {
             e.preventDefault();
 
-            if(secondaryPhoneInput.length != 8){
-                alert('Please enter a valid phone number');
-            }
-            
             var localPart = (secondaryPhoneInput.value || '').replace(/\D+/g, '');
 
-            if (!localPart) {
-                alert('Please enter a phone number');
+            // Require exactly 8 digits for the local part on the client side
+            if (localPart.length !== 8) {
+                alert('Please enter a valid 8-digit phone number (without country code).');
                 return;
             }
 

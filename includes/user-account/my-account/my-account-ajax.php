@@ -112,10 +112,10 @@ function handle_update_secondary_phone() {
         return;
     }
 
-    // Ensure the phone is saved with the country code (without the +)
-    $country_code = '357';
-    if (strpos($secondary_phone_digits, $country_code) !== 0) {
-        $secondary_phone_digits = $country_code . $secondary_phone_digits;
+    // Match exactly what the JS sends: country code (357) + 8 local digits
+    if (!preg_match('/^357\d{8}$/', $secondary_phone_digits)) {
+        wp_send_json_error('Please enter a valid 8-digit phone number (without country code).');
+        return;
     }
 
     update_user_meta($user_id, 'secondary_phone', $secondary_phone_digits);
