@@ -27,6 +27,12 @@ function ajax_send_otp() {
         return;
     }
 
+    $ts_token = isset($_POST['turnstile_token']) ? sanitize_text_field($_POST['turnstile_token']) : '';
+    if (!custom_verify_turnstile_token($ts_token)) {
+        wp_send_json_error(['message' => esc_html__('Verification failed. Please try again.', 'astra-child')]);
+        return;
+    }
+
     // *** ADD USER EXISTENCE CHECK HERE ***
     $user_by_phone = get_users(array(
         'meta_key' => 'phone_number',

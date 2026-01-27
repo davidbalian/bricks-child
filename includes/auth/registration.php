@@ -152,3 +152,22 @@ function custom_handle_registration() {
     // Note: Removed the global error handling part, needs integration into the form display
 }
 add_action( 'template_redirect', 'custom_handle_registration' ); // Changed hook to run later 
+
+
+function custom_verify_turnstile_token($token) {
+    if (empty($token)) return false;
+
+    $resp = wp_remote_post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+        'body' => [
+            'secret'   => TURNSTILE_SECRET_KEY,
+            'response' => $token,
+            'remoteip' => $_SERVER['REMOTE_ADDR'] ?? '',
+        ],
+        'timeout' => 10,
+    ]);
+
+    if (is_wp_error($resp)) return false;
+
+    $data = json_decode(wp_remote_retrieve_body($resp), true);
+    return !empty($data['success']);
+}

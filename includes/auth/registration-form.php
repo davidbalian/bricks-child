@@ -1,10 +1,12 @@
-<div style="text-align: center; padding: 40px 20px; max-width: 600px; margin: 0 auto;">
+<!-- <div style="text-align: center; padding: 40px 20px; max-width: 600px; margin: 0 auto;">
     <h2 style="margin-bottom: 20px;">Registration is currently under maintenance.</h2>
     <p style="font-size: 16px; margin-bottom: 10px;">To register, or for other questions, contact:</p>
     <p style="font-size: 20px; font-weight: bold;"><a href="tel:+35797839738">+357 97839738</a></p>
-</div>
+</div> -->
 
-<!--
+<!-- Cloudflare bot protection -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
 <form id="custom-registration-form" method="post">
 
     <div id="registration-messages"></div>
@@ -15,6 +17,10 @@
             <label for="reg_phone_number_display"><?php _e( 'Phone Number', 'bricks-child' ); ?>:</label>
             <input type="tel" name="reg_phone_number_display" id="reg_phone_number_display" required>
         </p>
+
+        <div class="cf-turnstile" data-sitekey="<?php echo esc_attr(TURNSTILE_SITE_KEY); ?>"></div>
+
+
         <p class="button-stack">
             <button type="button" id="send-otp-button" class="btn btn-primary"><?php esc_html_e( 'Send Verification Code', 'bricks-child' ); ?></button>
         </p>
@@ -63,9 +69,9 @@
         </div>
 
 </form>
--->
 
-<!--
+
+
 <script type="text/javascript">
     jQuery(document).ready(function($) {
         let verifiedPhoneNumber = '';
@@ -120,12 +126,24 @@
                  return;
             }
 
+            const tsToken =
+                document.querySelector('input[name="cf-turnstile-response"]')?.value || '';
+
+            if (!tsToken) {
+                showMessage('Please complete the verification and try again.', true);
+                button.prop('disabled', false).text('Send Verification Code');
+                if (window.turnstile) turnstile.reset(); // refresh token
+                return;
+            }
+
+
             $.ajax({
                 url: '<?php echo admin_url("admin-ajax.php"); ?>',
                 type: 'POST',
                 data: {
                     action: 'send_otp',
                     phone: fullPhoneNumber,
+                    turnstile_token: tsToken,
                     nonce: $('#custom_registration_nonce').val()
                 },
                 success: function(response) {
@@ -136,11 +154,13 @@
                         stepOtp.show();
                     } else {
                         showMessage(response.data.message, true);
+                        if (window.turnstile) turnstile.reset();
                         button.prop('disabled', false).text('Send Verification Code');
                     }
                 },
                 error: function() {
                     showMessage('An error occurred sending the code. Please try again.', true);
+                    if (window.turnstile) turnstile.reset();
                     button.prop('disabled', false).text('Send Verification Code');
                 }
             });
@@ -319,4 +339,3 @@
 
     });
 </script>
--->
