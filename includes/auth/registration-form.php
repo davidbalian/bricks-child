@@ -130,7 +130,7 @@
             // const tsToken =
             //     document.querySelector('input[name="cf-turnstile-response"]')?.value || '';
 
-            const tsToken = ''; // <-- force fail on purpose for testing
+            const tsToken = 'fake'; // <-- force fail on purpose for testing
 
 
             if (!tsToken) {
