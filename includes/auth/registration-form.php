@@ -130,6 +130,9 @@
             // const tsToken =
             //     document.querySelector('input[name="cf-turnstile-response"]')?.value || '';
 
+            const tsToken = ''; // <-- force fail on purpose for testing
+
+
             if (!tsToken) {
                 showMessage('Please complete the verification and try again.', true);
                 button.prop('disabled', false).text('Send Verification Code');
