@@ -126,11 +126,8 @@
                  return;
             }
 
-            //JUST FOR TEST UNCOMMENT LATER
-            // const tsToken =
-            //     document.querySelector('input[name="cf-turnstile-response"]')?.value || '';
-
-            const tsToken = 'fake'; // <-- force fail on purpose for testing
+            const tsToken =
+                document.querySelector('input[name="cf-turnstile-response"]')?.value || '';
 
 
             if (!tsToken) {
