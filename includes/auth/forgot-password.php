@@ -12,6 +12,10 @@ if (!defined('ABSPATH')) {
 }
 ?>
 
+<!-- Cloudflare Turnstile -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+
 <div class="forgot-password-container">
     <div class="forgot-password-header">
         <h1>Reset Your Password</h1>
@@ -29,6 +33,7 @@ if (!defined('ABSPATH')) {
                 <label for="forgot-phone-number-display">Phone Number:</label>
                 <input type="tel" name="forgot_phone_number_display" id="forgot-phone-number-display" required placeholder="Enter your phone number">
             </div>
+            <div class="cf-turnstile" data-sitekey="<?php echo esc_attr(TURNSTILE_SITE_KEY); ?>"></div>
             <div class="form-actions">
                 <button type="button" id="send-forgot-otp-button" class="btn btn-primary">Send Verification Code</button>
                 <a href="<?php echo wp_login_url(); ?>" class="btn btn-secondary">Back to Login</a>

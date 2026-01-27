@@ -30,6 +30,12 @@ function handle_send_forgot_password_otp() {
         wp_send_json_error('Access denied: Already logged in');
         return;
     }
+
+    $ts_token = isset($_POST['turnstile_token']) ? sanitize_text_field($_POST['turnstile_token']) : '';
+    if (!custom_verify_turnstile_token($ts_token)) {
+        wp_send_json_error(['message' => esc_html__('Verification failed. Please try again.', 'astra-child')]);
+        return;
+    }
     
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'send_forgot_password_otp_nonce')) {
@@ -56,6 +62,7 @@ function handle_send_forgot_password_otp() {
         wp_send_json_error('No account found with this phone number');
         return;
     }
+    
 
     $user = $users[0];
     $user_id = $user->ID;

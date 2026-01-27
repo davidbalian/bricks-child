@@ -123,13 +123,25 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       return;
     }
 
-            if (isDevelopment) console.log("Sending AJAX request to send OTP");
+    const tsToken =
+      document.querySelector('input[name="cf-turnstile-response"]')?.value || '';
+
+    if (!tsToken) {
+      showMessage("Please complete the verification and try again.", true);
+      button.prop("disabled", false).text("Send Verification Code");
+      if (window.turnstile) turnstile.reset();
+      return;
+    }
+
+
+    if (isDevelopment) console.log("Sending AJAX request to send OTP");
     $.ajax({
       url: ForgotPasswordAjax.ajax_url,
       type: "POST",
       data: {
         action: "send_forgot_password_otp",
         phone: fullPhoneNumber,
+        turnstile_token: tsToken,
         nonce: ForgotPasswordAjax.send_otp_nonce,
       },
       success: function (response) {
@@ -140,11 +152,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
           hideAllSteps();
           stepOtp.show();
         } else {
-                      if (isDevelopment) console.error("Send OTP failed:", response.data.message);
+          if (isDevelopment) console.error("Send OTP failed:", response.data.message);
           showMessage(
             response.data.message || "Failed to send verification code.",
             true
           );
+          if (window.turnstile) turnstile.reset();
           button.prop("disabled", false).text("Send Verification Code");
         }
       },
@@ -155,6 +168,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
           response: jqXHR.responseText,
         });
         showMessage("An error occurred. Please try again.", true);
+        if (window.turnstile) turnstile.reset();
         button.prop("disabled", false).text("Send Verification Code");
       },
     });
