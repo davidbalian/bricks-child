@@ -126,8 +126,9 @@
                  return;
             }
 
-            const tsToken =
-                document.querySelector('input[name="cf-turnstile-response"]')?.value || '';
+            //JUST FOR TEST UNCOMMENT LATER
+            // const tsToken =
+            //     document.querySelector('input[name="cf-turnstile-response"]')?.value || '';
 
             if (!tsToken) {
                 showMessage('Please complete the verification and try again.', true);
