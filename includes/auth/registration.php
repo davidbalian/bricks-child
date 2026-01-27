@@ -155,7 +155,9 @@ add_action( 'template_redirect', 'custom_handle_registration' ); // Changed hook
 
 
 function custom_verify_turnstile_token($token) {
-    if (empty($token)) return false;
+    if (empty($token) || !defined('TURNSTILE_SECRET_KEY') || empty(TURNSTILE_SECRET_KEY)) {
+        return false;
+    }
 
     $resp = wp_remote_post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
         'body' => [

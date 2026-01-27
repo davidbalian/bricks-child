@@ -210,6 +210,7 @@
         });
 
         $('#change-phone-button').on('click', function() {
+            if (window.turnstile) turnstile.reset();
             messagesDiv.hide();
             stepOtp.hide();
             stepPhone.show();

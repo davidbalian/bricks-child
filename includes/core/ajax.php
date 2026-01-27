@@ -20,6 +20,12 @@ function ajax_send_otp() {
     // Verify AJAX nonce (consider adding this for security if not already done)
     // check_ajax_referer( 'your_nonce_action', 'nonce' );
 
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'custom_registration_nonce')) {
+        wp_send_json_error(['message' => esc_html__('Security check failed.', 'astra-child')]);
+        return;
+    }
+    
+
     $phone = isset($_POST['phone']) ? sanitize_text_field($_POST['phone']) : '';
 
     if (empty($phone)) {
