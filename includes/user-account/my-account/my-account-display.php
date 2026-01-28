@@ -123,7 +123,9 @@ function display_my_account_main($current_user) {
                     }
 
                     $secondary_phone_display = '';
-                    if ($secondary_phone_digits !== '') {
+                    $has_secondary_phone     = ($secondary_phone_digits !== '');
+
+                    if ($has_secondary_phone) {
                         $secondary_phone_display = '+' . $secondary_phone_country_code . ' ' . $secondary_phone_local;
                     }
                     ?>
@@ -136,7 +138,9 @@ function display_my_account_main($current_user) {
                         >
                             <?php echo esc_html($secondary_phone_display); ?>
                         </span>
-                        <button class="btn btn-primary edit-secondary-phone-btn">Edit</button>
+                        <button class="btn btn-primary edit-secondary-phone-btn">
+                            <?php echo $has_secondary_phone ? 'Edit' : 'Add'; ?>
+                        </button>
                     </div>
                     <div class="info-row secondary-phone-edit-row" style="display: none;">
                         <span class="label">Secondary Phone Number:</span>
