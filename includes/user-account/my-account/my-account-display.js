@@ -208,6 +208,11 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                         originalSecondaryPhone = newFullPhone;
                         originalSecondaryPhoneLocal = localPart;
 
+                        // Once a valid secondary phone is saved, the action becomes "Edit"
+                        if (editSecondaryPhoneBtn) {
+                            editSecondaryPhoneBtn.textContent = 'Edit';
+                        }
+
                         secondaryPhoneRow.style.display = 'flex';
                         secondaryPhoneEditRows.forEach(function (row) {
                             row.style.display = 'none';
