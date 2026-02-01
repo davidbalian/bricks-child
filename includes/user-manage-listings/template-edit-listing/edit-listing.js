@@ -54,34 +54,54 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     let accumulatedFilesList = []; // For newly added files
 
     // Keep engine capacity behavior aligned with add listing (lock for electric)
-    const $fuelType = $('#fuel_type');
-    const $engineCapacity = $('#engine_capacity');
+    const $fuelType = $('#edit-listing-fuel-type');
+    const $engineCapacitySelect = $('#edit-listing-engine-capacity');
+    const $engineCapacityDropdown = $('#edit-listing-engine-capacity-wrapper');
+    const $engineCapacityButton = $engineCapacityDropdown.find('.car-filter-dropdown-button');
+    const $engineCapacityOptions = $engineCapacityDropdown.find('.car-filter-dropdown-options');
 
     function handleElectricFuelType() {
-        if (!$fuelType.length || !$engineCapacity.length) return;
+        if (!$fuelType.length || !$engineCapacitySelect.length || !$engineCapacityDropdown.length) return;
 
         const selectedFuelType = $fuelType.val();
 
         if (selectedFuelType === 'Electric') {
-            if ($engineCapacity.find('option[value="0.0"]').length === 0) {
-                $engineCapacity
+            // Add 0.0 option if missing
+            if ($engineCapacitySelect.find('option[value="0.0"]').length === 0) {
+                $engineCapacitySelect
                     .find('option[value=""]')
-                    .after('<option value="0.0">0.0</option>');
+                    .after('<option value="0.0">0.0L</option>');
+                $engineCapacityOptions
+                    .find('.car-filter-dropdown-option[data-value=""]')
+                    .after('<button type="button" class="car-filter-dropdown-option" role="option" data-value="0.0">0.0L</button>');
             }
-            $engineCapacity.val('0.0');
-            $engineCapacity.prop('disabled', true);
-            $engineCapacity.addClass('electric-locked');
+
+            // Select 0.0 and update UI
+            $engineCapacitySelect.val('0.0');
+            $engineCapacityDropdown.find('.car-filter-dropdown-option').removeClass('selected');
+            $engineCapacityDropdown.find('.car-filter-dropdown-option[data-value="0.0"]').addClass('selected');
+            $engineCapacityButton.find('.car-filter-dropdown-text').removeClass('placeholder').text('0.0L');
+
+            // Disable dropdown interactions
+            $engineCapacityButton.prop('disabled', true);
+            $engineCapacityDropdown.addClass('car-filter-dropdown-disabled electric-locked');
 
             // Clear any validation error since field is now auto-filled
             clearFieldError('edit-listing-engine-capacity');
         } else {
-            $engineCapacity.prop('disabled', false);
-            $engineCapacity.removeClass('electric-locked');
+            $engineCapacityButton.prop('disabled', false);
+            $engineCapacityDropdown.removeClass('car-filter-dropdown-disabled electric-locked');
 
-            if ($engineCapacity.val() === '0.0') {
-                $engineCapacity.val('');
+            if ($engineCapacitySelect.val() === '0.0') {
+                $engineCapacitySelect.val('');
+                $engineCapacityDropdown.find('.car-filter-dropdown-option').removeClass('selected');
+                $engineCapacityDropdown.find('.car-filter-dropdown-option[data-value=""]').addClass('selected');
+                $engineCapacityButton.find('.car-filter-dropdown-text').addClass('placeholder').text('Select Engine Capacity');
             }
-            $engineCapacity.find('option[value="0.0"]').remove();
+
+            // Remove electric-only option
+            $engineCapacitySelect.find('option[value="0.0"]').remove();
+            $engineCapacityDropdown.find('.car-filter-dropdown-option[data-value="0.0"]').remove();
         }
     }
 
@@ -973,8 +993,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         }).appendTo(this);
 
         // Ensure engine capacity value submits even when locked for electric
-        if ($engineCapacity.length && $engineCapacity.prop('disabled')) {
-            $engineCapacity.prop('disabled', false);
+        if ($engineCapacitySelect.length && $engineCapacitySelect.prop('disabled')) {
+            $engineCapacitySelect.prop('disabled', false);
         }
         
         // Disable the original inputs
