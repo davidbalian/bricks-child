@@ -764,11 +764,17 @@ function store_car_publication_date($new_status, $old_status, $post) {
         return;
     }
 
-    // Check if the post is being published
+    // Check if the post is being published for the first time
     if ($new_status === 'publish' && $old_status !== 'publish') {
-        // Store the current time as the publication date
-        $publication_date = current_time('mysql');
-        update_post_meta($post->ID, 'publication_date', $publication_date);
+        $existing_publication_date = get_post_meta($post->ID, 'publication_date', true);
+
+        // Only set the publication date if it has never been set.
+        // Refreshes have their own logic and should remain the only path
+        // that deliberately bumps the displayed "posted" date.
+        if (empty($existing_publication_date)) {
+            $publication_date = current_time('mysql');
+            update_post_meta($post->ID, 'publication_date', $publication_date);
+        }
         
         // Debug log
         if (WP_DEBUG === true) {
