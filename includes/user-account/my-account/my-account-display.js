@@ -118,6 +118,124 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         });
     });
 
+    // Secondary phone editing functionality
+    (function () {
+        var secondaryPhoneDisplay = document.getElementById('display-secondary-phone');
+        var secondaryPhoneRow = document.querySelector('.secondary-phone-row');
+        var secondaryPhoneEditRows = document.querySelectorAll('.secondary-phone-edit-row');
+        var secondaryPhoneInput = document.getElementById('secondary-phone-local');
+        var editSecondaryPhoneBtn = document.querySelector('.edit-secondary-phone-btn');
+        var saveSecondaryPhoneBtn = document.querySelector('.save-secondary-phone-btn');
+        var cancelSecondaryPhoneBtn = document.querySelector('.cancel-secondary-phone-btn');
+        var COUNTRY_CODE = '357';
+
+        if (!secondaryPhoneDisplay || !secondaryPhoneRow || !secondaryPhoneInput || !editSecondaryPhoneBtn || !saveSecondaryPhoneBtn || !cancelSecondaryPhoneBtn) {
+            return;
+        }
+
+        var originalSecondaryPhone = (secondaryPhoneDisplay.dataset.fullPhone || '').trim();
+        var originalSecondaryPhoneLocal = originalSecondaryPhone;
+
+        if (originalSecondaryPhone && originalSecondaryPhone.indexOf(COUNTRY_CODE) === 0) {
+            originalSecondaryPhoneLocal = originalSecondaryPhone.slice(COUNTRY_CODE.length);
+        }
+
+        // Initialize input with the local part
+        secondaryPhoneInput.value = originalSecondaryPhoneLocal;
+
+        editSecondaryPhoneBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            secondaryPhoneRow.style.display = 'none';
+            secondaryPhoneEditRows.forEach(function (row) {
+                row.style.display = 'flex';
+            });
+
+            secondaryPhoneInput.focus();
+        });
+
+        cancelSecondaryPhoneBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            // Restore original value
+            secondaryPhoneInput.value = originalSecondaryPhoneLocal;
+
+            secondaryPhoneRow.style.display = 'flex';
+            secondaryPhoneEditRows.forEach(function (row) {
+                row.style.display = 'none';
+            });
+        });
+
+        saveSecondaryPhoneBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            var localPart = (secondaryPhoneInput.value || '').replace(/\D+/g, '');
+
+            // Require exactly 8 digits for the local part on the client side
+            if (localPart.length !== 8) {
+                alert('Please enter a valid 8-digit phone number (without country code).');
+                return;
+            }
+
+            var newFullPhone = COUNTRY_CODE + localPart;
+
+            // If nothing changed, just hide the edit UI without AJAX
+            if (newFullPhone === originalSecondaryPhone) {
+                secondaryPhoneRow.style.display = 'flex';
+                secondaryPhoneEditRows.forEach(function (row) {
+                    row.style.display = 'none';
+                });
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append('action', 'update_secondary_phone');
+            formData.append('secondary_phone', newFullPhone);
+            formData.append('nonce', MyAccountAjax.update_secondary_phone_nonce);
+
+            fetch(MyAccountAjax.ajax_url, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            })
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    if (data && data.success) {
+                        // Update the display value and internal state
+                        var displayText = '+' + COUNTRY_CODE + ' ' + localPart;
+                        secondaryPhoneDisplay.textContent = displayText;
+                        secondaryPhoneDisplay.dataset.fullPhone = newFullPhone;
+                        originalSecondaryPhone = newFullPhone;
+                        originalSecondaryPhoneLocal = localPart;
+
+                        // Once a valid secondary phone is saved, the action becomes "Edit"
+                        if (editSecondaryPhoneBtn) {
+                            editSecondaryPhoneBtn.textContent = 'Edit';
+                        }
+
+                        secondaryPhoneRow.style.display = 'flex';
+                        secondaryPhoneEditRows.forEach(function (row) {
+                            row.style.display = 'none';
+                        });
+                    } else {
+                        var errorMsg = (data && data.data) ? data.data : 'Error updating secondary phone number. Please try again.';
+                        alert(errorMsg);
+                    }
+                })
+                .catch(function () {
+                    alert('Error updating secondary phone number. Please try again.');
+                });
+        });
+
+        // Handle Enter key for secondary phone input
+        secondaryPhoneInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                saveSecondaryPhoneBtn.click();
+            }
+        });
+    })();
+
     // Password reset functionality
     document.querySelector('.reset-password-btn').addEventListener('click', function(e) {
         e.preventDefault();

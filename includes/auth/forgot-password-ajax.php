@@ -30,7 +30,7 @@ function handle_send_forgot_password_otp() {
         wp_send_json_error('Access denied: Already logged in');
         return;
     }
-    
+
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'send_forgot_password_otp_nonce')) {
         wp_send_json_error('Invalid security token');
@@ -42,6 +42,36 @@ function handle_send_forgot_password_otp() {
     if (empty($phone)) {
         wp_send_json_error('Phone number is required');
         return;
+    }
+
+    // Only allow Cyprus phone numbers (E.164 +357... or 357...) to reach Twilio.
+    $normalized_phone = preg_replace('/[\s\-]/', '', $phone);
+    if (strpos($normalized_phone, '+357') !== 0 && strpos($normalized_phone, '357') !== 0) {
+        wp_send_json_error('Only Cypriot (+357) phone numbers are supported for verification');
+        return;
+    }
+
+    $ts_token = isset($_POST['turnstile_token']) ? sanitize_text_field($_POST['turnstile_token']) : '';
+    if (!custom_verify_turnstile_token($ts_token)) {
+        wp_send_json_error(['message' => esc_html__('Verification failed. Please try again.', 'astra-child')]);
+        return;
+    }
+
+    // Basic rate limiting to protect Twilio from abuse on forgot-password as well.
+    $client_ip = function_exists('get_client_ip_for_otp_rate_limit')
+        ? get_client_ip_for_otp_rate_limit()
+        : ( $_SERVER['REMOTE_ADDR'] ?? 'unknown' );
+
+    // Example limits (tune as needed):
+    // - max 5 OTP sends per IP per 10 minutes
+    // - max 3 OTP sends per phone number per hour
+    if (function_exists('has_exceeded_otp_rate_limit')) {
+        if (has_exceeded_otp_rate_limit('forgot_ip', $client_ip, 5, 10 * 60)
+            || has_exceeded_otp_rate_limit('forgot_phone', $normalized_phone, 3, 60 * 60)
+        ) {
+            wp_send_json_error(array('message' => esc_html__('Too many verification attempts. Please try again later.', 'astra-child')));
+            return;
+        }
     }
 
     // Find user by phone number
@@ -56,6 +86,7 @@ function handle_send_forgot_password_otp() {
         wp_send_json_error('No account found with this phone number');
         return;
     }
+    
 
     $user = $users[0];
     $user_id = $user->ID;
@@ -69,6 +100,12 @@ function handle_send_forgot_password_otp() {
         error_log('Twilio Verify configuration is missing for forgot password.');
         wp_send_json_error('SMS service configuration error. Please contact support.');
         return;
+    }
+
+    if (function_exists('increment_otp_rate_counter')) {
+        // Increment counters just before contacting Twilio so even failed attempts are limited.
+        increment_otp_rate_counter('forgot_ip', $client_ip, 10 * 60);
+        increment_otp_rate_counter('forgot_phone', $normalized_phone, 60 * 60);
     }
 
     $twilio = new \Twilio\Rest\Client($twilio_sid, $twilio_token);

@@ -69,25 +69,42 @@ function custom_handle_registration() {
             wp_die( esc_html__( 'Security check failed.', 'bricks-child' ), esc_html__( 'Error', 'bricks-child' ), array( 'response' => 403 ) );
         }
 
-        $errors = new WP_Error();
+		$errors = new WP_Error();
 
-        // Get data from the final form submission
-        $first_name      = sanitize_text_field( $_POST['reg_first_name'] );
-        $last_name       = sanitize_text_field( $_POST['reg_last_name'] );
-        $phone           = sanitize_text_field( $_POST['reg_phone'] ); // Assumed verified
-        $password        = $_POST['reg_password'];
-        $password_confirm = isset( $_POST['reg_password_confirm'] ) ? $_POST['reg_password_confirm'] : ''; // Get confirm password
+		// Get data from the final form submission
+		$first_name      = sanitize_text_field( $_POST['reg_first_name'] );
+		$last_name       = sanitize_text_field( $_POST['reg_last_name'] );
+		$phone           = sanitize_text_field( $_POST['reg_phone'] ); // Should already be verified via OTP
+		$password        = $_POST['reg_password'];
+		$password_confirm = isset( $_POST['reg_password_confirm'] ) ? $_POST['reg_password_confirm'] : ''; // Get confirm password
 
-        // --- Final Validation ---
+		// Ensure this phone has recently passed OTP verification. This prevents bots
+		// from bypassing the JS flow and POSTing directly to this endpoint.
+		if ( empty( $phone ) ) {
+			$errors->add( 'required', esc_html__( 'Phone number is missing.', 'bricks-child' ) );
+		} else {
+			$verification_key  = 'registration_phone_verified_' . md5( $phone );
+			$verification_data = get_transient( $verification_key );
+
+			if ( empty( $verification_data ) || empty( $verification_data['phone'] ) || $verification_data['phone'] !== $phone ) {
+				$errors->add(
+					'phone_not_verified',
+					esc_html__( 'Please verify your phone number before completing registration.', 'bricks-child' )
+				);
+			} else {
+				// One-time use: remove the marker so it cannot be reused for another account.
+				delete_transient( $verification_key );
+			}
+		}
+
+		// --- Final Validation ---
         if ( empty( $first_name ) ) {
             $errors->add( 'required', esc_html__( 'Please enter your first name.', 'bricks-child' ) );
         }
         if ( empty( $last_name ) ) {
             $errors->add( 'required', esc_html__( 'Please enter your last name.', 'bricks-child' ) );
         }
-        if ( empty( $phone ) ) { // Should not happen if flow is correct, but check anyway
-            $errors->add( 'required', esc_html__( 'Phone number is missing.', 'bricks-child' ) );
-        }
+		// Phone emptiness is validated above together with OTP state.
         if ( strlen( $password ) < 8 ) {
             $errors->add( 'password_length', esc_html__( 'Password must be at least 8 characters long.', 'bricks-child' ) );
         }
@@ -152,3 +169,24 @@ function custom_handle_registration() {
     // Note: Removed the global error handling part, needs integration into the form display
 }
 add_action( 'template_redirect', 'custom_handle_registration' ); // Changed hook to run later 
+
+
+function custom_verify_turnstile_token($token) {
+    if (empty($token) || !defined('TURNSTILE_SECRET_KEY') || empty(TURNSTILE_SECRET_KEY)) {
+        return false;
+    }
+
+    $resp = wp_remote_post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+        'body' => [
+            'secret'   => TURNSTILE_SECRET_KEY,
+            'response' => $token,
+            'remoteip' => $_SERVER['REMOTE_ADDR'] ?? '',
+        ],
+        'timeout' => 10,
+    ]);
+
+    if (is_wp_error($resp)) return false;
+
+    $data = json_decode(wp_remote_retrieve_body($resp), true);
+    return !empty($data['success']);
+}

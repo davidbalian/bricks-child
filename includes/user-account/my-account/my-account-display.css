@@ -171,6 +171,40 @@
   margin-left: 10px;
 }
 
+/* Secondary phone editing styles */
+.secondary-phone-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.country-code-prefix {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f8f9fa;
+  font-size: 14px;
+  color: #555;
+  white-space: nowrap;
+}
+
+.secondary-phone-input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.secondary-phone-edit-row .btn {
+  margin-left: 0;
+}
+
+.secondary-phone-edit-row .btn + .btn {
+  margin-left: 10px;
+}
+
 /* logo upload section styling */
 .account-logo-wrapper {
 	display: flex;

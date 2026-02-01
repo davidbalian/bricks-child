@@ -8,6 +8,80 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Lightweight OTP rate limiting helpers to protect Twilio usage.
+ * These are intentionally simple and stateless beyond WordPress transients.
+ */
+function get_client_ip_for_otp_rate_limit() {
+    if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+        return sanitize_text_field( wp_unslash( $_SERVER['HTTP_CLIENT_IP'] ) );
+    }
+
+    if ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+        // Could be a comma-separated list; take the first one.
+        $parts = explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] );
+        return sanitize_text_field( trim( $parts[0] ) );
+    }
+
+    if ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
+        return sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
+    }
+
+    return 'unknown';
+}
+
+/**
+ * Check whether an identifier (IP/phone) has exceeded a simple OTP rate limit.
+ *
+ * @param string $context        Short context label, e.g. 'ip' or 'phone'.
+ * @param string $identifier     Raw identifier value (IP string, phone string).
+ * @param int    $max_attempts   Maximum allowed attempts within the window.
+ * @param int    $window_seconds Window length in seconds.
+ *
+ * @return bool True if the limit is exceeded, false otherwise.
+ */
+function has_exceeded_otp_rate_limit( $context, $identifier, $max_attempts, $window_seconds ) {
+    $key  = 'otp_rate_' . $context . '_' . md5( $identifier );
+    $data = get_transient( $key );
+
+    if ( ! is_array( $data ) || empty( $data['window_start'] ) || empty( $data['count'] ) ) {
+        return false;
+    }
+
+    // If the window has expired, treat as not limited.
+    if ( time() - (int) $data['window_start'] > $window_seconds ) {
+        return false;
+    }
+
+    return (int) $data['count'] >= $max_attempts;
+}
+
+/**
+ * Increment an OTP rate counter for the given identifier.
+ *
+ * @param string $context        Short context label, e.g. 'ip' or 'phone'.
+ * @param string $identifier     Raw identifier value (IP string, phone string).
+ * @param int    $window_seconds Window length in seconds.
+ */
+function increment_otp_rate_counter( $context, $identifier, $window_seconds ) {
+    $key  = 'otp_rate_' . $context . '_' . md5( $identifier );
+    $data = get_transient( $key );
+
+    $now = time();
+
+    if ( ! is_array( $data ) || empty( $data['window_start'] ) || $now - (int) $data['window_start'] > $window_seconds ) {
+        $data = array(
+            'count'        => 1,
+            'window_start' => $now,
+        );
+    } else {
+        $data['count'] = isset( $data['count'] ) ? ( (int) $data['count'] + 1 ) : 1;
+    }
+
+    // Store for the remaining window; using full $window_seconds is fine for a simple limiter.
+    set_transient( $key, $data, $window_seconds );
+}
+
+/**
  * AJAX handler to send OTP.
  */
 function ajax_send_otp() {
@@ -20,10 +94,42 @@ function ajax_send_otp() {
     // Verify AJAX nonce (consider adding this for security if not already done)
     // check_ajax_referer( 'your_nonce_action', 'nonce' );
 
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'custom_registration_nonce')) {
+        wp_send_json_error(['message' => esc_html__('Security check failed.', 'astra-child')]);
+        return;
+    }
+    
+
     $phone = isset($_POST['phone']) ? sanitize_text_field($_POST['phone']) : '';
 
     if (empty($phone)) {
         wp_send_json_error(array('message' => esc_html__('Phone number is required.', 'astra-child')));
+        return;
+    }
+
+    // Only allow Cyprus phone numbers (E.164 +357... or 357...) to reach Twilio.
+    $normalized_phone = preg_replace('/[\s\-]/', '', $phone);
+    if (strpos($normalized_phone, '+357') !== 0 && strpos($normalized_phone, '357') !== 0) {
+        wp_send_json_error(array('message' => esc_html__('Only Cypriot (+357) phone numbers are supported for verification.', 'astra-child')));
+        return;
+    }
+
+    $ts_token = isset($_POST['turnstile_token']) ? sanitize_text_field($_POST['turnstile_token']) : '';
+    if (!custom_verify_turnstile_token($ts_token)) {
+        wp_send_json_error(['message' => esc_html__('Verification failed. Please try again.', 'astra-child')]);
+        return;
+    }
+
+    // Basic rate limiting to protect Twilio from abuse.
+    $client_ip = get_client_ip_for_otp_rate_limit();
+
+    // Example limits (tune as needed):
+    // - max 5 OTP sends per IP per 10 minutes
+    // - max 3 OTP sends per phone number per hour
+    if (has_exceeded_otp_rate_limit('ip', $client_ip, 5, 10 * 60)
+        || has_exceeded_otp_rate_limit('phone', $normalized_phone, 3, 60 * 60)
+    ) {
+        wp_send_json_error(array('message' => esc_html__('Too many verification attempts. Please try again later.', 'astra-child')));
         return;
     }
 
@@ -49,6 +155,10 @@ function ajax_send_otp() {
         wp_send_json_error(array('message' => esc_html__('SMS configuration error. Please contact admin.', 'astra-child')));
         return;
     }
+
+    // Increment counters just before contacting Twilio so even failed attempts are limited.
+    increment_otp_rate_counter('ip', $client_ip, 10 * 60);
+    increment_otp_rate_counter('phone', $normalized_phone, 60 * 60);
 
     $twilio = new \Twilio\Rest\Client($twilio_sid, $twilio_token);
 
@@ -107,6 +217,16 @@ function ajax_verify_otp() {
             ]);
 
         if ($verification_check->status === 'approved') {
+            // Mark this phone as OTP-verified for a short window so final registration can trust it.
+            set_transient(
+                'registration_phone_verified_' . md5($phone),
+                array(
+                    'phone'      => $phone,
+                    'timestamp'  => time(),
+                ),
+                10 * 60 // 10 minutes
+            );
+
             wp_send_json_success(array('message' => esc_html__('Phone number verified successfully!', 'astra-child')));
         } else {
             wp_send_json_error(array('message' => esc_html__('Invalid verification code.', 'astra-child')));

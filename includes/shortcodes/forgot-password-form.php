@@ -75,6 +75,15 @@ function enqueue_forgot_password_assets() {
             'verify_otp_nonce' => wp_create_nonce('verify_forgot_password_otp_nonce'),
             'update_password_nonce' => wp_create_nonce('update_forgot_password_nonce')
         ));
+
+        wp_enqueue_script(
+            'cf-turnstile',
+            'https://challenges.cloudflare.com/turnstile/v0/api.js',
+            array(),
+            null,
+            true
+          );
+          
     }
 }
 add_action('wp_enqueue_scripts', 'enqueue_forgot_password_assets');
@@ -105,6 +114,7 @@ function forgot_password_form_shortcode() {
                     <label for="forgot-phone-number-display">Phone Number:</label>
                     <input type="tel" name="forgot_phone_number_display" id="forgot-phone-number-display" required placeholder="Enter your phone number">
                 </div>
+                <div class="cf-turnstile" data-sitekey="<?php echo esc_attr(TURNSTILE_SITE_KEY); ?>"></div>
                 <div class="form-actions">
                     <button type="button" id="send-forgot-otp-button" class="btn btn-primary">Send Verification Code</button>
                     <a href="<?php echo wp_login_url(); ?>" class="btn btn-secondary">Back to Login</a>
