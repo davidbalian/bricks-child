@@ -1502,3 +1502,90 @@ label svg path,
     right: 8px;
   }
 }
+
+/* JSON Import Section Styles (Admin Only) */
+.json-import-section {
+  background: var(--white);
+  border: var(--border);
+  border-radius: var(--border-radius-large);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.json-import-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: var(--text-color);
+}
+
+.json-import-note {
+  margin: 0 0 1.5rem 0 !important;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  background-color: #f0f9eb;
+  border: 1px solid #2e7d32;
+  border-radius: var(--border-radius-medium);
+  width: fit-content;
+  color: #2e7d32;
+}
+
+.json-import-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.json-file-name {
+  color: var(--text-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  background: var(--light-bg);
+  border-radius: var(--border-radius-medium);
+}
+
+.json-import-controls .btn-link {
+  color: #dc2626;
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.json-import-controls .btn-link:hover {
+  color: #991b1b;
+  text-decoration: underline;
+}
+
+.json-import-status {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius-medium);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.json-import-status.success {
+  background-color: #f0f9eb;
+  border: 1px solid #2e7d32;
+  color: #2e7d32;
+}
+
+.json-import-status.error {
+  background-color: #fff5f5;
+  border: 1px solid #f56565;
+  color: #c53030;
+}
+
+.json-import-status.info {
+  background-color: #f0f8ff;
+  border: 1px solid #007cba;
+  color: #007cba;
+}
