@@ -13,6 +13,9 @@ if (!defined('WPINC')) {
     die;
 }
 
+// Include field validation functions
+require_once get_stylesheet_directory() . '/includes/user-manage-listings/field-validation.php';
+
 /**
  * Process form submission for adding a new car listing
  */
@@ -203,6 +206,45 @@ function handle_add_car_listing() {
     // Debug logging
     error_log('Vehicle History POST data: ' . print_r($_POST['vehiclehistory'], true));
     error_log('Processed Vehicle History: ' . print_r($vehiclehistory, true));
+    
+    // Validate all field values against whitelists
+    $validation_data = array(
+        'availability' => $availability,
+        'fuel_type' => $fuel_type,
+        'transmission' => $transmission,
+        'body_type' => $body_type,
+        'exterior_color' => $exterior_color,
+        'interior_color' => $interior_color,
+        'drive_type' => $drive_type,
+        'year' => $year,
+        'engine_capacity' => $engine_capacity,
+        'number_of_doors' => $number_of_doors,
+        'number_of_seats' => $number_of_seats,
+        'mileage' => $mileage,
+        'price' => $price,
+        'hp' => $hp,
+        'numowners' => $numowners,
+        'extras' => $extras,
+        'vehiclehistory' => $vehiclehistory,
+    );
+    
+    $validation_result = validate_car_listing_fields($validation_data);
+    
+    if (!$validation_result['valid']) {
+        car_submission_error('Field validation failed', array(
+            'validation_errors' => $validation_result['errors'],
+            'submitted_data' => $validation_data
+        ));
+        $redirect_url = add_query_arg(
+            array(
+                'error' => 'validation',
+                'message' => urlencode(implode('; ', $validation_result['errors']))
+            ),
+            wp_get_referer()
+        );
+        wp_redirect($redirect_url);
+        exit;
+    }
     
     // Prepare post data
     $post_title = $year . ' ' . $make . ' ' . $model;

@@ -9,6 +9,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Include field validation functions
+require_once get_stylesheet_directory() . '/includes/user-manage-listings/field-validation.php';
+
 /**
  * Process edit listing form submission
  * 
@@ -17,6 +20,40 @@ if (!defined('ABSPATH')) {
  * @return bool True on success, false on failure
  */
 function process_edit_listing_form($data, $car_id) {
+    // Validate all field values against whitelists before processing
+    $validation_data = array();
+    
+    // Collect all fields that need validation
+    if (isset($data['availability'])) $validation_data['availability'] = $data['availability'];
+    if (isset($data['fuel_type'])) $validation_data['fuel_type'] = $data['fuel_type'];
+    if (isset($data['transmission'])) $validation_data['transmission'] = $data['transmission'];
+    if (isset($data['body_type'])) $validation_data['body_type'] = $data['body_type'];
+    if (isset($data['exterior_color'])) $validation_data['exterior_color'] = $data['exterior_color'];
+    if (isset($data['interior_color'])) $validation_data['interior_color'] = $data['interior_color'];
+    if (isset($data['drive_type'])) $validation_data['drive_type'] = $data['drive_type'];
+    if (isset($data['year'])) $validation_data['year'] = $data['year'];
+    if (isset($data['engine_capacity'])) $validation_data['engine_capacity'] = $data['engine_capacity'];
+    if (isset($data['number_of_doors'])) $validation_data['number_of_doors'] = $data['number_of_doors'];
+    if (isset($data['number_of_seats'])) $validation_data['number_of_seats'] = $data['number_of_seats'];
+    if (isset($data['mileage'])) $validation_data['mileage'] = $data['mileage'];
+    if (isset($data['price'])) $validation_data['price'] = $data['price'];
+    if (isset($data['hp'])) $validation_data['hp'] = $data['hp'];
+    if (isset($data['numowners'])) $validation_data['numowners'] = $data['numowners'];
+    if (isset($data['extras']) && is_array($data['extras'])) $validation_data['extras'] = $data['extras'];
+    if (isset($data['vehiclehistory']) && is_array($data['vehiclehistory'])) $validation_data['vehiclehistory'] = $data['vehiclehistory'];
+    
+    // Only validate if there's data to validate
+    if (!empty($validation_data)) {
+        $validation_result = validate_car_listing_fields($validation_data);
+        
+        if (!$validation_result['valid']) {
+            // Log validation errors
+            error_log('Edit listing validation failed for car ID ' . $car_id . ': ' . implode('; ', $validation_result['errors']));
+            // Return false to indicate failure
+            return false;
+        }
+    }
+    
     $integer_fields = array(
         'year',
         'mileage',
