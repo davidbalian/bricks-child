@@ -1,0 +1,337 @@
+/* Bulk Upload Shortcode Styles */
+
+#bulk-upload-app {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Phase visibility */
+.bu-phase {
+    display: none;
+}
+.bu-phase.active {
+    display: block;
+}
+
+.bu-phase h2 {
+    margin: 0 0 6px;
+    font-size: 1.4rem;
+}
+.bu-phase-desc {
+    color: #666;
+    margin: 0 0 24px;
+    font-size: 0.95rem;
+}
+
+.bu-section {
+    margin-bottom: 24px;
+}
+.bu-section h3 {
+    margin: 0 0 10px;
+    font-size: 1.1rem;
+}
+
+/* Buttons */
+.bu-btn {
+    display: inline-block;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, background-color 0.2s;
+}
+.bu-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+.bu-btn-primary {
+    background: #2563eb;
+    color: #fff;
+}
+.bu-btn-primary:hover:not(:disabled) {
+    background: #1d4ed8;
+}
+.bu-btn-secondary {
+    background: #e5e7eb;
+    color: #374151;
+}
+.bu-btn-secondary:hover:not(:disabled) {
+    background: #d1d5db;
+}
+
+/* Upload area */
+.bu-upload-area {
+    border: 2px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    transition: border-color 0.2s, background-color 0.2s;
+    cursor: pointer;
+}
+.bu-upload-area.bu-dragover {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+.bu-upload-placeholder {
+    color: #64748b;
+}
+.bu-upload-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 8px;
+}
+.bu-browse-link {
+    color: #2563eb;
+    cursor: pointer;
+    text-decoration: underline;
+}
+.bu-upload-hint {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    margin-top: 6px;
+}
+.bu-upload-hint code {
+    background: #f1f5f9;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.82rem;
+}
+
+/* Upload stats */
+.bu-upload-stats {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #475569;
+}
+
+/* Location display */
+.bu-location-display {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    background: #f9fafb;
+    box-sizing: border-box;
+}
+
+/* Summary bar */
+.bu-summary {
+    padding: 12px 16px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+.bu-valid-text {
+    color: #16a34a;
+    font-weight: 600;
+}
+.bu-error-text {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+/* Slider */
+.bu-slider {
+    margin-bottom: 24px;
+}
+.bu-slider-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+.bu-nav-btn {
+    padding: 6px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.15s;
+}
+.bu-nav-btn:hover:not(:disabled) {
+    background: #f3f4f6;
+}
+.bu-nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.bu-slider-counter {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+/* Listing card */
+.bu-listing-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 20px;
+    background: #fff;
+}
+.bu-listing-card.bu-card-has-errors {
+    border-color: #fca5a5;
+    background: #fef2f2;
+}
+
+.bu-card-banner {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    margin-bottom: 14px;
+}
+.bu-card-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.bu-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+}
+.bu-card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #111827;
+}
+.bu-card-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #16a34a;
+}
+
+/* Image thumbnails */
+.bu-card-images {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+}
+.bu-card-thumb {
+    width: 100px;
+    height: 75px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+    border: 1px solid #e5e7eb;
+}
+.bu-card-no-images {
+    color: #94a3b8;
+    font-style: italic;
+    margin-bottom: 14px;
+}
+
+/* Detail grid */
+.bu-card-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px 16px;
+    margin-bottom: 14px;
+}
+.bu-detail-item {
+    display: flex;
+    flex-direction: column;
+}
+.bu-detail-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.bu-detail-value {
+    font-size: 0.9rem;
+    color: #111827;
+}
+
+.bu-card-extras,
+.bu-card-description,
+.bu-card-location {
+    font-size: 0.9rem;
+    color: #374151;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+/* Phase actions */
+.bu-phase-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* Progress bar */
+.bu-progress-wrapper {
+    margin-bottom: 24px;
+}
+.bu-progress-bar {
+    height: 24px;
+    background: #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+}
+.bu-progress-fill {
+    height: 100%;
+    background: #2563eb;
+    border-radius: 12px;
+    transition: width 0.3s ease;
+}
+.bu-progress-text {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 600;
+}
+
+/* Results */
+.bu-results {
+    max-height: 400px;
+    overflow-y: auto;
+}
+.bu-result {
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+}
+.bu-result-success {
+    color: #166534;
+    background: #f0fdf4;
+}
+.bu-result-error {
+    color: #991b1b;
+    background: #fef2f2;
+}
+
+.bu-done-actions {
+    margin-top: 20px;
+    padding: 14px 16px;
+    background: #f0fdf4;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #166534;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    #bulk-upload-app {
+        padding: 12px;
+    }
+    .bu-card-details {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+    .bu-card-header {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
