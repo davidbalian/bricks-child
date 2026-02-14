@@ -235,14 +235,17 @@ function validate_numeric_range_field($field_name, $value) {
             break;
             
         case 'engine_capacity':
-            // Engine capacity range: 0.4 to 12.0 (in 0.1 increments)
-            if ($numeric_value < 0.4 || $numeric_value > 12.0) {
-                return sprintf(__('Engine capacity must be between 0.4 and 12.0. Got: %s', 'bricks-child'), esc_html($value));
+            // Engine capacity range: 0.0 (for Electric) to 12.0 (in 0.1 increments)
+            // Allow 0.0 for Electric vehicles
+            if ($numeric_value < 0.0 || $numeric_value > 12.0) {
+                return sprintf(__('Engine capacity must be between 0.0 and 12.0. Got: %s', 'bricks-child'), esc_html($value));
             }
-            // Check if it's a valid increment (0.1 steps)
-            $rounded = round($numeric_value, 1);
-            if (abs($numeric_value - $rounded) > 0.01) {
-                return sprintf(__('Engine capacity must be in 0.1 increments. Got: %s', 'bricks-child'), esc_html($value));
+            // Check if it's a valid increment (0.1 steps), but allow 0.0 exactly
+            if ($numeric_value > 0) {
+                $rounded = round($numeric_value, 1);
+                if (abs($numeric_value - $rounded) > 0.01) {
+                    return sprintf(__('Engine capacity must be in 0.1 increments. Got: %s', 'bricks-child'), esc_html($value));
+                }
             }
             break;
             
