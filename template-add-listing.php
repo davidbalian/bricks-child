@@ -88,10 +88,9 @@ wp_localize_script('astra-child-add-listing-js', 'addListingData', array(
     'nonce' => wp_create_nonce('add_car_listing_nonce')
 ));
 
-// Enqueue JSON import handler - Admin Only (Server-side check)
+// Enqueue JSON import handler - Specific User Only (Server-side check)
 $current_user = wp_get_current_user();
-$user_roles = $current_user->roles;
-if ( in_array( 'administrator', $user_roles, true ) ) {
+if ( $current_user->user_login === '35799252525' ) {
     wp_enqueue_script(
         'astra-child-json-import-js',
         get_stylesheet_directory_uri() . '/includes/user-manage-listings/template-add-listing/json-import-handler.js',
@@ -193,13 +192,12 @@ get_header(); ?>
                     <input type="hidden" id="async_session_id" name="async_session_id" value="">
 
                     <?php
-                    // JSON Import Section - Admin Only (Server-side check, no client-side bypass possible)
+                    // JSON Import Section - Specific User Only (Server-side check, no client-side bypass possible)
                     $current_user = wp_get_current_user();
-                    $user_roles = $current_user->roles;
-                    if ( in_array( 'administrator', $user_roles, true ) ) {
+                    if ( $current_user->user_login === '35799252525' ) {
                         ?>
                         <div class="json-import-section input-wrapper" id="json-import-section">
-                            <h2><?php echo get_svg_icon('file-import'); ?> <?php esc_html_e( 'Import from JSON (Admin Only)', 'bricks-child' ); ?></h2>
+                            <h2><?php echo get_svg_icon('file-import'); ?> <?php esc_html_e( 'Import from JSON', 'bricks-child' ); ?></h2>
                             <p class="json-import-note"><?php esc_html_e( 'Upload a JSON file to automatically fill form fields. Make, Model, Availability, and Location must still be set manually.', 'bricks-child' ); ?></p>
                             <div class="json-import-controls">
                                 <input type="file" id="json-file-input" accept=".json" style="display: none;">
