@@ -170,7 +170,10 @@ get_header(); ?>
                                 </div>
                                 <div class="meta-content">
                                     <span class="meta-label"><?php esc_html_e( 'Phone', 'bricks-child' ); ?></span>
-                                    <a href="<?php echo esc_attr( $tel_link ); ?>" class="meta-value meta-phone-link">
+                                    <a href="<?php echo esc_attr( $tel_link ); ?>" 
+                                       class="meta-value meta-phone-link buyer-request-call-button"
+                                       data-post-id="<?php echo esc_attr( $post_id ); ?>"
+                                       data-nonce="<?php echo wp_create_nonce( 'buyer_request_call_button_click' ); ?>">
                                         <?php echo esc_html( '+' . $display_phone ); ?>
                                     </a>
                                 </div>
@@ -180,6 +183,8 @@ get_header(); ?>
                             <div class="buyer-request-meta-item buyer-request-whatsapp">
                                 <a href="<?php echo esc_url( $wa_link ); ?>" 
                                    class="buyer-request-whatsapp-button"
+                                   data-post-id="<?php echo esc_attr( $post_id ); ?>"
+                                   data-nonce="<?php echo wp_create_nonce( 'buyer_request_whatsapp_button_click' ); ?>"
                                    target="_blank"
                                    rel="noopener noreferrer">
                                     <i class="fab fa-whatsapp"></i>

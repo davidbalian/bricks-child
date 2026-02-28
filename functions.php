@@ -348,6 +348,8 @@ require_once get_stylesheet_directory() . '/includes/shortcodes/share-button/sha
 require_once get_stylesheet_directory() . '/includes/shortcodes/report-button/report-button.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-single-call-button/car-single-call-button.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-single-call-button/car-single-whatsapp-button.php';
+require_once get_stylesheet_directory() . '/includes/shortcodes/buyer-request-call-button/buyer-request-call-button.php';
+require_once get_stylesheet_directory() . '/includes/shortcodes/buyer-request-call-button/buyer-request-whatsapp-button.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/homepage-filters/homepage-filters.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-listings/car-listings.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-filters/car-filters.php';
