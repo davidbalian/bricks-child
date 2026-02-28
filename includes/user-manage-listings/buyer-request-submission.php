@@ -56,23 +56,37 @@ function handle_add_buyer_request() {
         exit;
     }
     
-    // Sanitize form data
+    // Sanitize form data (matching car-submission.php format)
     $make = sanitize_text_field($_POST['buyer_make']);
-    $model = isset($_POST['buyer_model']) ? sanitize_text_field($_POST['buyer_model']) : '';
+    $model = isset($_POST['buyer_model']) && !empty(trim($_POST['buyer_model'])) ? sanitize_text_field($_POST['buyer_model']) : '';
     $year = intval($_POST['buyer_year']);
-    $price = intval($_POST['buyer_price']);
+    // Price: handle comma-separated values like "10,000" -> 10000 (same as car submission)
+    $price = intval(str_replace(',', '', $_POST['buyer_price']));
     $description = isset($_POST['buyer_description']) ? wp_kses_post($_POST['buyer_description']) : '';
     
-    // Validate year range
-    $current_year = (int) date('Y');
-    if ($year < 1900 || $year > ($current_year + 1)) {
-        wp_redirect(add_query_arg('error', 'invalid_year', wp_get_referer()));
+    // Validate year range (matching car-submission.php: 1948 to 2025)
+    if ($year < 1948 || $year > 2025) {
+        $redirect_url = add_query_arg(
+            array(
+                'error' => 'validation',
+                'message' => urlencode(sprintf(__('Year must be between 1948 and 2025. Got: %s', 'bricks-child'), $year))
+            ),
+            wp_get_referer()
+        );
+        wp_redirect($redirect_url);
         exit;
     }
     
-    // Validate price
+    // Validate price (must be positive)
     if ($price <= 0) {
-        wp_redirect(add_query_arg('error', 'invalid_price', wp_get_referer()));
+        $redirect_url = add_query_arg(
+            array(
+                'error' => 'validation',
+                'message' => urlencode(__('Price must be a positive number.', 'bricks-child'))
+            ),
+            wp_get_referer()
+        );
+        wp_redirect($redirect_url);
         exit;
     }
     

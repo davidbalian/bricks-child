@@ -65,6 +65,21 @@ wp_enqueue_style(
     filemtime(get_stylesheet_directory() . '/includes/user-manage-listings/buyer-request-form.css')
 );
 
+// Enqueue buyer request form JavaScript
+wp_enqueue_script(
+    'buyer-request-form-js',
+    get_stylesheet_directory_uri() . '/includes/user-manage-listings/buyer-request-form.js',
+    array('jquery'),
+    filemtime(get_stylesheet_directory() . '/includes/user-manage-listings/buyer-request-form.js'),
+    true
+);
+
+// Localize the script with necessary data
+wp_localize_script('buyer-request-form-js', 'buyerRequestData', array(
+    'ajaxurl' => admin_url('admin-ajax.php'),
+    'nonce' => wp_create_nonce('add_car_listing_nonce')
+));
+
 get_header(); ?>
 
 <div class="bricks-container">
@@ -107,13 +122,9 @@ get_header(); ?>
                         echo '</ul>';
                         echo '</div>';
                     }
-                } elseif ( $_GET['error'] === 'invalid_year' ) {
+                } elseif ( isset( $_GET['message'] ) && ! empty( $_GET['message'] ) ) {
                     echo '<div class="form-error-message">';
-                    echo '<p>' . esc_html__( 'Please enter a valid year between 1900 and ' . ( date( 'Y' ) + 1 ), 'bricks-child' ) . '</p>';
-                    echo '</div>';
-                } elseif ( $_GET['error'] === 'invalid_price' ) {
-                    echo '<div class="form-error-message">';
-                    echo '<p>' . esc_html__( 'Please enter a valid price greater than 0.', 'bricks-child' ) . '</p>';
+                    echo '<p>' . esc_html( urldecode( sanitize_text_field( $_GET['message'] ) ) ) . '</p>';
                     echo '</div>';
                 } elseif ( $_GET['error'] === 'post_creation' ) {
                     echo '<div class="form-error-message">';
@@ -136,11 +147,10 @@ get_header(); ?>
                 <?php wp_nonce_field( 'add_buyer_request_nonce', 'add_buyer_request_nonce' ); ?>
                 <input type="hidden" name="action" value="add_new_buyer_request">
                 
-                <div class="form-section input-wrapper">
+                <div class="form-section basic-details-section input-wrapper">
                     <h2><?php echo get_svg_icon('circle-info'); ?> <?php esc_html_e( 'Car Details', 'bricks-child' ); ?></h2>
-                    
-                    <div class="form-row form-row-halves">
-                        <div class="form-half">
+                    <div class="form-row form-row-thirds">
+                        <div class="form-third">
                             <label><?php echo get_svg_icon('car-side'); ?> <?php esc_html_e( 'Make', 'bricks-child' ); ?><span class="required">*</span></label>
                             <?php
                             car_filter_render_dropdown(array(
@@ -157,20 +167,29 @@ get_header(); ?>
                             ));
                             ?>
                         </div>
-                        
-                        <div class="form-half">
-                            <label for="buyer_model"><?php echo get_svg_icon('car'); ?> <?php esc_html_e( 'Model', 'bricks-child' ); ?> <span class="optional">(<?php esc_html_e( 'Optional', 'bricks-child' ); ?>)</span></label>
-                            <input type="text" id="buyer_model" name="buyer_model" class="form-control" placeholder="<?php esc_attr_e( 'E.g. 5 Series, A4, C-Class', 'bricks-child' ); ?>">
+                        <div class="form-third">
+                            <label><?php echo get_svg_icon('car'); ?> <?php esc_html_e( 'Model', 'bricks-child' ); ?> <span class="optional">(<?php esc_html_e( 'Optional', 'bricks-child' ); ?>)</span></label>
+                            <?php
+                            car_filter_render_dropdown(array(
+                                'id'          => 'buyer-request-model',
+                                'name'        => 'buyer_model',
+                                'placeholder' => __('Select Model', 'bricks-child'),
+                                'options'     => array(),
+                                'selected'    => '',
+                                'disabled'    => true,
+                                'show_count'  => false,
+                                'searchable'  => true,
+                                'data_attrs'  => array(
+                                    'filter-type' => 'model',
+                                ),
+                            ));
+                            ?>
                         </div>
-                    </div>
-                    
-                    <div class="form-row form-row-halves">
-                        <div class="form-half">
-                            <label for="buyer_year"><?php echo get_svg_icon('calendar'); ?> <?php esc_html_e( 'Year', 'bricks-child' ); ?><span class="required">*</span></label>
+                        <div class="form-third">
+                            <label><?php echo get_svg_icon('calendar'); ?> <?php esc_html_e( 'Year', 'bricks-child' ); ?><span class="required">*</span></label>
                             <?php
                             $year_options = array();
-                            $current_year = (int) date('Y');
-                            for ($year = $current_year + 1; $year >= 1900; $year--) {
+                            for ($year = 2025; $year >= 1948; $year--) {
                                 $year_options[] = array('value' => $year, 'label' => $year);
                             }
                             car_filter_render_dropdown(array(
@@ -184,37 +203,31 @@ get_header(); ?>
                             ));
                             ?>
                         </div>
-                        
+                    </div>
+
+                    <div class="form-row form-row-halves">
                         <div class="form-half">
                             <label for="buyer_price"><?php echo get_svg_icon('euro-sign'); ?> <?php esc_html_e( 'Maximum Price', 'bricks-child' ); ?><span class="required">*</span></label>
-                            <div class="input-with-suffix">
-                                <input type="number" id="buyer_price" name="buyer_price" class="form-control" min="1" step="1" placeholder="<?php esc_attr_e( 'E.g. 10000', 'bricks-child' ); ?>" required>
-                                <span class="input-suffix">EUR</span>
-                            </div>
+                            <input type="text" id="buyer_price" name="buyer_price" class="form-control" placeholder="<?php esc_attr_e( 'E.g \'10,000\'', 'bricks-child' ); ?>">
                         </div>
                     </div>
                 </div>
-                
-                <div class="form-section input-wrapper">
-                    <h2><?php echo get_svg_icon('align-left'); ?> <?php esc_html_e( 'Description', 'bricks-child' ); ?> <span class="optional">(<?php esc_html_e( 'Optional', 'bricks-child' ); ?>)</span></h2>
-                    <p class="description-guidelines">
-                        <?php esc_html_e( 'Add any additional details about what you\'re looking for (condition, mileage, features, etc.)', 'bricks-child' ); ?>
-                    </p>
-                    
-                    <div class="form-row">
-                        <?php
-                        // Use WYSIWYG editor for description
-                        $content = '';
-                        $editor_id = 'buyer_description';
-                        $settings = array(
-                            'textarea_name' => 'buyer_description',
-                            'textarea_rows' => 8,
-                            'media_buttons' => false,
-                            'teeny' => true,
-                            'quicktags' => false,
-                        );
-                        wp_editor( $content, $editor_id, $settings );
-                        ?>
+
+                <div class="form-section input-wrapper collapsible-section collapsed">
+                    <div class="section-header" role="button" tabindex="0" aria-expanded="false">
+                        <h2><?php echo get_svg_icon('align-left'); ?> <?php esc_html_e( 'Description', 'bricks-child' ); ?> <span class="optional">(<?php esc_html_e( 'Optional', 'bricks-child' ); ?>)</span></h2>
+                        <span class="collapse-arrow"><?php echo get_svg_icon('chevron-down'); ?></span>
+                    </div>
+                    <div class="section-content-wrapper">
+                        <div class="section-content">
+                            <p class="description-guidelines">
+                                <?php esc_html_e( 'Add any additional details about what you\'re looking for (condition, mileage, features, etc.)', 'bricks-child' ); ?>
+                            </p>
+
+                            <div class="form-row">
+                                <textarea id="buyer_description" name="buyer_description" class="form-control" rows="5" placeholder="<?php esc_attr_e( 'Enter your description here...', 'bricks-child' ); ?>"></textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
