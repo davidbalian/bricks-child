@@ -134,19 +134,19 @@ jQuery(document).ready(function ($) {
       
       // Enable/disable based on options
       if (options.length > 0) {
+        $dropdown.removeClass('car-filter-dropdown-disabled');
         $button.prop('disabled', false).removeAttr('disabled');
         $select.prop('disabled', false).removeAttr('disabled');
-        $dropdown.removeClass('car-filter-dropdown-disabled');
-        var $wrapper = $dropdown.closest('[id$="-wrapper"]');
-        if ($wrapper.length) {
-          $wrapper.find('.car-filter-dropdown').removeClass('car-filter-dropdown-disabled');
+        if ($search.length) {
+          $search.prop('disabled', false).removeAttr('disabled');
         }
-        $search.prop('disabled', false).removeAttr('disabled');
       } else {
+        $dropdown.addClass('car-filter-dropdown-disabled');
         $button.prop('disabled', true);
         $select.prop('disabled', true);
-        $dropdown.addClass('car-filter-dropdown-disabled');
-        $search.prop('disabled', true);
+        if ($search.length) {
+          $search.prop('disabled', true);
+        }
       }
     },
     
@@ -172,18 +172,16 @@ jQuery(document).ready(function ($) {
       var $button = $dropdown.find('.car-filter-dropdown-button');
       var $search = $dropdown.find('.car-filter-dropdown-search');
       var $select = $dropdown.find('select');
-      var $wrapper = $dropdown.closest('[id$="-wrapper"]'); // Get the wrapper element
       
-      $button.prop('disabled', false);
-      $select.prop('disabled', false);
+      // Remove disabled class from the dropdown wrapper itself
       $dropdown.removeClass('car-filter-dropdown-disabled');
-      if ($wrapper.length) {
-        $wrapper.find('.car-filter-dropdown').removeClass('car-filter-dropdown-disabled');
-      }
-      $search.prop('disabled', false);
       
-      // Also ensure the select is enabled for form submission
-      $select.attr('disabled', false);
+      // Enable all elements
+      $button.prop('disabled', false).removeAttr('disabled');
+      $select.prop('disabled', false).removeAttr('disabled');
+      if ($search.length) {
+        $search.prop('disabled', false).removeAttr('disabled');
+      }
     }
   };
   
@@ -201,12 +199,11 @@ jQuery(document).ready(function ($) {
   $('#buyer-request-make').on('change', function() {
     const makeName = $(this).val();
     
-    // Get model dropdown dynamically each time (in case DOM changes)
-    var $modelWrapper = $('#buyer-request-model-wrapper');
-    var $modelDropdown = $modelWrapper.find('.car-filter-dropdown');
+    // Get model dropdown - the wrapper IS the dropdown (it has class car-filter-dropdown)
+    var $modelDropdown = $('#buyer-request-model-wrapper');
     
     if (!$modelDropdown.length) {
-      console.error('Buyer Request: Model dropdown not found!');
+      console.error('Buyer Request: Model dropdown wrapper not found!');
       return;
     }
     
@@ -233,9 +230,8 @@ jQuery(document).ready(function ($) {
       success: function(response) {
         isLoadingModels = false;
         
-        // Re-get elements in case DOM changed
-        $modelWrapper = $('#buyer-request-model-wrapper');
-        $modelDropdown = $modelWrapper.find('.car-filter-dropdown');
+        // Re-get dropdown (wrapper IS the dropdown)
+        var $modelDropdown = $('#buyer-request-model-wrapper');
         
         BuyerRequestDropdown.setLoading($modelDropdown, false);
         
@@ -258,12 +254,7 @@ jQuery(document).ready(function ($) {
           // Explicitly enable the dropdown to ensure it's enabled
           BuyerRequestDropdown.enable($modelDropdown);
           
-          // Also enable the wrapper elements directly
-          $modelWrapper.find('.car-filter-dropdown').removeClass('car-filter-dropdown-disabled');
-          $modelWrapper.find('.car-filter-dropdown-button').prop('disabled', false).removeAttr('disabled');
-          $modelWrapper.find('select').prop('disabled', false).removeAttr('disabled');
-          
-          console.log('Buyer Request: Model dropdown enabled. Button disabled?', $modelWrapper.find('.car-filter-dropdown-button').prop('disabled'));
+          console.log('Buyer Request: Model dropdown enabled. Button disabled?', $modelDropdown.find('.car-filter-dropdown-button').prop('disabled'));
         } else {
           console.log('Buyer Request: No models found or error in response');
           BuyerRequestDropdown.disable($modelDropdown, response.data && response.data.length === 0 ? 'No models available' : 'Error loading models');
@@ -272,9 +263,8 @@ jQuery(document).ready(function ($) {
       error: function(xhr, status, error) {
         isLoadingModels = false;
         
-        // Re-get elements in case DOM changed
-        var $modelWrapper = $('#buyer-request-model-wrapper');
-        var $modelDropdown = $modelWrapper.find('.car-filter-dropdown');
+        // Re-get dropdown (wrapper IS the dropdown)
+        var $modelDropdown = $('#buyer-request-model-wrapper');
         
         BuyerRequestDropdown.setLoading($modelDropdown, false);
         BuyerRequestDropdown.disable($modelDropdown, 'Error loading models');
