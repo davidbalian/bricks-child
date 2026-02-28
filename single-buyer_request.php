@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header(); ?>
 
 <div class="bricks-container">
-    <div class="bricks-content">
+    <div class="bricks-content single-buyer-request-page-wrapper">
         <?php
         while ( have_posts() ) : the_post();
             $post_id = get_the_ID();

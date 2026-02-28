@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header(); ?>
 
 <div class="bricks-container">
-    <div class="bricks-content">
+    <div class="bricks-content buyer-requests-page-wrapper">
         <div class="buyer-requests-header">
             <h1><?php esc_html_e( 'Buyer Requests', 'bricks-child' ); ?></h1>
             <a href="<?php echo esc_url( home_url( '/create-buyer-request' ) ); ?>" class="btn btn-primary create-buyer-request-btn">

@@ -10,13 +10,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-// If the user is not logged in, redirect to login
+// If the user is not logged in, send them straight to the login page
+// and mark that they came from the "Create Buyer Request" flow so we can show
+// a contextual banner on the login screen.
 if ( ! is_user_logged_in() ) {
     $login_url = add_query_arg(
-        'redirect_to',
-        urlencode( get_permalink() ),
+        'buyer_request',
+        '1',
         wp_login_url()
     );
+
     wp_safe_redirect( $login_url );
     exit;
 }
@@ -83,7 +86,7 @@ wp_localize_script('buyer-request-form-js', 'buyerRequestData', array(
 get_header(); ?>
 
 <div class="bricks-container">
-    <div class="bricks-content">
+    <div class="bricks-content create-buyer-request-page-wrapper">
         <?php
         // Display success message
         if ( isset( $_GET['request_submitted'] ) && $_GET['request_submitted'] == 'success' ) {

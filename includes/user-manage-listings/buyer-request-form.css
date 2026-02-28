@@ -5,6 +5,39 @@
  * @since 1.0.0
  */
 
+/* Page Wrapper Spacing */
+.buyer-requests-page-wrapper,
+.create-buyer-request-page-wrapper,
+.single-buyer-request-page-wrapper {
+    padding: 2rem 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    .buyer-requests-page-wrapper,
+    .create-buyer-request-page-wrapper,
+    .single-buyer-request-page-wrapper {
+        padding: 2.5rem 2rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .buyer-requests-page-wrapper,
+    .create-buyer-request-page-wrapper,
+    .single-buyer-request-page-wrapper {
+        padding: 3rem 2.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .buyer-requests-page-wrapper,
+    .create-buyer-request-page-wrapper,
+    .single-buyer-request-page-wrapper {
+        padding: 1.5rem 1rem;
+    }
+}
+
 /* Buyer Requests Listing Page */
 .buyer-requests-header {
     display: flex;

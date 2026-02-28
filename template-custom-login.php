@@ -35,6 +35,11 @@ get_header(); ?>
                                     <?php esc_html_e( 'To continue selling your car, please log in.', 'bricks-child' ); ?>
                                 </div>
                             <?php endif; ?>
+							<?php if ( isset( $_GET['buyer_request'] ) && $_GET['buyer_request'] === '1' ) : ?>
+                                <div class="selling-car-login-banner">
+                                    <?php esc_html_e( 'To create a buyer request, please log in.', 'bricks-child' ); ?>
+                                </div>
+                            <?php endif; ?>
 							<!-- Display Login Errors -->
 							<?php if ( isset( $_GET['login'] ) && $_GET['login'] === 'failed' ) : ?>
 								<div class="login-error">
