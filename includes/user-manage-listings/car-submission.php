@@ -16,6 +16,9 @@ if (!defined('WPINC')) {
 // Include field validation functions
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/field-validation.php';
 
+// Include custom failure logger
+require_once get_stylesheet_directory() . '/includes/user-manage-listings/car-submission-logger.php';
+
 /**
  * Process form submission for adding a new car listing
  */
@@ -56,6 +59,11 @@ function handle_add_car_listing() {
             'nonce_present' => isset($_POST['add_car_listing_nonce']),
             'referer' => wp_get_referer()
         ));
+        log_car_submission_failure('nonce', 'Nonce verification failed', array(
+            'nonce_present' => isset($_POST['add_car_listing_nonce']),
+            'referer' => wp_get_referer(),
+            'post_keys' => array_keys($_POST)
+        ));
         wp_redirect(add_query_arg('listing_error', 'nonce_failed', wp_get_referer()));
         exit;
     }
@@ -72,6 +80,11 @@ function handle_add_car_listing() {
         car_submission_error('Required fields validation failed', array(
             'missing_fields' => $missing_fields,
             'submitted_keys' => array_keys($_POST)
+        ));
+        log_car_submission_failure('validation', 'Required fields missing', array(
+            'missing_fields' => $missing_fields,
+            'submitted_keys' => array_keys($_POST),
+            'submitted_data' => array_intersect_key($_POST, array_flip(array('make', 'model', 'year', 'mileage', 'price')))
         ));
         // Redirect back with error message
         $redirect_url = add_query_arg(
@@ -118,6 +131,12 @@ function handle_add_car_listing() {
             'async_images_count' => count($async_images),
             'files_present' => isset($_FILES['car_images'])
         ));
+        log_car_submission_failure('image_upload', 'No images provided', array(
+            'async_session_id' => $async_session_id,
+            'async_images_count' => count($async_images),
+            'files_present' => isset($_FILES['car_images']),
+            'submitted_data' => array_intersect_key($_POST, array_flip(array('make', 'model', 'year')))
+        ));
         wp_redirect(add_query_arg('error', 'no_images', wp_get_referer()));
         exit;
     }
@@ -152,6 +171,14 @@ function handle_add_car_listing() {
             'latitude' => $latitude,
             'longitude' => $longitude,
             'district' => $district
+        ));
+        log_car_submission_failure('location', 'Location validation failed', array(
+            'city' => $city,
+            'address' => $address,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'district' => $district,
+            'submitted_data' => array_intersect_key($_POST, array_flip(array('make', 'model', 'year')))
         ));
         $redirect_url = add_query_arg(
             array(
@@ -235,6 +262,10 @@ function handle_add_car_listing() {
             'validation_errors' => $validation_result['errors'],
             'submitted_data' => $validation_data
         ));
+        log_car_submission_failure('field_validation', 'Field validation failed - invalid values', array(
+            'validation_errors' => $validation_result['errors'],
+            'submitted_data' => $validation_data
+        ));
         $redirect_url = add_query_arg(
             array(
                 'error' => 'validation',
@@ -270,6 +301,15 @@ function handle_add_car_listing() {
             'make' => $make,
             'model' => $model,
             'year' => $year
+        ));
+        log_car_submission_failure('post_creation', 'Post creation failed', array(
+            'error_code' => $post_id->get_error_code(),
+            'error_message' => $post_id->get_error_message(),
+            'post_title' => $post_title,
+            'make' => $make,
+            'model' => $model,
+            'year' => $year,
+            'submitted_data' => array_intersect_key($validation_data, array_flip(array('year', 'make', 'model', 'price', 'mileage')))
         ));
         wp_redirect(add_query_arg('error', 'post_creation', wp_get_referer()));
         exit;
@@ -450,6 +490,13 @@ function handle_add_car_listing() {
             'error_code' => $image_ids->get_error_code(),
             'error_message' => $image_ids->get_error_message(),
             'files_count' => isset($_FILES['car_images']) ? count($_FILES['car_images']['name']) : 0
+        ));
+        log_car_submission_failure('image_upload', 'Image upload failed', array(
+            'post_id' => $post_id,
+            'error_code' => $image_ids->get_error_code(),
+            'error_message' => $image_ids->get_error_message(),
+            'files_count' => isset($_FILES['car_images']) ? count($_FILES['car_images']['name']) : 0,
+            'submitted_data' => array_intersect_key($_POST, array_flip(array('make', 'model', 'year')))
         ));
         // Delete the post since images are required
         wp_delete_post($post_id, true);
