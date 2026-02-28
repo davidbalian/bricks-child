@@ -82,41 +82,24 @@ function buyer_request_call_button_enqueue_scripts() {
                     return; // Skip if data attributes are missing
                 }
                 
-                // Detect if mobile device
-                var isMobile = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                
-                if (isMobile && navigator.sendBeacon) {
-                    // Use sendBeacon for mobile - works even when page unloads
-                    var formData = new FormData();
-                    formData.append('action', 'buyer_request_call_button_click');
-                    formData.append('post_id', postId);
-                    formData.append('nonce', nonce);
-                    
-                    navigator.sendBeacon('" . admin_url('admin-ajax.php') . "', formData);
-                    
-                    if (window.isDevelopment) {
-                        console.log('Buyer request call button click tracked (mobile via sendBeacon)');
+                // Track the click via AJAX
+                $.ajax({
+                    url: '" . admin_url('admin-ajax.php') . "',
+                    type: 'POST',
+                    data: {
+                        action: 'buyer_request_call_button_click',
+                        post_id: postId,
+                        nonce: nonce
+                    },
+                    success: function(response) {
+                    if (window.isDevelopment)
+                        console.log('Buyer request call button click tracked:', response);
+                    },
+                    error: function(xhr, status, error) {
+                    if (window.isDevelopment)
+                        console.error('Error tracking buyer request call button click:', error);
                     }
-                } else {
-                    // Use regular AJAX for desktop
-                    $.ajax({
-                        url: '" . admin_url('admin-ajax.php') . "',
-                        type: 'POST',
-                        data: {
-                            action: 'buyer_request_call_button_click',
-                            post_id: postId,
-                            nonce: nonce
-                        },
-                        success: function(response) {
-                        if (window.isDevelopment)
-                            console.log('Buyer request call button click tracked:', response);
-                        },
-                        error: function(xhr, status, error) {
-                        if (window.isDevelopment)
-                            console.error('Error tracking buyer request call button click:', error);
-                        }
-                    });
-                }
+                });
                 
                 // Continue with the normal link behavior (making the call)
                 // The click tracking happens in the background

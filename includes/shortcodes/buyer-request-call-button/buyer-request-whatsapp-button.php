@@ -83,43 +83,27 @@ function buyer_request_whatsapp_button_enqueue_scripts() {
                     return; // Skip if data attributes are missing
                 }
                 
-                // Detect if mobile device
-                var isMobile = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                
-                if (isMobile && navigator.sendBeacon) {
-                    // Use sendBeacon for mobile - works even when page unloads
-                    var formData = new FormData();
-                    formData.append('action', 'buyer_request_whatsapp_button_click');
-                    formData.append('post_id', postId);
-                    formData.append('nonce', nonce);
-                    
-                    navigator.sendBeacon('" . admin_url('admin-ajax.php') . "', formData);
-                    
-                    if (window.isDevelopment) {
-                        console.log('Buyer request WhatsApp button click tracked (mobile via sendBeacon)');
+                // Track the click via AJAX
+                $.ajax({
+                    url: '" . admin_url('admin-ajax.php') . "',
+                    type: 'POST',
+                    data: {
+                        action: 'buyer_request_whatsapp_button_click',
+                        post_id: postId,
+                        nonce: nonce
+                    },
+                    success: function(response) {
+                    if (window.isDevelopment)
+                        console.log('Buyer request WhatsApp button click tracked:', response);
+                    },
+                    error: function(xhr, status, error) {
+                    if (window.isDevelopment)
+                        console.error('Error tracking buyer request WhatsApp button click:', error);
                     }
-                } else {
-                    // Use regular AJAX for desktop
-                    $.ajax({
-                        url: '" . admin_url('admin-ajax.php') . "',
-                        type: 'POST',
-                        data: {
-                            action: 'buyer_request_whatsapp_button_click',
-                            post_id: postId,
-                            nonce: nonce
-                        },
-                        success: function(response) {
-                        if (window.isDevelopment)
-                            console.log('Buyer request WhatsApp button click tracked:', response);
-                        },
-                        error: function(xhr, status, error) {
-                        if (window.isDevelopment)
-                            console.error('Error tracking buyer request WhatsApp button click:', error);
-                        }
-                    });
-                }
-                
+                });
                 // --- Handle open behavior ---
+                var isMobile = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
                 if (!isMobile) {
                     e.preventDefault(); // prevent default same-tab behavior
                     window.open(waLink, '_blank'); // open in new tab on desktop
