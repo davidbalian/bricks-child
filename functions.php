@@ -19,6 +19,7 @@ require_once get_stylesheet_directory() . '/vendor/autoload.php';
 require_once get_stylesheet_directory() . '/includes/core/google-maps-assets.php';
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/listing-details-badge-manager.php';
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/car-submission.php';
+require_once get_stylesheet_directory() . '/includes/user-manage-listings/buyer-request-submission.php';
 require_once get_stylesheet_directory() . '/includes/user-account/my-account/my-account.php';
 require_once get_stylesheet_directory() . '/includes/user-account/my-listings/MyListingsAjaxHandler.php';
 require_once get_stylesheet_directory() . '/includes/user-account/my-listings/my-listings.php';
