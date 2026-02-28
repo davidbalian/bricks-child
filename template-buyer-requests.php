@@ -54,38 +54,65 @@ get_header(); ?>
                     $price = get_field( 'buyer_price', $post_id );
                     $description = get_field( 'buyer_description', $post_id );
                     $author = get_the_author();
+                    $author_id = get_the_author_meta( 'ID' );
                     $date = get_the_date();
+                    $permalink = get_permalink( $post_id );
+                    
+                    // Truncate description for card view
+                    $description_preview = '';
+                    if ( ! empty( $description ) ) {
+                        $description_text = wp_strip_all_tags( $description );
+                        $description_preview = mb_strlen( $description_text ) > 120 
+                            ? mb_substr( $description_text, 0, 120 ) . '...' 
+                            : $description_text;
+                    }
                     ?>
                     <article class="buyer-request-card">
-                        <div class="buyer-request-card-header">
-                            <h3 class="buyer-request-title">
-                                <?php
-                                echo esc_html( $year . ' ' . $make );
-                                if ( ! empty( $model ) ) {
-                                    echo ' ' . esc_html( $model );
-                                }
-                                ?>
-                            </h3>
-                            <div class="buyer-request-price">
-                                <?php esc_html_e( 'Up to', 'bricks-child' ); ?> 
-                                <strong>€<?php echo number_format( $price, 0, ',', '.' ); ?></strong>
+                        <a href="<?php echo esc_url( $permalink ); ?>" class="buyer-request-card-link">
+                            <div class="buyer-request-card-header">
+                                <div class="buyer-request-title-section">
+                                    <h3 class="buyer-request-title">
+                                        <?php
+                                        echo esc_html( $year . ' ' . $make );
+                                        if ( ! empty( $model ) ) {
+                                            echo ' ' . esc_html( $model );
+                                        }
+                                        ?>
+                                    </h3>
+                                    <div class="buyer-request-badge">
+                                        <?php echo get_svg_icon('magnifying-glass'); ?>
+                                        <?php esc_html_e( 'Buyer Request', 'bricks-child' ); ?>
+                                    </div>
+                                </div>
+                                <div class="buyer-request-price">
+                                    <span class="buyer-request-price-label"><?php esc_html_e( 'Up to', 'bricks-child' ); ?></span>
+                                    <strong class="buyer-request-price-amount">€<?php echo number_format( $price, 0, ',', '.' ); ?></strong>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <?php if ( ! empty( $description ) ) : ?>
-                            <div class="buyer-request-description">
-                                <?php echo wp_kses_post( $description ); ?>
+                            
+                            <?php if ( ! empty( $description_preview ) ) : ?>
+                                <div class="buyer-request-description">
+                                    <p><?php echo esc_html( $description_preview ); ?></p>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <div class="buyer-request-card-footer">
+                                <div class="buyer-request-meta">
+                                    <div class="buyer-request-meta-item">
+                                        <?php echo get_svg_icon('user'); ?>
+                                        <span class="buyer-request-author"><?php echo esc_html( $author ); ?></span>
+                                    </div>
+                                    <div class="buyer-request-meta-item">
+                                        <?php echo get_svg_icon('calendar'); ?>
+                                        <span class="buyer-request-date"><?php echo esc_html( $date ); ?></span>
+                                    </div>
+                                </div>
+                                <div class="buyer-request-view-link">
+                                    <?php esc_html_e( 'View Details', 'bricks-child' ); ?>
+                                    <?php echo get_svg_icon('arrow-right'); ?>
+                                </div>
                             </div>
-                        <?php endif; ?>
-                        
-                        <div class="buyer-request-meta">
-                            <span class="buyer-request-author">
-                                <?php echo esc_html( $author ); ?>
-                            </span>
-                            <span class="buyer-request-date">
-                                <?php echo esc_html( $date ); ?>
-                            </span>
-                        </div>
+                        </a>
                     </article>
                     <?php
                 endwhile;

@@ -1,0 +1,148 @@
+<?php
+/**
+ * Template for displaying single buyer request posts
+ *
+ * @package Bricks Child
+ * @since 1.0.0
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
+get_header(); ?>
+
+<div class="bricks-container">
+    <div class="bricks-content">
+        <?php
+        while ( have_posts() ) : the_post();
+            $post_id = get_the_ID();
+            $make = get_field( 'buyer_make', $post_id );
+            $model = get_field( 'buyer_model', $post_id );
+            $year = get_field( 'buyer_year', $post_id );
+            $price = get_field( 'buyer_price', $post_id );
+            $description = get_field( 'buyer_description', $post_id );
+            $author = get_the_author();
+            $author_id = get_the_author_meta( 'ID' );
+            $date = get_the_date();
+            ?>
+            
+            <div class="single-buyer-request">
+                <!-- Back Button -->
+                <div class="buyer-request-back">
+                    <a href="<?php echo esc_url( home_url( '/buyer-requests' ) ); ?>" class="buyer-request-back-link">
+                        <?php echo get_svg_icon('arrow-left'); ?>
+                        <?php esc_html_e( 'Back to Buyer Requests', 'bricks-child' ); ?>
+                    </a>
+                </div>
+
+                <!-- Main Content -->
+                <div class="single-buyer-request-content">
+                    <!-- Header Section -->
+                    <div class="single-buyer-request-header">
+                        <div class="buyer-request-badge-large">
+                            <?php echo get_svg_icon('magnifying-glass'); ?>
+                            <?php esc_html_e( 'Buyer Request', 'bricks-child' ); ?>
+                        </div>
+                        <h1 class="single-buyer-request-title">
+                            <?php
+                            echo esc_html( $year . ' ' . $make );
+                            if ( ! empty( $model ) ) {
+                                echo ' ' . esc_html( $model );
+                            }
+                            ?>
+                        </h1>
+                        <div class="single-buyer-request-price">
+                            <span class="price-label"><?php esc_html_e( 'Maximum Price', 'bricks-child' ); ?></span>
+                            <span class="price-amount">€<?php echo number_format( $price, 0, ',', '.' ); ?></span>
+                        </div>
+                    </div>
+
+                    <!-- Details Section -->
+                    <div class="single-buyer-request-details">
+                        <div class="buyer-request-details-grid">
+                            <div class="buyer-request-detail-item">
+                                <div class="detail-icon">
+                                    <?php echo get_svg_icon('car-side'); ?>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label"><?php esc_html_e( 'Make', 'bricks-child' ); ?></span>
+                                    <span class="detail-value"><?php echo esc_html( $make ); ?></span>
+                                </div>
+                            </div>
+
+                            <?php if ( ! empty( $model ) ) : ?>
+                                <div class="buyer-request-detail-item">
+                                    <div class="detail-icon">
+                                        <?php echo get_svg_icon('car'); ?>
+                                    </div>
+                                    <div class="detail-content">
+                                        <span class="detail-label"><?php esc_html_e( 'Model', 'bricks-child' ); ?></span>
+                                        <span class="detail-value"><?php echo esc_html( $model ); ?></span>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <div class="buyer-request-detail-item">
+                                <div class="detail-icon">
+                                    <?php echo get_svg_icon('calendar'); ?>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label"><?php esc_html_e( 'Year', 'bricks-child' ); ?></span>
+                                    <span class="detail-value"><?php echo esc_html( $year ); ?></span>
+                                </div>
+                            </div>
+
+                            <div class="buyer-request-detail-item">
+                                <div class="detail-icon">
+                                    <?php echo get_svg_icon('euro-sign'); ?>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label"><?php esc_html_e( 'Maximum Price', 'bricks-child' ); ?></span>
+                                    <span class="detail-value">€<?php echo number_format( $price, 0, ',', '.' ); ?></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description Section -->
+                    <?php if ( ! empty( $description ) ) : ?>
+                        <div class="single-buyer-request-description">
+                            <h2><?php echo get_svg_icon('align-left'); ?> <?php esc_html_e( 'Description', 'bricks-child' ); ?></h2>
+                            <div class="description-content">
+                                <?php echo wp_kses_post( $description ); ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Author & Date Section -->
+                    <div class="single-buyer-request-meta">
+                        <div class="buyer-request-meta-item">
+                            <div class="meta-icon">
+                                <?php echo get_svg_icon('user'); ?>
+                            </div>
+                            <div class="meta-content">
+                                <span class="meta-label"><?php esc_html_e( 'Posted by', 'bricks-child' ); ?></span>
+                                <span class="meta-value"><?php echo esc_html( $author ); ?></span>
+                            </div>
+                        </div>
+                        <div class="buyer-request-meta-item">
+                            <div class="meta-icon">
+                                <?php echo get_svg_icon('calendar'); ?>
+                            </div>
+                            <div class="meta-content">
+                                <span class="meta-label"><?php esc_html_e( 'Posted on', 'bricks-child' ); ?></span>
+                                <span class="meta-value"><?php echo esc_html( $date ); ?></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php
+        endwhile;
+        ?>
+    </div>
+</div>
+
+<?php get_footer(); ?>
+

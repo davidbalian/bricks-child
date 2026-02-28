@@ -38,6 +38,11 @@ function bricks_child_enqueue_styles() {
         wp_enqueue_style( 'bricks-child-edit-listing-css', get_stylesheet_directory_uri() . '/includes/user-manage-listings/template-add-listing/add-listing.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/includes/user-manage-listings/template-add-listing/add-listing.css' ), 'all' );
     }
 
+    // Enqueue buyer request styles
+    if (is_page_template('template-buyer-requests.php') || is_page_template('template-create-buyer-request.php') || is_singular('buyer_request')) {
+        wp_enqueue_style( 'bricks-child-buyer-request-css', get_stylesheet_directory_uri() . '/includes/user-manage-listings/buyer-request-form.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/includes/user-manage-listings/buyer-request-form.css' ), 'all' );
+    }
+
     // Enqueue my-listings styles conditionally
     global $post;
     if (is_page('my-listings') || (is_singular() && is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'my_listings'))) {
