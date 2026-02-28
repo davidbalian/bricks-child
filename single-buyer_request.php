@@ -22,8 +22,43 @@ get_header(); ?>
             $year = get_field( 'buyer_year', $post_id );
             $price = get_field( 'buyer_price', $post_id );
             $description = get_field( 'buyer_description', $post_id );
-            $author = get_the_author();
             $author_id = get_the_author_meta( 'ID' );
+            $author_user = get_userdata( $author_id );
+            $first_name = get_user_meta( $author_id, 'first_name', true );
+            $last_name = get_user_meta( $author_id, 'last_name', true );
+            $username = $author_user ? $author_user->user_login : '';
+            
+            // Build display name from first and last name
+            $display_name = '';
+            if ( ! empty( $first_name ) || ! empty( $last_name ) ) {
+                $display_name = trim( $first_name . ' ' . $last_name );
+            }
+            
+            // Format phone number for display and links
+            $tel_link_number = '';
+            $display_phone = '';
+            $tel_link = '';
+            if ( ! empty( $username ) ) {
+                $tel_link_number = preg_replace( '/[^0-9+]/', '', $username );
+                $display_phone = preg_replace( '/[^0-9+]/', '', $username );
+                $display_phone = preg_replace( '/^(.{3})(.+)/', '$1 $2', $display_phone );
+                $tel_link = 'tel:+' . $tel_link_number;
+            }
+            
+            // WhatsApp link
+            $wa_link = '';
+            if ( ! empty( $tel_link_number ) ) {
+                $buyer_year = get_field( 'buyer_year', $post_id );
+                $buyer_make = get_field( 'buyer_make', $post_id );
+                $buyer_model = get_field( 'buyer_model', $post_id );
+                $car_info = $buyer_year . ' ' . $buyer_make;
+                if ( ! empty( $buyer_model ) ) {
+                    $car_info .= ' ' . $buyer_model;
+                }
+                $message_text = urlencode( "Hi, I saw your buyer request for a $car_info on AutoAgora.cy." );
+                $wa_link = "https://wa.me/" . $tel_link_number . "?text=" . $message_text;
+            }
+            
             $date = get_the_date();
             ?>
             
@@ -117,15 +152,41 @@ get_header(); ?>
 
                     <!-- Author & Date Section -->
                     <div class="single-buyer-request-meta">
-                        <div class="buyer-request-meta-item">
-                            <div class="meta-icon">
-                                <?php echo get_svg_icon('user'); ?>
+                        <?php if ( ! empty( $display_name ) ) : ?>
+                            <div class="buyer-request-meta-item">
+                                <div class="meta-icon">
+                                    <?php echo get_svg_icon('user'); ?>
+                                </div>
+                                <div class="meta-content">
+                                    <span class="meta-label"><?php esc_html_e( 'Posted by', 'bricks-child' ); ?></span>
+                                    <span class="meta-value"><?php echo esc_html( $display_name ); ?></span>
+                                </div>
                             </div>
-                            <div class="meta-content">
-                                <span class="meta-label"><?php esc_html_e( 'Posted by', 'bricks-child' ); ?></span>
-                                <span class="meta-value"><?php echo esc_html( $author ); ?></span>
+                        <?php endif; ?>
+                        <?php if ( ! empty( $display_phone ) && ! empty( $tel_link ) ) : ?>
+                            <div class="buyer-request-meta-item">
+                                <div class="meta-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div class="meta-content">
+                                    <span class="meta-label"><?php esc_html_e( 'Phone', 'bricks-child' ); ?></span>
+                                    <a href="<?php echo esc_attr( $tel_link ); ?>" class="meta-value meta-phone-link">
+                                        <?php echo esc_html( '+' . $display_phone ); ?>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
+                        <?php endif; ?>
+                        <?php if ( ! empty( $wa_link ) ) : ?>
+                            <div class="buyer-request-meta-item buyer-request-whatsapp">
+                                <a href="<?php echo esc_url( $wa_link ); ?>" 
+                                   class="buyer-request-whatsapp-button"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    <i class="fab fa-whatsapp"></i>
+                                    <span><?php esc_html_e( 'WhatsApp', 'bricks-child' ); ?></span>
+                                </a>
+                            </div>
+                        <?php endif; ?>
                         <div class="buyer-request-meta-item">
                             <div class="meta-icon">
                                 <?php echo get_svg_icon('calendar'); ?>

@@ -53,8 +53,27 @@ get_header(); ?>
                     $year = get_field( 'buyer_year', $post_id );
                     $price = get_field( 'buyer_price', $post_id );
                     $description = get_field( 'buyer_description', $post_id );
-                    $author = get_the_author();
                     $author_id = get_the_author_meta( 'ID' );
+                    $author_user = get_userdata( $author_id );
+                    $first_name = get_user_meta( $author_id, 'first_name', true );
+                    $last_name = get_user_meta( $author_id, 'last_name', true );
+                    $username = $author_user ? $author_user->user_login : '';
+                    
+                    // Build display name from first and last name
+                    $display_name = '';
+                    if ( ! empty( $first_name ) || ! empty( $last_name ) ) {
+                        $display_name = trim( $first_name . ' ' . $last_name );
+                    }
+                    
+                    // Format phone number for display
+                    $display_phone = '';
+                    $tel_link_number = '';
+                    if ( ! empty( $username ) ) {
+                        $tel_link_number = preg_replace( '/[^0-9+]/', '', $username );
+                        $display_phone = preg_replace( '/[^0-9+]/', '', $username );
+                        $display_phone = preg_replace( '/^(.{3})(.+)/', '$1 $2', $display_phone );
+                    }
+                    
                     $date = get_the_date();
                     $permalink = get_permalink( $post_id );
                     
@@ -98,10 +117,18 @@ get_header(); ?>
                             
                             <div class="buyer-request-card-footer">
                                 <div class="buyer-request-meta">
-                                    <div class="buyer-request-meta-item">
-                                        <?php echo get_svg_icon('user'); ?>
-                                        <span class="buyer-request-author"><?php echo esc_html( $author ); ?></span>
-                                    </div>
+                                    <?php if ( ! empty( $display_name ) ) : ?>
+                                        <div class="buyer-request-meta-item buyer-request-author-name">
+                                            <?php echo get_svg_icon('user'); ?>
+                                            <span class="buyer-request-author"><?php echo esc_html( $display_name ); ?></span>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if ( ! empty( $display_phone ) ) : ?>
+                                        <div class="buyer-request-meta-item buyer-request-phone">
+                                            <i class="fas fa-phone"></i>
+                                            <span class="buyer-request-username"><?php echo esc_html( '+' . $display_phone ); ?></span>
+                                        </div>
+                                    <?php endif; ?>
                                     <div class="buyer-request-meta-item">
                                         <?php echo get_svg_icon('calendar'); ?>
                                         <span class="buyer-request-date"><?php echo esc_html( $date ); ?></span>

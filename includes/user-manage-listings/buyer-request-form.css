@@ -197,6 +197,27 @@
     opacity: 0.7;
 }
 
+.buyer-request-meta-item i {
+    font-size: 0.875rem;
+    color: currentColor;
+    opacity: 0.7;
+}
+
+.buyer-request-meta-item.buyer-request-author-name {
+    margin-bottom: 0.25rem;
+}
+
+.buyer-request-meta-item.buyer-request-phone {
+    margin-top: 0.25rem;
+    font-size: 0.8125rem;
+}
+
+.buyer-request-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
 .buyer-request-author {
     font-weight: 500;
     color: #374151;
@@ -829,6 +850,11 @@
     fill: #6b7280;
 }
 
+.meta-icon i {
+    font-size: 1.25rem;
+    color: #6b7280;
+}
+
 .meta-content {
     display: flex;
     flex-direction: column;
@@ -847,6 +873,49 @@
     font-size: 1rem;
     font-weight: 600;
     color: #111827;
+}
+
+.meta-phone-link {
+    color: #3b82f6;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.meta-phone-link:hover {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.buyer-request-whatsapp {
+    margin-top: 0.5rem;
+}
+
+.buyer-request-whatsapp-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #25D366;
+    color: #000000;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.buyer-request-whatsapp-button:hover {
+    background-color: #20ba5a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    color: #000000;
+}
+
+.buyer-request-whatsapp-button i {
+    font-size: 1.25rem;
+    color: #000000;
 }
 
 /* Responsive */
