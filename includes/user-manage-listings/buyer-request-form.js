@@ -134,10 +134,14 @@ jQuery(document).ready(function ($) {
       
       // Enable/disable based on options
       if (options.length > 0) {
-        $button.prop('disabled', false);
-        $select.prop('disabled', false);
+        $button.prop('disabled', false).removeAttr('disabled');
+        $select.prop('disabled', false).removeAttr('disabled');
         $dropdown.removeClass('car-filter-dropdown-disabled');
-        $search.prop('disabled', false);
+        var $wrapper = $dropdown.closest('[id$="-wrapper"]');
+        if ($wrapper.length) {
+          $wrapper.find('.car-filter-dropdown').removeClass('car-filter-dropdown-disabled');
+        }
+        $search.prop('disabled', false).removeAttr('disabled');
       } else {
         $button.prop('disabled', true);
         $select.prop('disabled', true);
@@ -168,11 +172,18 @@ jQuery(document).ready(function ($) {
       var $button = $dropdown.find('.car-filter-dropdown-button');
       var $search = $dropdown.find('.car-filter-dropdown-search');
       var $select = $dropdown.find('select');
+      var $wrapper = $dropdown.closest('[id$="-wrapper"]'); // Get the wrapper element
       
       $button.prop('disabled', false);
       $select.prop('disabled', false);
       $dropdown.removeClass('car-filter-dropdown-disabled');
+      if ($wrapper.length) {
+        $wrapper.find('.car-filter-dropdown').removeClass('car-filter-dropdown-disabled');
+      }
       $search.prop('disabled', false);
+      
+      // Also ensure the select is enabled for form submission
+      $select.attr('disabled', false);
     }
   };
   
@@ -183,14 +194,21 @@ jQuery(document).ready(function ($) {
   // MAKE/MODEL HANDLING
   // =====================================================
   // Note: car_filter_render_dropdown creates wrapper with id="{id}-wrapper"
-  var $makeDropdown = $('#buyer-request-make-wrapper').find('.car-filter-dropdown');
-  var $modelDropdown = $('#buyer-request-model-wrapper').find('.car-filter-dropdown');
   var isLoadingModels = false;
   
   // Handle make selection to populate model dropdown
   // Listen to the hidden select change event
   $('#buyer-request-make').on('change', function() {
     const makeName = $(this).val();
+    
+    // Get model dropdown dynamically each time (in case DOM changes)
+    var $modelWrapper = $('#buyer-request-model-wrapper');
+    var $modelDropdown = $modelWrapper.find('.car-filter-dropdown');
+    
+    if (!$modelDropdown.length) {
+      console.error('Buyer Request: Model dropdown not found!');
+      return;
+    }
     
     if (!makeName || makeName === '') {
       // Reset model dropdown if no make selected
@@ -214,9 +232,16 @@ jQuery(document).ready(function ($) {
       },
       success: function(response) {
         isLoadingModels = false;
+        
+        // Re-get elements in case DOM changed
+        $modelWrapper = $('#buyer-request-model-wrapper');
+        $modelDropdown = $modelWrapper.find('.car-filter-dropdown');
+        
         BuyerRequestDropdown.setLoading($modelDropdown, false);
         
-        if (response.success && response.data) {
+        console.log('Buyer Request: Models AJAX response:', response);
+        
+        if (response.success && response.data && response.data.length > 0) {
           // response.data is an array of model names
           const options = response.data.map(function(modelName) {
             return {
@@ -225,15 +250,35 @@ jQuery(document).ready(function ($) {
             };
           });
           
+          console.log('Buyer Request: Updating model dropdown with', options.length, 'options');
+          
+          // Update options (this will enable the dropdown if options exist)
           BuyerRequestDropdown.updateOptions($modelDropdown, options, 'Select Model');
+          
+          // Explicitly enable the dropdown to ensure it's enabled
+          BuyerRequestDropdown.enable($modelDropdown);
+          
+          // Also enable the wrapper elements directly
+          $modelWrapper.find('.car-filter-dropdown').removeClass('car-filter-dropdown-disabled');
+          $modelWrapper.find('.car-filter-dropdown-button').prop('disabled', false).removeAttr('disabled');
+          $modelWrapper.find('select').prop('disabled', false).removeAttr('disabled');
+          
+          console.log('Buyer Request: Model dropdown enabled. Button disabled?', $modelWrapper.find('.car-filter-dropdown-button').prop('disabled'));
         } else {
-          BuyerRequestDropdown.disable($modelDropdown, 'Error loading models');
+          console.log('Buyer Request: No models found or error in response');
+          BuyerRequestDropdown.disable($modelDropdown, response.data && response.data.length === 0 ? 'No models available' : 'Error loading models');
         }
       },
       error: function(xhr, status, error) {
         isLoadingModels = false;
+        
+        // Re-get elements in case DOM changed
+        var $modelWrapper = $('#buyer-request-model-wrapper');
+        var $modelDropdown = $modelWrapper.find('.car-filter-dropdown');
+        
         BuyerRequestDropdown.setLoading($modelDropdown, false);
         BuyerRequestDropdown.disable($modelDropdown, 'Error loading models');
+        console.error('Buyer Request: AJAX error:', error);
       }
     });
   });
