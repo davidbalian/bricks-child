@@ -213,21 +213,14 @@ get_header(); ?>
                     </div>
                 </div>
 
-                <div class="form-section input-wrapper collapsible-section collapsed">
-                    <div class="section-header" role="button" tabindex="0" aria-expanded="false">
-                        <h2><?php echo get_svg_icon('align-left'); ?> <?php esc_html_e( 'Description', 'bricks-child' ); ?> <span class="optional">(<?php esc_html_e( 'Optional', 'bricks-child' ); ?>)</span></h2>
-                        <span class="collapse-arrow"><?php echo get_svg_icon('chevron-down'); ?></span>
-                    </div>
-                    <div class="section-content-wrapper">
-                        <div class="section-content">
-                            <p class="description-guidelines">
-                                <?php esc_html_e( 'Add any additional details about what you\'re looking for (condition, mileage, features, etc.)', 'bricks-child' ); ?>
-                            </p>
+                <div class="form-section input-wrapper">
+                    <h2><?php echo get_svg_icon('align-left'); ?> <?php esc_html_e( 'Description', 'bricks-child' ); ?> <span class="optional">(<?php esc_html_e( 'Optional', 'bricks-child' ); ?>)</span></h2>
+                    <p class="description-guidelines">
+                        <?php esc_html_e( 'Add any additional details about what you\'re looking for (condition, mileage, features, etc.)', 'bricks-child' ); ?>
+                    </p>
 
-                            <div class="form-row">
-                                <textarea id="buyer_description" name="buyer_description" class="form-control" rows="5" placeholder="<?php esc_attr_e( 'Enter your description here...', 'bricks-child' ); ?>"></textarea>
-                            </div>
-                        </div>
+                    <div class="form-row">
+                        <textarea id="buyer_description" name="buyer_description" class="form-control" rows="5" placeholder="<?php esc_attr_e( 'Enter your description here...', 'bricks-child' ); ?>"></textarea>
                     </div>
                 </div>
                 
