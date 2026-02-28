@@ -482,6 +482,29 @@
     }
 }
 
+/* Validation Error Styles */
+.field-has-error {
+  position: relative;
+}
+
+.field-has-error .form-control,
+.field-has-error .car-filter-dropdown-button {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.field-error-message {
+  display: block;
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.field-has-error label {
+  color: #ef4444;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .buyer-requests-header {

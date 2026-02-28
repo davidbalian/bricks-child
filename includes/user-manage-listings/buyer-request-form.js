@@ -1,5 +1,184 @@
 jQuery(document).ready(function ($) {
   // =====================================================
+  // FORM VALIDATION CONFIGURATION
+  // =====================================================
+  const requiredFields = {
+    'buyer-request-make': { type: 'dropdown', label: 'Make' },
+    'buyer-request-year': { type: 'dropdown', label: 'Year' },
+    'buyer_price': { type: 'text', label: 'Price' }
+    // Note: buyer-request-model and buyer_description are optional
+  };
+
+  // =====================================================
+  // FORM VALIDATION FUNCTIONS
+  // =====================================================
+
+  /**
+   * Check if a specific field is valid
+   */
+  function isFieldValid(fieldId, config) {
+    if (config.type === 'dropdown') {
+      const $wrapper = $('#' + fieldId + '-wrapper');
+      const $select = $wrapper.find('select');
+
+      // Skip model validation if dropdown is disabled (no make selected) - model is optional anyway
+      if (fieldId === 'buyer-request-model' && $select.prop('disabled')) {
+        return true; // Model is optional, so if disabled it's still valid
+      }
+
+      const value = $select.val();
+      return value !== '' && value !== null && value !== undefined;
+    } else if (config.type === 'text') {
+      const $input = $('#' + fieldId);
+      let value = $input.val().trim();
+      
+      // For price, remove commas before checking
+      if (fieldId === 'buyer_price') {
+        value = value.replace(/,/g, '');
+      }
+      
+      return value !== '' && !isNaN(value) && parseFloat(value) > 0;
+    }
+    return false;
+  }
+
+  /**
+   * Validate all required fields and return validation result
+   */
+  function validateAllFields() {
+    const errors = [];
+
+    // Check all required fields
+    for (const [fieldId, config] of Object.entries(requiredFields)) {
+      if (!isFieldValid(fieldId, config)) {
+        errors.push({ fieldId, label: config.label, type: config.type });
+      }
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors: errors
+    };
+  }
+
+  /**
+   * Show error state for a specific field
+   */
+  function showFieldError(fieldId, label) {
+    let $container;
+
+    if (fieldId.startsWith('buyer-request-')) {
+      // Dropdown field
+      $container = $('#' + fieldId + '-wrapper').closest('.form-third, .form-half, .form-row');
+    } else {
+      // Text input
+      $container = $('#' + fieldId).closest('.form-third, .form-half, .form-row');
+    }
+
+    if ($container.length) {
+      $container.addClass('field-has-error');
+
+      // Add error message if not already present
+      if (!$container.find('.field-error-message').length) {
+        let errorMsg = 'This field is required';
+        if (fieldId === 'buyer_price') {
+          errorMsg = 'Please enter a valid price';
+        }
+        $container.append('<span class="field-error-message">' + errorMsg + '</span>');
+      }
+    }
+  }
+
+  /**
+   * Clear error state for a specific field
+   */
+  function clearFieldError(fieldId) {
+    let $container;
+
+    if (fieldId.startsWith('buyer-request-')) {
+      $container = $('#' + fieldId + '-wrapper').closest('.form-third, .form-half, .form-row');
+    } else {
+      $container = $('#' + fieldId).closest('.form-third, .form-half, .form-row');
+    }
+
+    if ($container.length) {
+      $container.removeClass('field-has-error');
+      $container.find('.field-error-message').remove();
+    }
+  }
+
+  /**
+   * Clear all field errors
+   */
+  function clearAllFieldErrors() {
+    $('.field-has-error').removeClass('field-has-error');
+    $('.field-error-message').remove();
+  }
+
+  /**
+   * Show all validation errors and scroll to first error
+   */
+  function showAllValidationErrors(errors) {
+    // First clear all existing errors
+    clearAllFieldErrors();
+
+    // Show each error
+    errors.forEach(error => {
+      showFieldError(error.fieldId, error.label);
+    });
+
+    // Scroll to first error
+    if (errors.length > 0) {
+      let $firstError;
+      const firstErrorId = errors[0].fieldId;
+
+      if (firstErrorId.startsWith('buyer-request-')) {
+        $firstError = $('#' + firstErrorId + '-wrapper');
+      } else {
+        $firstError = $('#' + firstErrorId);
+      }
+
+      if ($firstError.length) {
+        $('html, body').animate({
+          scrollTop: $firstError.offset().top - 100
+        }, 300);
+      }
+    }
+  }
+
+  /**
+   * Bind validation events to form fields
+   */
+  function bindValidationEvents() {
+    // Dropdown changes - listen to hidden select change events
+    Object.keys(requiredFields).forEach(fieldId => {
+      const config = requiredFields[fieldId];
+
+      if (config.type === 'dropdown') {
+        const $select = $('#' + fieldId);
+        $select.on('change', function() {
+          // Clear error for this field if now valid
+          if (isFieldValid(fieldId, config)) {
+            clearFieldError(fieldId);
+          }
+        });
+      } else if (config.type === 'text') {
+        const $input = $('#' + fieldId);
+        $input.on('input blur', function() {
+          if (isFieldValid(fieldId, config)) {
+            clearFieldError(fieldId);
+          }
+        });
+      }
+    });
+  }
+
+  // Initialize validation after a short delay to ensure DOM is ready
+  setTimeout(function() {
+    bindValidationEvents();
+  }, 100);
+
+  // =====================================================
   // DROPDOWN SYSTEM (copied from add-listing.js)
   // =====================================================
   var BuyerRequestDropdown = {
@@ -332,6 +511,16 @@ jQuery(document).ready(function ($) {
   
   // Handle form submission
   $("#create-buyer-request-form").on("submit", function (e) {
+    // Run full validation
+    const validation = validateAllFields();
+
+    if (!validation.isValid) {
+      e.preventDefault();
+      showAllValidationErrors(validation.errors);
+      console.log('Buyer Request: Form submission blocked - validation failed:', validation.errors);
+      return false;
+    }
+
     // Re-enable model dropdown before submission (disabled fields don't submit)
     const $modelSelect = $("#buyer-request-model");
     if ($modelSelect.prop("disabled")) {
