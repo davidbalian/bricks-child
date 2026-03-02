@@ -951,9 +951,16 @@
     color: #000000;
 }
 
+/* Buyer Request Top Actions (Back + Delete) */
+.buyer-request-top-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
 /* Buyer Request Owner Actions (Delete) */
 .buyer-request-owner-actions {
-    margin-top: 1.5rem;
     display: flex;
     justify-content: flex-end;
 }

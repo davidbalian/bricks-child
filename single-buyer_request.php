@@ -64,29 +64,31 @@ get_header(); ?>
             ?>
             
             <div class="single-buyer-request">
-                <!-- Back Button -->
-                <div class="buyer-request-back">
-                    <a href="<?php echo esc_url( home_url( '/buyer-requests' ) ); ?>" class="buyer-request-back-link">
-                        <?php echo get_svg_icon('arrow-left'); ?>
-                        <?php esc_html_e( 'Back to Buyer Requests', 'bricks-child' ); ?>
-                    </a>
-                </div>
-
-                <?php if ( $can_delete ) : ?>
-                    <div class="buyer-request-owner-actions">
-                        <form method="post"
-                              action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
-                              onsubmit="return confirm('<?php echo esc_js( __( 'Are you sure you want to delete this buyer request?', 'bricks-child' ) ); ?>');">
-                            <?php wp_nonce_field( 'delete_buyer_request_nonce', 'delete_buyer_request_nonce' ); ?>
-                            <input type="hidden" name="action" value="delete_buyer_request">
-                            <input type="hidden" name="buyer_request_id" value="<?php echo esc_attr( $post_id ); ?>">
-                            <button type="submit" class="buyer-request-delete-button">
-                                <?php echo get_svg_icon( 'trash' ); ?>
-                                <span><?php esc_html_e( 'Delete this request', 'bricks-child' ); ?></span>
-                            </button>
-                        </form>
+                <!-- Top Actions: Back + Delete (if owner) -->
+                <div class="buyer-request-top-actions">
+                    <div class="buyer-request-back">
+                        <a href="<?php echo esc_url( home_url( '/buyer-requests' ) ); ?>" class="buyer-request-back-link">
+                            <?php echo get_svg_icon('arrow-left'); ?>
+                            <?php esc_html_e( 'Back to Buyer Requests', 'bricks-child' ); ?>
+                        </a>
                     </div>
-                <?php endif; ?>
+
+                    <?php if ( $can_delete ) : ?>
+                        <div class="buyer-request-owner-actions">
+                            <form method="post"
+                                  action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
+                                  onsubmit="return confirm('<?php echo esc_js( __( 'Are you sure you want to delete this buyer request?', 'bricks-child' ) ); ?>');">
+                                <?php wp_nonce_field( 'delete_buyer_request_nonce', 'delete_buyer_request_nonce' ); ?>
+                                <input type="hidden" name="action" value="delete_buyer_request">
+                                <input type="hidden" name="buyer_request_id" value="<?php echo esc_attr( $post_id ); ?>">
+                                <button type="submit" class="buyer-request-delete-button">
+                                    <?php echo get_svg_icon( 'trash' ); ?>
+                                    <span><?php esc_html_e( 'Delete this request', 'bricks-child' ); ?></span>
+                                </button>
+                            </form>
+                        </div>
+                    <?php endif; ?>
+                </div>
 
                 <!-- Main Content -->
                 <div class="single-buyer-request-content">
