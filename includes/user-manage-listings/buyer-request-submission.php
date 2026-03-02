@@ -104,20 +104,35 @@ function handle_add_buyer_request() {
     
     // Create the post
     $post_data = array(
-        'post_title' => $post_title,
+        'post_title'   => $post_title,
         'post_content' => '',
-        'post_status' => 'publish', // Buyer requests are published immediately
-        'post_type' => 'buyer_request',
-        'post_author' => get_current_user_id(),
+        'post_status'  => 'publish', // Buyer requests are published immediately
+        'post_type'    => 'buyer_request',
+        'post_author'  => get_current_user_id(),
     );
     
     // Insert the post
-    $post_id = wp_insert_post($post_data);
+    $post_id = wp_insert_post( $post_data );
     
     // Check if post creation was successful
-    if (is_wp_error($post_id)) {
+    if ( is_wp_error( $post_id ) ) {
         wp_redirect(add_query_arg('error', 'post_creation', wp_get_referer()));
         exit;
+    }
+
+    // Ensure the permalink is unique and stable by appending the post ID to the slug,
+    // e.g. /buyer_request/looking-for-2025-acura-cl-up-to-e12-312-1234/
+    // This prevents collisions when two buyer requests have the same title.
+    $current_post = get_post( $post_id );
+    if ( $current_post && ! empty( $current_post->post_name ) ) {
+        $slug_with_id = sanitize_title( $current_post->post_name . '-' . $post_id );
+        // Update the post_name only (no need to change anything else)
+        wp_update_post(
+            array(
+                'ID'        => $post_id,
+                'post_name' => $slug_with_id,
+            )
+        );
     }
     
     // Add post meta for all the buyer request details
