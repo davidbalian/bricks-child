@@ -17,6 +17,11 @@ if (!defined('WPINC')) {
  * Process form submission for adding a new buyer request
  */
 function handle_add_buyer_request() {
+    // Only allow POST requests
+    if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
+        wp_die( esc_html__( 'Invalid request method.', 'bricks-child' ), 400 );
+    }
+
     // Verify nonce
     if (!isset($_POST['add_buyer_request_nonce']) || !wp_verify_nonce($_POST['add_buyer_request_nonce'], 'add_buyer_request_nonce')) {
         wp_redirect(add_query_arg('error', 'nonce_failed', wp_get_referer()));
@@ -136,7 +141,6 @@ function handle_add_buyer_request() {
     exit;
 }
 
-// Add hooks for handling form submissions
+// Add hook for handling form submissions (authenticated users only)
 add_action('admin_post_add_new_buyer_request', 'handle_add_buyer_request');
-add_action('admin_post_nopriv_add_new_buyer_request', 'handle_add_buyer_request');
 
