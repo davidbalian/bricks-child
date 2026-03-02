@@ -141,6 +141,69 @@ function handle_add_buyer_request() {
     exit;
 }
 
+/**
+ * Handle deletion of an existing buyer request.
+ *
+ * Security:
+ * - Only accepts POST requests.
+ * - Requires valid nonce.
+ * - Requires logged-in user.
+ * - Buyer request must belong to the current user.
+ */
+function handle_delete_buyer_request() {
+    // Only allow POST requests
+    if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
+        wp_die( esc_html__( 'Invalid request method.', 'bricks-child' ), 400 );
+    }
+
+    // Verify nonce
+    if (
+        ! isset( $_POST['delete_buyer_request_nonce'] )
+        || ! wp_verify_nonce( $_POST['delete_buyer_request_nonce'], 'delete_buyer_request_nonce' )
+    ) {
+        wp_die( esc_html__( 'Security check failed.', 'bricks-child' ), 403 );
+    }
+
+    // Require logged-in user
+    if ( ! is_user_logged_in() ) {
+        wp_die( esc_html__( 'You must be logged in to delete a buyer request.', 'bricks-child' ), 403 );
+    }
+
+    // Validate buyer request ID
+    $post_id = isset( $_POST['buyer_request_id'] ) ? intval( $_POST['buyer_request_id'] ) : 0;
+    if ( ! $post_id || get_post_type( $post_id ) !== 'buyer_request' ) {
+        wp_die( esc_html__( 'Invalid buyer request.', 'bricks-child' ), 400 );
+    }
+
+    $post = get_post( $post_id );
+    if ( ! $post ) {
+        wp_die( esc_html__( 'Buyer request not found.', 'bricks-child' ), 404 );
+    }
+
+    $current_user_id = get_current_user_id();
+    if ( intval( $post->post_author ) !== $current_user_id ) {
+        wp_die( esc_html__( 'You are not allowed to delete this buyer request.', 'bricks-child' ), 403 );
+    }
+
+    // Move the post to trash (safer than permanent delete)
+    wp_trash_post( $post_id );
+
+    // Redirect to buyer requests index with a success flag
+    $buyer_requests_page = get_page_by_path( 'buyer-requests' );
+    if ( $buyer_requests_page ) {
+        $redirect_url = get_permalink( $buyer_requests_page->ID );
+    } else {
+        $redirect_url = home_url( '/buyer-requests' );
+    }
+
+    $redirect_url = add_query_arg( 'buyer_request_deleted', 'success', $redirect_url );
+
+    wp_safe_redirect( $redirect_url );
+    exit;
+}
+
 // Add hook for handling form submissions (authenticated users only)
 add_action('admin_post_add_new_buyer_request', 'handle_add_buyer_request');
+// Add hook for handling deletions (authenticated users only)
+add_action('admin_post_delete_buyer_request', 'handle_delete_buyer_request');
 

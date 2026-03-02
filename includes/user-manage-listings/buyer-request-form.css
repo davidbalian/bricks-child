@@ -951,6 +951,43 @@
     color: #000000;
 }
 
+/* Buyer Request Owner Actions (Delete) */
+.buyer-request-owner-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.buyer-request-delete-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 999px;
+    border: none;
+    background-color: #f97373;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.buyer-request-delete-button svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.buyer-request-delete-button:hover {
+    background-color: #ef4444;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(239, 68, 68, 0.25);
+}
+
+.buyer-request-delete-button:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .buyer-requests-header {
