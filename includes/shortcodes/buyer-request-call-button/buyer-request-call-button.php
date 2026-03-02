@@ -112,3 +112,4 @@ function buyer_request_call_button_enqueue_scripts() {
 }
 add_action('wp_enqueue_scripts', 'buyer_request_call_button_enqueue_scripts');
 
+

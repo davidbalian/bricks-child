@@ -13,9 +13,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 // If the user is not logged in, send them straight to the login page
 // and mark that they came from the "Create Buyer Request" flow so we can show
 // a contextual banner on the login screen.
+//
+// IMPORTANT: Use a query parameter name that does NOT conflict with the
+// buyer_request custom post type query var. Using ?buyer_request=1 would
+// make WordPress treat the request as a buyer_request single instead of
+// the signin page, causing a 404.
 if ( ! is_user_logged_in() ) {
     $login_url = add_query_arg(
-        'buyer_request',
+        'creating_buyer_request',
         '1',
         wp_login_url()
     );

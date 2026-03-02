@@ -35,7 +35,14 @@ get_header(); ?>
                                     <?php esc_html_e( 'To continue selling your car, please log in.', 'bricks-child' ); ?>
                                 </div>
                             <?php endif; ?>
-							<?php if ( isset( $_GET['buyer_request'] ) && $_GET['buyer_request'] === '1' ) : ?>
+							<?php
+                            // Show a banner when coming from the "Create Buyer Request" flow.
+                            // Primary param: creating_buyer_request=1 (does NOT conflict with CPT).
+                            // Backwards-compat: also accept buyer_request=1 if it ever appears.
+                            if (
+                                ( isset( $_GET['creating_buyer_request'] ) && $_GET['creating_buyer_request'] === '1' ) ||
+                                ( isset( $_GET['buyer_request'] ) && $_GET['buyer_request'] === '1' )
+                            ) : ?>
                                 <div class="selling-car-login-banner">
                                     <?php esc_html_e( 'To create a buyer request, please log in.', 'bricks-child' ); ?>
                                 </div>
