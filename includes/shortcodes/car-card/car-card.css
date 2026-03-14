@@ -1,0 +1,241 @@
+/* ============================================
+   Car Card Component
+   ============================================ */
+
+/* ── Card container ── */
+.car-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Slider container ── */
+.car-card-slider {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1rem 1rem 0 0;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    user-select: none;
+    -webkit-user-select: none;
+    background: #f0f0f0;
+}
+
+/* ── Slides track ── */
+.car-card-slider-track {
+    display: flex;
+    transition: transform 0.2s ease;
+    will-change: transform;
+    touch-action: pan-y pinch-zoom;
+    -webkit-user-drag: none;
+    height: 100%;
+}
+
+/* ── Individual slide ── */
+.car-card-slide {
+    min-width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.car-card-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+    -webkit-user-drag: none;
+}
+
+/* ── No image fallback ── */
+.car-card-no-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #999;
+    font-size: 0.875rem;
+}
+
+/* ── 5th slide overlay ── */
+.car-card-slide-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.car-card-view-all-btn {
+    position: relative;
+    z-index: 11;
+    pointer-events: auto;
+    background: var(--bricks-color-primary, #333);
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.car-card-view-all-btn:hover {
+    opacity: 0.85;
+    color: #fff;
+}
+
+/* ── Badges (top-left) ── */
+.car-card-badges {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.car-card-badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #fff;
+}
+
+.badge-full {
+    background: #2ecc71;
+}
+
+.badge-extra {
+    background: #3498db;
+}
+
+/* ── Favorite button (top-right) ── */
+.car-card-slider .favorite-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 10;
+}
+
+/* ── Arrows ── */
+.car-card-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: opacity 0.25s;
+    opacity: 1;
+    touch-action: manipulation;
+}
+
+.car-card-arrow svg {
+    width: 0.75rem;
+    height: 0.75rem;
+    flex-shrink: 0;
+    stroke: #333;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+.car-card-arrow-left {
+    left: 0.5rem;
+}
+
+.car-card-arrow-left svg {
+    margin-right: 2px;
+}
+
+.car-card-arrow-right {
+    right: 0.5rem;
+}
+
+.car-card-arrow-right svg {
+    margin-left: 2px;
+}
+
+.car-card-arrow.car-card-arrow-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ── Pagination dots ── */
+.car-card-dots {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    gap: 0.3rem;
+    pointer-events: none;
+}
+
+.car-card-dot {
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.45);
+    transition: background 0.25s, transform 0.25s;
+}
+
+.car-card-dot.car-card-dot-active {
+    background: #fff;
+    transform: scale(1.25);
+}
+
+/* ── Counter badge ── */
+.car-card-counter {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    z-index: 3;
+    background: #fff;
+    color: #333;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0.25rem 0.45rem;
+    border-radius: 0.25rem;
+    pointer-events: none;
+}
+
+/* ── Body (Row 2) ── */
+.car-card-body {
+    background: #fff;
+    padding: 0.5rem 1rem;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.car-card-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #333;
+}
+
+.car-card-body:hover .car-card-title {
+    color: #000;
+}
