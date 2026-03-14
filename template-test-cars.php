@@ -441,6 +441,21 @@ $cars_query = new WP_Query( $args );
     flex: 0 0 calc(50% - 0.5rem);
 }
 
+@media (max-width: 768px) {
+    #tcp-sort-label {
+        display: none;
+    }
+    .tcp-filters-modal {
+        max-width: 100%;
+        max-height: 100%;
+        height: 100%;
+        border-radius: 0;
+    }
+    .tcp-filters-modal-overlay {
+        padding: 0;
+    }
+}
+
 /* ============================================
    Main Content
    ============================================ */
