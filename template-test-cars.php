@@ -273,10 +273,11 @@ $cars_query = new WP_Query( $args );
     border-radius: 50%;
     background: rgba(0,0,0,0.1);
     color: #2a3546;
-    font-size: 0.7rem;
-    line-height: 1;
+    font-size: 0.75rem;
+    line-height: 0;
     cursor: pointer;
     padding: 0;
+    padding-bottom: 1px;
     flex-shrink: 0;
 }
 .tcp-chip-remove:hover {
