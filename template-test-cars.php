@@ -51,6 +51,23 @@ $cars_query = new WP_Query( $args );
             Filters
         </button>
         <div class="tcp-active-filters" id="tcp-active-filters"></div>
+
+        <div class="tcp-sort" id="tcp-sort">
+            <button type="button" class="tcp-sort-btn" id="tcp-sort-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
+                <span id="tcp-sort-label">Newest</span>
+            </button>
+            <div class="tcp-sort-menu" id="tcp-sort-menu">
+                <button type="button" class="tcp-sort-option selected" data-orderby="date" data-order="DESC">Newest</button>
+                <button type="button" class="tcp-sort-option" data-orderby="date" data-order="ASC">Oldest</button>
+                <button type="button" class="tcp-sort-option" data-orderby="price" data-order="ASC">Price: Low to High</button>
+                <button type="button" class="tcp-sort-option" data-orderby="price" data-order="DESC">Price: High to Low</button>
+                <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="ASC">Mileage: Low to High</button>
+                <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="DESC">Mileage: High to Low</button>
+                <button type="button" class="tcp-sort-option" data-orderby="year" data-order="DESC">Year: Newest</button>
+                <button type="button" class="tcp-sort-option" data-orderby="year" data-order="ASC">Year: Oldest</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -153,6 +170,67 @@ $cars_query = new WP_Query( $args );
 .tcp-filters-btn:hover {
     border-color: #bbb;
     background: #f9fafb;
+}
+
+/* Sort dropdown */
+.tcp-sort {
+    position: relative;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+.tcp-sort-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border: 2px solid #dfe2e6;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #2a3546;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color 0.15s, background 0.15s;
+}
+.tcp-sort-btn:hover {
+    border-color: #bbb;
+    background: #f9fafb;
+}
+.tcp-sort-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    min-width: 200px;
+    background: #fff;
+    border: 2px solid #dfe2e6;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    z-index: 200;
+    padding: 0.25rem 0;
+}
+.tcp-sort.open .tcp-sort-menu {
+    display: block;
+}
+.tcp-sort-option {
+    display: block;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    border: none;
+    background: none;
+    color: #2a3546;
+    font-size: 0.875rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+.tcp-sort-option:hover {
+    background: rgba(13, 134, 227, 0.08);
+}
+.tcp-sort-option.selected {
+    font-weight: 700;
+    background: rgba(13, 134, 227, 0.12);
 }
 
 /* Active filter chips */
@@ -538,6 +616,43 @@ $cars_query = new WP_Query( $args );
             buildChips();
         });
     }
+
+    /* ── Sort dropdown ── */
+    var $sort = $('#tcp-sort');
+    var $sortBtn = $('#tcp-sort-btn');
+    var $sortLabel = $('#tcp-sort-label');
+
+    $sortBtn.on('click', function(e) {
+        e.stopPropagation();
+        $sort.toggleClass('open');
+    });
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#tcp-sort').length) {
+            $sort.removeClass('open');
+        }
+    });
+
+    $sort.on('click', '.tcp-sort-option', function() {
+        var $opt = $(this);
+        var orderby = $opt.data('orderby');
+        var order = $opt.data('order');
+
+        // Update UI
+        $sort.find('.tcp-sort-option').removeClass('selected');
+        $opt.addClass('selected');
+        $sortLabel.text($opt.text());
+        $sort.removeClass('open');
+
+        // Update listing_atts and reload page 1
+        var atts = $container.data('atts') || {};
+        atts.orderby = orderby;
+        atts.order = order;
+        $container.data('atts', atts);
+        // Also update the data attribute for future reads
+        $container.attr('data-atts', JSON.stringify(atts));
+
+        loadPage(1);
+    });
 
     /* ── AJAX pagination ── */
     function loadPage(page) {
