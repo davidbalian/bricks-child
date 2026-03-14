@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 
 $listing_atts = array(
-    'posts_per_page' => 12,
+    'posts_per_page' => 24,
     'orderby'        => 'date',
     'order'          => 'DESC',
     'card_type'      => 'car_card',
@@ -22,7 +22,7 @@ $listing_atts = array(
 $args = array(
     'post_type'      => 'car',
     'post_status'    => 'publish',
-    'posts_per_page' => 12,
+    'posts_per_page' => 24,
     'paged'          => 1,
     'orderby'        => 'date',
     'order'          => 'DESC',
@@ -444,6 +444,28 @@ $cars_query = new WP_Query( $args );
     var $overlay    = $('#tcp-filters-modal-overlay');
     var $chips      = $('#tcp-active-filters');
     var group       = 'default';
+    var MIN_ROWS     = 4;
+    var MIN_PER_PAGE = 12;
+    var CARD_MIN_W   = 280; // matches minmax(280px, 1fr)
+    var GRID_GAP     = 24;  // 1.5rem
+
+    /**
+     * Calculate posts_per_page as a multiple of current column count
+     * so every row is fully filled. At least 4 rows and at least 12 cards.
+     */
+    function calcPostsPerPage() {
+        var gridW = $wrapper.width() || $container.width();
+        if (!gridW) return MIN_PER_PAGE;
+        var cols = Math.max(1, Math.floor((gridW + GRID_GAP) / (CARD_MIN_W + GRID_GAP)));
+        return Math.max(MIN_PER_PAGE, cols * MIN_ROWS);
+    }
+
+    function syncPostsPerPage() {
+        var atts = $container.data('atts') || {};
+        atts.posts_per_page = calcPostsPerPage();
+        $container.data('atts', atts);
+        $container.attr('data-atts', JSON.stringify(atts));
+    }
 
     // Filter label map for chips
     var filterLabels = {
@@ -658,6 +680,7 @@ $cars_query = new WP_Query( $args );
 
     /* ── AJAX pagination ── */
     function loadPage(page) {
+        syncPostsPerPage();
         var filterData = (window.CarFilters && CarFilters.getFilterData)
             ? CarFilters.getFilterData(group)
             : {};
@@ -698,6 +721,39 @@ $cars_query = new WP_Query( $args );
         var page = parseInt(href.replace('#', ''), 10);
         if (page && page > 0) {
             loadPage(page);
+        }
+    });
+
+    // Hide orphan cards from the initial server-side render
+    function hideOrphans() {
+        var gridW = $wrapper.width();
+        if (!gridW) return;
+        var cols = Math.max(1, Math.floor((gridW + GRID_GAP) / (CARD_MIN_W + GRID_GAP)));
+        var $cards = $wrapper.children('.car-card');
+        var total = $cards.length;
+        var overflow = total % cols;
+        // Show all first, then hide overflow
+        $cards.show();
+        if (overflow > 0) {
+            $cards.slice(total - overflow).hide();
+        }
+    }
+    // Run once on load for the initial server-rendered cards
+    $(document).ready(function() {
+        hideOrphans();
+    });
+
+    // Sync posts_per_page before filter AJAX fires
+    $(document).on('ajaxSend', function(e, xhr, settings) {
+        if (settings.data && typeof settings.data === 'string' &&
+            settings.data.indexOf('action=car_filters_filter_listings') !== -1) {
+            syncPostsPerPage();
+            // Re-inject updated listing_atts into the request data
+            var atts = $container.data('atts') || {};
+            settings.data = settings.data.replace(
+                /listing_atts=[^&]*/,
+                'listing_atts=' + encodeURIComponent(JSON.stringify(atts))
+            );
         }
     });
 
