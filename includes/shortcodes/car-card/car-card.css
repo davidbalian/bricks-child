@@ -123,6 +123,16 @@
     top: 0.5rem;
     right: 0.5rem;
     z-index: 10;
+    background: white;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 99px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
 }
 
 /* ── Arrows ── */
