@@ -359,9 +359,20 @@ $cars_query = new WP_Query( $args );
 }
 .tcp-filters-modal-body {
     padding: 1.25rem;
+    padding-bottom: 20rem;
     overflow-y: auto;
     flex: 1;
     min-height: 0;
+}
+.tcp-filters-modal-header {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+}
+.tcp-filters-modal-footer {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
 }
 .tcp-filters-modal-body .car-filters-container {
     width: 100%;
