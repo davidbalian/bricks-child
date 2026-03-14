@@ -101,20 +101,23 @@
 
 .car-card-badge {
     display: inline-block;
-    padding: 0.2rem 0.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 600;
     line-height: 1.2;
-    color: #fff;
+    color: var(--bricks-color-lgsrvt, #fff);
+    border: 1px solid var(--bricks-border-color, transparent);
+    border-radius: 50px;
+    padding: 0 0.3rem;
 }
 
 .badge-full {
-    background: #2ecc71;
+    background-color: rgba(30, 174, 85, 0.8);
+    border-color: #22c55e;
 }
 
 .badge-extra {
-    background: #3498db;
+    background-color: rgba(59, 130, 246, 0.8);
+    border-color: rgb(59, 130, 246);
 }
 
 /* ── Favorite button (top-right) ── */
