@@ -463,6 +463,7 @@ $cars_query = new WP_Query( $args );
     max-width: 2000px;
     margin: 0 auto;
     padding: 1.5rem 1rem 6rem;
+    background-color: var(--bricks-color-lgsrvt);
 }
 .tcp-heading {
     font-size: 1.5rem;

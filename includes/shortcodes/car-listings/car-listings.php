@@ -149,44 +149,8 @@ function car_listings_build_query_args($atts) {
     // === URL PARAMETER FILTERS (for filter integration) ===
     $tax_query = array();
 
-    // Check for pretty URL filter data first
-    $pretty_url_filters = null;
-    if (function_exists('car_filters_get_parsed_url_data')) {
-        $pretty_url_filters = car_filters_get_parsed_url_data();
-    }
-
-    // Make/Model filter from URL
-    if ($pretty_url_filters && !empty($pretty_url_filters['model'])) {
-        // Pretty URL: model is the full slug (e.g., "bmw-m2")
-        $model_term = get_term_by('slug', $pretty_url_filters['model'], 'car_make');
-        if ($model_term) {
-            $tax_query[] = array(
-                'taxonomy' => 'car_make',
-                'field'    => 'term_id',
-                'terms'    => $model_term->term_id,
-            );
-        }
-    } elseif ($pretty_url_filters && !empty($pretty_url_filters['make'])) {
-        // Pretty URL: make only
-        $make_term = get_term_by('slug', $pretty_url_filters['make'], 'car_make');
-        if ($make_term && $make_term->parent === 0) {
-            // Get all models for this make
-            $models = get_terms(array(
-                'taxonomy' => 'car_make',
-                'parent' => $make_term->term_id,
-                'hide_empty' => true,
-                'fields' => 'ids',
-            ));
-            if (!empty($models) && !is_wp_error($models)) {
-                $tax_query[] = array(
-                    'taxonomy' => 'car_make',
-                    'field'    => 'term_id',
-                    'terms'    => $models,
-                );
-            }
-        }
-    } elseif (isset($_GET['model']) && !empty($_GET['model'])) {
-        // Fallback: Query param model
+    // Make/Model filter from query params
+    if (isset($_GET['model']) && !empty($_GET['model'])) {
         $model_param = sanitize_text_field($_GET['model']);
         $model_term = get_term_by('slug', $model_param, 'car_make');
         if ($model_term) {
@@ -197,11 +161,9 @@ function car_listings_build_query_args($atts) {
             );
         }
     } elseif (isset($_GET['make']) && !empty($_GET['make'])) {
-        // Fallback: Query param make
         $make_param = sanitize_text_field($_GET['make']);
         $make_term = get_term_by('slug', $make_param, 'car_make');
         if ($make_term && $make_term->parent === 0) {
-            // Get all models for this make
             $models = get_terms(array(
                 'taxonomy' => 'car_make',
                 'parent' => $make_term->term_id,
@@ -218,11 +180,8 @@ function car_listings_build_query_args($atts) {
         }
     }
 
-    // Helper to get filter value from pretty URL or $_GET
-    $get_filter_value = function($key) use ($pretty_url_filters) {
-        if ($pretty_url_filters && isset($pretty_url_filters[$key]) && $pretty_url_filters[$key] !== null) {
-            return $pretty_url_filters[$key];
-        }
+    // Helper to get filter value from query params
+    $get_filter_value = function($key) {
         if (isset($_GET[$key]) && $_GET[$key] !== '') {
             return sanitize_text_field($_GET[$key]);
         }

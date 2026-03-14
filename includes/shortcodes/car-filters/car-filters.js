@@ -104,138 +104,70 @@
         },
 
         /**
-         * Build URL with filter parameters (JetSmartFilters-style pretty URLs)
-         * Format: /cars/filter/make:bmw-m2/meta/price!range:10000_50000/
+         * Build URL with filter parameters as simple query params.
+         * Format: /cars/?make=bmw&model=bmw-m2&price_min=10000&fuel_type=Diesel
          */
         buildUrl: function(group, forRedirect) {
             var state = this.getState(group);
-            var parts = [];
+            var params = new URLSearchParams();
 
-            // Taxonomy: make (and model combined as parent-child slug)
-            if (state.make.slug) {
-                var makeSlug = state.make.slug;
-                if (state.model.slug) {
-                    // Model slug is the full combined slug (e.g., "bmw-m2")
-                    makeSlug = state.model.slug;
-                }
-                parts.push('make:' + makeSlug);
-            }
+            if (state.make.slug) params.set('make', state.make.slug);
+            if (state.model.slug) params.set('model', state.model.slug);
 
-            // Meta filters
-            var metaParts = [];
-
-            // Price range (only if at least one bound is set)
             var priceMin = this.parseNumber(state.price_min);
             var priceMax = this.parseNumber(state.price_max);
-            if (priceMin || priceMax) {
-                metaParts.push('price!range:' + (priceMin || 0) + '_' + (priceMax || 999999999));
-            }
+            if (priceMin) params.set('price_min', priceMin);
+            if (priceMax) params.set('price_max', priceMax);
 
-            // Mileage range
             var mileageMin = this.parseNumber(state.mileage_min);
             var mileageMax = this.parseNumber(state.mileage_max);
-            if (mileageMin || mileageMax) {
-                metaParts.push('mileage!range:' + (mileageMin || 0) + '_' + (mileageMax || 999999999));
-            }
+            if (mileageMin) params.set('mileage_min', mileageMin);
+            if (mileageMax) params.set('mileage_max', mileageMax);
 
-            // Year range
             var yearMin = this.parseNumber(state.year_min);
             var yearMax = this.parseNumber(state.year_max);
-            if (yearMin || yearMax) {
-                metaParts.push('year!range:' + (yearMin || 1900) + '_' + (yearMax || 2100));
-            }
+            if (yearMin) params.set('year_min', yearMin);
+            if (yearMax) params.set('year_max', yearMax);
 
-            // Simple meta filters
-            if (state.fuel_type) metaParts.push('fuel_type:' + state.fuel_type);
-            if (state.body_type) metaParts.push('body_type:' + state.body_type);
+            if (state.fuel_type) params.set('fuel_type', state.fuel_type);
+            if (state.body_type) params.set('body_type', state.body_type);
 
-            if (metaParts.length) {
-                parts.push('meta/' + metaParts.join(';'));
-            }
-
-            // Base URL: use redirect_url for redirect mode, current page for AJAX
             var baseUrl = forRedirect ? state.redirectUrl : this.getCurrentBasePath();
+            baseUrl = baseUrl.replace(/\/+$/, '') + '/';
 
-            // Ensure baseUrl ends without trailing slash
-            baseUrl = baseUrl.replace(/\/+$/, '');
-
-            // If no filters, return base URL without /filter/
-            if (parts.length === 0) {
-                return baseUrl + '/';
-            }
-
-            return baseUrl + '/filter/' + parts.join('/') + '/';
+            var qs = params.toString();
+            return qs ? baseUrl + '?' + qs : baseUrl;
         },
 
         /**
-         * Get current page's base path (e.g., /cars from /cars/filter/make:bmw/)
+         * Get current page's base path (strips query string)
          */
         getCurrentBasePath: function() {
-            var path = window.location.pathname;
-            var match = path.match(/^(\/[^\/]+)\/filter\//);
-            if (match) {
-                return match[1]; // Return base path before /filter/
-            }
-            return path.replace(/\/+$/, ''); // Current path without trailing slash
+            return window.location.pathname.replace(/\/+$/, '');
         },
 
         /**
-         * Parse pretty URL into filter state
-         * Format: /cars/filter/make:bmw-m2/meta/price!range:10000_50000/
+         * Parse URL query parameters into filter state
          */
         parseUrl: function() {
-            var path = window.location.pathname;
-            var match = path.match(/\/filter\/(.+?)\/?$/);
-            if (!match) return null;
+            var params = new URLSearchParams(window.location.search);
+            if (!params.toString()) return null;
 
-            var filterString = match[1];
             var result = {
-                makeSlug: null,
-                price_min: null,
-                price_max: null,
-                mileage_min: null,
-                mileage_max: null,
-                year_min: null,
-                year_max: null,
-                fuel_type: null,
-                body_type: null
+                makeSlug: params.get('make') || null,
+                price_min: params.get('price_min') ? parseInt(params.get('price_min'), 10) : null,
+                price_max: params.get('price_max') ? parseInt(params.get('price_max'), 10) : null,
+                mileage_min: params.get('mileage_min') ? parseInt(params.get('mileage_min'), 10) : null,
+                mileage_max: params.get('mileage_max') ? parseInt(params.get('mileage_max'), 10) : null,
+                year_min: params.get('year_min') ? parseInt(params.get('year_min'), 10) : null,
+                year_max: params.get('year_max') ? parseInt(params.get('year_max'), 10) : null,
+                fuel_type: params.get('fuel_type') || null,
+                body_type: params.get('body_type') || null
             };
 
-            // Parse make:slug (could be make or make-model combined)
-            var makeMatch = filterString.match(/make:([^\/]+)/);
-            if (makeMatch) {
-                result.makeSlug = makeMatch[1]; // Will be resolved by AJAX lookup
-            }
-
-            // Parse meta/field:value;field!range:min_max
-            var metaMatch = filterString.match(/meta\/([^\/]+)/);
-            if (metaMatch) {
-                var metaParts = metaMatch[1].split(';');
-                metaParts.forEach(function(part) {
-                    if (part.indexOf('!range:') !== -1) {
-                        // Range: price!range:10000_50000
-                        var rangeParts = part.split('!range:');
-                        var field = rangeParts[0];
-                        var values = rangeParts[1].split('_');
-                        var min = parseInt(values[0], 10);
-                        var max = parseInt(values[1], 10);
-
-                        // Only set if not placeholder values
-                        if (min > 0) {
-                            result[field + '_min'] = min;
-                        }
-                        if (max > 0 && max < 999999999 && (field !== 'year' || max < 2100)) {
-                            result[field + '_max'] = max;
-                        }
-                    } else if (part.indexOf(':') !== -1) {
-                        // Simple: fuel_type:Diesel
-                        var simpleParts = part.split(':');
-                        result[simpleParts[0]] = simpleParts[1];
-                    }
-                });
-            }
-
-            return result;
+            // Return null if nothing was actually set
+            var hasAny = Object.keys(result).some(function(k) { return result[k] !== null; });
+            return hasAny ? result : null;
         },
 
         /**
@@ -1048,31 +980,6 @@
                     }
                 });
             });
-        } else {
-            // Fallback: Initialize state from query parameters (backward compatibility)
-            var urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.toString()) {
-                $('.car-filters-container').each(function() {
-                    var group = $(this).data('group');
-                    if (!group) return;
-
-                    // Set state from URL
-                    ['make', 'model', 'fuel_type', 'body_type'].forEach(function(key) {
-                        if (urlParams.has(key)) {
-                            CarFilters.setState(group, key, urlParams.get(key), urlParams.get(key));
-                        }
-                    });
-
-                    ['price', 'mileage', 'year'].forEach(function(key) {
-                        if (urlParams.has(key + '_min')) {
-                            CarFilters.setState(group, key + '_min', urlParams.get(key + '_min'));
-                        }
-                        if (urlParams.has(key + '_max')) {
-                            CarFilters.setState(group, key + '_max', urlParams.get(key + '_max'));
-                        }
-                    });
-                });
-            }
         }
 
         // Fire initial cascade fetch for each group to sync dropdown options

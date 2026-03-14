@@ -60,6 +60,8 @@
 
         track.addEventListener('pointerdown', function (e) {
             if (e.button !== 0) return;
+            // Don't capture pointer on interactive elements (e.g. "View All Images" link)
+            if (e.target.closest('a, button:not(.car-card-arrow)')) return;
             dragging     = true;
             locked       = false;
             isHorizontal = false;

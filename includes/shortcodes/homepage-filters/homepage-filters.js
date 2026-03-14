@@ -844,71 +844,33 @@
   }
 
   /**
-   * Build JetSmartFilters URL from current filter selections
+   * Build filter URL with simple query parameters
    */
   function buildFilterUrl($container) {
-    let url = filterData.baseUrl;
-    const parts = [];
+    const params = new URLSearchParams();
 
-    // Build make/model part
-    // If model is selected, use model slug (it already includes make slug)
-    // Otherwise, use make slug if only make is selected
     if (selectedModel) {
-      parts.push("make:" + selectedModel.slug);
+      params.set("make", selectedMake.slug);
+      params.set("model", selectedModel.slug);
     } else if (selectedMake) {
-      parts.push("make:" + selectedMake.slug);
+      params.set("make", selectedMake.slug);
     }
 
-    // Build meta filters part
-    const metaParts = [];
-
-    // Price range (get from the container that triggered the search)
     const priceMinVal = $container.find("#homepage-filter-price-min").val();
     const priceMaxVal = $container.find("#homepage-filter-price-max").val();
-    const priceMin =
-      parseFormattedNumber(priceMinVal) || currentRanges.price.min;
-    const priceMax =
-      parseFormattedNumber(priceMaxVal) || currentRanges.price.max;
-    if (
-      priceMin !== currentRanges.price.min ||
-      priceMax !== currentRanges.price.max
-    ) {
-      metaParts.push("price!range:" + priceMin + "_" + priceMax);
-    }
+    const priceMin = parseFormattedNumber(priceMinVal) || currentRanges.price.min;
+    const priceMax = parseFormattedNumber(priceMaxVal) || currentRanges.price.max;
+    if (priceMin !== currentRanges.price.min) params.set("price_min", priceMin);
+    if (priceMax !== currentRanges.price.max) params.set("price_max", priceMax);
 
-    // Mileage range (get from the container that triggered the search)
     const mileageMinVal = $container.find("#homepage-filter-mileage-min").val();
     const mileageMaxVal = $container.find("#homepage-filter-mileage-max").val();
-    const mileageMin =
-      parseFormattedNumber(mileageMinVal) || currentRanges.mileage.min;
-    const mileageMax =
-      parseFormattedNumber(mileageMaxVal) || currentRanges.mileage.max;
-    if (
-      mileageMin !== currentRanges.mileage.min ||
-      mileageMax !== currentRanges.mileage.max
-    ) {
-      metaParts.push("mileage!range:" + mileageMin + "_" + mileageMax);
-    }
+    const mileageMin = parseFormattedNumber(mileageMinVal) || currentRanges.mileage.min;
+    const mileageMax = parseFormattedNumber(mileageMaxVal) || currentRanges.mileage.max;
+    if (mileageMin !== currentRanges.mileage.min) params.set("mileage_min", mileageMin);
+    if (mileageMax !== currentRanges.mileage.max) params.set("mileage_max", mileageMax);
 
-    // Combine parts
-    if (parts.length > 0) {
-      url += parts.join("/");
-    }
-
-    if (metaParts.length > 0) {
-      // Ensure we don't create double slashes
-      if (url.endsWith("/")) {
-        url += "meta/" + metaParts.join(";");
-      } else {
-        url += "/meta/" + metaParts.join(";");
-      }
-    }
-
-    // Ensure URL ends with a single slash
-    if (!url.endsWith("/")) {
-      url += "/";
-    }
-
-    return url;
+    const qs = params.toString();
+    return qs ? filterData.baseUrl + "?" + qs : filterData.baseUrl;
   }
 })(jQuery);

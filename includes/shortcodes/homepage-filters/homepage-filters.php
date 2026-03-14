@@ -201,7 +201,7 @@ function homepage_filters_shortcode($atts) {
         },
         "ajaxUrl": "<?php echo esc_url(admin_url('admin-ajax.php')); ?>",
         "nonce": "<?php echo esc_js(wp_create_nonce('homepage_filters_nonce')); ?>",
-        "baseUrl": "<?php echo esc_url(home_url('/cars/filter/')); ?>"
+        "baseUrl": "<?php echo esc_url(home_url('/cars/')); ?>"
     }
     </script>
     <?php
