@@ -306,7 +306,7 @@ $cars_query = new WP_Query( $args );
     z-index: 10000;
     background: rgba(0, 0, 0, 0.5);
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     padding: 2rem 1rem;
     overflow-y: auto;
 }
@@ -363,6 +363,15 @@ $cars_query = new WP_Query( $args );
 .tcp-filters-modal-body .car-filters-item {
     width: 100%;
     min-width: 0;
+}
+.tcp-filters-modal-body .car-filters-wrapper {
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+.tcp-filters-modal-body .car-filters-item-make,
+.tcp-filters-modal-body .car-filters-item-model {
+    width: calc(50% - 0.5rem);
+    flex: none;
 }
 
 /* ============================================
