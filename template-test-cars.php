@@ -124,8 +124,8 @@ $cars_query = new WP_Query( $args );
                 echo paginate_links( array(
                     'total'     => $cars_query->max_num_pages,
                     'current'   => 1,
-                    'prev_text' => '&laquo; Previous',
-                    'next_text' => 'Next &raquo;',
+                    'prev_text' => 'Previous',
+                    'next_text' => 'Next',
                     'type'      => 'list',
                     'base'      => '#%#%',
                     'format'    => '%#%',
@@ -454,32 +454,48 @@ $cars_query = new WP_Query( $args );
     list-style: none;
     display: flex;
     justify-content: center;
-    gap: 0.25rem;
+    align-items: stretch;
+    gap: 0.35rem;
     padding: 0;
     margin: 0;
     flex-wrap: wrap;
 }
 .tcp-pagination .page-numbers li {
     list-style: none;
+    display: flex;
 }
 .tcp-pagination .page-numbers a,
 .tcp-pagination .page-numbers span {
-    display: inline-block;
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0 0.75rem;
+    border-radius: 0.5rem;
     text-decoration: none;
-    color: #333;
-    background: #f0f0f0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+    background: #0b72c1;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    transition: opacity 0.15s;
 }
 .tcp-pagination .page-numbers a:hover {
-    background: #ddd;
+    opacity: 0.85;
 }
 .tcp-pagination .page-numbers .current {
-    background: #333;
+    background: #084a7e;
     color: #fff;
     pointer-events: none;
+    font-weight: 700;
+}
+.tcp-pagination .page-numbers .dots {
+    background: transparent;
+    color: #0b72c1;
+    cursor: default;
+    min-width: auto;
+    padding: 0 0.25rem;
 }
 
 /* ============================================

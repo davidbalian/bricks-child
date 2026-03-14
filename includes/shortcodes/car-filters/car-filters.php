@@ -382,8 +382,8 @@ function car_filters_ajax_filter_listings() {
         $pagination_html = paginate_links(array(
             'total'     => $car_query->max_num_pages,
             'current'   => $page,
-            'prev_text' => '&laquo; Previous',
-            'next_text' => 'Next &raquo;',
+            'prev_text' => 'Previous',
+            'next_text' => 'Next',
             'type'      => 'list',
             'base'      => '#%#%',     // Dummy base so links are intercepted by JS
             'format'    => '%#%',
