@@ -10,156 +10,537 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-get_header(); ?>
+get_header();
 
-<div class="bricks-container">
-    <div class="bricks-content test-cars-page-wrapper">
-        <h1><?php esc_html_e( 'Test Cars Page', 'bricks-child' ); ?></h1>
+$listing_atts = array(
+    'posts_per_page' => 12,
+    'orderby'        => 'date',
+    'order'          => 'DESC',
+    'card_type'      => 'car_card',
+);
 
-        <?php echo do_shortcode( '[car_filters filters="make,model,price,mileage,year,fuel,body" mode="ajax" target="test-cars-listings" layout="horizontal" show_button="true" button_text="Search Cars"]' ); ?>
+$args = array(
+    'post_type'      => 'car',
+    'post_status'    => 'publish',
+    'posts_per_page' => 12,
+    'paged'          => 1,
+    'orderby'        => 'date',
+    'order'          => 'DESC',
+    'meta_query'     => array(
+        'relation' => 'OR',
+        array(
+            'key'     => 'is_sold',
+            'compare' => 'NOT EXISTS',
+        ),
+        array(
+            'key'     => 'is_sold',
+            'value'   => '1',
+            'compare' => '!=',
+        ),
+    ),
+);
 
-        <?php
-        $listing_atts = array(
-            'posts_per_page' => 12,
-            'orderby'        => 'date',
-            'order'          => 'DESC',
-            'card_type'      => 'car_card',
-        );
+$cars_query = new WP_Query( $args );
+?>
 
-        $args = array(
-            'post_type'      => 'car',
-            'post_status'    => 'publish',
-            'posts_per_page' => 12,
-            'paged'          => 1,
-            'orderby'        => 'date',
-            'order'          => 'DESC',
-            'meta_query'     => array(
-                'relation' => 'OR',
-                array(
-                    'key'     => 'is_sold',
-                    'compare' => 'NOT EXISTS',
-                ),
-                array(
-                    'key'     => 'is_sold',
-                    'value'   => '1',
-                    'compare' => '!=',
-                ),
-            ),
-        );
+<!-- Filters bar -->
+<div class="tcp-filters-bar">
+    <div class="tcp-filters-bar-inner">
+        <button type="button" class="tcp-filters-btn" id="tcp-filters-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="1" fill="currentColor" stroke="none"/></svg>
+            Filters
+        </button>
+        <div class="tcp-active-filters" id="tcp-active-filters"></div>
+    </div>
+</div>
 
-        $cars_query = new WP_Query( $args );
-        ?>
+<!-- Filters modal -->
+<div class="tcp-filters-modal-overlay" id="tcp-filters-modal-overlay">
+    <div class="tcp-filters-modal">
+        <div class="tcp-filters-modal-header">
+            <h2>Filters</h2>
+            <button type="button" class="tcp-filters-modal-close" id="tcp-filters-modal-close" aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="tcp-filters-modal-body">
+            <?php echo do_shortcode( '[car_filters filters="make,model,price,mileage,year,fuel,body" mode="ajax" target="test-cars-listings" layout="vertical" show_button="true" button_text="Search"]' ); ?>
+        </div>
+    </div>
+</div>
 
-        <div class="car-listings-container"
-             id="test-cars-listings"
-             data-atts="<?php echo esc_attr( wp_json_encode( $listing_atts ) ); ?>"
-             data-page="1"
-             data-max-pages="<?php echo esc_attr( $cars_query->max_num_pages ); ?>">
+<!-- Main content -->
+<div class="tcp-main">
+    <h1 class="tcp-heading">Used Cars for Sale in Cyprus</h1>
 
-            <div class="car-listings-wrapper test-cars-grid">
-                <?php
-                if ( $cars_query->have_posts() ) :
-                    $post_ids = wp_list_pluck( $cars_query->posts, 'ID' );
-                    update_postmeta_cache( $post_ids );
+    <div class="car-listings-container"
+         id="test-cars-listings"
+         data-atts="<?php echo esc_attr( wp_json_encode( $listing_atts ) ); ?>"
+         data-page="1"
+         data-max-pages="<?php echo esc_attr( $cars_query->max_num_pages ); ?>">
 
-                    while ( $cars_query->have_posts() ) : $cars_query->the_post();
-                        render_car_card( get_the_ID() );
-                    endwhile;
-                else :
-                    ?>
-                    <p class="car-listings-no-results"><?php esc_html_e( 'No car listings found.', 'bricks-child' ); ?></p>
-                    <?php
-                endif;
-                wp_reset_postdata();
+        <div class="car-listings-wrapper tcp-grid">
+            <?php
+            if ( $cars_query->have_posts() ) :
+                $post_ids = wp_list_pluck( $cars_query->posts, 'ID' );
+                update_postmeta_cache( $post_ids );
+
+                while ( $cars_query->have_posts() ) : $cars_query->the_post();
+                    render_car_card( get_the_ID() );
+                endwhile;
+            else :
                 ?>
-            </div>
-
-            <div class="test-cars-pagination">
+                <p class="car-listings-no-results"><?php esc_html_e( 'No car listings found.', 'bricks-child' ); ?></p>
                 <?php
-                if ( $cars_query->max_num_pages > 1 ) {
-                    echo paginate_links( array(
-                        'total'     => $cars_query->max_num_pages,
-                        'current'   => 1,
-                        'prev_text' => '&laquo; Previous',
-                        'next_text' => 'Next &raquo;',
-                        'type'      => 'list',
-                        'base'      => '#%#%',
-                        'format'    => '%#%',
-                    ) );
-                }
-                ?>
-            </div>
+            endif;
+            wp_reset_postdata();
+            ?>
+        </div>
+
+        <div class="tcp-pagination">
+            <?php
+            if ( $cars_query->max_num_pages > 1 ) {
+                echo paginate_links( array(
+                    'total'     => $cars_query->max_num_pages,
+                    'current'   => 1,
+                    'prev_text' => '&laquo; Previous',
+                    'next_text' => 'Next &raquo;',
+                    'type'      => 'list',
+                    'base'      => '#%#%',
+                    'format'    => '%#%',
+                ) );
+            }
+            ?>
         </div>
     </div>
 </div>
 
 <style>
-    .test-cars-page-wrapper {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem 1rem;
-    }
-    .test-cars-page-wrapper > h1 {
-        margin-bottom: 1.5rem;
-    }
-    .test-cars-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin-top: 1.5rem;
-    }
-    .test-cars-pagination {
-        margin-top: 2rem;
-        text-align: center;
-    }
-    .test-cars-pagination .page-numbers {
-        list-style: none;
-        display: flex;
-        justify-content: center;
-        gap: 0.25rem;
-        padding: 0;
-        margin: 0;
-        flex-wrap: wrap;
-    }
-    .test-cars-pagination .page-numbers li {
-        list-style: none;
-    }
-    .test-cars-pagination .page-numbers a,
-    .test-cars-pagination .page-numbers span {
-        display: inline-block;
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.25rem;
-        text-decoration: none;
-        color: #333;
-        background: #f0f0f0;
-        cursor: pointer;
-        transition: background 0.15s, color 0.15s;
-    }
-    .test-cars-pagination .page-numbers a:hover {
-        background: #ddd;
-    }
-    .test-cars-pagination .page-numbers .current {
-        background: #333;
-        color: #fff;
-        pointer-events: none;
-    }
-    .car-listings-wrapper.car-listings-loading {
-        opacity: 0.5;
-        pointer-events: none;
-        transition: opacity 0.15s;
-    }
+/* ============================================
+   Filters Bar
+   ============================================ */
+.tcp-filters-bar {
+    border-bottom: 1px solid #e5e7eb;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.tcp-filters-bar-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.tcp-filters-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 2px solid #dfe2e6;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #2a3546;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color 0.15s, background 0.15s;
+    flex-shrink: 0;
+}
+.tcp-filters-btn:hover {
+    border-color: #bbb;
+    background: #f9fafb;
+}
+
+/* Active filter chips */
+.tcp-active-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    overflow-x: auto;
+    flex: 1;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.tcp-active-filters::-webkit-scrollbar {
+    display: none;
+}
+.tcp-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 2rem;
+    background: #f0f4f8;
+    color: #2a3546;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.tcp-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.1);
+    color: #2a3546;
+    font-size: 0.7rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+}
+.tcp-chip-remove:hover {
+    background: rgba(0,0,0,0.2);
+}
+.tcp-chip-clear {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.6rem;
+    border: none;
+    border-radius: 2rem;
+    background: none;
+    color: #0d86e3;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.tcp-chip-clear:hover {
+    text-decoration: underline;
+}
+
+/* ============================================
+   Filters Modal
+   ============================================ */
+.tcp-filters-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem 1rem;
+    overflow-y: auto;
+}
+.tcp-filters-modal-overlay.open {
+    display: flex;
+}
+.tcp-filters-modal {
+    background: #fff;
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.tcp-filters-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+.tcp-filters-modal-header h2 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #2a3546;
+}
+.tcp-filters-modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: 50%;
+    background: #f0f0f0;
+    color: #333;
+    cursor: pointer;
+    padding: 0;
+}
+.tcp-filters-modal-close:hover {
+    background: #e0e0e0;
+}
+.tcp-filters-modal-body {
+    padding: 1.25rem;
+}
+.tcp-filters-modal-body .car-filters-container {
+    width: 100%;
+}
+.tcp-filters-modal-body .car-filters-wrapper {
+    gap: 1rem;
+}
+.tcp-filters-modal-body .car-filters-item {
+    width: 100%;
+    min-width: 0;
+}
+
+/* ============================================
+   Main Content
+   ============================================ */
+.tcp-main {
+    max-width: 2000px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+}
+.tcp-heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2a3546;
+    margin: 0 0 1.25rem;
+}
+.tcp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+/* ============================================
+   Pagination
+   ============================================ */
+.tcp-pagination {
+    margin-top: 2rem;
+    text-align: center;
+}
+.tcp-pagination .page-numbers {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0;
+    margin: 0;
+    flex-wrap: wrap;
+}
+.tcp-pagination .page-numbers li {
+    list-style: none;
+}
+.tcp-pagination .page-numbers a,
+.tcp-pagination .page-numbers span {
+    display: inline-block;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    color: #333;
+    background: #f0f0f0;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.tcp-pagination .page-numbers a:hover {
+    background: #ddd;
+}
+.tcp-pagination .page-numbers .current {
+    background: #333;
+    color: #fff;
+    pointer-events: none;
+}
+
+/* ============================================
+   Loading state
+   ============================================ */
+.car-listings-wrapper.car-listings-loading {
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 0.15s;
+}
 </style>
 
 <script>
 (function($) {
     'use strict';
 
-    var $container = $('#test-cars-listings');
-    var $wrapper   = $container.find('.car-listings-wrapper');
-    var $pagination = $container.find('.test-cars-pagination');
+    var $container  = $('#test-cars-listings');
+    var $wrapper    = $container.find('.car-listings-wrapper');
+    var $pagination = $container.find('.tcp-pagination');
+    var $overlay    = $('#tcp-filters-modal-overlay');
+    var $chips      = $('#tcp-active-filters');
+    var group       = 'default';
 
+    // Filter label map for chips
+    var filterLabels = {
+        make: 'Brand',
+        model: 'Model',
+        price_min: 'Price min',
+        price_max: 'Price max',
+        mileage_min: 'Mileage min',
+        mileage_max: 'Mileage max',
+        year_min: 'Year min',
+        year_max: 'Year max',
+        fuel_type: 'Fuel',
+        body_type: 'Body'
+    };
+
+    /* ── Modal open/close ── */
+    $('#tcp-filters-btn').on('click', function() {
+        $overlay.addClass('open');
+        $('body').css('overflow', 'hidden');
+    });
+    function closeModal() {
+        $overlay.removeClass('open');
+        $('body').css('overflow', '');
+    }
+    $('#tcp-filters-modal-close').on('click', closeModal);
+    $overlay.on('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape' && $overlay.hasClass('open')) closeModal();
+    });
+
+    /* ── Active filter chips ── */
+    function buildChips() {
+        if (!window.CarFilters) return;
+        var state = CarFilters.getState(group);
+        var html = '';
+        var hasAny = false;
+
+        // Make
+        if (state.make && state.make.value) {
+            var makeLabel = getMakeLabel(state.make.value);
+            html += chip('make', makeLabel);
+            hasAny = true;
+        }
+        // Model
+        if (state.model && state.model.value) {
+            var modelLabel = getModelLabel(state.model.value);
+            html += chip('model', modelLabel);
+            hasAny = true;
+        }
+        // Range filters
+        ['price', 'mileage', 'year'].forEach(function(key) {
+            var min = state[key + '_min'];
+            var max = state[key + '_max'];
+            if (min) {
+                html += chip(key + '_min', filterLabels[key + '_min'] + ': ' + formatNum(min));
+                hasAny = true;
+            }
+            if (max) {
+                html += chip(key + '_max', filterLabels[key + '_max'] + ': ' + formatNum(max));
+                hasAny = true;
+            }
+        });
+        // Simple selects
+        ['fuel_type', 'body_type'].forEach(function(key) {
+            if (state[key]) {
+                html += chip(key, filterLabels[key] + ': ' + state[key]);
+                hasAny = true;
+            }
+        });
+
+        if (hasAny) {
+            html += '<button type="button" class="tcp-chip-clear" id="tcp-clear-all">Clear all</button>';
+        }
+
+        $chips.html(html);
+    }
+
+    function chip(key, label) {
+        return '<span class="tcp-chip" data-filter="' + key + '">' +
+               label +
+               '<button type="button" class="tcp-chip-remove" data-filter="' + key + '" aria-label="Remove">&times;</button>' +
+               '</span>';
+    }
+
+    function formatNum(val) {
+        var n = parseInt(String(val).replace(/,/g, ''), 10);
+        return n ? n.toLocaleString() : val;
+    }
+
+    function getMakeLabel(termId) {
+        var $opt = $('.car-filter-make .car-filter-dropdown-option[data-value="' + termId + '"]').first();
+        if ($opt.length) {
+            return $opt.clone().children('.car-filter-count').remove().end().text().trim();
+        }
+        return 'Brand: ' + termId;
+    }
+
+    function getModelLabel(termId) {
+        var $opt = $('.car-filter-model .car-filter-dropdown-option[data-value="' + termId + '"]').first();
+        if ($opt.length) {
+            return $opt.clone().children('.car-filter-count').remove().end().text().trim();
+        }
+        return 'Model: ' + termId;
+    }
+
+    // Remove single filter chip
+    $chips.on('click', '.tcp-chip-remove', function(e) {
+        e.stopPropagation();
+        var key = $(this).data('filter');
+        clearFilter(key);
+        CarFilters.triggerFilter(group);
+    });
+
+    // Clear all
+    $chips.on('click', '#tcp-clear-all', function() {
+        ['make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max',
+         'year_min', 'year_max', 'fuel_type', 'body_type'].forEach(function(key) {
+            clearFilter(key);
+        });
+        CarFilters.triggerFilter(group);
+    });
+
+    function clearFilter(key) {
+        if (key === 'make' || key === 'model') {
+            CarFilters.setState(group, key, '', '');
+            // Reset dropdown UI
+            var cls = key === 'make' ? '.car-filter-make' : '.car-filter-model';
+            $(cls + ' .car-filter-dropdown-option').removeClass('selected');
+            $(cls + ' .car-filter-dropdown-option[data-value=""]').addClass('selected');
+            $(cls + ' .car-filter-dropdown-text').addClass('placeholder').text(key === 'make' ? 'All Brands' : 'All Models');
+            $(cls + ' select').val('');
+            if (key === 'make') {
+                $(document).trigger('carFilters:makeChanged', [group, '']);
+            }
+        } else if (key.match(/_(min|max)$/)) {
+            CarFilters.setState(group, key, '');
+            // Clear input
+            var parts = key.split('_');
+            var bound = parts.pop(); // min or max
+            var field = parts.join('_');
+            var filterCls = field === 'fuel_type' ? 'fuel' : (field === 'body_type' ? 'body' : field);
+            $('.car-filter-' + filterCls + ' .car-filter-input-' + bound).val('');
+        } else {
+            CarFilters.setState(group, key, '');
+            var filterCls = key === 'fuel_type' ? 'fuel' : (key === 'body_type' ? 'body' : key);
+            var $dd = $('.car-filter-' + filterCls + ' .car-filter-dropdown');
+            $dd.find('.car-filter-dropdown-option').removeClass('selected');
+            $dd.find('.car-filter-dropdown-option[data-value=""]').addClass('selected');
+            $dd.find('.car-filter-dropdown-text').addClass('placeholder').text($dd.find('select option:first').text());
+            $dd.find('select').val('');
+        }
+    }
+
+    // Rebuild chips whenever filters update
+    $(document).on('carFilters:updated', function(e, g, data) {
+        if (data.pagination_html !== undefined) {
+            $pagination.html(data.pagination_html || '');
+        }
+        $container.data('page', data.current_page || 1);
+        $container.data('max-pages', data.max_pages || 1);
+        buildChips();
+        closeModal();
+    });
+
+    // Also rebuild chips when state changes (before AJAX completes)
+    if (window.CarFilters) {
+        CarFilters.subscribe(group, function() {
+            buildChips();
+        });
+    }
+
+    /* ── AJAX pagination ── */
     function loadPage(page) {
-        var group = 'default';
         var filterData = (window.CarFilters && CarFilters.getFilterData)
             ? CarFilters.getFilterData(group)
             : {};
@@ -182,11 +563,7 @@ get_header(); ?>
                     $pagination.html(response.data.pagination_html || '');
                     $container.data('page', response.data.current_page);
                     $container.data('max-pages', response.data.max_pages);
-
-                    // Scroll to top of listings
-                    $('html, body').animate({
-                        scrollTop: $container.offset().top - 20
-                    }, 300);
+                    $('html, body').animate({ scrollTop: $container.offset().top - 20 }, 300);
                 }
             },
             error: function(xhr, status, error) {
@@ -198,8 +575,7 @@ get_header(); ?>
         });
     }
 
-    // Intercept pagination clicks
-    $container.on('click', '.test-cars-pagination a.page-numbers', function(e) {
+    $container.on('click', '.tcp-pagination a.page-numbers', function(e) {
         e.preventDefault();
         var href = $(this).attr('href');
         var page = parseInt(href.replace('#', ''), 10);
@@ -208,13 +584,9 @@ get_header(); ?>
         }
     });
 
-    // After filter AJAX completes, also update pagination
-    $(document).on('carFilters:updated', function(e, group, data) {
-        if (data.pagination_html !== undefined) {
-            $pagination.html(data.pagination_html || '');
-        }
-        $container.data('page', data.current_page || 1);
-        $container.data('max-pages', data.max_pages || 1);
+    // Build initial chips on load
+    $(document).ready(function() {
+        setTimeout(buildChips, 100);
     });
 
 })(jQuery);
