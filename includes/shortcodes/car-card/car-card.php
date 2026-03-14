@@ -81,9 +81,10 @@ function render_car_card($post_id) {
         $relative_date = '<span class="post-date">' . $months . ' months ago</span>';
     }
 
-    // Badges
+    // Badges & featured
     $show_full_badge = get_field('fulldetailsbadge', $post_id);
     $show_extra_badge = get_field('extradetailsbadge', $post_id);
+    $is_featured = get_field('is_featured', $post_id);
 
     // Images — handle both ID array and associative array formats
     $raw_images = get_field('car_images', $post_id, false);
@@ -104,7 +105,7 @@ function render_car_card($post_id) {
     $slide_ids = array_slice($image_ids, 0, $max_slides);
     $slide_count = count($slide_ids);
     ?>
-    <article class="car-card" data-post-id="<?php echo esc_attr($post_id); ?>">
+    <article class="car-card<?php echo $is_featured ? ' car-card-featured' : ''; ?>" data-post-id="<?php echo esc_attr($post_id); ?>">
         <!-- ROW 1: Slider -->
         <div class="car-card-slider" data-total="<?php echo esc_attr($total_images); ?>" data-slides="<?php echo esc_attr($slide_count); ?>">
 
