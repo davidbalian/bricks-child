@@ -81,7 +81,11 @@ $cars_query = new WP_Query( $args );
             </button>
         </div>
         <div class="tcp-filters-modal-body">
-            <?php echo do_shortcode( '[car_filters filters="make,model,price,mileage,year,fuel,body" mode="ajax" target="test-cars-listings" layout="vertical" show_button="true" button_text="Search"]' ); ?>
+            <?php echo do_shortcode( '[car_filters filters="make,model,price,mileage,year,fuel,body" mode="ajax" target="test-cars-listings" layout="vertical" show_button="false"]' ); ?>
+        </div>
+        <div class="tcp-filters-modal-footer">
+            <button type="button" class="tcp-modal-apply-btn" id="tcp-modal-apply-btn">Apply Filters</button>
+            <button type="button" class="tcp-modal-clear-btn" id="tcp-modal-clear-btn">Clear All</button>
         </div>
     </div>
 </div>
@@ -356,6 +360,49 @@ $cars_query = new WP_Query( $args );
 }
 .tcp-filters-modal-body .car-filters-container {
     width: 100%;
+}
+.tcp-filters-modal-footer {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.tcp-modal-apply-btn {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: #0d86e3;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.2s ease;
+}
+.tcp-modal-apply-btn:hover {
+    background-color: #0b75c9;
+}
+.tcp-modal-apply-btn:active {
+    background-color: #0965b0;
+}
+.tcp-modal-clear-btn {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #dfe2e6;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #2a3546;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.15s, background 0.15s;
+}
+.tcp-modal-clear-btn:hover {
+    border-color: #bbb;
+    background: #f9fafb;
 }
 .tcp-filters-modal-body .car-filters-wrapper {
     gap: 1rem;
@@ -633,6 +680,18 @@ $cars_query = new WP_Query( $args );
             $dd.find('select').val('');
         }
     }
+
+    /* ── Modal apply / clear buttons ── */
+    $('#tcp-modal-apply-btn').on('click', function() {
+        CarFilters.triggerFilter(group);
+    });
+    $('#tcp-modal-clear-btn').on('click', function() {
+        ['make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max',
+         'year_min', 'year_max', 'fuel_type', 'body_type'].forEach(function(key) {
+            clearFilter(key);
+        });
+        CarFilters.triggerFilter(group);
+    });
 
     // Rebuild chips whenever filters update
     $(document).on('carFilters:updated', function(e, g, data) {
