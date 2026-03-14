@@ -192,6 +192,7 @@ function car_filters_ajax_filter_listings() {
     $year_max     = isset($_POST['year_max']) ? intval($_POST['year_max']) : 0;
     $fuel_type    = isset($_POST['fuel_type']) ? sanitize_text_field($_POST['fuel_type']) : '';
     $body_type    = isset($_POST['body_type']) ? sanitize_text_field($_POST['body_type']) : '';
+    $page         = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
 
     // Base listing attributes (passed from the target)
     $atts = isset($_POST['listing_atts']) ? json_decode(stripslashes($_POST['listing_atts']), true) : array();
@@ -202,6 +203,7 @@ function car_filters_ajax_filter_listings() {
         'post_type'      => 'car',
         'post_status'    => 'publish',
         'posts_per_page' => isset($atts['posts_per_page']) ? intval($atts['posts_per_page']) : 12,
+        'paged'          => $page,
     );
 
     $meta_query = array('relation' => 'AND');
@@ -354,12 +356,18 @@ function car_filters_ajax_filter_listings() {
         update_postmeta_cache($post_ids);
     }
 
+    // Determine which card renderer to use
+    $card_type = isset($atts['card_type']) ? $atts['card_type'] : '';
+    $use_car_card = ($card_type === 'car_card') && function_exists('render_car_card');
+
     // Render cards
     ob_start();
     if ($car_query->have_posts()) {
         while ($car_query->have_posts()) {
             $car_query->the_post();
-            if (function_exists('car_listings_render_card')) {
+            if ($use_car_card) {
+                render_car_card(get_the_ID());
+            } elseif (function_exists('car_listings_render_card')) {
                 car_listings_render_card(get_the_ID());
             }
         }
@@ -367,12 +375,29 @@ function car_filters_ajax_filter_listings() {
         echo '<p class="car-listings-no-results">No car listings found matching your criteria.</p>';
     }
     $html = ob_get_clean();
+
+    // Build pagination HTML if multiple pages
+    $pagination_html = '';
+    if ($car_query->max_num_pages > 1) {
+        $pagination_html = paginate_links(array(
+            'total'     => $car_query->max_num_pages,
+            'current'   => $page,
+            'prev_text' => '&laquo; Previous',
+            'next_text' => 'Next &raquo;',
+            'type'      => 'list',
+            'base'      => '#%#%',     // Dummy base so links are intercepted by JS
+            'format'    => '%#%',
+        ));
+    }
+
     wp_reset_postdata();
 
     wp_send_json_success(array(
-        'html'        => $html,
-        'found_posts' => $car_query->found_posts,
-        'max_pages'   => $car_query->max_num_pages,
+        'html'            => $html,
+        'pagination_html' => $pagination_html,
+        'found_posts'     => $car_query->found_posts,
+        'max_pages'       => $car_query->max_num_pages,
+        'current_page'    => $page,
     ));
 }
 add_action('wp_ajax_car_filters_filter_listings', 'car_filters_ajax_filter_listings');
