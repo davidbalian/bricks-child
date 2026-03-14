@@ -537,6 +537,15 @@
 
         formatInput: function($input) {
             var value = $input.val();
+
+            // Skip comma formatting for year inputs
+            var filterType = $input.closest('.car-filter-range').data('filter-type');
+            if (filterType === 'year') {
+                var cleaned = value.replace(/[^0-9]/g, '');
+                $input.val(cleaned);
+                return;
+            }
+
             // Remove non-numeric characters except for the cursor position
             var cursorPos = $input[0].selectionStart;
             var beforeCursor = value.substring(0, cursorPos);

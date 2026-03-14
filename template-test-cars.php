@@ -499,12 +499,13 @@ $cars_query = new WP_Query( $args );
         ['price', 'mileage', 'year'].forEach(function(key) {
             var min = state[key + '_min'];
             var max = state[key + '_max'];
+            var noComma = (key === 'year');
             if (min) {
-                html += chip(key + '_min', filterLabels[key + '_min'] + ': ' + formatNum(min));
+                html += chip(key + '_min', filterLabels[key + '_min'] + ': ' + formatNum(min, noComma));
                 hasAny = true;
             }
             if (max) {
-                html += chip(key + '_max', filterLabels[key + '_max'] + ': ' + formatNum(max));
+                html += chip(key + '_max', filterLabels[key + '_max'] + ': ' + formatNum(max, noComma));
                 hasAny = true;
             }
         });
@@ -530,9 +531,10 @@ $cars_query = new WP_Query( $args );
                '</span>';
     }
 
-    function formatNum(val) {
+    function formatNum(val, raw) {
         var n = parseInt(String(val).replace(/,/g, ''), 10);
-        return n ? n.toLocaleString() : val;
+        if (!n) return val;
+        return raw ? String(n) : n.toLocaleString();
     }
 
     function getMakeLabel(termId) {
