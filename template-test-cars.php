@@ -462,7 +462,7 @@ $cars_query = new WP_Query( $args );
 .tcp-main {
     max-width: 2000px;
     margin: 0 auto;
-    padding: 1.5rem 1rem 3rem;
+    padding: 1.5rem 1rem 6rem;
 }
 .tcp-heading {
     font-size: 1.5rem;
@@ -794,11 +794,12 @@ $cars_query = new WP_Query( $args );
         // Also update the data attribute for future reads
         $container.attr('data-atts', JSON.stringify(atts));
 
-        loadPage(1);
+        loadPage(1, { scroll: false });
     });
 
     /* ── AJAX pagination ── */
-    function loadPage(page) {
+    function loadPage(page, opts) {
+        opts = opts || {};
         syncPostsPerPage();
         var filterData = (window.CarFilters && CarFilters.getFilterData)
             ? CarFilters.getFilterData(group)
@@ -822,7 +823,9 @@ $cars_query = new WP_Query( $args );
                     $pagination.html(response.data.pagination_html || '');
                     $container.data('page', response.data.current_page);
                     $container.data('max-pages', response.data.max_pages);
-                    $('html, body').animate({ scrollTop: $container.offset().top - 20 }, 300);
+                    if (opts.scroll !== false) {
+                        $('html, body').animate({ scrollTop: $container.offset().top - 20 }, 300);
+                    }
                 }
             },
             error: function(xhr, status, error) {
