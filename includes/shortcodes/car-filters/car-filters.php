@@ -404,6 +404,32 @@ add_action('wp_ajax_car_filters_filter_listings', 'car_filters_ajax_filter_listi
 add_action('wp_ajax_nopriv_car_filters_filter_listings', 'car_filters_ajax_filter_listings');
 
 /**
+ * AJAX handler to get available options for cascading dropdowns
+ */
+function car_filters_ajax_get_available_options() {
+    check_ajax_referer('car_filters_nonce', 'nonce');
+
+    $filters = array(
+        'make'        => isset($_POST['make']) ? intval($_POST['make']) : 0,
+        'model'       => isset($_POST['model']) ? intval($_POST['model']) : 0,
+        'price_min'   => isset($_POST['price_min']) ? intval($_POST['price_min']) : 0,
+        'price_max'   => isset($_POST['price_max']) ? intval($_POST['price_max']) : 0,
+        'mileage_min' => isset($_POST['mileage_min']) ? intval($_POST['mileage_min']) : 0,
+        'mileage_max' => isset($_POST['mileage_max']) ? intval($_POST['mileage_max']) : 0,
+        'year_min'    => isset($_POST['year_min']) ? intval($_POST['year_min']) : 0,
+        'year_max'    => isset($_POST['year_max']) ? intval($_POST['year_max']) : 0,
+        'fuel_type'   => isset($_POST['fuel_type']) ? sanitize_text_field($_POST['fuel_type']) : '',
+        'body_type'   => isset($_POST['body_type']) ? sanitize_text_field($_POST['body_type']) : '',
+    );
+
+    $data = car_filter_get_available_options_data($filters);
+
+    wp_send_json_success($data);
+}
+add_action('wp_ajax_car_filters_get_available_options', 'car_filters_ajax_get_available_options');
+add_action('wp_ajax_nopriv_car_filters_get_available_options', 'car_filters_ajax_get_available_options');
+
+/**
  * ============================================
  * PRETTY URL SUPPORT (JetSmartFilters-style)
  * ============================================

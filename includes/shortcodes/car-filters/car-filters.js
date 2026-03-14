@@ -63,6 +63,7 @@
             }
 
             this.notifySubscribers(group, key, value);
+            $(document).trigger('carFilters:stateChanged', [group, key]);
         },
 
         /**
@@ -594,7 +595,8 @@
 
     /**
      * Model Filter Controller
-     * Handles loading models when make changes
+     * Handles disabling model dropdown when no make is selected.
+     * Model population is handled by CascadeController.
      */
     var ModelController = {
         init: function() {
@@ -604,13 +606,12 @@
         bindEvents: function() {
             var self = this;
 
-            // Subscribe to make changes for each group
             $(document).on('carFilters:makeChanged', function(e, group, makeId) {
-                self.loadModels(group, makeId);
+                self.handleMakeChange(group, makeId);
             });
         },
 
-        loadModels: function(group, makeId) {
+        handleMakeChange: function(group, makeId) {
             var $modelFilters = $('.car-filter-model[data-group="' + group + '"]');
 
             $modelFilters.each(function() {
@@ -619,7 +620,6 @@
                 var $button = $dropdown.find('.car-filter-dropdown-button');
                 var $options = $dropdown.find('.car-filter-dropdown-options');
                 var $select = $dropdown.find('select');
-
                 var $search = $dropdown.find('.car-filter-dropdown-search');
 
                 if (!makeId) {
@@ -636,69 +636,240 @@
                     return;
                 }
 
-                // Show loading state with animated dots
+                // Show loading state — CascadeController will populate
                 $button.prop('disabled', true);
                 var $buttonText = $button.find('.car-filter-dropdown-text');
                 $options.html('<div class="car-filter-loading">Loading.</div>');
                 $buttonText.text('Loading.');
 
-                // Start loading animation
-                var isLoading = true; // Track loading state to prevent race conditions
                 var loadingDots = 1;
-                var loadingInterval = setInterval(function() {
-                    // Check if still loading and loading element exists to prevent race condition
-                    if (!isLoading || !$options.find('.car-filter-loading').length) {
-                        return;
-                    }
+                $dropdown.data('loadingInterval', setInterval(function() {
+                    if (!$options.find('.car-filter-loading').length) return;
                     loadingDots = (loadingDots % 3) + 1;
                     var loadingText = 'Loading' + '.'.repeat(loadingDots);
                     $options.find('.car-filter-loading').text(loadingText);
                     $buttonText.text(loadingText);
-                }, 400);
+                }, 400));
+            });
+        }
+    };
 
-                // Fetch models via AJAX
-                $.ajax({
+    /**
+     * Cascade Controller
+     * Fetches available options for all dropdowns whenever any filter changes.
+     * Uses the "exclude-self" pattern so a filter never hides its own selected value.
+     */
+    var CascadeController = {
+        _updating: false,
+        _debounceTimer: null,
+        _currentXhr: null,
+
+        init: function() {
+            this.bindEvents();
+        },
+
+        bindEvents: function() {
+            var self = this;
+            $(document).on('carFilters:stateChanged', function(e, group, key) {
+                if (self._updating) return;
+                self.fetchAvailableOptions(group);
+            });
+        },
+
+        fetchAvailableOptions: function(group) {
+            var self = this;
+
+            // Debounce
+            if (this._debounceTimer) {
+                clearTimeout(this._debounceTimer);
+            }
+
+            this._debounceTimer = setTimeout(function() {
+                // Abort in-flight request
+                if (self._currentXhr) {
+                    self._currentXhr.abort();
+                }
+
+                var filterData = CarFilters.getFilterData(group);
+
+                self._currentXhr = $.ajax({
                     url: carFiltersConfig.ajaxUrl,
                     type: 'POST',
                     data: {
-                        action: 'car_filters_get_models',
+                        action: 'car_filters_get_available_options',
                         nonce: carFiltersConfig.nonce,
-                        make_term_id: makeId
+                        make: filterData.make,
+                        model: filterData.model,
+                        price_min: filterData.price_min,
+                        price_max: filterData.price_max,
+                        mileage_min: filterData.mileage_min,
+                        mileage_max: filterData.mileage_max,
+                        year_min: filterData.year_min,
+                        year_max: filterData.year_max,
+                        fuel_type: filterData.fuel_type,
+                        body_type: filterData.body_type
                     },
                     success: function(response) {
-                        // Stop loading state and clear animation BEFORE updating DOM
-                        isLoading = false;
-                        clearInterval(loadingInterval);
                         if (response.success && response.data) {
-                            var html = '<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="" data-slug="">All Models</button>';
-                            var selectHtml = '<option value="">All Models</option>';
-
-                            response.data.forEach(function(model) {
-                                html += '<button type="button" class="car-filter-dropdown-option" role="option" data-value="' + model.term_id + '" data-slug="' + model.slug + '">' +
-                                    model.name +
-                                    '<span class="car-filter-count">(' + model.count + ')</span>' +
-                                    '</button>';
-                                selectHtml += '<option value="' + model.term_id + '" data-slug="' + model.slug + '">' + model.name + ' (' + model.count + ')</option>';
-                            });
-
-                            html += '<div class="car-filter-no-results hidden">No matching results</div>';
-
-                            $options.html(html);
-                            $select.html(selectHtml).prop('disabled', false);
-                            $button.prop('disabled', false).removeClass('car-filter-dropdown-disabled');
-                            $buttonText.addClass('placeholder').text('Select Model');
-                            $dropdown.removeClass('car-filter-dropdown-disabled');
-                            $search.prop('disabled', false);
+                            self.updateDropdowns(group, response.data);
                         }
                     },
-                    error: function() {
-                        // Stop loading state and clear animation BEFORE updating DOM
-                        isLoading = false;
-                        clearInterval(loadingInterval);
-                        $options.html('<div class="car-filter-error">Failed to load models</div>');
-                        $buttonText.addClass('placeholder').text('Select Model');
+                    complete: function() {
+                        self._currentXhr = null;
                     }
                 });
+            }, 150);
+        },
+
+        updateDropdowns: function(group, data) {
+            this._updating = true;
+
+            this.updateDropdown(group, 'make', data.makes, 'term_id', 'name', 'slug', 'All Brands');
+            this.updateDropdown(group, 'fuel_type', data.fuel_type, 'value', 'label', 'slug', 'All Fuel Types');
+            this.updateDropdown(group, 'body_type', data.body_type, 'value', 'label', 'slug', 'All Body Types');
+
+            if (data.models !== null) {
+                this.rebuildModelDropdown(group, data.models);
+            }
+
+            this._updating = false;
+        },
+
+        /**
+         * Show/hide existing dropdown options based on available values.
+         * If selected option becomes unavailable, auto-clear to "All".
+         */
+        updateDropdown: function(group, filterType, items, valueKey, labelKey, slugKey, placeholder) {
+            var filterClass = filterType;
+            if (filterType === 'fuel_type') filterClass = 'fuel';
+            if (filterType === 'body_type') filterClass = 'body';
+
+            var $filters = $('.car-filter-' + filterClass + '[data-group="' + group + '"]');
+            if (!$filters.length) return;
+
+            // Build lookup of available values with counts
+            var available = {};
+            if (items) {
+                items.forEach(function(item) {
+                    available[String(item[valueKey])] = item;
+                });
+            }
+
+            var state = CarFilters.getState(group);
+            var currentValue = (filterType === 'make' || filterType === 'model')
+                ? String(state[filterType].value)
+                : String(state[filterType] || '');
+
+            $filters.each(function() {
+                var $dropdown = $(this).find('.car-filter-dropdown');
+                var $options = $dropdown.find('.car-filter-dropdown-option');
+                var selectedBecameUnavailable = false;
+
+                $options.each(function() {
+                    var $opt = $(this);
+                    var val = String($opt.data('value'));
+
+                    if (val === '' || val === 'undefined') {
+                        // "All" option — always visible
+                        return;
+                    }
+
+                    if (available[val]) {
+                        $opt.removeClass('hidden cascade-hidden');
+                        // Update count
+                        var $count = $opt.find('.car-filter-count');
+                        if ($count.length) {
+                            $count.text('(' + available[val].count + ')');
+                        } else {
+                            $opt.append('<span class="car-filter-count">(' + available[val].count + ')</span>');
+                        }
+                    } else {
+                        $opt.addClass('hidden cascade-hidden');
+                        if (val === currentValue) {
+                            selectedBecameUnavailable = true;
+                        }
+                    }
+                });
+
+                // Auto-clear if selected value is no longer available
+                if (selectedBecameUnavailable && currentValue) {
+                    var $allOption = $dropdown.find('.car-filter-dropdown-option[data-value=""]');
+                    $dropdown.find('.car-filter-dropdown-option').removeClass('selected');
+                    $allOption.addClass('selected');
+                    $dropdown.find('.car-filter-dropdown-text').addClass('placeholder').text(placeholder);
+                    $dropdown.find('select').val('');
+
+                    if (filterType === 'make' || filterType === 'model') {
+                        CarFilters.setState(group, filterType, '', '');
+                    } else {
+                        CarFilters.setState(group, filterType, '');
+                    }
+                }
+            });
+        },
+
+        /**
+         * Full rebuild for model dropdown since models are dynamically loaded.
+         */
+        rebuildModelDropdown: function(group, models) {
+            var $modelFilters = $('.car-filter-model[data-group="' + group + '"]');
+
+            $modelFilters.each(function() {
+                var $filter = $(this);
+                var $dropdown = $filter.find('.car-filter-dropdown');
+                var $button = $dropdown.find('.car-filter-dropdown-button');
+                var $options = $dropdown.find('.car-filter-dropdown-options');
+                var $select = $dropdown.find('select');
+                var $search = $dropdown.find('.car-filter-dropdown-search');
+
+                // Clear loading animation if present
+                var loadingInterval = $dropdown.data('loadingInterval');
+                if (loadingInterval) {
+                    clearInterval(loadingInterval);
+                    $dropdown.removeData('loadingInterval');
+                }
+
+                var state = CarFilters.getState(group);
+                var currentModelValue = String(state.model.value);
+
+                var html = '<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="" data-slug="">All Models</button>';
+                var selectHtml = '<option value="">All Models</option>';
+                var selectedModelExists = false;
+
+                models.forEach(function(model) {
+                    var isSelected = String(model.term_id) === currentModelValue;
+                    if (isSelected) selectedModelExists = true;
+
+                    html += '<button type="button" class="car-filter-dropdown-option' + (isSelected ? ' selected' : '') + '" role="option" data-value="' + model.term_id + '" data-slug="' + model.slug + '">' +
+                        model.name +
+                        '<span class="car-filter-count">(' + model.count + ')</span>' +
+                        '</button>';
+                    selectHtml += '<option value="' + model.term_id + '" data-slug="' + model.slug + '"' + (isSelected ? ' selected' : '') + '>' + model.name + ' (' + model.count + ')</option>';
+                });
+
+                html += '<div class="car-filter-no-results hidden">No matching results</div>';
+
+                $options.html(html);
+                $select.html(selectHtml).prop('disabled', false);
+                $button.prop('disabled', false).removeClass('car-filter-dropdown-disabled');
+                $dropdown.removeClass('car-filter-dropdown-disabled');
+                $search.prop('disabled', false);
+
+                if (selectedModelExists) {
+                    var $selectedOpt = $options.find('.car-filter-dropdown-option.selected[data-value!=""]');
+                    var modelName = $selectedOpt.clone().children('.car-filter-count').remove().end().text().trim();
+                    $button.find('.car-filter-dropdown-text').removeClass('placeholder').text(modelName);
+                    $select.val(currentModelValue);
+                    // Deselect "All"
+                    $options.find('.car-filter-dropdown-option[data-value=""]').removeClass('selected');
+                } else {
+                    $button.find('.car-filter-dropdown-text').addClass('placeholder').text('Select Model');
+
+                    // Clear model if it was set but no longer available
+                    if (currentModelValue) {
+                        CarFilters.setState(group, 'model', '', '');
+                    }
+                }
             });
         }
     };
@@ -723,6 +894,7 @@
         DropdownController.init();
         RangeController.init();
         ModelController.init();
+        CascadeController.init();
         SearchButtonController.init();
 
         // Initialize groups from DOM
@@ -902,6 +1074,14 @@
                 });
             }
         }
+
+        // Fire initial cascade fetch for each group to sync dropdown options
+        $('.car-filters-container').each(function() {
+            var group = $(this).data('group');
+            if (group) {
+                CascadeController.fetchAvailableOptions(group);
+            }
+        });
     });
 
 })(jQuery);

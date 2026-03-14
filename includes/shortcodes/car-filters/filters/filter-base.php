@@ -359,6 +359,248 @@ function car_filter_get_meta_options($meta_key) {
 }
 
 /**
+ * Build an array of post IDs matching current filters, excluding specified keys.
+ * Used by cascading dropdowns to find what options remain valid.
+ *
+ * @param array $filters All current filter values
+ * @param array $exclude_keys Filter keys to skip (the "exclude-self" pattern)
+ * @return array Post IDs
+ */
+function car_filter_build_constrained_post_ids($filters, $exclude_keys = array()) {
+    $args = array(
+        'post_type'      => 'car',
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+        'no_found_rows'  => true,
+        'fields'         => 'ids',
+    );
+
+    $meta_query = array('relation' => 'AND');
+    $tax_query = array();
+
+    // Make/model taxonomy
+    if (!in_array('model', $exclude_keys) && !empty($filters['model'])) {
+        $tax_query[] = array(
+            'taxonomy' => 'car_make',
+            'field'    => 'term_id',
+            'terms'    => intval($filters['model']),
+        );
+    } elseif (!in_array('make', $exclude_keys) && !empty($filters['make'])) {
+        $models = car_filter_get_models(intval($filters['make']));
+        if (!empty($models)) {
+            $model_ids = wp_list_pluck($models, 'term_id');
+            $tax_query[] = array(
+                'taxonomy' => 'car_make',
+                'field'    => 'term_id',
+                'terms'    => $model_ids,
+            );
+        }
+    }
+
+    // Range filters: price, mileage, year
+    $range_keys = array('price', 'mileage', 'year');
+    foreach ($range_keys as $key) {
+        if (in_array($key, $exclude_keys)) continue;
+
+        $min = !empty($filters[$key . '_min']) ? intval($filters[$key . '_min']) : 0;
+        $max = !empty($filters[$key . '_max']) ? intval($filters[$key . '_max']) : 0;
+
+        if ($min > 0) {
+            $meta_query[] = array(
+                'key'     => $key,
+                'value'   => $min,
+                'compare' => '>=',
+                'type'    => 'NUMERIC',
+            );
+        }
+        if ($max > 0) {
+            $meta_query[] = array(
+                'key'     => $key,
+                'value'   => $max,
+                'compare' => '<=',
+                'type'    => 'NUMERIC',
+            );
+        }
+    }
+
+    // Meta value filters: fuel_type, body_type
+    $meta_value_keys = array('fuel_type', 'body_type');
+    foreach ($meta_value_keys as $key) {
+        if (in_array($key, $exclude_keys)) continue;
+
+        if (!empty($filters[$key])) {
+            $meta_query[] = array(
+                'key'     => $key,
+                'value'   => sanitize_text_field($filters[$key]),
+                'compare' => '=',
+            );
+        }
+    }
+
+    // Exclude sold
+    $meta_query[] = array(
+        'relation' => 'OR',
+        array(
+            'key'     => 'is_sold',
+            'compare' => 'NOT EXISTS',
+        ),
+        array(
+            'key'     => 'is_sold',
+            'value'   => '1',
+            'compare' => '!=',
+        ),
+    );
+
+    if (count($meta_query) > 1) {
+        $args['meta_query'] = $meta_query;
+    }
+    if (!empty($tax_query)) {
+        $args['tax_query'] = $tax_query;
+    }
+
+    $query = new WP_Query($args);
+    return $query->posts;
+}
+
+/**
+ * Get available options for all dropdown filters given current state.
+ * Each dropdown's options are computed by excluding that dropdown's own filter
+ * so it never hides its own selected value.
+ *
+ * @param array $filters Current filter values
+ * @return array Associative array with makes, models, fuel_type, body_type
+ */
+function car_filter_get_available_options_data($filters) {
+    global $wpdb;
+
+    $result = array(
+        'makes'     => array(),
+        'models'    => null,
+        'fuel_type' => array(),
+        'body_type' => array(),
+    );
+
+    // --- Makes: exclude make and model from constraints ---
+    $post_ids = car_filter_build_constrained_post_ids($filters, array('make', 'model'));
+    if (!empty($post_ids)) {
+        $ids_placeholder = implode(',', array_map('intval', $post_ids));
+        $makes_sql = "
+            SELECT t.term_id, t.name, t.slug, COUNT(DISTINCT tr.object_id) as count
+            FROM {$wpdb->terms} t
+            INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+            INNER JOIN {$wpdb->term_taxonomy} tt_child ON tt_child.parent = t.term_id AND tt_child.taxonomy = 'car_make'
+            INNER JOIN {$wpdb->term_relationships} tr ON tr.term_taxonomy_id = tt_child.term_taxonomy_id
+            WHERE tt.taxonomy = 'car_make'
+            AND tt.parent = 0
+            AND tr.object_id IN ($ids_placeholder)
+            GROUP BY t.term_id, t.name, t.slug
+            ORDER BY t.name ASC
+        ";
+        $makes = $wpdb->get_results($makes_sql);
+        if ($makes) {
+            foreach ($makes as $make) {
+                $result['makes'][] = array(
+                    'term_id' => (int) $make->term_id,
+                    'name'    => $make->name,
+                    'slug'    => $make->slug,
+                    'count'   => (int) $make->count,
+                );
+            }
+        }
+    }
+
+    // --- Models: only if make is set; exclude model but keep make ---
+    if (!empty($filters['make'])) {
+        $model_post_ids = car_filter_build_constrained_post_ids($filters, array('model'));
+        if (!empty($model_post_ids)) {
+            $ids_placeholder = implode(',', array_map('intval', $model_post_ids));
+            $make_term_id = intval($filters['make']);
+            $models_sql = $wpdb->prepare("
+                SELECT t.term_id, t.name, t.slug, COUNT(DISTINCT tr.object_id) as count
+                FROM {$wpdb->terms} t
+                INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+                INNER JOIN {$wpdb->term_relationships} tr ON tr.term_taxonomy_id = tt.term_taxonomy_id
+                WHERE tt.taxonomy = 'car_make'
+                AND tt.parent = %d
+                AND tr.object_id IN ($ids_placeholder)
+                GROUP BY t.term_id, t.name, t.slug
+                ORDER BY t.name ASC
+            ", $make_term_id);
+            $models = $wpdb->get_results($models_sql);
+            $result['models'] = array();
+            if ($models) {
+                foreach ($models as $model) {
+                    $result['models'][] = array(
+                        'term_id' => (int) $model->term_id,
+                        'name'    => $model->name,
+                        'slug'    => $model->slug,
+                        'count'   => (int) $model->count,
+                    );
+                }
+            }
+        } else {
+            $result['models'] = array();
+        }
+    }
+
+    // --- Fuel type: exclude fuel_type from constraints ---
+    $fuel_post_ids = car_filter_build_constrained_post_ids($filters, array('fuel_type'));
+    if (!empty($fuel_post_ids)) {
+        $ids_placeholder = implode(',', array_map('intval', $fuel_post_ids));
+        $fuel_sql = "
+            SELECT pm.meta_value, COUNT(DISTINCT pm.post_id) as count
+            FROM {$wpdb->postmeta} pm
+            WHERE pm.meta_key = 'fuel_type'
+            AND pm.meta_value != ''
+            AND pm.meta_value IS NOT NULL
+            AND pm.post_id IN ($ids_placeholder)
+            GROUP BY pm.meta_value
+            ORDER BY count DESC, pm.meta_value ASC
+        ";
+        $fuels = $wpdb->get_results($fuel_sql);
+        if ($fuels) {
+            foreach ($fuels as $fuel) {
+                $result['fuel_type'][] = array(
+                    'value' => $fuel->meta_value,
+                    'label' => ucfirst($fuel->meta_value),
+                    'slug'  => sanitize_title($fuel->meta_value),
+                    'count' => (int) $fuel->count,
+                );
+            }
+        }
+    }
+
+    // --- Body type: exclude body_type from constraints ---
+    $body_post_ids = car_filter_build_constrained_post_ids($filters, array('body_type'));
+    if (!empty($body_post_ids)) {
+        $ids_placeholder = implode(',', array_map('intval', $body_post_ids));
+        $body_sql = "
+            SELECT pm.meta_value, COUNT(DISTINCT pm.post_id) as count
+            FROM {$wpdb->postmeta} pm
+            WHERE pm.meta_key = 'body_type'
+            AND pm.meta_value != ''
+            AND pm.meta_value IS NOT NULL
+            AND pm.post_id IN ($ids_placeholder)
+            GROUP BY pm.meta_value
+            ORDER BY count DESC, pm.meta_value ASC
+        ";
+        $bodies = $wpdb->get_results($body_sql);
+        if ($bodies) {
+            foreach ($bodies as $body) {
+                $result['body_type'][] = array(
+                    'value' => $body->meta_value,
+                    'label' => ucfirst($body->meta_value),
+                    'slug'  => sanitize_title($body->meta_value),
+                    'count' => (int) $body->count,
+                );
+            }
+        }
+    }
+
+    return $result;
+}
+
+/**
  * Get models for a specific make by slug
  */
 function car_filter_get_make_by_slug($slug) {
