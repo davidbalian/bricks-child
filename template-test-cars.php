@@ -865,6 +865,14 @@ $cars_query = new WP_Query( $args );
         setTimeout(buildChips, 100);
     });
 
+    // Scroll modal body to bottom when fuel/body dropdowns are opened
+    $(document).on('click', '.tcp-filters-modal-body .car-filters-item-fuel .car-filter-dropdown-button, .tcp-filters-modal-body .car-filters-item-body .car-filter-dropdown-button', function() {
+        var modalBody = document.querySelector('.tcp-filters-modal-body');
+        if (!modalBody) return;
+        setTimeout(function() {
+            modalBody.scrollTo({ top: modalBody.scrollHeight, behavior: 'smooth' });
+        }, 50);
+    });
 
 })(jQuery);
 </script>
