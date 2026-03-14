@@ -168,7 +168,7 @@ function render_car_card($post_id) {
             <h3 class="car-card-title"><?php echo esc_html($make . ' ' . $model); ?></h3>
 
             <?php if ($mileage) : ?>
-                <div class="car-card-mileage"><?php echo esc_html(number_format(floatval(str_replace(',', '', $mileage)))); ?>km</div>
+                <div class="car-card-mileage"><i class="ion-ios-speedometer"></i> <?php echo esc_html(number_format(floatval(str_replace(',', '', $mileage)))); ?>km</div>
             <?php endif; ?>
 
             <div class="car-card-specs">
@@ -187,6 +187,7 @@ function render_car_card($post_id) {
 
             <div class="car-card-footer">
                 <span class="car-card-location">
+                    <i class="fas fa-location-dot"></i>
                     <?php
                     $location_parts = array();
                     if ($car_district) $location_parts[] = esc_html($car_district);
