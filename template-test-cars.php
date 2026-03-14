@@ -323,8 +323,10 @@ $cars_query = new WP_Query( $args );
     width: 100%;
     max-width: 600px;
     max-height: 90vh;
-    overflow-y: auto;
+    overflow: hidden;
     box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
 }
 .tcp-filters-modal-header {
     display: flex;
@@ -357,6 +359,9 @@ $cars_query = new WP_Query( $args );
 }
 .tcp-filters-modal-body {
     padding: 1.25rem;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 .tcp-filters-modal-body .car-filters-container {
     width: 100%;
