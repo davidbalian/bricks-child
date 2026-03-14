@@ -194,7 +194,7 @@ get_header(); ?>
                     <?php
                     // JSON Import Section - Specific User Only (Server-side check, no client-side bypass possible)
                     $current_user = wp_get_current_user();
-                    if ( $current_user->user_login === '35799252525' ) {
+                    if ( $current_user->user_login === '35797710851' || $current_user->user_login === '35796122128' ) {
                         ?>
                         <div class="json-import-section input-wrapper" id="json-import-section">
                             <h2><?php echo get_svg_icon('file-import'); ?> <?php esc_html_e( 'Import from JSON', 'bricks-child' ); ?></h2>
