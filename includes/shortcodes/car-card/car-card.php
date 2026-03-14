@@ -43,7 +43,43 @@ function render_car_card($post_id) {
     // Get ACF fields
     $make = get_field('make', $post_id);
     $model = get_field('model', $post_id);
+    $price = get_field('price', $post_id);
+    $mileage = get_field('mileage', $post_id);
+    $engine_capacity = get_field('engine_capacity', $post_id);
+    $fuel_type = get_field('fuel_type', $post_id);
+    $transmission = get_field('transmission', $post_id);
+    $car_district = get_field('car_district', $post_id);
+    $car_city = get_field('car_city', $post_id);
     $permalink = get_permalink($post_id);
+
+    // Relative date
+    $publication_date = get_post_meta($post_id, 'publication_date', true);
+    if (empty($publication_date)) {
+        $publication_date = get_the_date('Y-m-d H:i:s', $post_id);
+    }
+    $now = current_time('timestamp');
+    $post_time = strtotime($publication_date);
+    $time_diff = $now - $post_time;
+    $days = floor($time_diff / (60 * 60 * 24));
+
+    if ($days == 0) {
+        $relative_date = '<span class="post-date posted-today">Today</span>';
+    } elseif ($days == 1) {
+        $relative_date = '<span class="post-date">Yesterday</span>';
+    } elseif ($days >= 2 && $days <= 6) {
+        $relative_date = '<span class="post-date">' . $days . ' days ago</span>';
+    } elseif ($days >= 7 && $days <= 13) {
+        $relative_date = '<span class="post-date">1 week ago</span>';
+    } elseif ($days >= 14 && $days <= 20) {
+        $relative_date = '<span class="post-date">2 weeks ago</span>';
+    } elseif ($days >= 21 && $days <= 27) {
+        $relative_date = '<span class="post-date">3 weeks ago</span>';
+    } elseif ($days >= 28 && $days <= 59) {
+        $relative_date = '<span class="post-date">1 month ago</span>';
+    } else {
+        $months = floor($days / 30);
+        $relative_date = '<span class="post-date">' . $months . ' months ago</span>';
+    }
 
     // Badges
     $show_full_badge = get_field('fulldetailsbadge', $post_id);
@@ -129,6 +165,36 @@ function render_car_card($post_id) {
         <!-- ROW 2: Body -->
         <a href="<?php echo esc_url($permalink); ?>" class="car-card-body">
             <h3 class="car-card-title"><?php echo esc_html($make . ' ' . $model); ?></h3>
+
+            <?php if ($mileage) : ?>
+                <div class="car-card-mileage"><?php echo esc_html(number_format(floatval(str_replace(',', '', $mileage)))); ?>km</div>
+            <?php endif; ?>
+
+            <div class="car-card-specs">
+                <?php
+                $specs = array();
+                if ($engine_capacity) $specs[] = esc_html($engine_capacity) . 'L';
+                if ($fuel_type)       $specs[] = esc_html($fuel_type);
+                if ($transmission)    $specs[] = esc_html($transmission);
+                echo implode(' <span class="car-card-specs-sep">|</span> ', $specs);
+                ?>
+            </div>
+
+            <?php if ($price) : ?>
+                <div class="car-card-price">&euro;<?php echo esc_html(number_format(floatval(str_replace(',', '', $price)))); ?></div>
+            <?php endif; ?>
+
+            <div class="car-card-footer">
+                <span class="car-card-location">
+                    <?php
+                    $location_parts = array();
+                    if ($car_district) $location_parts[] = esc_html($car_district);
+                    if ($car_city)     $location_parts[] = esc_html($car_city);
+                    echo implode(', ', $location_parts);
+                    ?>
+                </span>
+                <span class="car-card-date"><?php echo $relative_date; ?></span>
+            </div>
         </a>
     </article>
     <?php
