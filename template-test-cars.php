@@ -433,7 +433,7 @@ $cars_query = new WP_Query( $args );
 }
 .tcp-heading {
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: 500;
     color: #2a3546;
     margin: 0 0 1.25rem;
 }
