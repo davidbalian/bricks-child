@@ -368,10 +368,12 @@ $cars_query = new WP_Query( $args );
     flex-wrap: wrap;
     flex-direction: row;
 }
+.tcp-filters-modal-body .car-filters-item {
+    flex: 0 0 100%;
+}
 .tcp-filters-modal-body .car-filters-item-make,
 .tcp-filters-modal-body .car-filters-item-model {
-    width: calc(50% - 0.5rem);
-    flex: none;
+    flex: 0 0 calc(50% - 0.5rem);
 }
 
 /* ============================================
