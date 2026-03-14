@@ -81,7 +81,7 @@ $cars_query = new WP_Query( $args );
             </button>
         </div>
         <div class="tcp-filters-modal-body">
-            <?php echo do_shortcode( '[car_filters filters="make,model,price,mileage,year,fuel,body" mode="ajax" target="test-cars-listings" layout="vertical" show_button="false"]' ); ?>
+            <?php echo do_shortcode( '[car_filters filters="make,model,price,mileage,fuel,body,year" mode="ajax" target="test-cars-listings" layout="vertical" show_button="false"]' ); ?>
         </div>
         <div class="tcp-filters-modal-footer">
             <button type="button" class="tcp-modal-apply-btn" id="tcp-modal-apply-btn">Apply Filters</button>
@@ -434,7 +434,9 @@ $cars_query = new WP_Query( $args );
     flex: 0 0 100%;
 }
 .tcp-filters-modal-body .car-filters-item-make,
-.tcp-filters-modal-body .car-filters-item-model {
+.tcp-filters-modal-body .car-filters-item-model,
+.tcp-filters-modal-body .car-filters-item-fuel,
+.tcp-filters-modal-body .car-filters-item-body {
     flex: 0 0 calc(50% - 0.5rem);
 }
 
@@ -863,23 +865,6 @@ $cars_query = new WP_Query( $args );
         setTimeout(buildChips, 100);
     });
 
-    // Auto-scroll modal body when a dropdown opens so it's fully visible
-    $(document).on('click', '.tcp-filters-modal-body .car-filter-dropdown-button', function() {
-        var $dropdown = $(this).closest('.car-filter-dropdown');
-        // Small delay so the 'open' class is applied first
-        setTimeout(function() {
-            if ($dropdown.hasClass('open')) {
-                var modalBody = document.querySelector('.tcp-filters-modal-body');
-                if (!modalBody) return;
-                var dropdownEl = $dropdown[0];
-                var bodyRect = modalBody.getBoundingClientRect();
-                var dropdownRect = dropdownEl.getBoundingClientRect();
-                // Scroll so the dropdown button is near the top of the visible area
-                var scrollTarget = dropdownEl.offsetTop - modalBody.offsetTop - 10;
-                modalBody.scrollTo({ top: scrollTarget, behavior: 'smooth' });
-            }
-        }, 50);
-    });
 
 })(jQuery);
 </script>
