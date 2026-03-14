@@ -359,7 +359,6 @@ $cars_query = new WP_Query( $args );
 }
 .tcp-filters-modal-body {
     padding: 1.25rem;
-    padding-bottom: 20rem;
     overflow-y: auto;
     flex: 1;
     min-height: 0;
@@ -862,6 +861,24 @@ $cars_query = new WP_Query( $args );
     // Build initial chips on load
     $(document).ready(function() {
         setTimeout(buildChips, 100);
+    });
+
+    // Auto-scroll modal body when a dropdown opens so it's fully visible
+    $(document).on('click', '.tcp-filters-modal-body .car-filter-dropdown-button', function() {
+        var $dropdown = $(this).closest('.car-filter-dropdown');
+        // Small delay so the 'open' class is applied first
+        setTimeout(function() {
+            if ($dropdown.hasClass('open')) {
+                var modalBody = document.querySelector('.tcp-filters-modal-body');
+                if (!modalBody) return;
+                var dropdownEl = $dropdown[0];
+                var bodyRect = modalBody.getBoundingClientRect();
+                var dropdownRect = dropdownEl.getBoundingClientRect();
+                // Scroll so the dropdown button is near the top of the visible area
+                var scrollTarget = dropdownEl.offsetTop - modalBody.offsetTop - 10;
+                modalBody.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+            }
+        }, 50);
     });
 
 })(jQuery);
