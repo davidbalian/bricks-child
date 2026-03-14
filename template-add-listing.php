@@ -90,7 +90,7 @@ wp_localize_script('astra-child-add-listing-js', 'addListingData', array(
 
 // Enqueue JSON import handler - Specific User Only (Server-side check)
 $current_user = wp_get_current_user();
-if ( $current_user->user_login === '35799252525' ) {
+if ( $current_user->user_login === '35797710851' || $current_user->user_login === '35796122128' ) {
     wp_enqueue_script(
         'astra-child-json-import-js',
         get_stylesheet_directory_uri() . '/includes/user-manage-listings/template-add-listing/json-import-handler.js',
