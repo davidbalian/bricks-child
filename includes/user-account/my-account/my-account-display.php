@@ -211,6 +211,93 @@ function display_my_account_main($current_user) {
                         </div>
                     </div>
                 </div>
+
+                <div class="account-section dealer-info-section">
+                    <h3>Dealership Information</h3>
+                    <?php
+                    // Get current dealer field values
+                    $dealer_website = get_field('dealer_website', 'user_' . $current_user->ID);
+                    $dealer_instagram = get_field('dealer_instagram', 'user_' . $current_user->ID);
+                    $dealer_facebook = get_field('dealer_facebook', 'user_' . $current_user->ID);
+                    $dealer_maps_url = get_field('dealer_maps_url', 'user_' . $current_user->ID);
+                    $dealer_maps_address = get_field('dealer_maps_address', 'user_' . $current_user->ID);
+                    ?>
+                    <div class="info-row dealer-website-row">
+                        <span class="label">Website:</span>
+                        <span class="value" id="display-dealer-website"><?php echo esc_html($dealer_website ?: 'Not set'); ?></span>
+                        <button class="btn btn-primary edit-dealer-website-btn">Edit</button>
+                    </div>
+                    <div class="info-row dealer-website-edit-row" style="display: none;">
+                        <span class="label">Website URL:</span>
+                        <input type="url" id="dealer-website" value="<?php echo esc_attr($dealer_website); ?>" class="dealer-input" placeholder="https://example.com">
+                    </div>
+                    <div class="info-row dealer-website-edit-row" style="display: none;">
+                        <span class="label"></span>
+                        <button class="btn btn-primary save-dealer-website-btn">Save Changes</button>
+                        <button class="btn btn-secondary cancel-dealer-website-btn">Cancel</button>
+                    </div>
+
+                    <div class="info-row dealer-instagram-row">
+                        <span class="label">Instagram:</span>
+                        <span class="value" id="display-dealer-instagram"><?php echo esc_html($dealer_instagram ?: 'Not set'); ?></span>
+                        <button class="btn btn-primary edit-dealer-instagram-btn">Edit</button>
+                    </div>
+                    <div class="info-row dealer-instagram-edit-row" style="display: none;">
+                        <span class="label">Instagram URL:</span>
+                        <input type="url" id="dealer-instagram" value="<?php echo esc_attr($dealer_instagram); ?>" class="dealer-input" placeholder="https://instagram.com/username">
+                    </div>
+                    <div class="info-row dealer-instagram-edit-row" style="display: none;">
+                        <span class="label"></span>
+                        <button class="btn btn-primary save-dealer-instagram-btn">Save Changes</button>
+                        <button class="btn btn-secondary cancel-dealer-instagram-btn">Cancel</button>
+                    </div>
+
+                    <div class="info-row dealer-facebook-row">
+                        <span class="label">Facebook:</span>
+                        <span class="value" id="display-dealer-facebook"><?php echo esc_html($dealer_facebook ?: 'Not set'); ?></span>
+                        <button class="btn btn-primary edit-dealer-facebook-btn">Edit</button>
+                    </div>
+                    <div class="info-row dealer-facebook-edit-row" style="display: none;">
+                        <span class="label">Facebook URL:</span>
+                        <input type="url" id="dealer-facebook" value="<?php echo esc_attr($dealer_facebook); ?>" class="dealer-input" placeholder="https://facebook.com/username">
+                    </div>
+                    <div class="info-row dealer-facebook-edit-row" style="display: none;">
+                        <span class="label"></span>
+                        <button class="btn btn-primary save-dealer-facebook-btn">Save Changes</button>
+                        <button class="btn btn-secondary cancel-dealer-facebook-btn">Cancel</button>
+                    </div>
+
+                    <div class="info-row dealer-maps-url-row">
+                        <span class="label">Maps URL:</span>
+                        <span class="value" id="display-dealer-maps-url"><?php echo esc_html($dealer_maps_url ?: 'Not set'); ?></span>
+                        <button class="btn btn-primary edit-dealer-maps-url-btn">Edit</button>
+                    </div>
+                    <div class="info-row dealer-maps-url-edit-row" style="display: none;">
+                        <span class="label">Maps URL:</span>
+                        <input type="text" id="dealer-maps-url" value="<?php echo esc_attr($dealer_maps_url); ?>" class="dealer-input" placeholder="Google Maps URL">
+                    </div>
+                    <div class="info-row dealer-maps-url-edit-row" style="display: none;">
+                        <span class="label"></span>
+                        <button class="btn btn-primary save-dealer-maps-url-btn">Save Changes</button>
+                        <button class="btn btn-secondary cancel-dealer-maps-url-btn">Cancel</button>
+                    </div>
+
+                    <div class="info-row dealer-maps-address-row">
+                        <span class="label">Maps Address:</span>
+                        <span class="value" id="display-dealer-maps-address"><?php echo esc_html($dealer_maps_address ?: 'Not set'); ?></span>
+                        <button class="btn btn-primary edit-dealer-maps-address-btn">Edit</button>
+                    </div>
+                    <div class="info-row dealer-maps-address-edit-row" style="display: none;">
+                        <span class="label">Maps Address:</span>
+                        <input type="text" id="dealer-maps-address" value="<?php echo esc_attr($dealer_maps_address); ?>" class="dealer-input" placeholder="Full address">
+                    </div>
+                    <div class="info-row dealer-maps-address-edit-row" style="display: none;">
+                        <span class="label"></span>
+                        <button class="btn btn-primary save-dealer-maps-address-btn">Save Changes</button>
+                        <button class="btn btn-secondary cancel-dealer-maps-address-btn">Cancel</button>
+                    </div>
+                    <div id="dealer-info-feedback" class="dealer-info-feedback" aria-live="polite"></div>
+                </div>
             <?php endif; ?>
 
             <div class="account-section notification-preferences-section">

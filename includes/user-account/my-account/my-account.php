@@ -36,6 +36,11 @@ function display_my_account($atts) {
         'notification_preferences_nonce' => wp_create_nonce('notification_preferences_nonce'),
         'upload_account_logo_nonce'      => wp_create_nonce('upload_account_logo_nonce'),
         'remove_account_logo_nonce'      => wp_create_nonce('remove_account_logo_nonce'),
+        'update_dealer_website_nonce'    => wp_create_nonce('update_dealer_website_nonce'),
+        'update_dealer_instagram_nonce'  => wp_create_nonce('update_dealer_instagram_nonce'),
+        'update_dealer_facebook_nonce'   => wp_create_nonce('update_dealer_facebook_nonce'),
+        'update_dealer_maps_url_nonce'   => wp_create_nonce('update_dealer_maps_url_nonce'),
+        'update_dealer_maps_address_nonce' => wp_create_nonce('update_dealer_maps_address_nonce'),
     ));
 
     // Check if we're in password reset flow

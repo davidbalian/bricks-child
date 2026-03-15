@@ -540,3 +540,168 @@ function handle_remove_account_logo() {
 
     wp_send_json_success('Logo removed successfully');
 }
+
+/**
+ * AJAX: Update dealer website
+ */
+add_action('wp_ajax_update_dealer_website', 'handle_update_dealer_website');
+function handle_update_dealer_website() {
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_dealer_website_nonce')) {
+        wp_send_json_error('Invalid nonce');
+        return;
+    }
+
+    if (!is_user_logged_in()) {
+        wp_send_json_error('User not logged in');
+        return;
+    }
+
+    $user_id = get_current_user_id();
+
+    if (!my_account_user_can_manage_dealership_fields($user_id)) {
+        wp_send_json_error('Not allowed');
+        return;
+    }
+
+    $dealer_website = isset($_POST['dealer_website']) ? esc_url_raw($_POST['dealer_website']) : '';
+    
+    // Update ACF field
+    update_field('dealer_website', $dealer_website, 'user_' . $user_id);
+
+    wp_send_json_success(array(
+        'message' => 'Website updated successfully',
+        'dealer_website' => $dealer_website
+    ));
+}
+
+/**
+ * AJAX: Update dealer Instagram
+ */
+add_action('wp_ajax_update_dealer_instagram', 'handle_update_dealer_instagram');
+function handle_update_dealer_instagram() {
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_dealer_instagram_nonce')) {
+        wp_send_json_error('Invalid nonce');
+        return;
+    }
+
+    if (!is_user_logged_in()) {
+        wp_send_json_error('User not logged in');
+        return;
+    }
+
+    $user_id = get_current_user_id();
+
+    if (!my_account_user_can_manage_dealership_fields($user_id)) {
+        wp_send_json_error('Not allowed');
+        return;
+    }
+
+    $dealer_instagram = isset($_POST['dealer_instagram']) ? esc_url_raw($_POST['dealer_instagram']) : '';
+    
+    // Update ACF field
+    update_field('dealer_instagram', $dealer_instagram, 'user_' . $user_id);
+
+    wp_send_json_success(array(
+        'message' => 'Instagram updated successfully',
+        'dealer_instagram' => $dealer_instagram
+    ));
+}
+
+/**
+ * AJAX: Update dealer Facebook
+ */
+add_action('wp_ajax_update_dealer_facebook', 'handle_update_dealer_facebook');
+function handle_update_dealer_facebook() {
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_dealer_facebook_nonce')) {
+        wp_send_json_error('Invalid nonce');
+        return;
+    }
+
+    if (!is_user_logged_in()) {
+        wp_send_json_error('User not logged in');
+        return;
+    }
+
+    $user_id = get_current_user_id();
+
+    if (!my_account_user_can_manage_dealership_fields($user_id)) {
+        wp_send_json_error('Not allowed');
+        return;
+    }
+
+    $dealer_facebook = isset($_POST['dealer_facebook']) ? esc_url_raw($_POST['dealer_facebook']) : '';
+    
+    // Update ACF field
+    update_field('dealer_facebook', $dealer_facebook, 'user_' . $user_id);
+
+    wp_send_json_success(array(
+        'message' => 'Facebook updated successfully',
+        'dealer_facebook' => $dealer_facebook
+    ));
+}
+
+/**
+ * AJAX: Update dealer maps URL
+ */
+add_action('wp_ajax_update_dealer_maps_url', 'handle_update_dealer_maps_url');
+function handle_update_dealer_maps_url() {
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_dealer_maps_url_nonce')) {
+        wp_send_json_error('Invalid nonce');
+        return;
+    }
+
+    if (!is_user_logged_in()) {
+        wp_send_json_error('User not logged in');
+        return;
+    }
+
+    $user_id = get_current_user_id();
+
+    if (!my_account_user_can_manage_dealership_fields($user_id)) {
+        wp_send_json_error('Not allowed');
+        return;
+    }
+
+    $dealer_maps_url = isset($_POST['dealer_maps_url']) ? sanitize_text_field($_POST['dealer_maps_url']) : '';
+    
+    // Update ACF field
+    update_field('dealer_maps_url', $dealer_maps_url, 'user_' . $user_id);
+
+    wp_send_json_success(array(
+        'message' => 'Maps URL updated successfully',
+        'dealer_maps_url' => $dealer_maps_url
+    ));
+}
+
+/**
+ * AJAX: Update dealer maps address
+ */
+add_action('wp_ajax_update_dealer_maps_address', 'handle_update_dealer_maps_address');
+function handle_update_dealer_maps_address() {
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_dealer_maps_address_nonce')) {
+        wp_send_json_error('Invalid nonce');
+        return;
+    }
+
+    if (!is_user_logged_in()) {
+        wp_send_json_error('User not logged in');
+        return;
+    }
+
+    $user_id = get_current_user_id();
+
+    if (!my_account_user_can_manage_dealership_fields($user_id)) {
+        wp_send_json_error('Not allowed');
+        return;
+    }
+
+    $dealer_maps_address = isset($_POST['dealer_maps_address']) ? sanitize_text_field($_POST['dealer_maps_address']) : '';
+    
+    // Update ACF field
+    update_field('dealer_maps_address', $dealer_maps_address, 'user_' . $user_id);
+
+    wp_send_json_success(array(
+        'message' => 'Maps address updated successfully',
+        'dealer_maps_address' => $dealer_maps_address
+    ));
+}

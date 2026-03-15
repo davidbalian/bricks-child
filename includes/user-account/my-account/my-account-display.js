@@ -537,6 +537,158 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     if (removeLogoBtn) {
         removeLogoBtn.addEventListener('click', handleRemoveLogo);
     }
+
+    // Dealer information fields handling
+    (function() {
+        // Helper function to handle dealer field edit/save/cancel
+        function setupDealerField(fieldName, displayId, inputId, editBtnClass, saveBtnClass, cancelBtnClass, displayRowClass, editRowClass, ajaxAction, nonceKey) {
+            var editBtn = document.querySelector('.' + editBtnClass);
+            var saveBtn = document.querySelector('.' + saveBtnClass);
+            var cancelBtn = document.querySelector('.' + cancelBtnClass);
+            var displayRow = document.querySelector('.' + displayRowClass);
+            var editRows = document.querySelectorAll('.' + editRowClass);
+            var displayElement = document.getElementById(displayId);
+            var inputElement = document.getElementById(inputId);
+            
+            if (!editBtn || !saveBtn || !cancelBtn || !displayRow || !inputElement) {
+                return; // Field doesn't exist on this page
+            }
+
+            var originalValue = inputElement.value || '';
+
+            editBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                displayRow.style.display = 'none';
+                editRows.forEach(function(row) {
+                    row.style.display = 'flex';
+                });
+                inputElement.focus();
+            });
+
+            cancelBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                inputElement.value = originalValue;
+                displayRow.style.display = 'flex';
+                editRows.forEach(function(row) {
+                    row.style.display = 'none';
+                });
+            });
+
+            saveBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                var newValue = inputElement.value.trim();
+                
+                // Check if value changed
+                if (newValue === originalValue) {
+                    displayRow.style.display = 'flex';
+                    editRows.forEach(function(row) {
+                        row.style.display = 'none';
+                    });
+                    return;
+                }
+
+                // Validate URL fields
+                if (fieldName.includes('website') || fieldName.includes('instagram') || fieldName.includes('facebook')) {
+                    if (newValue && !isValidUrl(newValue)) {
+                        alert('Please enter a valid URL (e.g., https://example.com)');
+                        return;
+                    }
+                }
+
+                var formData = new FormData();
+                formData.append('action', ajaxAction);
+                formData.append(fieldName, newValue);
+                formData.append('nonce', MyAccountAjax[nonceKey]);
+
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Saving...';
+
+                fetch(MyAccountAjax.ajax_url, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                })
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (data && data.success) {
+                        originalValue = newValue;
+                        if (displayElement) {
+                            displayElement.textContent = newValue || 'Not set';
+                        }
+                        displayRow.style.display = 'flex';
+                        editRows.forEach(function(row) {
+                            row.style.display = 'none';
+                        });
+                        showDealerFeedback('Updated successfully', 'success');
+                    } else {
+                        var errorMsg = (data && data.data) ? data.data : 'Error updating ' + fieldName + '. Please try again.';
+                        showDealerFeedback(errorMsg, 'error');
+                    }
+                })
+                .catch(function() {
+                    showDealerFeedback('Connection error. Please try again.', 'error');
+                })
+                .finally(function() {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save Changes';
+                });
+            });
+
+            // Handle Enter key
+            inputElement.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    saveBtn.click();
+                }
+            });
+        }
+
+        function isValidUrl(string) {
+            try {
+                var url = new URL(string);
+                return url.protocol === 'http:' || url.protocol === 'https:';
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function showDealerFeedback(message, type) {
+            var feedback = document.getElementById('dealer-info-feedback');
+            if (!feedback) return;
+            
+            feedback.textContent = message;
+            feedback.className = 'dealer-info-feedback ' + (type || '');
+            
+            if (type === 'success') {
+                setTimeout(function() {
+                    feedback.textContent = '';
+                    feedback.className = 'dealer-info-feedback';
+                }, 3000);
+            }
+        }
+
+        // Setup each dealer field
+        setupDealerField('dealer_website', 'display-dealer-website', 'dealer-website', 
+            'edit-dealer-website-btn', 'save-dealer-website-btn', 'cancel-dealer-website-btn',
+            'dealer-website-row', 'dealer-website-edit-row', 'update_dealer_website', 'update_dealer_website_nonce');
+        
+        setupDealerField('dealer_instagram', 'display-dealer-instagram', 'dealer-instagram',
+            'edit-dealer-instagram-btn', 'save-dealer-instagram-btn', 'cancel-dealer-instagram-btn',
+            'dealer-instagram-row', 'dealer-instagram-edit-row', 'update_dealer_instagram', 'update_dealer_instagram_nonce');
+        
+        setupDealerField('dealer_facebook', 'display-dealer-facebook', 'dealer-facebook',
+            'edit-dealer-facebook-btn', 'save-dealer-facebook-btn', 'cancel-dealer-facebook-btn',
+            'dealer-facebook-row', 'dealer-facebook-edit-row', 'update_dealer_facebook', 'update_dealer_facebook_nonce');
+        
+        setupDealerField('dealer_maps_url', 'display-dealer-maps-url', 'dealer-maps-url',
+            'edit-dealer-maps-url-btn', 'save-dealer-maps-url-btn', 'cancel-dealer-maps-url-btn',
+            'dealer-maps-url-row', 'dealer-maps-url-edit-row', 'update_dealer_maps_url', 'update_dealer_maps_url_nonce');
+        
+        setupDealerField('dealer_maps_address', 'display-dealer-maps-address', 'dealer-maps-address',
+            'edit-dealer-maps-address-btn', 'save-dealer-maps-address-btn', 'cancel-dealer-maps-address-btn',
+            'dealer-maps-address-row', 'dealer-maps-address-edit-row', 'update_dealer_maps_address', 'update_dealer_maps_address_nonce');
+    })();
 });
 
 /**
