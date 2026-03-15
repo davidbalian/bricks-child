@@ -62,9 +62,19 @@ function dealership_access_message_shortcode($atts) {
     // Get the ACF field value
     $autoagora_dealer = get_field('autoagora_dealer', $post_id);
     
-    // Check if field is 0 or false
-    // ACF returns false for unchecked checkboxes, 0 for number fields, or empty for other types
-    if ($autoagora_dealer === 0 || $autoagora_dealer === false || $autoagora_dealer === '0' || empty($autoagora_dealer)) {
+    // Fallback: if ACF returns null/empty, try direct post meta
+    if ($autoagora_dealer === null || $autoagora_dealer === '') {
+        $autoagora_dealer = get_post_meta($post_id, 'autoagora_dealer', true);
+    }
+    
+    // Check if field is empty, 0, false, null, or '0'
+    // Show message if field is: empty string, null, 0, false, '0', or not set
+    if ($autoagora_dealer === null || 
+        $autoagora_dealer === '' || 
+        $autoagora_dealer === 0 || 
+        $autoagora_dealer === false || 
+        $autoagora_dealer === '0' || 
+        empty($autoagora_dealer)) {
         return get_dealership_access_message_html();
     }
     
