@@ -317,8 +317,6 @@ function car_filters_ajax_filter_listings() {
                 'compare' => 'IN',
             );
         }
-            'compare' => '=',
-        );
     }
 
     // Exclude sold (default behavior)
