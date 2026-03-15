@@ -67,19 +67,26 @@ function dealership_access_message_shortcode($atts) {
         $autoagora_dealer = get_post_meta($post_id, 'autoagora_dealer', true);
     }
     
-    // Check if field is empty, 0, false, null, or '0'
-    // Show message if field is: empty string, null, 0, false, '0', or not set
-    if ($autoagora_dealer === null || 
-        $autoagora_dealer === '' || 
-        $autoagora_dealer === 0 || 
-        $autoagora_dealer === false || 
-        $autoagora_dealer === '0' || 
-        empty($autoagora_dealer)) {
-        return get_dealership_access_message_html();
+    // Check if field indicates dealer is claimed (1, '1', or true)
+    // Only show message when field is explicitly 0, false, '0', null, or empty
+    $is_dealer_claimed = false;
+    
+    // Explicitly check for values that mean "claimed"
+    // Handle both integer 1, string '1', boolean true, and any truthy value
+    if ($autoagora_dealer === 1 || 
+        $autoagora_dealer === '1' || 
+        $autoagora_dealer === true ||
+        (is_numeric($autoagora_dealer) && intval($autoagora_dealer) === 1)) {
+        $is_dealer_claimed = true;
     }
     
-    // Field is set to true/1, so don't show the message
-    return '';
+    // If dealer is claimed, don't show the message
+    if ($is_dealer_claimed) {
+        return '';
+    }
+    
+    // Dealer is NOT claimed (field is 0, false, '0', null, empty, or any other value), so show the message
+    return get_dealership_access_message_html();
 }
 
 /**
