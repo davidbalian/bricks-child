@@ -40,7 +40,7 @@ $args = array(
     ),
 );
 
-$cars_query = new WP_Query( $args );
+$cars_query = car_listings_execute_query( $args );
 ?>
 
 <!-- Filters bar -->

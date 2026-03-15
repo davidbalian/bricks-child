@@ -365,8 +365,8 @@ function car_filters_ajax_filter_listings() {
     }
     $args['order'] = $order;
 
-    // Execute query
-    $car_query = new WP_Query($args);
+    // Execute query with featured-first sorting
+    $car_query = car_listings_execute_query($args);
 
     // Pre-fetch meta
     if ($car_query->have_posts()) {
