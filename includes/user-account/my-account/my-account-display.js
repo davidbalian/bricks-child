@@ -594,6 +594,22 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                         alert('Please enter a valid URL (e.g., https://example.com)');
                         return;
                     }
+                    // Validate length for URL fields (max 500 characters)
+                    if (newValue && newValue.length > 500) {
+                        alert('URL must be 500 characters or less');
+                        return;
+                    }
+                }
+                
+                // Validate length for text fields
+                if (fieldName === 'dealer_maps_url' && newValue && newValue.length > 1000) {
+                    alert('Maps URL must be 1000 characters or less');
+                    return;
+                }
+                
+                if (fieldName === 'dealer_maps_address' && newValue && newValue.length > 500) {
+                    alert('Maps address must be 500 characters or less');
+                    return;
                 }
 
                 var formData = new FormData();

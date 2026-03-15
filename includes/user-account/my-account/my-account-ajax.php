@@ -563,7 +563,32 @@ function handle_update_dealer_website() {
         return;
     }
 
-    $dealer_website = isset($_POST['dealer_website']) ? esc_url_raw($_POST['dealer_website']) : '';
+    $dealer_website = isset($_POST['dealer_website']) ? trim($_POST['dealer_website']) : '';
+    
+    // Validate URL if provided
+    if (!empty($dealer_website)) {
+        // Validate URL format
+        if (!filter_var($dealer_website, FILTER_VALIDATE_URL)) {
+            wp_send_json_error('Please enter a valid URL (e.g., https://example.com)');
+            return;
+        }
+        
+        // Validate URL protocol (must be http or https)
+        $parsed_url = parse_url($dealer_website);
+        if (!isset($parsed_url['scheme']) || !in_array($parsed_url['scheme'], array('http', 'https'))) {
+            wp_send_json_error('URL must start with http:// or https://');
+            return;
+        }
+        
+        // Validate length (max 500 characters)
+        if (strlen($dealer_website) > 500) {
+            wp_send_json_error('Website URL must be 500 characters or less');
+            return;
+        }
+        
+        // Sanitize URL
+        $dealer_website = esc_url_raw($dealer_website);
+    }
     
     // Update ACF field
     update_field('dealer_website', $dealer_website, 'user_' . $user_id);
@@ -596,7 +621,32 @@ function handle_update_dealer_instagram() {
         return;
     }
 
-    $dealer_instagram = isset($_POST['dealer_instagram']) ? esc_url_raw($_POST['dealer_instagram']) : '';
+    $dealer_instagram = isset($_POST['dealer_instagram']) ? trim($_POST['dealer_instagram']) : '';
+    
+    // Validate URL if provided
+    if (!empty($dealer_instagram)) {
+        // Validate URL format
+        if (!filter_var($dealer_instagram, FILTER_VALIDATE_URL)) {
+            wp_send_json_error('Please enter a valid URL (e.g., https://instagram.com/username)');
+            return;
+        }
+        
+        // Validate URL protocol (must be http or https)
+        $parsed_url = parse_url($dealer_instagram);
+        if (!isset($parsed_url['scheme']) || !in_array($parsed_url['scheme'], array('http', 'https'))) {
+            wp_send_json_error('URL must start with http:// or https://');
+            return;
+        }
+        
+        // Validate length (max 500 characters)
+        if (strlen($dealer_instagram) > 500) {
+            wp_send_json_error('Instagram URL must be 500 characters or less');
+            return;
+        }
+        
+        // Sanitize URL
+        $dealer_instagram = esc_url_raw($dealer_instagram);
+    }
     
     // Update ACF field
     update_field('dealer_instagram', $dealer_instagram, 'user_' . $user_id);
@@ -629,7 +679,32 @@ function handle_update_dealer_facebook() {
         return;
     }
 
-    $dealer_facebook = isset($_POST['dealer_facebook']) ? esc_url_raw($_POST['dealer_facebook']) : '';
+    $dealer_facebook = isset($_POST['dealer_facebook']) ? trim($_POST['dealer_facebook']) : '';
+    
+    // Validate URL if provided
+    if (!empty($dealer_facebook)) {
+        // Validate URL format
+        if (!filter_var($dealer_facebook, FILTER_VALIDATE_URL)) {
+            wp_send_json_error('Please enter a valid URL (e.g., https://facebook.com/username)');
+            return;
+        }
+        
+        // Validate URL protocol (must be http or https)
+        $parsed_url = parse_url($dealer_facebook);
+        if (!isset($parsed_url['scheme']) || !in_array($parsed_url['scheme'], array('http', 'https'))) {
+            wp_send_json_error('URL must start with http:// or https://');
+            return;
+        }
+        
+        // Validate length (max 500 characters)
+        if (strlen($dealer_facebook) > 500) {
+            wp_send_json_error('Facebook URL must be 500 characters or less');
+            return;
+        }
+        
+        // Sanitize URL
+        $dealer_facebook = esc_url_raw($dealer_facebook);
+    }
     
     // Update ACF field
     update_field('dealer_facebook', $dealer_facebook, 'user_' . $user_id);
@@ -662,7 +737,16 @@ function handle_update_dealer_maps_url() {
         return;
     }
 
-    $dealer_maps_url = isset($_POST['dealer_maps_url']) ? sanitize_text_field($_POST['dealer_maps_url']) : '';
+    $dealer_maps_url = isset($_POST['dealer_maps_url']) ? trim($_POST['dealer_maps_url']) : '';
+    
+    // Validate length (max 1000 characters for maps URL)
+    if (!empty($dealer_maps_url) && strlen($dealer_maps_url) > 1000) {
+        wp_send_json_error('Maps URL must be 1000 characters or less');
+        return;
+    }
+    
+    // Sanitize text field
+    $dealer_maps_url = sanitize_text_field($dealer_maps_url);
     
     // Update ACF field
     update_field('dealer_maps_url', $dealer_maps_url, 'user_' . $user_id);
@@ -695,7 +779,16 @@ function handle_update_dealer_maps_address() {
         return;
     }
 
-    $dealer_maps_address = isset($_POST['dealer_maps_address']) ? sanitize_text_field($_POST['dealer_maps_address']) : '';
+    $dealer_maps_address = isset($_POST['dealer_maps_address']) ? trim($_POST['dealer_maps_address']) : '';
+    
+    // Validate length (max 500 characters for address)
+    if (!empty($dealer_maps_address) && strlen($dealer_maps_address) > 500) {
+        wp_send_json_error('Maps address must be 500 characters or less');
+        return;
+    }
+    
+    // Sanitize text field
+    $dealer_maps_address = sanitize_text_field($dealer_maps_address);
     
     // Update ACF field
     update_field('dealer_maps_address', $dealer_maps_address, 'user_' . $user_id);
