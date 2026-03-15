@@ -165,7 +165,7 @@ function render_car_card($post_id) {
 
         <!-- ROW 2: Body -->
         <a href="<?php echo esc_url($permalink); ?>" class="car-card-body">
-            <h3 class="car-card-title"><?php echo esc_html($make . ' ' . $model); ?></h3>
+            <h3 class="car-card-title"><?php echo esc_html(get_the_title($post_id)); ?></h3>
 
             <?php if ($mileage) : ?>
                 <div class="car-card-mileage"><i class="ion-ios-speedometer"></i> <?php echo esc_html(number_format(floatval(str_replace(',', '', $mileage)))); ?>km</div>
