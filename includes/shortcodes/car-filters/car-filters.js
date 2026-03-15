@@ -923,6 +923,9 @@
                                                     $dropdown.find('select').val(data.model_term_id);
                                                 }
                                             });
+
+                                            // Trigger filter after model is set
+                                            CarFilters.triggerFilter(group);
                                         }, 500);
                                     }
 
@@ -940,6 +943,11 @@
                                             $dropdown.find('select').val(data.make_term_id);
                                         }
                                     });
+
+                                    // Trigger filter after make is set (only if no model to wait for)
+                                    if (!data.model) {
+                                        CarFilters.triggerFilter(group);
+                                    }
                                 }
                             }
                         }
@@ -980,6 +988,16 @@
                     }
                 });
             });
+
+            // Trigger filter for non-make params (price, mileage, year, fuel, body)
+            if (!parsedUrl.makeSlug) {
+                $('.car-filters-container').each(function() {
+                    var group = $(this).data('group');
+                    if (group) {
+                        CarFilters.triggerFilter(group);
+                    }
+                });
+            }
         }
 
         // Fire initial cascade fetch for each group to sync dropdown options

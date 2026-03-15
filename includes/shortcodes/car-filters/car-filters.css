@@ -416,6 +416,16 @@
 }
 
 /* ============================================
+   Homepage: 2-row layout (Make+Model, Price+Mileage)
+   ============================================ */
+
+.car-filters-container[data-group="homepage"] .car-filters-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* ============================================
    Responsive
    ============================================ */
 
@@ -435,6 +445,10 @@
 
     .car-filter-range-inputs {
         flex-direction: row;
+    }
+
+    .car-filters-container[data-group="homepage"] .car-filters-wrapper {
+        grid-template-columns: 1fr;
     }
 }
 
