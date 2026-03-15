@@ -59,34 +59,41 @@ function dealership_access_message_shortcode($atts) {
         return '';
     }
     
-    // Get the ACF field value
+    // Get the ACF field value - try both formatted and raw
     $autoagora_dealer = get_field('autoagora_dealer', $post_id);
     
-    // Fallback: if ACF returns null/empty, try direct post meta
-    if ($autoagora_dealer === null || $autoagora_dealer === '') {
+    // Also try direct post meta as fallback
+    if ($autoagora_dealer === null || $autoagora_dealer === '' || $autoagora_dealer === false) {
         $autoagora_dealer = get_post_meta($post_id, 'autoagora_dealer', true);
     }
     
-    // Check if field indicates dealer is claimed (1, '1', or true)
-    // Only show message when field is explicitly 0, false, '0', null, or empty
-    $is_dealer_claimed = false;
-    
-    // Explicitly check for values that mean "claimed"
-    // Handle both integer 1, string '1', boolean true, and any truthy value
-    if ($autoagora_dealer === 1 || 
-        $autoagora_dealer === '1' || 
-        $autoagora_dealer === true ||
-        (is_numeric($autoagora_dealer) && intval($autoagora_dealer) === 1)) {
-        $is_dealer_claimed = true;
+    // Convert to a comparable value - normalize to integer for comparison
+    $dealer_value = null;
+    if ($autoagora_dealer !== null && $autoagora_dealer !== '' && $autoagora_dealer !== false) {
+        // Convert to integer: 1, '1', true all become 1
+        $dealer_value = intval($autoagora_dealer);
     }
     
-    // If dealer is claimed, don't show the message
-    if ($is_dealer_claimed) {
-        return '';
+    // TEMPORARY DEBUG - Remove this block after testing
+    // This will show visible debug info on the page
+    $debug_output = '<div style="background: #ffeb3b; padding: 10px; margin: 10px 0; border: 2px solid #f57f17;">';
+    $debug_output .= '<strong>DEBUG INFO:</strong><br>';
+    $debug_output .= 'Post ID: ' . esc_html($post_id) . '<br>';
+    $debug_output .= 'Raw Value: ' . var_export($autoagora_dealer, true) . '<br>';
+    $debug_output .= 'Type: ' . gettype($autoagora_dealer) . '<br>';
+    $debug_output .= 'Intval: ' . intval($autoagora_dealer) . '<br>';
+    $debug_output .= 'Dealer Value: ' . var_export($dealer_value, true) . '<br>';
+    $debug_output .= 'Will show message: ' . ($dealer_value === 1 ? 'NO' : 'YES') . '<br>';
+    $debug_output .= '</div>';
+    
+    // Only show message if value is NOT 1 (i.e., it's 0, null, empty, false, or not set)
+    // If dealer_value is 1, the dealer is claimed - don't show message
+    if ($dealer_value === 1) {
+        return $debug_output; // Show debug when claimed (should not show message)
     }
     
-    // Dealer is NOT claimed (field is 0, false, '0', null, empty, or any other value), so show the message
-    return get_dealership_access_message_html();
+    // Dealer is NOT claimed (value is 0, null, empty, false, or not set), so show the message
+    return $debug_output . get_dealership_access_message_html();
 }
 
 /**
