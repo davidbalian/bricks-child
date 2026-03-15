@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: Test Cars Page
+ * Template Name: New Cars Page Template
  *
  * @package Bricks Child
  * @since 1.0.0
