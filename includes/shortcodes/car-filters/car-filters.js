@@ -343,6 +343,12 @@
             var label = $option.clone().children('.car-filter-count').remove().end().text().trim();
             var filterType = $dropdown.data('filter-type');
             var group = $dropdown.data('group');
+            var isMultiSelect = $dropdown.data('multiselect') === true || $dropdown.data('multiselect') === 'true';
+
+            if (isMultiSelect) {
+                this._selectMulti($dropdown, $option, value, filterType, group);
+                return;
+            }
 
             // Update hidden select
             var $select = $dropdown.find('select');
@@ -371,6 +377,56 @@
             // Clear search
             $dropdown.find('.car-filter-dropdown-search').val('');
             this.filterOptions($dropdown, '');
+        },
+
+        _selectMulti: function($dropdown, $option, value, filterType, group) {
+            var $button = $dropdown.find('.car-filter-dropdown-button');
+            var $text = $button.find('.car-filter-dropdown-text');
+            var placeholder = $dropdown.find('select option:first').text();
+
+            // Clicking "All" clears everything
+            if (value === '' || value === null || value === undefined || String(value) === '') {
+                $dropdown.find('.car-filter-dropdown-option').removeClass('selected');
+                $dropdown.find('.car-filter-dropdown-option[data-value=""]').addClass('selected');
+                $text.addClass('placeholder').text(placeholder);
+                CarFilters.setState(group, filterType, '');
+                return;
+            }
+
+            // Toggle this option
+            $option.toggleClass('selected');
+
+            // Deselect "All" option
+            $dropdown.find('.car-filter-dropdown-option[data-value=""]').removeClass('selected');
+
+            // Build comma-separated value from all selected options
+            var selectedValues = [];
+            $dropdown.find('.car-filter-dropdown-option.selected').each(function() {
+                var v = $(this).data('value');
+                if (v !== '' && v !== null && v !== undefined && String(v) !== '') {
+                    selectedValues.push(String(v));
+                }
+            });
+
+            // If nothing selected, revert to "All"
+            if (selectedValues.length === 0) {
+                $dropdown.find('.car-filter-dropdown-option[data-value=""]').addClass('selected');
+                $text.addClass('placeholder').text(placeholder);
+                CarFilters.setState(group, filterType, '');
+                return;
+            }
+
+            // Update button text
+            if (selectedValues.length === 1) {
+                var $sel = $dropdown.find('.car-filter-dropdown-option.selected[data-value!=""]').first();
+                var singleLabel = $sel.clone().children('.car-filter-count').remove().end().text().trim();
+                $text.removeClass('placeholder').text(singleLabel);
+            } else {
+                $text.removeClass('placeholder').text(selectedValues.length + ' selected');
+            }
+
+            // Update state with comma-separated string
+            CarFilters.setState(group, filterType, selectedValues.join(','));
         },
 
         filterOptions: function($dropdown, query) {
@@ -688,14 +744,21 @@
             }
 
             var state = CarFilters.getState(group);
-            var currentValue = (filterType === 'make' || filterType === 'model')
-                ? String(state[filterType].value)
-                : String(state[filterType] || '');
+            var isMultiSelect = (filterType === 'fuel_type' || filterType === 'body_type');
+            var currentValue, currentValues;
+
+            if (filterType === 'make' || filterType === 'model') {
+                currentValue = String(state[filterType].value);
+                currentValues = currentValue ? [currentValue] : [];
+            } else {
+                currentValue = String(state[filterType] || '');
+                currentValues = currentValue ? currentValue.split(',') : [];
+            }
 
             $filters.each(function() {
                 var $dropdown = $(this).find('.car-filter-dropdown');
                 var $options = $dropdown.find('.car-filter-dropdown-option');
-                var selectedBecameUnavailable = false;
+                var unavailableSelected = [];
 
                 $options.each(function() {
                     var $opt = $(this);
@@ -717,24 +780,54 @@
                         }
                     } else {
                         $opt.addClass('hidden cascade-hidden');
-                        if (val === currentValue) {
-                            selectedBecameUnavailable = true;
+                        if (isMultiSelect) {
+                            if (currentValues.indexOf(val) !== -1) {
+                                unavailableSelected.push(val);
+                                $opt.removeClass('selected');
+                            }
+                        } else {
+                            if (val === currentValue) {
+                                unavailableSelected.push(val);
+                            }
                         }
                     }
                 });
 
-                // Auto-clear if selected value is no longer available
-                if (selectedBecameUnavailable && currentValue) {
-                    var $allOption = $dropdown.find('.car-filter-dropdown-option[data-value=""]');
-                    $dropdown.find('.car-filter-dropdown-option').removeClass('selected');
-                    $allOption.addClass('selected');
-                    $dropdown.find('.car-filter-dropdown-text').addClass('placeholder').text(placeholder);
-                    $dropdown.find('select').val('');
+                // Auto-clear unavailable selections
+                if (unavailableSelected.length > 0) {
+                    if (isMultiSelect) {
+                        // Remove unavailable values from selection
+                        var remaining = currentValues.filter(function(v) {
+                            return unavailableSelected.indexOf(v) === -1;
+                        });
+                        var newValue = remaining.join(',');
+                        var $text = $dropdown.find('.car-filter-dropdown-text');
 
-                    if (filterType === 'make' || filterType === 'model') {
-                        CarFilters.setState(group, filterType, '', '');
+                        if (remaining.length === 0) {
+                            $dropdown.find('.car-filter-dropdown-option').removeClass('selected');
+                            $dropdown.find('.car-filter-dropdown-option[data-value=""]').addClass('selected');
+                            $text.addClass('placeholder').text(placeholder);
+                        } else if (remaining.length === 1) {
+                            var $sel = $dropdown.find('.car-filter-dropdown-option.selected[data-value!=""]').first();
+                            var singleLabel = $sel.clone().children('.car-filter-count').remove().end().text().trim();
+                            $text.removeClass('placeholder').text(singleLabel);
+                        } else {
+                            $text.removeClass('placeholder').text(remaining.length + ' selected');
+                        }
+
+                        CarFilters.setState(group, filterType, newValue);
                     } else {
-                        CarFilters.setState(group, filterType, '');
+                        var $allOption = $dropdown.find('.car-filter-dropdown-option[data-value=""]');
+                        $dropdown.find('.car-filter-dropdown-option').removeClass('selected');
+                        $allOption.addClass('selected');
+                        $dropdown.find('.car-filter-dropdown-text').addClass('placeholder').text(placeholder);
+                        $dropdown.find('select').val('');
+
+                        if (filterType === 'make' || filterType === 'model') {
+                            CarFilters.setState(group, filterType, '', '');
+                        } else {
+                            CarFilters.setState(group, filterType, '');
+                        }
                     }
                 }
             });
@@ -966,23 +1059,35 @@
                     }
                 });
 
-                // Update simple filter dropdown UIs
+                // Update multi-select filter dropdown UIs (fuel_type, body_type)
                 ['fuel_type', 'body_type'].forEach(function(key) {
                     if (parsedUrl[key]) {
                         var filterClass = key === 'fuel_type' ? 'fuel' : 'body';
+                        var values = parsedUrl[key].split(',');
                         var $dropdowns = $('.car-filter-' + filterClass + '[data-group="' + group + '"] .car-filter-dropdown');
                         $dropdowns.each(function() {
                             var $dropdown = $(this);
-                            var $option = $dropdown.find('.car-filter-dropdown-option').filter(function() {
-                                return $(this).data('slug') === parsedUrl[key] || $(this).data('value') === parsedUrl[key];
+                            // Deselect "All" option
+                            $dropdown.find('.car-filter-dropdown-option[data-value=""]').removeClass('selected');
+
+                            var matchCount = 0;
+                            var lastMatchLabel = '';
+                            values.forEach(function(val) {
+                                var $option = $dropdown.find('.car-filter-dropdown-option').filter(function() {
+                                    return $(this).data('slug') === val || String($(this).data('value')) === val;
+                                });
+                                if ($option.length) {
+                                    $option.addClass('selected');
+                                    matchCount++;
+                                    lastMatchLabel = $option.clone().children('.car-filter-count').remove().end().text().trim();
+                                }
                             });
-                            if ($option.length) {
-                                $dropdown.find('.car-filter-dropdown-option').removeClass('selected');
-                                $option.addClass('selected');
-                                $dropdown.find('.car-filter-dropdown-text')
-                                    .removeClass('placeholder')
-                                    .text($option.clone().children('.car-filter-count').remove().end().text().trim());
-                                $dropdown.find('select').val($option.data('value'));
+
+                            var $text = $dropdown.find('.car-filter-dropdown-text');
+                            if (matchCount === 1) {
+                                $text.removeClass('placeholder').text(lastMatchLabel);
+                            } else if (matchCount > 1) {
+                                $text.removeClass('placeholder').text(matchCount + ' selected');
                             }
                         });
                     }

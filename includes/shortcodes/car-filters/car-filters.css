@@ -245,6 +245,60 @@
     display: none;
 }
 
+/* Multi-select checkbox indicator */
+.car-filter-dropdown[data-multiselect="true"] .car-filter-dropdown-option {
+    padding-left: 2.25rem;
+    position: relative;
+}
+
+.car-filter-dropdown[data-multiselect="true"] .car-filter-dropdown-option[data-value=""] {
+    padding-left: 1rem;
+}
+
+.car-filter-dropdown[data-multiselect="true"] .car-filter-dropdown-option::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid #dfe2e6;
+    border-radius: 3px;
+    background-color: #ffffff;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.car-filter-dropdown[data-multiselect="true"] .car-filter-dropdown-option[data-value=""]::before {
+    display: none;
+}
+
+.car-filter-dropdown[data-multiselect="true"] .car-filter-dropdown-option.selected::before {
+    background-color: #0d86e3;
+    border-color: #0d86e3;
+}
+
+.car-filter-dropdown[data-multiselect="true"] .car-filter-dropdown-option.selected::after {
+    content: '';
+    position: absolute;
+    left: 0.95rem;
+    top: 50%;
+    transform: translateY(-60%) rotate(45deg);
+    width: 5px;
+    height: 9px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+}
+
+.car-filter-dropdown[data-multiselect="true"] .car-filter-dropdown-option[data-value=""].selected::after {
+    display: none;
+}
+
+.car-filter-dropdown[data-multiselect="true"] .car-filter-dropdown-option.selected {
+    background-color: rgba(13, 134, 227, 0.05);
+    font-weight: 500;
+}
+
 /* Count Badge */
 .car-filter-count {
     color: #6b7280;

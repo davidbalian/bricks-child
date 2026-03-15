@@ -42,14 +42,16 @@ function car_filter_fuel_shortcode($atts) {
         );
     }
 
-    // Check URL parameter
-    $selected = '';
+    // Check URL parameter (supports comma-separated for multi-select)
+    $selected = array();
     if (isset($_GET['fuel_type'])) {
-        $fuel_param = sanitize_text_field($_GET['fuel_type']);
-        foreach ($options as $opt) {
-            if ($opt['value'] === $fuel_param || $opt['slug'] === $fuel_param) {
-                $selected = $opt['value'];
-                break;
+        $fuel_params = array_map('trim', explode(',', sanitize_text_field($_GET['fuel_type'])));
+        foreach ($fuel_params as $fuel_param) {
+            foreach ($options as $opt) {
+                if ($opt['value'] === $fuel_param || $opt['slug'] === $fuel_param) {
+                    $selected[] = $opt['value'];
+                    break;
+                }
             }
         }
     }
@@ -74,6 +76,7 @@ function car_filter_fuel_shortcode($atts) {
             'placeholder' => $atts['placeholder'],
             'options'     => $options,
             'selected'    => $selected,
+            'multiselect' => true,
             'show_count'  => $atts['show_count'] === 'true',
             'searchable'  => false,
             'data_attrs'  => array(

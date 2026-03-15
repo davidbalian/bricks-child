@@ -190,8 +190,10 @@ function car_filters_ajax_filter_listings() {
     $mileage_max  = isset($_POST['mileage_max']) ? intval($_POST['mileage_max']) : 0;
     $year_min     = isset($_POST['year_min']) ? intval($_POST['year_min']) : 0;
     $year_max     = isset($_POST['year_max']) ? intval($_POST['year_max']) : 0;
-    $fuel_type    = isset($_POST['fuel_type']) ? sanitize_text_field($_POST['fuel_type']) : '';
-    $body_type    = isset($_POST['body_type']) ? sanitize_text_field($_POST['body_type']) : '';
+    $fuel_type_raw = isset($_POST['fuel_type']) ? sanitize_text_field($_POST['fuel_type']) : '';
+    $body_type_raw = isset($_POST['body_type']) ? sanitize_text_field($_POST['body_type']) : '';
+    $fuel_types   = !empty($fuel_type_raw) ? array_map('trim', explode(',', $fuel_type_raw)) : array();
+    $body_types   = !empty($body_type_raw) ? array_map('trim', explode(',', $body_type_raw)) : array();
     $page         = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
 
     // Base listing attributes (passed from the target)
@@ -283,20 +285,38 @@ function car_filters_ajax_filter_listings() {
         );
     }
 
-    // Fuel type
-    if (!empty($fuel_type)) {
-        $meta_query[] = array(
-            'key'     => 'fuel_type',
-            'value'   => $fuel_type,
-            'compare' => '=',
-        );
+    // Fuel type (supports multiple comma-separated values)
+    if (!empty($fuel_types)) {
+        if (count($fuel_types) === 1) {
+            $meta_query[] = array(
+                'key'     => 'fuel_type',
+                'value'   => $fuel_types[0],
+                'compare' => '=',
+            );
+        } else {
+            $meta_query[] = array(
+                'key'     => 'fuel_type',
+                'value'   => $fuel_types,
+                'compare' => 'IN',
+            );
+        }
     }
 
-    // Body type
-    if (!empty($body_type)) {
-        $meta_query[] = array(
-            'key'     => 'body_type',
-            'value'   => $body_type,
+    // Body type (supports multiple comma-separated values)
+    if (!empty($body_types)) {
+        if (count($body_types) === 1) {
+            $meta_query[] = array(
+                'key'     => 'body_type',
+                'value'   => $body_types[0],
+                'compare' => '=',
+            );
+        } else {
+            $meta_query[] = array(
+                'key'     => 'body_type',
+                'value'   => $body_types,
+                'compare' => 'IN',
+            );
+        }
             'compare' => '=',
         );
     }
@@ -420,6 +440,8 @@ function car_filters_ajax_get_available_options() {
         'year_max'    => isset($_POST['year_max']) ? intval($_POST['year_max']) : 0,
         'fuel_type'   => isset($_POST['fuel_type']) ? sanitize_text_field($_POST['fuel_type']) : '',
         'body_type'   => isset($_POST['body_type']) ? sanitize_text_field($_POST['body_type']) : '',
+        'fuel_types'  => !empty($_POST['fuel_type']) ? array_map('trim', explode(',', sanitize_text_field($_POST['fuel_type']))) : array(),
+        'body_types'  => !empty($_POST['body_type']) ? array_map('trim', explode(',', sanitize_text_field($_POST['body_type']))) : array(),
     );
 
     $data = car_filter_get_available_options_data($filters);

@@ -51,6 +51,7 @@ function car_filter_render_dropdown($args) {
         'options'     => array(),
         'popular'     => array(),
         'selected'    => '',
+        'multiselect' => false,
         'disabled'    => false,
         'show_count'  => true,
         'searchable'  => true,
@@ -58,11 +59,22 @@ function car_filter_render_dropdown($args) {
     );
     $args = wp_parse_args($args, $defaults);
 
+    // For multiselect, selected can be an array
+    $selected_values = array();
+    if ($args['multiselect'] && is_array($args['selected'])) {
+        $selected_values = $args['selected'];
+    } elseif (!empty($args['selected'])) {
+        $selected_values = array((string)$args['selected']);
+    }
+
     $disabled_class = $args['disabled'] ? ' car-filter-dropdown-disabled' : '';
     $disabled_attr = $args['disabled'] ? ' disabled' : '';
 
     // Build data attributes string
     $data_str = '';
+    if ($args['multiselect']) {
+        $data_str .= ' data-multiselect="true"';
+    }
     foreach ($args['data_attrs'] as $key => $value) {
         $data_str .= ' data-' . esc_attr($key) . '="' . esc_attr($value) . '"';
     }
@@ -70,26 +82,32 @@ function car_filter_render_dropdown($args) {
     // Find the selected option's label for display
     $selected_label = $args['placeholder'];
     $has_selection = false;
-    if (!empty($args['selected'])) {
-        // Check popular options first
-        if (!empty($args['popular'])) {
-            foreach ($args['popular'] as $option) {
-                if ((string)$option['value'] === (string)$args['selected']) {
-                    $selected_label = $option['label'];
-                    $has_selection = true;
-                    break;
+    if (!empty($selected_values)) {
+        if (count($selected_values) === 1) {
+            $single_val = $selected_values[0];
+            // Check popular options first
+            if (!empty($args['popular'])) {
+                foreach ($args['popular'] as $option) {
+                    if ((string)$option['value'] === $single_val) {
+                        $selected_label = $option['label'];
+                        $has_selection = true;
+                        break;
+                    }
                 }
             }
-        }
-        // Check regular options if not found in popular
-        if (!$has_selection) {
-            foreach ($args['options'] as $option) {
-                if ((string)$option['value'] === (string)$args['selected']) {
-                    $selected_label = $option['label'];
-                    $has_selection = true;
-                    break;
+            // Check regular options if not found in popular
+            if (!$has_selection) {
+                foreach ($args['options'] as $option) {
+                    if ((string)$option['value'] === $single_val) {
+                        $selected_label = $option['label'];
+                        $has_selection = true;
+                        break;
+                    }
                 }
             }
+        } else {
+            $selected_label = count($selected_values) . ' selected';
+            $has_selection = true;
         }
     }
     ?>
@@ -123,7 +141,7 @@ function car_filter_render_dropdown($args) {
             <div class="car-filter-dropdown-options" id="<?php echo esc_attr($args['id']); ?>-options">
                 <!-- All option -->
                 <button type="button"
-                        class="car-filter-dropdown-option<?php echo empty($args['selected']) ? ' selected' : ''; ?>"
+                        class="car-filter-dropdown-option<?php echo empty($selected_values) ? ' selected' : ''; ?>"
                         role="option"
                         data-value=""
                         data-slug="">
@@ -140,7 +158,7 @@ function car_filter_render_dropdown($args) {
                 ?>
                     <div class="car-filter-section-header">Most Popular</div>
                     <?php foreach ($args['popular'] as $option) :
-                        $is_selected = (string)$option['value'] === (string)$args['selected'];
+                        $is_selected = in_array((string)$option['value'], $selected_values, true);
                     ?>
                         <button type="button"
                                 class="car-filter-dropdown-option<?php echo $is_selected ? ' selected' : ''; ?>"
@@ -161,7 +179,7 @@ function car_filter_render_dropdown($args) {
                     if (in_array((string)$option['value'], $popular_values, true)) {
                         continue;
                     }
-                    $is_selected = (string)$option['value'] === (string)$args['selected'];
+                    $is_selected = in_array((string)$option['value'], $selected_values, true);
                 ?>
                     <button type="button"
                             class="car-filter-dropdown-option<?php echo $is_selected ? ' selected' : ''; ?>"
@@ -190,7 +208,7 @@ function car_filter_render_dropdown($args) {
             <?php foreach ($args['options'] as $option) : ?>
                 <option value="<?php echo esc_attr($option['value']); ?>"
                         data-slug="<?php echo esc_attr($option['slug'] ?? ''); ?>"
-                        <?php selected($args['selected'], $option['value']); ?>>
+                        <?php if (in_array((string)$option['value'], $selected_values, true)) echo 'selected'; ?>>
                     <?php echo esc_html($option['label']); ?>
                 </option>
             <?php endforeach; ?>
@@ -423,17 +441,33 @@ function car_filter_build_constrained_post_ids($filters, $exclude_keys = array()
         }
     }
 
-    // Meta value filters: fuel_type, body_type
+    // Meta value filters: fuel_type, body_type (support comma-separated multi-values)
     $meta_value_keys = array('fuel_type', 'body_type');
     foreach ($meta_value_keys as $key) {
         if (in_array($key, $exclude_keys)) continue;
 
-        if (!empty($filters[$key])) {
-            $meta_query[] = array(
-                'key'     => $key,
-                'value'   => sanitize_text_field($filters[$key]),
-                'compare' => '=',
-            );
+        // Check for pre-parsed array first, then fall back to comma-separated string
+        $values = array();
+        if (!empty($filters[$key . 's']) && is_array($filters[$key . 's'])) {
+            $values = $filters[$key . 's'];
+        } elseif (!empty($filters[$key])) {
+            $values = array_map('trim', explode(',', sanitize_text_field($filters[$key])));
+        }
+
+        if (!empty($values)) {
+            if (count($values) === 1) {
+                $meta_query[] = array(
+                    'key'     => $key,
+                    'value'   => $values[0],
+                    'compare' => '=',
+                );
+            } else {
+                $meta_query[] = array(
+                    'key'     => $key,
+                    'value'   => $values,
+                    'compare' => 'IN',
+                );
+            }
         }
     }
 

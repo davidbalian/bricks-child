@@ -42,14 +42,16 @@ function car_filter_body_shortcode($atts) {
         );
     }
 
-    // Check URL parameter
-    $selected = '';
+    // Check URL parameter (supports comma-separated for multi-select)
+    $selected = array();
     if (isset($_GET['body_type'])) {
-        $body_param = sanitize_text_field($_GET['body_type']);
-        foreach ($options as $opt) {
-            if ($opt['value'] === $body_param || $opt['slug'] === $body_param) {
-                $selected = $opt['value'];
-                break;
+        $body_params = array_map('trim', explode(',', sanitize_text_field($_GET['body_type'])));
+        foreach ($body_params as $body_param) {
+            foreach ($options as $opt) {
+                if ($opt['value'] === $body_param || $opt['slug'] === $body_param) {
+                    $selected[] = $opt['value'];
+                    break;
+                }
             }
         }
     }
@@ -74,6 +76,7 @@ function car_filter_body_shortcode($atts) {
             'placeholder' => $atts['placeholder'],
             'options'     => $options,
             'selected'    => $selected,
+            'multiselect' => true,
             'show_count'  => $atts['show_count'] === 'true',
             'searchable'  => false,
             'data_attrs'  => array(
