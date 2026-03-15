@@ -67,6 +67,15 @@ function dealership_access_message_shortcode($atts) {
         $autoagora_dealer = get_post_meta($post_id, 'autoagora_dealer', true);
     }
     
+    // Get all meta keys that contain "autoagora" for debugging
+    $all_meta = get_post_meta($post_id);
+    $autoagora_meta = array();
+    foreach ($all_meta as $key => $value) {
+        if (strpos($key, 'autoagora') !== false) {
+            $autoagora_meta[$key] = $value;
+        }
+    }
+    
     // Convert to a comparable value - normalize to integer for comparison
     $dealer_value = null;
     if ($autoagora_dealer !== null && $autoagora_dealer !== '' && $autoagora_dealer !== false) {
@@ -79,10 +88,13 @@ function dealership_access_message_shortcode($atts) {
     $debug_output = '<div style="background: #ffeb3b; padding: 10px; margin: 10px 0; border: 2px solid #f57f17;">';
     $debug_output .= '<strong>DEBUG INFO:</strong><br>';
     $debug_output .= 'Post ID: ' . esc_html($post_id) . '<br>';
-    $debug_output .= 'Raw Value: ' . var_export($autoagora_dealer, true) . '<br>';
-    $debug_output .= 'Type: ' . gettype($autoagora_dealer) . '<br>';
-    $debug_output .= 'Intval: ' . intval($autoagora_dealer) . '<br>';
-    $debug_output .= 'Dealer Value: ' . var_export($dealer_value, true) . '<br>';
+    $debug_output .= 'ACF get_field(): ' . var_export($autoagora_dealer, true) . ' (type: ' . gettype($autoagora_dealer) . ')<br>';
+    $debug_output .= 'Direct get_post_meta(): ' . var_export(get_post_meta($post_id, 'autoagora_dealer', true), true) . '<br>';
+    $debug_output .= '<strong>All autoagora meta keys:</strong><br>';
+    foreach ($autoagora_meta as $key => $value) {
+        $debug_output .= '&nbsp;&nbsp;' . esc_html($key) . ' = ' . var_export($value, true) . '<br>';
+    }
+    $debug_output .= 'Dealer Value (intval): ' . var_export($dealer_value, true) . '<br>';
     $debug_output .= 'Will show message: ' . ($dealer_value === 1 ? 'NO' : 'YES') . '<br>';
     $debug_output .= '</div>';
     
