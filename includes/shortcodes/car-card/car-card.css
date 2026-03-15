@@ -323,6 +323,21 @@
     margin-left: 0.5rem;
 }
 
+.car-card-date .posted-today {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.car-card-date .posted-today::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #22c55e;
+    flex-shrink: 0;
+}
+
 @media (max-width: 768px) {
     .car-card-title {
         font-size: 1.25rem;
