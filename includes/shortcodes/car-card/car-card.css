@@ -291,6 +291,7 @@
 }
 
 .car-card-price {
+    margin-top: auto;
     padding-top: 0.6rem;
     padding-bottom: 0.5rem;
     font-family: 'Outfit', sans-serif;
@@ -302,7 +303,6 @@
 
 .car-card-footer {
     padding-top: 0;
-    margin-top: auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
