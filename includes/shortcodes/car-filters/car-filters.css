@@ -425,6 +425,15 @@
     gap: 1rem;
 }
 
+.car-filters-container[data-group="homepage"] .car-filters-item-price,
+.car-filters-container[data-group="homepage"] .car-filters-item-mileage {
+    grid-column: 1 / -1;
+}
+
+.car-filters-container[data-group="homepage"] .car-filters-search-btn {
+    text-align: center;
+}
+
 /* ============================================
    Responsive
    ============================================ */
