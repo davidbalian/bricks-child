@@ -72,6 +72,18 @@ function dealership_access_message_shortcode($atts) {
         return '';
     }
     
+    // Check if user has the "dealership" role - only show message for dealership users
+    $user = get_userdata($user_id);
+    if (!$user) {
+        return '';
+    }
+    
+    $user_roles = (array) $user->roles;
+    if (!in_array('dealership', $user_roles, true)) {
+        // User doesn't have dealership role, don't show message
+        return '';
+    }
+    
     // Get the ACF field value from the USER (not the post)
     // ACF user fields use format: 'user_' . $user_id
     $autoagora_dealer = get_field('autoagora_dealer', 'user_' . $user_id);
