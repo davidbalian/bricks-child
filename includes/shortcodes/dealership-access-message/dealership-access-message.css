@@ -1,0 +1,25 @@
+/**
+ * Dealership Access Message Styles
+ */
+
+.dealership-access-message {
+    padding: 1rem;
+    margin: 1rem 0;
+    background-color: #f0f7ff;
+    border-left: 4px solid #0066cc;
+    border-radius: 4px;
+}
+
+.dealership-access-message-text {
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+    color: #0066cc;
+}
+
+.dealership-access-message-description {
+    margin: 0;
+    color: #333;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+

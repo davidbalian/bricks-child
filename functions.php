@@ -44,6 +44,7 @@ require_once get_stylesheet_directory() . '/includes/shortcodes/favourites-butto
 require_once get_stylesheet_directory() . '/includes/shortcodes/single-car-template-gallery.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/forgot-password-form.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/seller-verification/seller-verification.php';
+require_once get_stylesheet_directory() . '/includes/shortcodes/dealership-access-message/dealership-access-message.php';
 
 require_once get_stylesheet_directory() . '/includes/admin/user-favorites-column.php';
 
