@@ -250,7 +250,9 @@
 .car-card-body {
     background: #fff;
     padding: 0.75rem 1rem;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
     text-decoration: none;
     color: #2a3546;
     border-left: 1px solid #dfe2e6;
@@ -300,6 +302,7 @@
 
 .car-card-footer {
     padding-top: 0;
+    margin-top: auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
