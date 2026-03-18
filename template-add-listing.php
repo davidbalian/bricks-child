@@ -90,7 +90,7 @@ wp_localize_script('astra-child-add-listing-js', 'addListingData', array(
 
 // Enqueue JSON import handler - Specific User Only (Server-side check)
 $current_user = wp_get_current_user();
-if ( $current_user->user_login === '35796045644' ) {
+if ( $current_user->user_login === '35799575001' ) {
     wp_enqueue_script(
         'astra-child-json-import-js',
         get_stylesheet_directory_uri() . '/includes/user-manage-listings/template-add-listing/json-import-handler.js',
@@ -194,7 +194,7 @@ get_header(); ?>
                     <?php
                     // JSON Import Section - Specific User Only (Server-side check, no client-side bypass possible)
                     $current_user = wp_get_current_user();
-                    if ( $current_user->user_login === '35796045644') {
+                    if ( $current_user->user_login === '35799575001') {
                         ?>
                         <div class="json-import-section input-wrapper" id="json-import-section">
                             <h2><?php echo get_svg_icon('file-import'); ?> <?php esc_html_e( 'Import from JSON', 'bricks-child' ); ?></h2>
