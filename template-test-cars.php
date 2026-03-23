@@ -675,6 +675,8 @@ $cars_query = car_listings_execute_query( $args );
 }
 .tcp-location-map-wrap {
     position: relative;
+    border-radius: 0.75rem;
+    overflow: hidden;
 }
 .tcp-location-center-pin {
     position: absolute;
@@ -705,7 +707,16 @@ $cars_query = car_listings_execute_query( $args );
     top: 6px;
 }
 .tcp-location-radius-row {
-    margin-top: 0.9rem;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin-top: 0;
+    padding: 0.75rem 0.9rem;
+    background: rgba(255, 255, 255, 0.97);
+    border-top: 1px solid #e2e8f0;
+    z-index: 6;
+    box-shadow: 0 -2px 12px rgba(15, 23, 42, 0.08);
 }
 .tcp-location-radius-row label {
     display: block;
@@ -713,6 +724,10 @@ $cars_query = car_listings_execute_query( $args );
     font-size: 0.9rem;
     font-weight: 600;
     color: #2a3546;
+}
+.tcp-location-map {
+    padding-bottom: 110px;
+    box-sizing: border-box;
 }
 .tcp-location-radius-controls {
     display: flex;
@@ -1004,11 +1019,14 @@ $cars_query = car_listings_execute_query( $args );
         lat: null,
         lng: null,
         radiusKm: 25,
-        active: false
+        active: false,
+        cityName: ''
     };
     var locationMap = null;
     var locationCircle = null;
     var locationAutocomplete = null;
+    var locationGeocoder = null;
+    var reverseGeocodeTimer = null;
 
     /**
      * Calculate posts_per_page as a multiple of current column count
@@ -1135,7 +1153,8 @@ $cars_query = car_listings_execute_query( $args );
             }
         });
         if (locationState.active && locationState.lat && locationState.lng && locationState.radiusKm > 0) {
-            html += chip('location_radius', filterLabels.location_radius + ': ' + locationState.radiusKm + ' km');
+            var locationLabel = locationState.cityName ? locationState.cityName : 'Selected area';
+            html += chip('location_radius', filterLabels.location_radius + ': ' + locationLabel);
             hasAny = true;
         }
 
@@ -1191,6 +1210,41 @@ $cars_query = car_listings_execute_query( $args );
         return 8;
     }
 
+    function getCityFromAddressComponents(components) {
+        if (!components || !components.length) return '';
+        var byType = function(type) {
+            var comp = components.find(function(item) {
+                return item.types && item.types.indexOf(type) !== -1;
+            });
+            return comp ? comp.long_name : '';
+        };
+        return byType('locality') || byType('administrative_area_level_1') || byType('administrative_area_level_2') || '';
+    }
+
+    function updateLocationSearchFromCenter() {
+        if (!locationGeocoder || !locationState.lat || !locationState.lng) return;
+        var searchInput = document.getElementById('tcp-location-search');
+        if (!searchInput) return;
+
+        locationGeocoder.geocode({
+            location: { lat: locationState.lat, lng: locationState.lng },
+            region: 'CY',
+            language: 'en'
+        }, function(results, status) {
+            if (status !== 'OK' || !results || !results.length) return;
+            var best = results[0];
+            searchInput.value = best.formatted_address || searchInput.value;
+            locationState.cityName = getCityFromAddressComponents(best.address_components || []);
+        });
+    }
+
+    function scheduleReverseGeocode() {
+        if (reverseGeocodeTimer) {
+            clearTimeout(reverseGeocodeTimer);
+        }
+        reverseGeocodeTimer = setTimeout(updateLocationSearchFromCenter, 250);
+    }
+
     function syncLocationVisuals(shouldAdjustZoom) {
         if (!locationMap || !locationCircle || !locationState.lat || !locationState.lng) {
             return;
@@ -1232,6 +1286,7 @@ $cars_query = car_listings_execute_query( $args );
                 streetViewControl: false,
                 fullscreenControl: false
             });
+            locationGeocoder = new google.maps.Geocoder();
 
             locationCircle = new google.maps.Circle({
                 map: locationMap,
@@ -1254,13 +1309,14 @@ $cars_query = car_listings_execute_query( $args );
                 locationState.lat = center.lat();
                 locationState.lng = center.lng();
                 syncLocationVisuals(false);
+                scheduleReverseGeocode();
             });
 
             var searchInput = document.getElementById('tcp-location-search');
             if (searchInput) {
                 locationAutocomplete = new google.maps.places.Autocomplete(searchInput, {
                     componentRestrictions: { country: 'cy' },
-                    fields: ['geometry'],
+                    fields: ['geometry', 'formatted_address', 'address_components'],
                     types: ['geocode']
                 });
 
@@ -1269,6 +1325,10 @@ $cars_query = car_listings_execute_query( $args );
                     if (!place.geometry || !place.geometry.location) {
                         return;
                     }
+                    if (place.formatted_address) {
+                        searchInput.value = place.formatted_address;
+                    }
+                    locationState.cityName = getCityFromAddressComponents(place.address_components || []);
                     setLocationPoint(place.geometry.location.lat(), place.geometry.location.lng(), true);
                 });
             }
@@ -1278,12 +1338,14 @@ $cars_query = car_listings_execute_query( $args );
         if (shouldUseSaved) {
             locationMap.setCenter({ lat: locationState.lat, lng: locationState.lng });
             syncLocationVisuals(true);
+            scheduleReverseGeocode();
         } else {
             var currentCenter = locationMap.getCenter();
             if (currentCenter) {
                 locationState.lat = currentCenter.lat();
                 locationState.lng = currentCenter.lng();
                 syncLocationVisuals(true);
+                scheduleReverseGeocode();
             }
         }
 
@@ -1330,6 +1392,8 @@ $cars_query = car_listings_execute_query( $args );
         } else if (key === 'location_radius') {
             locationState.active = false;
             locationState.radiusKm = 25;
+            locationState.cityName = '';
+            $('#tcp-location-search').val('');
             updateLocationRadiusUI(locationState.radiusKm);
             if (locationCircle) {
                 locationCircle.setRadius(locationState.radiusKm * 1000);
