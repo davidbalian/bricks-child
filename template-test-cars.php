@@ -57,7 +57,7 @@ add_action( 'wp_head', function() {
           "name": "Are used cars in Cyprus left-hand drive or right-hand drive?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Cyprus drives on the left side of the road, but the vast majority of cars on the island are left-hand drive (LHD) - meaning the steering wheel is on the left. This is because most vehicles are imported from mainland Europe and Japan (re-configured). You'll find some right-hand drive cars, especially older Japanese imports, but LHD is the standard."
+            "text": "Cyprus drives on the left side of the road, and the vast majority of cars on the island are right-hand drive (RHD) - meaning the steering wheel is on the right. A lot of vehicles are imported from the UK or Japan, where driving is also on the left. You'll find some left-hand drive cars imported from mainland Europe, but RHD is the standard in Cyprus."
           }
         },
         {
@@ -269,7 +269,7 @@ $cars_query = car_listings_execute_query( $args );
                     <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="faq-answer">
-                    <p>Cyprus drives on the left side of the road, but the vast majority of cars on the island are left-hand drive (LHD) - meaning the steering wheel is on the left. This is because most vehicles are imported from mainland Europe and Japan (re-configured). You'll find some right-hand drive cars, especially older Japanese imports, but LHD is the standard.</p>
+                    <p>Cyprus drives on the left side of the road, and the vast majority of cars on the island are right-hand drive (RHD) - meaning the steering wheel is on the right. A lot of vehicles are imported from the UK or Japan, where driving is also on the left. You'll find some left-hand drive cars imported from mainland Europe, but RHD is the standard in Cyprus.</p>
                 </div>
             </div>
 
