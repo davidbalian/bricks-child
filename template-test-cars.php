@@ -654,10 +654,22 @@ $cars_query = car_listings_execute_query( $args );
     flex: 0 0 calc(50% - 0.5rem);
 }
 .tcp-location-modal {
-    max-width: 760px;
+    max-width: 860px;
+    width: min(92vw, 860px);
+    height: min(92vh, 860px);
+}
+.tcp-location-modal .tcp-filters-modal-body {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 1rem 1rem 0.75rem;
+}
+.tcp-location-modal .tcp-filters-modal-footer {
+    padding: 0.75rem 1rem 1rem;
+    gap: 0.45rem;
 }
 .tcp-location-search-wrap {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.6rem;
 }
 .tcp-location-search {
     width: 100%;
@@ -668,7 +680,7 @@ $cars_query = car_listings_execute_query( $args );
 }
 .tcp-location-map {
     width: 100%;
-    height: 340px;
+    height: 100%;
     border: 1px solid #dfe2e6;
     border-radius: 0.75rem;
     overflow: hidden;
@@ -676,6 +688,8 @@ $cars_query = car_listings_execute_query( $args );
 }
 .tcp-location-map-wrap {
     position: relative;
+    flex: 1 1 auto;
+    min-height: 360px;
 }
 .tcp-location-map-radius-overlay {
     position: absolute;
@@ -723,7 +737,7 @@ $cars_query = car_listings_execute_query( $args );
     top: 6px;
 }
 .tcp-location-radius-row {
-    margin-top: 0.9rem;
+    margin-top: 0;
 }
 .tcp-location-radius-row label {
     display: block;
@@ -798,7 +812,21 @@ $cars_query = car_listings_execute_query( $args );
         padding: 0;
     }
     .tcp-location-map {
-        height: 280px;
+        height: 100%;
+    }
+    .tcp-location-modal {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+    }
+    .tcp-location-modal .tcp-filters-modal-body {
+        padding: 0.85rem 0.85rem 0.6rem;
+    }
+    .tcp-location-modal .tcp-filters-modal-footer {
+        padding: 0.7rem 0.85rem 0.85rem;
+    }
+    .tcp-location-map-wrap {
+        min-height: 300px;
     }
 }
 
@@ -1264,15 +1292,15 @@ $cars_query = car_listings_execute_query( $args );
     }
 
     function getZoomForRadius(radiusKm) {
-        if (radiusKm <= 1) return 14;
-        if (radiusKm <= 2) return 14;
-        if (radiusKm <= 3) return 13;
-        if (radiusKm <= 5) return 13;
-        if (radiusKm <= 10) return 12;
-        if (radiusKm <= 25) return 11;
-        if (radiusKm <= 50) return 10;
-        if (radiusKm <= 100) return 9;
-        return 8;
+        if (radiusKm <= 1) return 13.5;
+        if (radiusKm <= 2) return 13.5;
+        if (radiusKm <= 3) return 12.5;
+        if (radiusKm <= 5) return 12.5;
+        if (radiusKm <= 10) return 11.5;
+        if (radiusKm <= 25) return 10.5;
+        if (radiusKm <= 50) return 9.5;
+        if (radiusKm <= 100) return 8.5;
+        return 7.5;
     }
 
     function syncLocationVisuals(shouldAdjustZoom) {
