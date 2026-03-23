@@ -160,6 +160,7 @@
             extras = extras || {};
             var state = this.getState(group);
             var params = new URLSearchParams();
+            var pageParams = new URLSearchParams(window.location.search);
             var baseUrl = (state.resultsBaseUrl || state.redirectUrl || '/cars/').replace(/\/+$/, '') + '/';
 
             if (state.make.slug) {
@@ -171,16 +172,25 @@
 
             this.appendNonMakeParams(params, state);
 
-            // Use cars_* to avoid WordPress core consuming orderby/order as main-query vars on /cars/ pages.
-            if (extras.orderby) {
-                params.set('cars_orderby', extras.orderby);
+            // Sort: extras wins; else keep current URL (ajaxFilter pushState must not drop cars_* from a full-page load).
+            var sortOrderby = extras.orderby || pageParams.get('cars_orderby') || pageParams.get('orderby');
+            var sortOrder = extras.order || pageParams.get('cars_order') || pageParams.get('order');
+            if (sortOrderby) {
+                params.set('cars_orderby', sortOrderby);
             }
-            if (extras.order) {
-                params.set('cars_order', extras.order);
+            if (sortOrder) {
+                params.set('cars_order', sortOrder);
             }
+
             var paged = parseInt(extras.paged, 10);
+            if (!paged || paged < 2) {
+                var fromUrl = parseInt(pageParams.get('paged') || pageParams.get('page') || '0', 10);
+                if (fromUrl > 1) {
+                    paged = fromUrl;
+                }
+            }
             if (paged > 1) {
-                params.set('paged', paged);
+                params.set('paged', String(paged));
             }
 
             var qs = params.toString();
