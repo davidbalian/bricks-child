@@ -186,6 +186,14 @@ $cars_query = car_listings_execute_query( $args );
             </div>
             <div class="tcp-location-map-wrap">
                 <div class="tcp-location-map" id="tcp-location-map"></div>
+                <div class="tcp-location-map-radius-overlay tcp-location-radius-presets">
+                    <button type="button" class="tcp-radius-preset" data-radius="5">+ 5 km</button>
+                    <button type="button" class="tcp-radius-preset" data-radius="10">+ 10 km</button>
+                    <button type="button" class="tcp-radius-preset" data-radius="25">+ 25 km</button>
+                    <button type="button" class="tcp-radius-preset" data-radius="50">+ 50 km</button>
+                    <button type="button" class="tcp-radius-preset" data-radius="100">+ 100 km</button>
+                    <button type="button" class="tcp-radius-preset" data-radius="200">+ 200 km</button>
+                </div>
                 <div class="tcp-location-center-pin" aria-hidden="true"></div>
             </div>
         </div>
@@ -193,15 +201,8 @@ $cars_query = car_listings_execute_query( $args );
             <div class="tcp-location-radius-row">
                 <label for="tcp-location-radius">Radius (km)</label>
                 <div class="tcp-location-radius-controls">
-                    <input type="range" id="tcp-location-radius" min="5" max="100" step="1" value="25">
+                    <input type="range" id="tcp-location-radius" min="1" max="200" step="1" value="25">
                     <span id="tcp-location-radius-value">25 km</span>
-                </div>
-                <div class="tcp-location-radius-presets">
-                    <button type="button" class="tcp-radius-preset" data-radius="5">5 km</button>
-                    <button type="button" class="tcp-radius-preset" data-radius="10">10 km</button>
-                    <button type="button" class="tcp-radius-preset" data-radius="25">25 km</button>
-                    <button type="button" class="tcp-radius-preset" data-radius="50">50 km</button>
-                    <button type="button" class="tcp-radius-preset" data-radius="100">100 km</button>
                 </div>
             </div>
             <button type="button" class="tcp-modal-apply-btn" id="tcp-location-apply-btn">Apply Location</button>
@@ -675,6 +676,23 @@ $cars_query = car_listings_execute_query( $args );
 }
 .tcp-location-map-wrap {
     position: relative;
+}
+.tcp-location-map-radius-overlay {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    display: flex !important;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    z-index: 6;
+    pointer-events: none;
+}
+.tcp-location-map-radius-overlay .tcp-radius-preset {
+    pointer-events: auto;
+    background: #fff;
+    border: 1px solid #d6dbe2;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
 .tcp-location-center-pin {
     position: absolute;
@@ -1225,10 +1243,10 @@ $cars_query = car_listings_execute_query( $args );
             return false;
         }
 
-        if (isNaN(radius) || radius < 5) {
+        if (isNaN(radius) || radius < 1) {
             radius = 25;
-        } else if (radius > 100) {
-            radius = 100;
+        } else if (radius > 200) {
+            radius = 200;
         }
 
         locationState.lat = lat;
@@ -1246,11 +1264,14 @@ $cars_query = car_listings_execute_query( $args );
     }
 
     function getZoomForRadius(radiusKm) {
+        if (radiusKm <= 1) return 14;
+        if (radiusKm <= 2) return 14;
+        if (radiusKm <= 3) return 13;
         if (radiusKm <= 5) return 13;
         if (radiusKm <= 10) return 12;
         if (radiusKm <= 25) return 11;
         if (radiusKm <= 50) return 10;
-        if (radiusKm <= 75) return 9;
+        if (radiusKm <= 100) return 9;
         return 8;
     }
 
@@ -1544,6 +1565,7 @@ $cars_query = car_listings_execute_query( $args );
         if (data.found_posts !== undefined) {
             updateResultsCount(data.found_posts);
         }
+        syncLocationParamsToUrl();
         buildChips();
         closeModal();
     });
@@ -1624,6 +1646,7 @@ $cars_query = car_listings_execute_query( $args );
                     if (response.data.found_posts !== undefined) {
                         updateResultsCount(response.data.found_posts);
                     }
+                    syncLocationParamsToUrl();
                     if (opts.scroll !== false) {
                         $('html, body').animate({ scrollTop: $container.offset().top - 20 }, 300);
                     }

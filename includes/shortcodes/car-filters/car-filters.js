@@ -198,6 +198,14 @@
             var pageParams = new URLSearchParams(window.location.search);
             var baseUrl = (state.resultsBaseUrl || state.redirectUrl || '/cars/').replace(/\/+$/, '') + '/';
 
+            // Preserve location-radius params managed outside CarFilters.
+            ['loc_lat', 'loc_lng', 'loc_radius', 'loc_label'].forEach(function(key) {
+                var value = pageParams.get(key);
+                if (value !== null && value !== '') {
+                    params.set(key, value);
+                }
+            });
+
             if (state.make.slug) {
                 params.set('make', state.make.slug);
             }
