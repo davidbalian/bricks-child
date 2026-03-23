@@ -755,6 +755,12 @@ get_header();
     var $overlay    = $('#tcp-filters-modal-overlay');
     var $chips      = $('#tcp-active-filters');
     var group       = '<?php echo esc_js($group); ?>';
+
+    // Block any automatic AJAX filter call on page load.
+    // Server-rendered listings are already correct; only allow AJAX once the user
+    // explicitly requests a filter (Apply, chip remove, sort, pagination).
+    var _filterLocked = true;
+    function unlockFilter() { _filterLocked = false; }
     var MIN_ROWS     = 4;
     var MIN_PER_PAGE = 12;
     var CARD_MIN_W   = 280;
@@ -887,6 +893,7 @@ get_header();
 
     /* ── Modal apply / clear buttons ── */
     $('#tcp-modal-apply-btn').on('click', function() {
+        unlockFilter();
         CarFilters.triggerFilter(group);
     });
     $('#tcp-modal-clear-btn').on('click', function() {
@@ -894,6 +901,7 @@ get_header();
          'year_min', 'year_max', 'fuel_type', 'body_type'].forEach(function(key) {
             clearFilter(key);
         });
+        unlockFilter();
         CarFilters.triggerFilter(group);
     });
 
@@ -1017,6 +1025,10 @@ get_header();
     $(document).on('ajaxSend', function(e, xhr, settings) {
         if (settings.data && typeof settings.data === 'string' &&
             settings.data.indexOf('action=car_filters_filter_listings') !== -1) {
+            if (_filterLocked) {
+                xhr.abort();
+                return;
+            }
             syncPostsPerPage();
             var atts = $container.data('atts') || {};
             settings.data = settings.data.replace(

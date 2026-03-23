@@ -293,6 +293,7 @@
                     }
                 },
                 error: function(xhr, status, error) {
+                    if (status === 'abort') return;
                     console.error('CarFilters: AJAX error', error);
                 },
                 complete: function() {
