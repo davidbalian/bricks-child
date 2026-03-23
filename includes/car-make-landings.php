@@ -342,12 +342,110 @@ function autoagora_get_managed_car_make_landing_term($term) {
     return autoagora_get_car_make_landing($term->slug);
 }
 
+/**
+ * Managed landing config only (the curated SEO pages). Returns null for other car_make terms.
+ */
 function autoagora_get_current_car_make_landing() {
     if (!is_tax('car_make')) {
         return null;
     }
 
     return autoagora_get_managed_car_make_landing_term(get_queried_object());
+}
+
+/**
+ * Data for the car_make archive template: managed copy when configured, otherwise synthetic titles/meta and empty intro/FAQ.
+ *
+ * @return array|null Same shape as entries in autoagora_get_car_make_landing_config(), plus optional managed_copy bool.
+ */
+function autoagora_get_car_make_landing_view_context() {
+    if (!is_tax('car_make')) {
+        return null;
+    }
+
+    $term = get_queried_object();
+    if (!$term || is_wp_error($term) || empty($term->slug)) {
+        return null;
+    }
+
+    $managed = autoagora_get_car_make_landing($term->slug);
+    if ($managed) {
+        $managed['managed_copy'] = true;
+
+        return $managed;
+    }
+
+    return autoagora_build_synthetic_car_make_landing_context($term);
+}
+
+/**
+ * Default SEO + labels for car_make terms that are not in the managed landing config.
+ *
+ * @param WP_Term $term Queried car_make term.
+ * @return array
+ */
+function autoagora_build_synthetic_car_make_landing_context($term) {
+    $slug  = $term->slug;
+    $name  = $term->name;
+    $canonical = trailingslashit(home_url('/car_make/' . $slug));
+
+    if ((int) $term->parent > 0) {
+        $parent = get_term($term->parent, 'car_make');
+        $make_name = ($parent && !is_wp_error($parent)) ? $parent->name : '';
+        $make_slug = ($parent && !is_wp_error($parent)) ? $parent->slug : '';
+        $model_name = $name;
+        $model_slug = $slug;
+
+        $h1 = trim($make_name . ' ' . $model_name) . ' ' . __('for Sale in Cyprus', 'bricks-child');
+        $title = sprintf(
+            /* translators: 1: make name, 2: model name */
+            __('%1$s %2$s for Sale in Cyprus - Browse Listings | AutoAgora', 'bricks-child'),
+            $make_name,
+            $model_name
+        );
+        $meta_description = sprintf(
+            /* translators: 1: make name, 2: model name */
+            __('Browse used %1$s %2$s cars for sale in Cyprus. Compare prices, specs, and listings on AutoAgora.', 'bricks-child'),
+            $make_name,
+            $model_name
+        );
+    } else {
+        $make_name   = $name;
+        $make_slug   = $slug;
+        $model_name  = '';
+        $model_slug  = '';
+
+        $h1 = sprintf(
+            /* translators: %s: car make name */
+            __('%s for Sale in Cyprus', 'bricks-child'),
+            $make_name
+        );
+        $title = sprintf(
+            /* translators: %s: car make name */
+            __('%s for Sale in Cyprus - Browse Listings | AutoAgora', 'bricks-child'),
+            $make_name
+        );
+        $meta_description = sprintf(
+            /* translators: %s: car make name */
+            __('Browse used %s cars for sale in Cyprus. Compare prices, specs, and listings on AutoAgora.', 'bricks-child'),
+            $make_name
+        );
+    }
+
+    return array(
+        'slug'              => $slug,
+        'make_name'         => $make_name,
+        'make_slug'         => $make_slug,
+        'model_name'        => $model_name,
+        'model_slug'        => $model_slug,
+        'title'             => $title,
+        'meta_description'  => $meta_description,
+        'h1'                => $h1,
+        'canonical'         => $canonical,
+        'intro'             => array(),
+        'faqs'              => array(),
+        'managed_copy'      => false,
+    );
 }
 
 function autoagora_get_car_make_landing_sync_option_name() {
@@ -648,7 +746,7 @@ function autoagora_get_cars_filter_canonical_url() {
 
 function autoagora_get_current_faq_schema() {
     $landing = autoagora_get_current_car_make_landing();
-    if (!$landing) {
+    if (!$landing || empty($landing['faqs'])) {
         return '';
     }
 
@@ -672,15 +770,17 @@ function autoagora_get_current_faq_schema() {
 }
 
 function autoagora_get_current_seo_context() {
-    $landing = autoagora_get_current_car_make_landing();
-    if ($landing) {
-        return array(
-            'type' => 'landing',
-            'title' => $landing['title'],
-            'description' => $landing['meta_description'],
-            'canonical' => $landing['canonical'],
-            'robots' => 'index, follow',
-        );
+    if (is_tax('car_make')) {
+        $ctx = autoagora_get_car_make_landing_view_context();
+        if ($ctx) {
+            return array(
+                'type' => 'landing',
+                'title' => $ctx['title'],
+                'description' => $ctx['meta_description'],
+                'canonical' => $ctx['canonical'],
+                'robots' => 'index, follow',
+            );
+        }
     }
 
     if (autoagora_is_cars_filter_route()) {
@@ -838,15 +938,14 @@ function autoagora_filter_wp_robots($robots) {
 add_filter('wp_robots', 'autoagora_filter_wp_robots');
 
 function autoagora_disable_default_canonical_on_custom_routes() {
-    if (autoagora_is_cars_filter_route() || autoagora_get_current_car_make_landing()) {
+    if (autoagora_is_cars_filter_route() || is_tax('car_make')) {
         remove_action('wp_head', 'rel_canonical');
     }
 }
 add_action('wp', 'autoagora_disable_default_canonical_on_custom_routes');
 
 function autoagora_filter_car_make_landing_template($template) {
-    $landing = autoagora_get_current_car_make_landing();
-    if (!$landing) {
+    if (!is_tax('car_make')) {
         return $template;
     }
 
@@ -857,8 +956,7 @@ function autoagora_filter_car_make_landing_template($template) {
 add_filter('template_include', 'autoagora_filter_car_make_landing_template', 99);
 
 function autoagora_enqueue_car_make_landing_assets() {
-    $landing = autoagora_get_current_car_make_landing();
-    if (!$landing) {
+    if (!is_tax('car_make')) {
         return;
     }
 
@@ -877,7 +975,7 @@ function autoagora_enqueue_car_make_landing_assets() {
 add_action('wp_enqueue_scripts', 'autoagora_enqueue_car_make_landing_assets', 20);
 
 function autoagora_filter_body_classes($classes) {
-    if (autoagora_get_current_car_make_landing()) {
+    if (is_tax('car_make')) {
         $classes[] = 'autoagora-car-make-landing';
     }
 

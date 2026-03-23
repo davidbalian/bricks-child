@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$landing = autoagora_get_current_car_make_landing();
+$landing = autoagora_get_car_make_landing_view_context();
 if (!$landing) {
     status_header(404);
     nocache_headers();
@@ -19,34 +19,6 @@ if (!$landing) {
 
 $group       = 'car-make-landing-' . sanitize_html_class($landing['slug']);
 $listings_id = 'car-make-landing-results';
-
-add_action('wp_head', function() use ($landing) {
-    echo '<meta name="description" content="' . esc_attr($landing['meta_description']) . '">' . "\n";
-    echo '<link rel="canonical" href="' . esc_url($landing['canonical']) . '">' . "\n";
-
-    $schema = array(
-        '@context'   => 'https://schema.org',
-        '@type'      => 'FAQPage',
-        'mainEntity' => array(),
-    );
-    foreach ($landing['faqs'] as $faq) {
-        $schema['mainEntity'][] = array(
-            '@type'          => 'Question',
-            'name'           => $faq['question'],
-            'acceptedAnswer' => array(
-                '@type' => 'Answer',
-                'text'  => $faq['answer'],
-            ),
-        );
-    }
-    echo '<script type="application/ld+json">' . "\n";
-    echo wp_json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-    echo "\n</script>\n";
-}, 5);
-
-add_filter('pre_get_document_title', function() use ($landing) {
-    return $landing['title'];
-}, 20);
 
 $listing_atts = array(
     'posts_per_page'     => 24,
@@ -194,7 +166,7 @@ get_header();
                 endwhile;
             else :
                 ?>
-                <p class="car-listings-no-results"><?php esc_html_e('No listings found for this model.', 'bricks-child'); ?></p>
+                <p class="car-listings-no-results"><?php esc_html_e('No listings match this selection yet.', 'bricks-child'); ?></p>
                 <?php
             endif;
             wp_reset_postdata();
@@ -218,18 +190,41 @@ get_header();
         </div>
     </div>
 
-    <!-- SEO Content: Intro + FAQ -->
+    <?php if (!empty($landing['intro']) || !empty($landing['faqs'])) : ?>
+    <!-- SEO Content: Intro + FAQ (managed landings only; empty for other makes/models) -->
     <div class="cars-seo-content">
-
+        <?php if (!empty($landing['intro'])) : ?>
         <section class="cars-intro">
-            <h2 class="cars-intro-heading">Buying insights for Cyprus shoppers</h2>
+            <h2 class="cars-intro-heading"><?php esc_html_e('Buying insights for Cyprus shoppers', 'bricks-child'); ?></h2>
             <?php foreach ($landing['intro'] as $paragraph) : ?>
                 <p><?php echo esc_html($paragraph); ?></p>
             <?php endforeach; ?>
         </section>
+        <?php endif; ?>
 
+        <?php if (!empty($landing['faqs'])) : ?>
         <section class="cars-faq">
-            <h2 class="cars-faq-heading">Common questions about the <?php echo esc_html($landing['model_name']); ?></h2>
+            <h2 class="cars-faq-heading">
+                <?php
+                if (!empty($landing['model_name'])) {
+                    echo esc_html(
+                        sprintf(
+                            /* translators: %s: model name */
+                            __('Common questions about the %s', 'bricks-child'),
+                            $landing['model_name']
+                        )
+                    );
+                } else {
+                    echo esc_html(
+                        sprintf(
+                            /* translators: %s: make name */
+                            __('Common questions about %s', 'bricks-child'),
+                            $landing['make_name']
+                        )
+                    );
+                }
+                ?>
+            </h2>
 
             <?php foreach ($landing['faqs'] as $faq) : ?>
             <div class="faq-item">
@@ -243,8 +238,10 @@ get_header();
             </div>
             <?php endforeach; ?>
         </section>
+        <?php endif; ?>
 
     </div><!-- .cars-seo-content -->
+    <?php endif; ?>
 </div>
 
 <style>
