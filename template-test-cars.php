@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( defined( 'GOOGLE_MAPS_API_KEY' ) && GOOGLE_MAPS_API_KEY ) {
-    $google_maps_url = 'https://maps.googleapis.com/maps/api/js?key=' . urlencode( GOOGLE_MAPS_API_KEY ) . '&libraries=places&language=en';
+    $google_maps_url = 'https://maps.googleapis.com/maps/api/js?key=' . urlencode( GOOGLE_MAPS_API_KEY ) . '&libraries=places&language=en&loading=async';
     wp_enqueue_script( 'google-maps', $google_maps_url, array(), null, true );
 }
 
@@ -184,12 +184,22 @@ $cars_query = car_listings_execute_query( $args );
             <div class="tcp-location-search-wrap">
                 <input type="text" id="tcp-location-search" class="tcp-location-search" placeholder="Search location in Cyprus">
             </div>
-            <div class="tcp-location-map" id="tcp-location-map"></div>
+            <div class="tcp-location-map-wrap">
+                <div class="tcp-location-map" id="tcp-location-map"></div>
+                <div class="tcp-location-center-pin" aria-hidden="true"></div>
+            </div>
             <div class="tcp-location-radius-row">
                 <label for="tcp-location-radius">Radius (km)</label>
                 <div class="tcp-location-radius-controls">
-                    <input type="range" id="tcp-location-radius" min="1" max="100" step="1" value="25">
+                    <input type="range" id="tcp-location-radius" min="5" max="100" step="1" value="25">
                     <span id="tcp-location-radius-value">25 km</span>
+                </div>
+                <div class="tcp-location-radius-presets">
+                    <button type="button" class="tcp-radius-preset" data-radius="5">5 km</button>
+                    <button type="button" class="tcp-radius-preset" data-radius="10">10 km</button>
+                    <button type="button" class="tcp-radius-preset" data-radius="25">25 km</button>
+                    <button type="button" class="tcp-radius-preset" data-radius="50">50 km</button>
+                    <button type="button" class="tcp-radius-preset" data-radius="100">100 km</button>
                 </div>
             </div>
         </div>
@@ -663,6 +673,37 @@ $cars_query = car_listings_execute_query( $args );
     overflow: hidden;
     background: #f8fafc;
 }
+.tcp-location-map-wrap {
+    position: relative;
+}
+.tcp-location-center-pin {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    transform: translate(-50%, -100%);
+    pointer-events: none;
+    z-index: 5;
+}
+.tcp-location-center-pin::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50% 50% 50% 0;
+    background: #0d86e3;
+    transform: rotate(-45deg);
+}
+.tcp-location-center-pin::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fff;
+    left: 6px;
+    top: 6px;
+}
 .tcp-location-radius-row {
     margin-top: 0.9rem;
 }
@@ -686,6 +727,33 @@ $cars_query = car_listings_execute_query( $args );
     font-size: 0.9rem;
     color: #475569;
     font-weight: 600;
+}
+.tcp-location-radius-presets {
+    margin-top: 0.6rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+.tcp-radius-preset {
+    border: 1px solid #dfe2e6;
+    background: #fff;
+    color: #2a3546;
+    border-radius: 999px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.tcp-radius-preset:hover {
+    background: #f8fafc;
+}
+.tcp-radius-preset.active {
+    border-color: #0d86e3;
+    color: #0d86e3;
+    background: rgba(13, 134, 227, 0.08);
+}
+.pac-container {
+    z-index: 10050 !important;
 }
 
 @media (max-width: 768px) {
@@ -929,7 +997,6 @@ $cars_query = car_listings_execute_query( $args );
         active: false
     };
     var locationMap = null;
-    var locationMarker = null;
     var locationCircle = null;
     var locationAutocomplete = null;
 
@@ -992,6 +1059,13 @@ $cars_query = car_listings_execute_query( $args );
         $locationOverlay.addClass('open');
         $('body').css('overflow', 'hidden');
         initLocationMap();
+        setTimeout(function() {
+            if (!locationMap || typeof google === 'undefined' || !google.maps) return;
+            google.maps.event.trigger(locationMap, 'resize');
+            if (locationState.lat && locationState.lng) {
+                locationMap.setCenter({ lat: locationState.lat, lng: locationState.lng });
+            }
+        }, 50);
     }
 
     function closeLocationModal() {
@@ -1094,29 +1168,39 @@ $cars_query = car_listings_execute_query( $args );
     function updateLocationRadiusUI(radiusKm) {
         $('#tcp-location-radius').val(radiusKm);
         $('#tcp-location-radius-value').text(radiusKm + ' km');
+        $('.tcp-radius-preset').removeClass('active');
+        $('.tcp-radius-preset[data-radius="' + radiusKm + '"]').addClass('active');
     }
 
-    function syncLocationVisuals() {
-        if (!locationMap || !locationMarker || !locationCircle || !locationState.lat || !locationState.lng) {
+    function getZoomForRadius(radiusKm) {
+        if (radiusKm <= 5) return 13;
+        if (radiusKm <= 10) return 12;
+        if (radiusKm <= 25) return 11;
+        if (radiusKm <= 50) return 10;
+        if (radiusKm <= 75) return 9;
+        return 8;
+    }
+
+    function syncLocationVisuals(shouldAdjustZoom) {
+        if (!locationMap || !locationCircle || !locationState.lat || !locationState.lng) {
             return;
         }
         var center = { lat: locationState.lat, lng: locationState.lng };
-        locationMarker.setPosition(center);
         locationCircle.setCenter(center);
         locationCircle.setRadius(locationState.radiusKm * 1000);
-        locationMap.panTo(center);
+        if (shouldAdjustZoom) {
+            locationMap.setZoom(getZoomForRadius(locationState.radiusKm));
+        }
     }
 
-    function setLocationPoint(lat, lng) {
+    function setLocationPoint(lat, lng, shouldAdjustZoom) {
         locationState.lat = lat;
         locationState.lng = lng;
-        if (locationMarker && locationMarker.getMap() === null) {
-            locationMarker.setMap(locationMap);
-        }
         if (locationCircle && locationCircle.getMap() === null) {
             locationCircle.setMap(locationMap);
         }
-        syncLocationVisuals();
+        locationMap.panTo({ lat: lat, lng: lng });
+        syncLocationVisuals(!!shouldAdjustZoom);
     }
 
     function initLocationMap() {
@@ -1139,11 +1223,6 @@ $cars_query = car_listings_execute_query( $args );
                 fullscreenControl: false
             });
 
-            locationMarker = new google.maps.Marker({
-                map: locationMap,
-                draggable: true
-            });
-
             locationCircle = new google.maps.Circle({
                 map: locationMap,
                 strokeColor: '#0d86e3',
@@ -1155,11 +1234,16 @@ $cars_query = car_listings_execute_query( $args );
             });
 
             locationMap.addListener('click', function(e) {
-                setLocationPoint(e.latLng.lat(), e.latLng.lng());
+                setLocationPoint(e.latLng.lat(), e.latLng.lng(), false);
             });
 
-            locationMarker.addListener('dragend', function(e) {
-                setLocationPoint(e.latLng.lat(), e.latLng.lng());
+            locationMap.addListener('idle', function() {
+                if (!locationMap) return;
+                var center = locationMap.getCenter();
+                if (!center) return;
+                locationState.lat = center.lat();
+                locationState.lng = center.lng();
+                syncLocationVisuals(false);
             });
 
             var searchInput = document.getElementById('tcp-location-search');
@@ -1175,18 +1259,22 @@ $cars_query = car_listings_execute_query( $args );
                     if (!place.geometry || !place.geometry.location) {
                         return;
                     }
-                    setLocationPoint(place.geometry.location.lat(), place.geometry.location.lng());
-                    locationMap.setZoom(11);
+                    setLocationPoint(place.geometry.location.lat(), place.geometry.location.lng(), true);
                 });
             }
         }
 
-        if (locationState.active && locationState.lat && locationState.lng) {
-            syncLocationVisuals();
-            locationMap.setZoom(11);
+        var shouldUseSaved = locationState.lat && locationState.lng;
+        if (shouldUseSaved) {
+            locationMap.setCenter({ lat: locationState.lat, lng: locationState.lng });
+            syncLocationVisuals(true);
         } else {
-            locationMarker.setMap(null);
-            locationCircle.setMap(null);
+            var currentCenter = locationMap.getCenter();
+            if (currentCenter) {
+                locationState.lat = currentCenter.lat();
+                locationState.lng = currentCenter.lng();
+                syncLocationVisuals(true);
+            }
         }
 
         updateLocationRadiusUI(locationState.radiusKm);
@@ -1231,12 +1319,11 @@ $cars_query = car_listings_execute_query( $args );
             $('.car-filter-' + filterCls + ' .car-filter-input-' + bound).val('');
         } else if (key === 'location_radius') {
             locationState.active = false;
-            locationState.lat = null;
-            locationState.lng = null;
             locationState.radiusKm = 25;
             updateLocationRadiusUI(locationState.radiusKm);
-            if (locationMarker) locationMarker.setMap(null);
-            if (locationCircle) locationCircle.setMap(null);
+            if (locationCircle) {
+                locationCircle.setRadius(locationState.radiusKm * 1000);
+            }
         } else {
             CarFilters.setState(group, key, '');
             var filterCls = key === 'fuel_type' ? 'fuel' : (key === 'body_type' ? 'body' : key);
@@ -1269,6 +1356,22 @@ $cars_query = car_listings_execute_query( $args );
         updateLocationRadiusUI(radius);
         if (locationCircle && locationCircle.getMap() !== null) {
             locationCircle.setRadius(radius * 1000);
+        }
+        if (locationMap) {
+            locationMap.setZoom(getZoomForRadius(radius));
+        }
+    });
+
+    $('.tcp-location-radius-presets').on('click', '.tcp-radius-preset', function() {
+        var radius = parseInt($(this).data('radius'), 10);
+        if (isNaN(radius) || radius <= 0) return;
+        locationState.radiusKm = radius;
+        updateLocationRadiusUI(radius);
+        if (locationCircle) {
+            locationCircle.setRadius(radius * 1000);
+        }
+        if (locationMap) {
+            locationMap.setZoom(getZoomForRadius(radius));
         }
     });
 
