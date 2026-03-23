@@ -954,12 +954,27 @@ get_header();
         $container.data('atts', atts);
         $container.attr('data-atts', JSON.stringify(atts));
 
-        loadPage(1, { scroll: false });
+        if (window.CarFilters && CarFilters.buildResultsUrl) {
+            window.location.href = CarFilters.buildResultsUrl(group, {
+                orderby: orderby,
+                order:   order
+            });
+        } else {
+            loadPage(1, { scroll: false });
+        }
     });
 
-    /* ── AJAX pagination ── */
+    /* ── Pagination: send users to /cars/ (same as filter apply on landing) ── */
     function loadPage(page, opts) {
         opts = opts || {};
+        if (window.CarFilters && CarFilters.buildResultsUrl) {
+            var listingAtts = $container.data('atts') || {};
+            var extras = { paged: page };
+            if (listingAtts.orderby) extras.orderby = listingAtts.orderby;
+            if (listingAtts.order) extras.order = listingAtts.order;
+            window.location.href = CarFilters.buildResultsUrl(group, extras);
+            return;
+        }
         syncPostsPerPage();
         var filterData = (window.CarFilters && CarFilters.getFilterData)
             ? CarFilters.getFilterData(group)

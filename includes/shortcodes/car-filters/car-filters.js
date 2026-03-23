@@ -166,13 +166,29 @@
             return qs ? baseUrl + '?' + qs : baseUrl;
         },
 
-        buildResultsUrl: function(group) {
+        /**
+         * @param {string} group Filter group id
+         * @param {Object} [extras] Optional: orderby, order, paged (for /cars/ query string)
+         */
+        buildResultsUrl: function(group, extras) {
+            extras = extras || {};
             var state = this.getState(group);
             var params = new URLSearchParams();
             var selectedSlug = state.model.slug || state.make.slug;
             var baseUrl = (state.resultsBaseUrl || '/cars/').replace(/\/+$/, '');
 
             this.appendNonMakeParams(params, state);
+
+            if (extras.orderby) {
+                params.set('orderby', extras.orderby);
+            }
+            if (extras.order) {
+                params.set('order', extras.order);
+            }
+            var paged = parseInt(extras.paged, 10);
+            if (paged > 1) {
+                params.set('paged', paged);
+            }
 
             if (selectedSlug) {
                 baseUrl += '/filter/make:' + encodeURIComponent(selectedSlug) + '/';
@@ -235,6 +251,9 @@
                 if (state.mode === 'redirect') {
                     // Redirect mode - navigate to URL
                     window.location.href = self.buildUrl(group, true);
+                } else if (self.hasLandingContext(state)) {
+                    // SEO landing pages: always continue browsing on /cars/ with the same filters
+                    window.location.href = self.buildResultsUrl(group);
                 } else {
                     // AJAX mode - update listings
                     self.ajaxFilter(group);
@@ -956,13 +975,6 @@
             $(document).on('click', '.car-filters-search-btn', function(e) {
                 e.preventDefault();
                 var group = $(this).data('group');
-                var state = CarFilters.getState(group);
-
-                if (CarFilters.hasLandingContext(state) && !CarFilters.matchesLandingContext(state)) {
-                    window.location.href = CarFilters.buildResultsUrl(group);
-                    return;
-                }
-
                 CarFilters.triggerFilter(group);
             });
         }

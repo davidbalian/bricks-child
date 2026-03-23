@@ -310,6 +310,30 @@ function car_listings_build_query_args($atts) {
     $orderby = in_array($atts['orderby'], $valid_orderby) ? $atts['orderby'] : 'date';
     $order = strtoupper($atts['order']) === 'ASC' ? 'ASC' : 'DESC';
 
+    // URL overrides (e.g. redirects from car_make landing pages to /cars/)
+    if (isset($_GET['orderby']) && $_GET['orderby'] !== '') {
+        $orderby_get = sanitize_key(wp_unslash($_GET['orderby']));
+        if (in_array($orderby_get, $valid_orderby, true)) {
+            $orderby = $orderby_get;
+        }
+    }
+    if (isset($_GET['order']) && $_GET['order'] !== '') {
+        $order_get = strtoupper(sanitize_text_field(wp_unslash($_GET['order'])));
+        if ($order_get === 'ASC' || $order_get === 'DESC') {
+            $order = $order_get;
+        }
+    }
+
+    $paged = 1;
+    if (isset($_GET['paged']) && $_GET['paged'] !== '') {
+        $paged = max(1, intval(wp_unslash($_GET['paged'])));
+    } elseif (isset($_GET['page']) && $_GET['page'] !== '' && is_numeric($_GET['page'])) {
+        $paged = max(1, intval(wp_unslash($_GET['page'])));
+    }
+    if ($paged > 1) {
+        $args['paged'] = $paged;
+    }
+
     // Store sort params for the filter
     $args['_car_listings_orderby'] = $orderby;
     $args['_car_listings_order'] = $order;
