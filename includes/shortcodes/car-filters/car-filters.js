@@ -1218,6 +1218,26 @@
                 CascadeController.fetchAvailableOptions(group);
             }
         });
+
+        // Match #tcp-sort label + .selected to ?cars_orderby= & cars_order= (e.g. after redirect from car_make).
+        (function syncTcpSortFromUrl() {
+            var params = new URLSearchParams(window.location.search);
+            var ob = params.get('cars_orderby') || params.get('orderby');
+            var ord = (params.get('cars_order') || params.get('order') || '').toUpperCase();
+            if (!ob || (ord !== 'ASC' && ord !== 'DESC')) {
+                return;
+            }
+            var $opt = $('.tcp-sort-menu .tcp-sort-option').filter(function() {
+                return $(this).data('orderby') === ob &&
+                    String($(this).data('order')).toUpperCase() === ord;
+            }).first();
+            if (!$opt.length || !$('#tcp-sort').length) {
+                return;
+            }
+            $('#tcp-sort').find('.tcp-sort-option').removeClass('selected');
+            $opt.addClass('selected');
+            $('#tcp-sort-label').text($.trim($opt.text()));
+        })();
     });
 
 })(jQuery);

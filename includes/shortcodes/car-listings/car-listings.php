@@ -50,6 +50,9 @@ function car_listings_shortcode($atts) {
         $atts['layout'] = 'grid';
     }
 
+    // Keep data-atts / client AJAX in sync with ?cars_orderby= & cars_order= (same rules as build_query_args).
+    $atts = car_listings_apply_request_sort_to_atts($atts);
+
     // Enqueue assets (only when shortcode is used)
     car_listings_enqueue_assets($atts);
 
@@ -68,6 +71,40 @@ function car_listings_shortcode($atts) {
     wp_reset_postdata();
 
     return ob_get_clean();
+}
+
+/**
+ * Merge cars_orderby / cars_order from the request into shortcode atts (for data-atts JSON + consistency).
+ *
+ * @param array $atts Shortcode attributes.
+ * @return array
+ */
+function car_listings_apply_request_sort_to_atts(array $atts) {
+    $valid_orderby = array('date', 'price', 'mileage', 'year');
+
+    $orderby_get = '';
+    if (isset($_GET['cars_orderby']) && $_GET['cars_orderby'] !== '') {
+        $orderby_get = sanitize_key(wp_unslash($_GET['cars_orderby']));
+    } elseif (isset($_GET['orderby']) && $_GET['orderby'] !== '') {
+        $orderby_get = sanitize_key(wp_unslash($_GET['orderby']));
+    }
+    if ($orderby_get !== '' && in_array($orderby_get, $valid_orderby, true)) {
+        $atts['orderby'] = $orderby_get;
+    }
+
+    if (isset($_GET['cars_order']) && $_GET['cars_order'] !== '') {
+        $order_get = strtoupper(sanitize_text_field(wp_unslash($_GET['cars_order'])));
+        if ($order_get === 'ASC' || $order_get === 'DESC') {
+            $atts['order'] = $order_get;
+        }
+    } elseif (isset($_GET['order']) && $_GET['order'] !== '') {
+        $order_get = strtoupper(sanitize_text_field(wp_unslash($_GET['order'])));
+        if ($order_get === 'ASC' || $order_get === 'DESC') {
+            $atts['order'] = $order_get;
+        }
+    }
+
+    return $atts;
 }
 
 /**
