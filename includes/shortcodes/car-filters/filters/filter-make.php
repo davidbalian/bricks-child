@@ -53,11 +53,23 @@ function car_filter_make_shortcode($atts) {
         $popular = array_slice($sorted, 0, 3);
     }
 
-    // Check for URL parameter
+    $request_context = function_exists('autoagora_get_active_car_filter_context')
+        ? autoagora_get_active_car_filter_context()
+        : array();
+
+    // Check for active request filter first, then landing defaults
     $selected = '';
-    if (isset($_GET['make'])) {
-        // Could be term_id or slug
-        $make_param = sanitize_text_field($_GET['make']);
+    $make_param = '';
+
+    if (!empty($request_context['make_slug'])) {
+        $make_param = $request_context['make_slug'];
+    } elseif (!empty($atts['landing_make_slug'])) {
+        $make_param = sanitize_title($atts['landing_make_slug']);
+    } elseif (isset($_GET['make'])) {
+        $make_param = sanitize_text_field(wp_unslash($_GET['make']));
+    }
+
+    if ($make_param !== '') {
         foreach ($options as $opt) {
             if ($opt['slug'] === $make_param || (string)$opt['value'] === $make_param) {
                 $selected = $opt['value'];

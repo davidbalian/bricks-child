@@ -1,0 +1,186 @@
+.autoagora-car-make-landing-page {
+    --landing-bg: #f4f1ea;
+    --landing-surface: #fffdf8;
+    --landing-border: rgba(36, 31, 26, 0.1);
+    --landing-text: #1f1914;
+    --landing-muted: #685d54;
+    --landing-accent: #9e5a2b;
+    background:
+        radial-gradient(circle at top right, rgba(158, 90, 43, 0.14), transparent 28%),
+        linear-gradient(180deg, #f7f3ed 0%, var(--landing-bg) 42%, #efe9df 100%);
+    color: var(--landing-text);
+    padding: 40px 0 80px;
+}
+
+.autoagora-car-make-landing__content {
+    display: grid;
+    gap: 32px;
+}
+
+.autoagora-car-make-landing__hero,
+.autoagora-car-make-landing__browse,
+.autoagora-car-make-landing__copy,
+.autoagora-car-make-landing__faq {
+    background: var(--landing-surface);
+    border: 1px solid var(--landing-border);
+    border-radius: 28px;
+    box-shadow: 0 18px 50px rgba(42, 28, 18, 0.08);
+}
+
+.autoagora-car-make-landing__hero {
+    padding: 32px;
+}
+
+.autoagora-car-make-landing__eyebrow,
+.autoagora-car-make-landing__section-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    background: rgba(158, 90, 43, 0.11);
+    color: var(--landing-accent);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 8px 12px;
+    text-transform: uppercase;
+}
+
+.autoagora-car-make-landing__title {
+    font-size: clamp(32px, 5vw, 54px);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin: 18px 0 14px;
+}
+
+.autoagora-car-make-landing__subtitle {
+    color: var(--landing-muted);
+    font-size: 18px;
+    line-height: 1.65;
+    margin: 0;
+    max-width: 780px;
+}
+
+.autoagora-car-make-landing__browse {
+    padding: 24px;
+}
+
+.autoagora-car-make-landing__filters {
+    border-bottom: 1px solid var(--landing-border);
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+}
+
+.autoagora-car-make-landing__results .car-listings-container {
+    margin: 0;
+}
+
+.autoagora-car-make-landing__copy,
+.autoagora-car-make-landing__faq {
+    padding: 32px;
+}
+
+.autoagora-car-make-landing__section-head {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.autoagora-car-make-landing__section-head h2 {
+    font-size: clamp(24px, 3vw, 34px);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin: 0;
+}
+
+.autoagora-car-make-landing__copy-body {
+    color: var(--landing-muted);
+    display: grid;
+    gap: 16px;
+    font-size: 17px;
+    line-height: 1.8;
+}
+
+.autoagora-car-make-landing__copy-body p,
+.autoagora-car-make-landing__faq-answer p {
+    margin: 0;
+}
+
+.autoagora-car-make-landing__faq-list {
+    display: grid;
+    gap: 14px;
+}
+
+.autoagora-car-make-landing__faq-item {
+    border: 1px solid var(--landing-border);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.autoagora-car-make-landing__faq-item summary {
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 600;
+    list-style: none;
+    padding: 20px 22px;
+    position: relative;
+}
+
+.autoagora-car-make-landing__faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.autoagora-car-make-landing__faq-item summary::after {
+    color: var(--landing-accent);
+    content: '+';
+    font-size: 24px;
+    line-height: 1;
+    position: absolute;
+    right: 22px;
+    top: 18px;
+}
+
+.autoagora-car-make-landing__faq-item[open] summary::after {
+    content: '-';
+}
+
+.autoagora-car-make-landing__faq-answer {
+    border-top: 1px solid var(--landing-border);
+    color: var(--landing-muted);
+    font-size: 16px;
+    line-height: 1.75;
+    padding: 20px 22px 22px;
+}
+
+@media (max-width: 767px) {
+    .autoagora-car-make-landing-page {
+        padding: 20px 0 56px;
+    }
+
+    .autoagora-car-make-landing__hero,
+    .autoagora-car-make-landing__browse,
+    .autoagora-car-make-landing__copy,
+    .autoagora-car-make-landing__faq {
+        border-radius: 20px;
+    }
+
+    .autoagora-car-make-landing__hero,
+    .autoagora-car-make-landing__copy,
+    .autoagora-car-make-landing__faq {
+        padding: 22px;
+    }
+
+    .autoagora-car-make-landing__browse {
+        padding: 18px;
+    }
+
+    .autoagora-car-make-landing__subtitle {
+        font-size: 16px;
+    }
+
+    .autoagora-car-make-landing__faq-item summary,
+    .autoagora-car-make-landing__faq-answer {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+}

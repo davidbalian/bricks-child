@@ -34,6 +34,9 @@ function car_listings_shortcode($atts) {
         'offset'          => 0,
         'id'              => '',            // Explicit ID for filter targeting
         'filter_group'    => '',            // Auto-connect to filter group
+        'card_type'       => '',
+        'default_make_slug' => '',
+        'default_model_slug' => '',
     ), $atts, 'car_listings');
 
     // Generate instance ID if not provided
@@ -149,9 +152,34 @@ function car_listings_build_query_args($atts) {
     // === URL PARAMETER FILTERS (for filter integration) ===
     $tax_query = array();
 
-    // Make/Model filter from query params
-    if (isset($_GET['model']) && !empty($_GET['model'])) {
-        $model_param = sanitize_text_field($_GET['model']);
+    // Make/Model filter from explicit request params, pretty filter routes, or landing defaults
+    $resolved_filter_context = function_exists('autoagora_get_active_car_filter_context')
+        ? autoagora_get_active_car_filter_context()
+        : array();
+
+    $explicit_model = isset($_GET['model']) && $_GET['model'] !== '' ? sanitize_text_field(wp_unslash($_GET['model'])) : '';
+    $explicit_make = isset($_GET['make']) && $_GET['make'] !== '' ? sanitize_text_field(wp_unslash($_GET['make'])) : '';
+
+    $model_param = '';
+    $make_param = '';
+
+    if (!empty($explicit_model)) {
+        $model_param = $explicit_model;
+    } elseif (!empty($resolved_filter_context['model_slug'])) {
+        $model_param = $resolved_filter_context['model_slug'];
+    } elseif (!empty($atts['default_model_slug'])) {
+        $model_param = sanitize_title($atts['default_model_slug']);
+    }
+
+    if (!empty($explicit_make)) {
+        $make_param = $explicit_make;
+    } elseif (!empty($resolved_filter_context['make_slug'])) {
+        $make_param = $resolved_filter_context['make_slug'];
+    } elseif (!empty($atts['default_make_slug'])) {
+        $make_param = sanitize_title($atts['default_make_slug']);
+    }
+
+    if (!empty($model_param)) {
         $model_term = get_term_by('slug', $model_param, 'car_make');
         if ($model_term) {
             $tax_query[] = array(
@@ -160,8 +188,7 @@ function car_listings_build_query_args($atts) {
                 'terms'    => $model_term->term_id,
             );
         }
-    } elseif (isset($_GET['make']) && !empty($_GET['make'])) {
-        $make_param = sanitize_text_field($_GET['make']);
+    } elseif (!empty($make_param)) {
         $make_term = get_term_by('slug', $make_param, 'car_make');
         if ($make_term && $make_term->parent === 0) {
             $models = get_terms(array(
@@ -316,6 +343,8 @@ function car_listings_render_output($car_query, $atts) {
     $layout = sanitize_text_field($atts['layout']);
     $layout_class = 'car-listings-' . $layout;
     $infinite_scroll = $atts['infinite_scroll'] === 'true';
+    $card_type = isset($atts['card_type']) ? $atts['card_type'] : '';
+    $use_car_card = ($card_type === 'car_card') && function_exists('render_car_card');
 
     // Pre-fetch all post meta in one query to avoid N+1 queries
     if ($car_query->have_posts()) {
@@ -340,7 +369,13 @@ function car_listings_render_output($car_query, $atts) {
         <?php if ($car_query->have_posts()) : ?>
             <div class="car-listings-wrapper">
                 <?php while ($car_query->have_posts()) : $car_query->the_post(); ?>
-                    <?php car_listings_render_card(get_the_ID()); ?>
+                    <?php
+                    if ($use_car_card) {
+                        render_car_card(get_the_ID());
+                    } else {
+                        car_listings_render_card(get_the_ID());
+                    }
+                    ?>
                 <?php endwhile; ?>
             </div>
 
@@ -549,6 +584,9 @@ function car_listings_ajax_load_more() {
         'order'           => 'DESC',
         'show_sold'       => 'false',
         'offset'          => 0,
+        'card_type'       => '',
+        'default_make_slug' => '',
+        'default_model_slug' => '',
     ), $atts);
 
     // Build query args (will use $_GET for filters)
@@ -570,9 +608,15 @@ function car_listings_ajax_load_more() {
     // Render cards
     ob_start();
     if ($car_query->have_posts()) {
+        $card_type = isset($atts['card_type']) ? $atts['card_type'] : '';
+        $use_car_card = ($card_type === 'car_card') && function_exists('render_car_card');
         while ($car_query->have_posts()) {
             $car_query->the_post();
-            car_listings_render_card(get_the_ID());
+            if ($use_car_card) {
+                render_car_card(get_the_ID());
+            } else {
+                car_listings_render_card(get_the_ID());
+            }
         }
     }
     $html = ob_get_clean();

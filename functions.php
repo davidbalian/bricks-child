@@ -62,6 +62,7 @@ require_once get_stylesheet_directory() . '/includes/notifications/listing-notif
 require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/init.php';
 require_once get_stylesheet_directory() . '/includes/notifications/listing-notifications/admin-email-tester.php';
 require_once get_stylesheet_directory() . '/includes/legal/legal-pages.php';
+require_once get_stylesheet_directory() . '/includes/car-make-landings.php';
 // Cookie consent functionality disabled
 // require_once get_stylesheet_directory() . '/includes/legal/cookie-consent.php';
 
@@ -1005,7 +1006,6 @@ function manual_sync_car_taxonomy() {
 // add_action('init', 'manual_sync_car_taxonomy');
 
 // =========================================================================
-
 
 
 

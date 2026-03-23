@@ -36,7 +36,10 @@
                     body_type: '',
                     target: '',
                     mode: 'ajax',
-                    redirectUrl: '/cars/'
+                    redirectUrl: '/cars/',
+                    resultsBaseUrl: '/cars/',
+                    landingMakeSlug: '',
+                    landingModelSlug: ''
                 };
                 this.subscribers[group] = [];
             }
@@ -103,17 +106,7 @@
             };
         },
 
-        /**
-         * Build URL with filter parameters as simple query params.
-         * Format: /cars/?make=bmw&model=bmw-m2&price_min=10000&fuel_type=Diesel
-         */
-        buildUrl: function(group, forRedirect) {
-            var state = this.getState(group);
-            var params = new URLSearchParams();
-
-            if (state.make.slug) params.set('make', state.make.slug);
-            if (state.model.slug) params.set('model', state.model.slug);
-
+        appendNonMakeParams: function(params, state) {
             var priceMin = this.parseNumber(state.price_min);
             var priceMax = this.parseNumber(state.price_max);
             if (priceMin) params.set('price_min', priceMin);
@@ -131,9 +124,61 @@
 
             if (state.fuel_type) params.set('fuel_type', state.fuel_type);
             if (state.body_type) params.set('body_type', state.body_type);
+        },
+
+        hasLandingContext: function(state) {
+            return !!(state && (state.landingMakeSlug || state.landingModelSlug));
+        },
+
+        matchesLandingContext: function(state) {
+            if (!this.hasLandingContext(state)) {
+                return false;
+            }
+
+            var makeMatches = state.make.slug === state.landingMakeSlug;
+            var modelMatches = state.landingModelSlug
+                ? state.model.slug === state.landingModelSlug
+                : !state.model.slug;
+
+            return makeMatches && modelMatches;
+        },
+
+        /**
+         * Build URL with filter parameters as simple query params.
+         * Format: /cars/?make=bmw&model=bmw-m2&price_min=10000&fuel_type=Diesel
+         */
+        buildUrl: function(group, forRedirect) {
+            var state = this.getState(group);
+            var params = new URLSearchParams();
+
+            var omitLandingTaxonomy = !forRedirect && this.matchesLandingContext(state);
+            if (!omitLandingTaxonomy) {
+                if (state.make.slug) params.set('make', state.make.slug);
+                if (state.model.slug) params.set('model', state.model.slug);
+            }
+
+            this.appendNonMakeParams(params, state);
 
             var baseUrl = forRedirect ? state.redirectUrl : this.getCurrentBasePath();
             baseUrl = baseUrl.replace(/\/+$/, '') + '/';
+
+            var qs = params.toString();
+            return qs ? baseUrl + '?' + qs : baseUrl;
+        },
+
+        buildResultsUrl: function(group) {
+            var state = this.getState(group);
+            var params = new URLSearchParams();
+            var selectedSlug = state.model.slug || state.make.slug;
+            var baseUrl = (state.resultsBaseUrl || '/cars/').replace(/\/+$/, '');
+
+            this.appendNonMakeParams(params, state);
+
+            if (selectedSlug) {
+                baseUrl += '/filter/make:' + encodeURIComponent(selectedSlug) + '/';
+            } else {
+                baseUrl += '/';
+            }
 
             var qs = params.toString();
             return qs ? baseUrl + '?' + qs : baseUrl;
@@ -151,10 +196,13 @@
          */
         parseUrl: function() {
             var params = new URLSearchParams(window.location.search);
-            if (!params.toString()) return null;
+            var pathname = window.location.pathname.replace(/\/+$/, '');
+            var prettyMatch = pathname.match(/\/cars\/filter\/make:([^/]+)$/);
+
+            if (!params.toString() && !prettyMatch) return null;
 
             var result = {
-                makeSlug: params.get('make') || null,
+                makeSlug: prettyMatch ? decodeURIComponent(prettyMatch[1]) : (params.get('model') || params.get('make') || null),
                 price_min: params.get('price_min') ? parseInt(params.get('price_min'), 10) : null,
                 price_max: params.get('price_max') ? parseInt(params.get('price_max'), 10) : null,
                 mileage_min: params.get('mileage_min') ? parseInt(params.get('mileage_min'), 10) : null,
@@ -907,7 +955,56 @@
             $(document).on('click', '.car-filters-search-btn', function(e) {
                 e.preventDefault();
                 var group = $(this).data('group');
+                var state = CarFilters.getState(group);
+
+                if (CarFilters.hasLandingContext(state) && !CarFilters.matchesLandingContext(state)) {
+                    window.location.href = CarFilters.buildResultsUrl(group);
+                    return;
+                }
+
                 CarFilters.triggerFilter(group);
+            });
+        }
+    };
+
+    var DomStateSeeder = {
+        seed: function() {
+            $('.car-filter').each(function() {
+                var $filter = $(this);
+                var group = $filter.data('group');
+                var filterType = $filter.data('filter-type');
+
+                if (!group || !filterType) {
+                    return;
+                }
+
+                var state = CarFilters.getState(group);
+
+                if (filterType === 'make' || filterType === 'model') {
+                    var $selectedOption = $filter.find('select option:selected');
+                    state[filterType] = {
+                        value: $selectedOption.val() || '',
+                        slug: $selectedOption.data('slug') || ''
+                    };
+                    return;
+                }
+
+                if (filterType === 'fuel_type' || filterType === 'body_type') {
+                    var values = [];
+                    $filter.find('.car-filter-dropdown-option.selected').each(function() {
+                        var value = $(this).data('value');
+                        if (value !== '' && value !== undefined && value !== null) {
+                            values.push(String(value));
+                        }
+                    });
+                    state[filterType] = values.join(',');
+                    return;
+                }
+
+                if (filterType === 'price' || filterType === 'mileage' || filterType === 'year') {
+                    state[filterType + '_min'] = $filter.find('.car-filter-input-min').val() || '';
+                    state[filterType + '_max'] = $filter.find('.car-filter-input-max').val() || '';
+                }
             });
         }
     };
@@ -928,14 +1025,22 @@
             var mode = $(this).data('mode');
             var target = $(this).data('target');
             var redirectUrl = $(this).data('redirect-url');
+            var resultsBaseUrl = $(this).data('results-base-url');
+            var landingMakeSlug = $(this).data('landing-make-slug');
+            var landingModelSlug = $(this).data('landing-model-slug');
 
             if (group) {
                 var state = CarFilters.initGroup(group);
                 if (mode) state.mode = mode;
                 if (target) state.target = target;
                 if (redirectUrl) state.redirectUrl = redirectUrl;
+                if (resultsBaseUrl) state.resultsBaseUrl = resultsBaseUrl;
+                if (landingMakeSlug) state.landingMakeSlug = landingMakeSlug;
+                if (landingModelSlug) state.landingModelSlug = landingModelSlug;
             }
         });
+
+        DomStateSeeder.seed();
 
         // Set up make -> model dependency
         $('.car-filter').each(function() {

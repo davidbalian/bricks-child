@@ -33,10 +33,20 @@ function car_filter_model_shortcode($atts) {
     $options = array();
     $selected = '';
     $disabled = true;
+    $request_context = function_exists('autoagora_get_active_car_filter_context')
+        ? autoagora_get_active_car_filter_context()
+        : array();
 
-    if (isset($_GET['make'])) {
-        $make_param = sanitize_text_field($_GET['make']);
+    $make_param = '';
+    if (!empty($request_context['make_slug'])) {
+        $make_param = $request_context['make_slug'];
+    } elseif (!empty($atts['landing_make_slug'])) {
+        $make_param = sanitize_title($atts['landing_make_slug']);
+    } elseif (isset($_GET['make'])) {
+        $make_param = sanitize_text_field(wp_unslash($_GET['make']));
+    }
 
+    if ($make_param !== '') {
         // Find make term
         $make_term = get_term_by('slug', $make_param, 'car_make');
         if (!$make_term) {
@@ -55,9 +65,17 @@ function car_filter_model_shortcode($atts) {
             }
             $disabled = false;
 
-            // Check for selected model in URL
-            if (isset($_GET['model'])) {
-                $model_param = sanitize_text_field($_GET['model']);
+            // Check for selected model in request context first, then landing defaults
+            $model_param = '';
+            if (!empty($request_context['model_slug'])) {
+                $model_param = $request_context['model_slug'];
+            } elseif (!empty($atts['landing_model_slug'])) {
+                $model_param = sanitize_title($atts['landing_model_slug']);
+            } elseif (isset($_GET['model'])) {
+                $model_param = sanitize_text_field(wp_unslash($_GET['model']));
+            }
+
+            if ($model_param !== '') {
                 foreach ($options as $opt) {
                     if ($opt['slug'] === $model_param || (string)$opt['value'] === $model_param) {
                         $selected = $opt['value'];

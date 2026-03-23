@@ -39,9 +39,12 @@ function car_filters_shortcode($atts) {
         'mode'         => 'ajax',                       // ajax or redirect
         'target'       => '',                           // Target car_listings ID
         'redirect_url' => '/cars/',                     // URL for redirect mode
+        'results_base_url' => '/cars/',                 // Base URL for landing page redirects
         'layout'       => 'horizontal',                 // horizontal, vertical, inline
         'show_button'  => 'true',
         'button_text'  => 'Search Cars',
+        'landing_make_slug' => '',
+        'landing_model_slug' => '',
     ), $atts, 'car_filters');
 
     // Enqueue assets
@@ -67,6 +70,9 @@ function car_filters_shortcode($atts) {
         'mode'         => $atts['mode'],
         'target'       => $atts['target'],
         'redirect_url' => $atts['redirect_url'],
+        'results_base_url' => $atts['results_base_url'],
+        'landing_make_slug' => $atts['landing_make_slug'],
+        'landing_model_slug' => $atts['landing_model_slug'],
     );
 
     $instance_id = 'car-filters-' . wp_rand(1000, 9999);
@@ -78,7 +84,10 @@ function car_filters_shortcode($atts) {
          data-group="<?php echo esc_attr($atts['group']); ?>"
          data-mode="<?php echo esc_attr($atts['mode']); ?>"
          data-target="<?php echo esc_attr($atts['target']); ?>"
-         data-redirect-url="<?php echo esc_attr($atts['redirect_url']); ?>">
+         data-redirect-url="<?php echo esc_attr($atts['redirect_url']); ?>"
+         data-results-base-url="<?php echo esc_attr($atts['results_base_url']); ?>"
+         data-landing-make-slug="<?php echo esc_attr($atts['landing_make_slug']); ?>"
+         data-landing-model-slug="<?php echo esc_attr($atts['landing_model_slug']); ?>">
 
         <div class="car-filters-wrapper">
             <?php
