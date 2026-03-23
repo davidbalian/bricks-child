@@ -10,6 +10,78 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+add_action( 'wp_head', function() {
+    if ( ! is_page_template( 'template-test-cars.php' ) ) {
+        return;
+    }
+    ?>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How much does a used car cost in Cyprus?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Used car prices in Cyprus vary widely depending on the make, model, age, and mileage. Budget-friendly options like the Nissan Note or Toyota Yaris typically start around €8,000–€13,000, while popular SUVs like the Mazda CX-5 or Volkswagen Tiguan range from €15,000–€30,000. Luxury and performance vehicles can go well above €50,000."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where can I buy a used car in Cyprus?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can buy used cars from licensed dealerships or private sellers across all major cities in Cyprus, including Nicosia, Limassol, Larnaca, and Paphos. AutoAgora lists vehicles from verified dealers and individuals across the island, so you can compare options from multiple sources without visiting each one in person."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What should I check before buying a used car in Cyprus?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Before purchasing, you should verify the vehicle's service history and mileage, check for any outstanding finance or liens, inspect the car for accident damage or rust (especially underbody), confirm the MOT (road worthiness) status, and make sure the registration documents match the seller's details. It's also a good idea to take the car for a test drive and have a trusted mechanic inspect it if possible."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I finance a used car purchase in Cyprus?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, most banks in Cyprus offer car loans for used vehicles. Typical loan terms range from 1 to 7 years, and interest rates depend on the bank and your credit profile. Some dealerships on AutoAgora also offer in-house financing options. It's worth comparing offers from multiple lenders before committing."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Are used cars in Cyprus left-hand drive or right-hand drive?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Cyprus drives on the left side of the road, but the vast majority of cars on the island are left-hand drive (LHD) — meaning the steering wheel is on the left. This is because most vehicles are imported from mainland Europe and Japan (re-configured). You'll find some right-hand drive cars, especially older Japanese imports, but LHD is the standard."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are the most popular used cars in Cyprus?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The most popular used cars in Cyprus include the Toyota Yaris, Nissan Note, Mazda CX-5, BMW 3 Series, Mercedes-Benz A-Class, Volkswagen Golf, and Nissan Qashqai. SUVs and compact hatchbacks tend to be the most in-demand body types, followed by saloons. Petrol hybrids have been growing in popularity in recent years."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I sell my car on AutoAgora?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Selling your car on AutoAgora is free and straightforward. Simply create an account, click 'Sell My Car,' and fill in your vehicle's details including photos, price, mileage, and specifications. Your listing will be visible to buyers across Cyprus."
+          }
+        }
+      ]
+    }
+    </script>
+    <?php
+} );
+
 get_header();
 
 $listing_atts = array(
@@ -134,6 +206,94 @@ $cars_query = car_listings_execute_query( $args );
             ?>
         </div>
     </div>
+
+    <!-- SEO Content: Intro + FAQ -->
+    <div class="cars-seo-content">
+
+        <section class="cars-intro">
+            <p>
+                Browse <strong>600+ used cars for sale in Cyprus</strong> from trusted dealerships and private sellers across Nicosia, Limassol, Larnaca, and Paphos. Whether you're looking for a fuel-efficient hatchback for city driving, a family SUV, or a luxury sedan, AutoAgora makes it easy to compare prices, specs, and photos — all in one place.
+            </p>
+            <p>
+                Use the filters above to narrow your search by make, model, price range, fuel type, mileage, and more. Every listing includes full vehicle details, high-quality photos, and direct contact with the seller. Can't find what you're looking for? <a href="/buyer-requests/">Post a buyer request</a> and let dealers across Cyprus come to you.
+            </p>
+        </section>
+
+        <section class="cars-faq">
+            <h2 class="cars-faq-heading">Frequently Asked Questions About Buying a Used Car in Cyprus</h2>
+
+            <div class="faq-item">
+                <button class="faq-trigger" aria-expanded="false">
+                    How much does a used car cost in Cyprus?
+                    <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="faq-answer">
+                    <p>Used car prices in Cyprus vary widely depending on the make, model, age, and mileage. Budget-friendly options like the Nissan Note or Toyota Yaris typically start around €8,000–€13,000, while popular SUVs like the Mazda CX-5 or Volkswagen Tiguan range from €15,000–€30,000. Luxury and performance vehicles can go well above €50,000. You can use the price filter above to browse cars within your budget.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-trigger" aria-expanded="false">
+                    Where can I buy a used car in Cyprus?
+                    <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="faq-answer">
+                    <p>You can buy used cars from licensed dealerships or private sellers across all major cities in Cyprus, including Nicosia, Limassol, Larnaca, and Paphos. AutoAgora lists vehicles from verified dealers and individuals across the island, so you can compare options from multiple sources without visiting each one in person.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-trigger" aria-expanded="false">
+                    What should I check before buying a used car in Cyprus?
+                    <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="faq-answer">
+                    <p>Before purchasing, you should verify the vehicle's service history and mileage, check for any outstanding finance or liens, inspect the car for accident damage or rust (especially underbody), confirm the MOT (road worthiness) status, and make sure the registration documents match the seller's details. It's also a good idea to take the car for a test drive and have a trusted mechanic inspect it if possible.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-trigger" aria-expanded="false">
+                    Can I finance a used car purchase in Cyprus?
+                    <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="faq-answer">
+                    <p>Yes, most banks in Cyprus offer car loans for used vehicles. Typical loan terms range from 1 to 7 years, and interest rates depend on the bank and your credit profile. Some dealerships on AutoAgora also offer in-house financing options. It's worth comparing offers from multiple lenders before committing.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-trigger" aria-expanded="false">
+                    Are used cars in Cyprus left-hand drive or right-hand drive?
+                    <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="faq-answer">
+                    <p>Cyprus drives on the left side of the road, but the vast majority of cars on the island are left-hand drive (LHD) — meaning the steering wheel is on the left. This is because most vehicles are imported from mainland Europe and Japan (re-configured). You'll find some right-hand drive cars, especially older Japanese imports, but LHD is the standard.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-trigger" aria-expanded="false">
+                    What are the most popular used cars in Cyprus?
+                    <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="faq-answer">
+                    <p>The most popular used cars in Cyprus include the Toyota Yaris, Nissan Note, Mazda CX-5, BMW 3 Series, Mercedes-Benz A-Class, Volkswagen Golf, and Nissan Qashqai. SUVs and compact hatchbacks tend to be the most in-demand body types, followed by saloons. Petrol hybrids have been growing in popularity in recent years.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-trigger" aria-expanded="false">
+                    How do I sell my car on AutoAgora?
+                    <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="faq-answer">
+                    <p>Selling your car on AutoAgora is free and straightforward. Simply create an account, click "Sell My Car," and fill in your vehicle's details including photos, price, mileage, and specifications. Your listing will be visible to buyers across Cyprus. For more details, visit our <a href="/how-to-sell-your-car/">guide on how to sell your car</a>.</p>
+                </div>
+            </div>
+        </section>
+
+    </div><!-- .cars-seo-content -->
 </div>
 
 <style>
@@ -540,6 +700,105 @@ $cars_query = car_listings_execute_query( $args );
     pointer-events: none;
     transition: opacity 0.15s;
 }
+
+/* ============================================
+   SEO Content: Intro + FAQ
+   ============================================ */
+.cars-seo-content {
+    max-width: 800px;
+    margin: 3rem auto 0;
+    padding: 0 1rem;
+}
+
+.cars-intro {
+    margin-bottom: 2.5rem;
+}
+.cars-intro p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #2a3546;
+    margin: 0 0 1rem;
+}
+.cars-intro p:last-child {
+    margin-bottom: 0;
+}
+.cars-intro a {
+    color: #0d86e3;
+    text-decoration: none;
+    font-weight: 500;
+}
+.cars-intro a:hover {
+    text-decoration: underline;
+}
+
+.cars-faq-heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2a3546;
+    margin: 0 0 0.25rem;
+}
+
+.faq-item {
+    border-top: 1px solid #e5e7eb;
+}
+.faq-item:last-child {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.faq-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem 0;
+    border: none;
+    background: none;
+    color: #2a3546;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    gap: 1rem;
+    line-height: 1.4;
+}
+.faq-trigger:hover {
+    color: #0d86e3;
+}
+.faq-trigger:hover .faq-chevron {
+    stroke: #0d86e3;
+}
+
+.faq-chevron {
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+    stroke: #2a3546;
+}
+.faq-item.open .faq-chevron {
+    transform: rotate(180deg);
+}
+
+.faq-answer {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.25s ease;
+}
+.faq-item.open .faq-answer {
+    max-height: 600px;
+}
+.faq-answer p {
+    margin: 0 0 1.25rem;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: #4b5563;
+}
+.faq-answer a {
+    color: #0d86e3;
+    text-decoration: none;
+    font-weight: 500;
+}
+.faq-answer a:hover {
+    text-decoration: underline;
+}
 </style>
 
 <script>
@@ -895,6 +1154,24 @@ $cars_query = car_listings_execute_query( $args );
     });
 
 })(jQuery);
+
+/* ── FAQ accordion ── */
+document.querySelectorAll('.faq-trigger').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var item = this.closest('.faq-item');
+        var isOpen = item.classList.contains('open');
+        // Close all
+        document.querySelectorAll('.faq-item.open').forEach(function(el) {
+            el.classList.remove('open');
+            el.querySelector('.faq-trigger').setAttribute('aria-expanded', 'false');
+        });
+        // Open clicked if it was closed
+        if (!isOpen) {
+            item.classList.add('open');
+            this.setAttribute('aria-expanded', 'true');
+        }
+    });
+});
 </script>
 
 <?php get_footer(); ?>
