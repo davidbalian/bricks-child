@@ -171,11 +171,12 @@
 
             this.appendNonMakeParams(params, state);
 
+            // Use cars_* to avoid WordPress core consuming orderby/order as main-query vars on /cars/ pages.
             if (extras.orderby) {
-                params.set('orderby', extras.orderby);
+                params.set('cars_orderby', extras.orderby);
             }
             if (extras.order) {
-                params.set('order', extras.order);
+                params.set('cars_order', extras.order);
             }
             var paged = parseInt(extras.paged, 10);
             if (paged > 1) {

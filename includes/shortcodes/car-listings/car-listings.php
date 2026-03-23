@@ -310,14 +310,23 @@ function car_listings_build_query_args($atts) {
     $orderby = in_array($atts['orderby'], $valid_orderby) ? $atts['orderby'] : 'date';
     $order = strtoupper($atts['order']) === 'ASC' ? 'ASC' : 'DESC';
 
-    // URL overrides (e.g. redirects from car_make landing pages to /cars/)
-    if (isset($_GET['orderby']) && $_GET['orderby'] !== '') {
+    // URL overrides (e.g. redirects from car_make landing pages). Prefer cars_* — WP reserves orderby/order.
+    $orderby_get = '';
+    if (isset($_GET['cars_orderby']) && $_GET['cars_orderby'] !== '') {
+        $orderby_get = sanitize_key(wp_unslash($_GET['cars_orderby']));
+    } elseif (isset($_GET['orderby']) && $_GET['orderby'] !== '') {
         $orderby_get = sanitize_key(wp_unslash($_GET['orderby']));
-        if (in_array($orderby_get, $valid_orderby, true)) {
-            $orderby = $orderby_get;
-        }
     }
-    if (isset($_GET['order']) && $_GET['order'] !== '') {
+    if ($orderby_get !== '' && in_array($orderby_get, $valid_orderby, true)) {
+        $orderby = $orderby_get;
+    }
+
+    if (isset($_GET['cars_order']) && $_GET['cars_order'] !== '') {
+        $order_get = strtoupper(sanitize_text_field(wp_unslash($_GET['cars_order'])));
+        if ($order_get === 'ASC' || $order_get === 'DESC') {
+            $order = $order_get;
+        }
+    } elseif (isset($_GET['order']) && $_GET['order'] !== '') {
         $order_get = strtoupper(sanitize_text_field(wp_unslash($_GET['order'])));
         if ($order_get === 'ASC' || $order_get === 'DESC') {
             $order = $order_get;
