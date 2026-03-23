@@ -57,26 +57,62 @@ $listing_atts = array(
     'default_model_slug' => $landing['model_slug'],
 );
 
-$query_atts = array_merge(
-    array(
-        'layout'          => 'grid',
-        'infinite_scroll' => 'false',
-        'featured'        => 'false',
-        'favorites'       => 'false',
-        'user_id'         => '',
-        'author'          => '',
-        'show_sold'       => 'false',
-        'offset'          => 0,
-        'id'              => $listings_id,
-        'filter_group'    => $group,
+// Build taxonomy filter: try model term first, fall back to all models of the make.
+$tax_terms = array();
+$model_term = get_term_by('slug', $landing['model_slug'], 'car_make');
+if ($model_term && !is_wp_error($model_term)) {
+    $tax_terms = array($model_term->term_id);
+} else {
+    $make_term = get_term_by('slug', $landing['make_slug'], 'car_make');
+    if ($make_term && !is_wp_error($make_term)) {
+        $child_ids = get_terms(array(
+            'taxonomy'   => 'car_make',
+            'parent'     => $make_term->term_id,
+            'hide_empty' => false,
+            'fields'     => 'ids',
+        ));
+        $tax_terms = (!is_wp_error($child_ids) && !empty($child_ids))
+            ? $child_ids
+            : array($make_term->term_id);
+    }
+}
+
+$query_args = array(
+    'post_type'      => 'car',
+    'post_status'    => 'publish',
+    'posts_per_page' => 24,
+    'paged'          => 1,
+    'orderby'        => 'date',
+    'order'          => 'DESC',
+    'meta_query'     => array(
+        'relation' => 'OR',
+        array(
+            'key'     => 'is_sold',
+            'compare' => 'NOT EXISTS',
+        ),
+        array(
+            'key'     => 'is_sold',
+            'value'   => '1',
+            'compare' => '!=',
+        ),
     ),
-    $listing_atts
 );
+if (!empty($tax_terms)) {
+    $query_args['tax_query'] = array(
+        array(
+            'taxonomy'         => 'car_make',
+            'field'            => 'term_id',
+            'terms'            => $tax_terms,
+            'include_children' => false,
+        ),
+    );
+}
 
-$cars_query = car_listings_execute_query(car_listings_build_query_args($query_atts));
+$cars_query = car_listings_execute_query($query_args);
 
-if (function_exists('car_listings_enqueue_assets')) {
-    car_listings_enqueue_assets($query_atts);
+// Enqueue car card assets before get_header() so CSS lands in <head>.
+if (function_exists('car_card_enqueue_assets')) {
+    car_card_enqueue_assets();
 }
 
 get_header();
