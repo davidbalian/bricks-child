@@ -112,6 +112,21 @@ $args = array(
     ),
 );
 
+global $wpdb;
+$city_rows = $wpdb->get_col(
+    "
+    SELECT DISTINCT pm.meta_value
+    FROM {$wpdb->postmeta} pm
+    INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+    WHERE pm.meta_key = 'car_city'
+      AND pm.meta_value <> ''
+      AND p.post_type = 'car'
+      AND p.post_status = 'publish'
+    ORDER BY pm.meta_value ASC
+    "
+);
+$city_options = is_array($city_rows) ? array_map('sanitize_text_field', $city_rows) : array();
+
 $cars_query = car_listings_execute_query( $args );
 ?>
 
@@ -123,6 +138,16 @@ $cars_query = car_listings_execute_query( $args );
             Filters
         </button>
         <div class="tcp-active-filters" id="tcp-active-filters"></div>
+
+        <div class="tcp-city-filter-wrap">
+            <label for="tcp-city-filter" class="screen-reader-text">City</label>
+            <select id="tcp-city-filter" class="tcp-city-filter" aria-label="Filter by city">
+                <option value="">All Cities</option>
+                <?php foreach ( $city_options as $city_option ) : ?>
+                    <option value="<?php echo esc_attr( $city_option ); ?>"><?php echo esc_html( $city_option ); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
 
         <div class="tcp-sort" id="tcp-sort">
             <button type="button" class="tcp-sort-btn" id="tcp-sort-btn">
@@ -345,6 +370,25 @@ $cars_query = car_listings_execute_query( $args );
     position: relative;
     flex-shrink: 0;
     margin-left: auto;
+}
+.tcp-city-filter-wrap {
+    flex-shrink: 0;
+}
+.tcp-city-filter {
+    min-width: 170px;
+    padding: 0.5rem 0.75rem;
+    border: 2px solid #dfe2e6;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #2a3546;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+.tcp-city-filter:hover,
+.tcp-city-filter:focus {
+    border-color: #bbb;
+    outline: none;
 }
 .tcp-sort-btn {
     display: inline-flex;
@@ -830,6 +874,7 @@ $cars_query = car_listings_execute_query( $args );
     var $overlay    = $('#tcp-filters-modal-overlay');
     var $chips      = $('#tcp-active-filters');
     var $results    = $('#tcp-results-count');
+    var $cityFilter = $('#tcp-city-filter');
     var group       = 'default';
     var MIN_ROWS     = 4;
     var MIN_PER_PAGE = 12;
@@ -933,6 +978,10 @@ $cars_query = car_listings_execute_query( $args );
                 hasAny = true;
             }
         });
+        if ($cityFilter.val()) {
+            html += chip('car_city', 'City: ' + $cityFilter.val());
+            hasAny = true;
+        }
 
         if (hasAny) {
             html += '<button type="button" class="tcp-chip-clear" id="tcp-clear-all">Clear all</button>';
@@ -981,7 +1030,7 @@ $cars_query = car_listings_execute_query( $args );
     // Clear all
     $chips.on('click', '#tcp-clear-all', function() {
         ['make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max',
-         'year_min', 'year_max', 'fuel_type', 'body_type'].forEach(function(key) {
+         'year_min', 'year_max', 'fuel_type', 'body_type', 'car_city'].forEach(function(key) {
             clearFilter(key);
         });
         CarFilters.triggerFilter(group);
@@ -1008,13 +1057,17 @@ $cars_query = car_listings_execute_query( $args );
             var filterCls = field === 'fuel_type' ? 'fuel' : (field === 'body_type' ? 'body' : field);
             $('.car-filter-' + filterCls + ' .car-filter-input-' + bound).val('');
         } else {
-            CarFilters.setState(group, key, '');
-            var filterCls = key === 'fuel_type' ? 'fuel' : (key === 'body_type' ? 'body' : key);
-            var $dd = $('.car-filter-' + filterCls + ' .car-filter-dropdown');
-            $dd.find('.car-filter-dropdown-option').removeClass('selected');
-            $dd.find('.car-filter-dropdown-option[data-value=""]').addClass('selected');
-            $dd.find('.car-filter-dropdown-text').addClass('placeholder').text($dd.find('select option:first').text());
-            $dd.find('select').val('');
+            if (key === 'car_city') {
+                $cityFilter.val('');
+            } else {
+                CarFilters.setState(group, key, '');
+                var filterCls = key === 'fuel_type' ? 'fuel' : (key === 'body_type' ? 'body' : key);
+                var $dd = $('.car-filter-' + filterCls + ' .car-filter-dropdown');
+                $dd.find('.car-filter-dropdown-option').removeClass('selected');
+                $dd.find('.car-filter-dropdown-option[data-value=""]').addClass('selected');
+                $dd.find('.car-filter-dropdown-text').addClass('placeholder').text($dd.find('select option:first').text());
+                $dd.find('select').val('');
+            }
         }
     }
 
@@ -1024,7 +1077,7 @@ $cars_query = car_listings_execute_query( $args );
     });
     $('#tcp-modal-clear-btn').on('click', function() {
         ['make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max',
-         'year_min', 'year_max', 'fuel_type', 'body_type'].forEach(function(key) {
+         'year_min', 'year_max', 'fuel_type', 'body_type', 'car_city'].forEach(function(key) {
             clearFilter(key);
         });
         CarFilters.triggerFilter(group);
@@ -1096,6 +1149,7 @@ $cars_query = car_listings_execute_query( $args );
             ? CarFilters.getFilterData(group)
             : {};
         var listingAtts = $container.data('atts') || {};
+        var selectedCity = $cityFilter.val() || '';
 
         $wrapper.addClass('car-listings-loading');
 
@@ -1106,7 +1160,8 @@ $cars_query = car_listings_execute_query( $args );
                 action: 'car_filters_filter_listings',
                 nonce: carFiltersConfig.nonce,
                 page: page,
-                listing_atts: JSON.stringify(listingAtts)
+                listing_atts: JSON.stringify(listingAtts),
+                car_city: selectedCity
             }, filterData),
             success: function(response) {
                 if (response.success) {
@@ -1140,6 +1195,10 @@ $cars_query = car_listings_execute_query( $args );
         }
     });
 
+    $cityFilter.on('change', function() {
+        CarFilters.triggerFilter(group);
+    });
+
     // Hide orphan cards from the initial server-side render
     function hideOrphans() {
         var gridW = $wrapper.width();
@@ -1170,6 +1229,14 @@ $cars_query = car_listings_execute_query( $args );
                 /listing_atts=[^&]*/,
                 'listing_atts=' + encodeURIComponent(JSON.stringify(atts))
             );
+            if (settings.data.indexOf('car_city=') !== -1) {
+                settings.data = settings.data.replace(
+                    /car_city=[^&]*/,
+                    'car_city=' + encodeURIComponent($cityFilter.val() || '')
+                );
+            } else {
+                settings.data += '&car_city=' + encodeURIComponent($cityFilter.val() || '');
+            }
         }
     });
 

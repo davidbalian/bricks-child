@@ -201,6 +201,7 @@ function car_filters_ajax_filter_listings() {
     $year_max     = isset($_POST['year_max']) ? intval($_POST['year_max']) : 0;
     $fuel_type_raw = isset($_POST['fuel_type']) ? sanitize_text_field($_POST['fuel_type']) : '';
     $body_type_raw = isset($_POST['body_type']) ? sanitize_text_field($_POST['body_type']) : '';
+    $car_city     = isset($_POST['car_city']) ? sanitize_text_field(wp_unslash($_POST['car_city'])) : '';
     $fuel_types   = !empty($fuel_type_raw) ? array_map('trim', explode(',', $fuel_type_raw)) : array();
     $body_types   = !empty($body_type_raw) ? array_map('trim', explode(',', $body_type_raw)) : array();
     $page         = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
@@ -326,6 +327,15 @@ function car_filters_ajax_filter_listings() {
                 'compare' => 'IN',
             );
         }
+    }
+
+    // City filter
+    if ($car_city !== '') {
+        $meta_query[] = array(
+            'key'     => 'car_city',
+            'value'   => $car_city,
+            'compare' => '=',
+        );
     }
 
     // Exclude sold (default behavior)
