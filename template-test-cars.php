@@ -730,11 +730,18 @@ $cars_query = car_listings_execute_query( $args );
 }
 .tcp-location-radius-presets {
     margin-top: 0.6rem;
-    display: flex;
+    display: flex !important;
     flex-wrap: wrap;
     gap: 0.45rem;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    z-index: 3;
 }
 .tcp-radius-preset {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
     border: 1px solid #dfe2e6;
     background: #fff;
     color: #2a3546;
@@ -743,6 +750,9 @@ $cars_query = car_listings_execute_query( $args );
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
+    line-height: 1.2;
+    min-height: 30px;
+    white-space: nowrap;
 }
 .tcp-radius-preset:hover {
     background: #f8fafc;
@@ -1237,7 +1247,7 @@ $cars_query = car_listings_execute_query( $args );
                 setLocationPoint(e.latLng.lat(), e.latLng.lng(), false);
             });
 
-            locationMap.addListener('idle', function() {
+            locationMap.addListener('center_changed', function() {
                 if (!locationMap) return;
                 var center = locationMap.getCenter();
                 if (!center) return;
