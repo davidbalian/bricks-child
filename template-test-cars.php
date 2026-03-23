@@ -188,6 +188,8 @@ $cars_query = car_listings_execute_query( $args );
                 <div class="tcp-location-map" id="tcp-location-map"></div>
                 <div class="tcp-location-center-pin" aria-hidden="true"></div>
             </div>
+        </div>
+        <div class="tcp-filters-modal-footer">
             <div class="tcp-location-radius-row">
                 <label for="tcp-location-radius">Radius (km)</label>
                 <div class="tcp-location-radius-controls">
@@ -202,8 +204,6 @@ $cars_query = car_listings_execute_query( $args );
                     <button type="button" class="tcp-radius-preset" data-radius="100">100 km</button>
                 </div>
             </div>
-        </div>
-        <div class="tcp-filters-modal-footer">
             <button type="button" class="tcp-modal-apply-btn" id="tcp-location-apply-btn">Apply Location</button>
             <button type="button" class="tcp-modal-clear-btn" id="tcp-location-clear-btn">Clear Location</button>
         </div>
@@ -675,8 +675,6 @@ $cars_query = car_listings_execute_query( $args );
 }
 .tcp-location-map-wrap {
     position: relative;
-    border-radius: 0.75rem;
-    overflow: hidden;
 }
 .tcp-location-center-pin {
     position: absolute;
@@ -707,16 +705,7 @@ $cars_query = car_listings_execute_query( $args );
     top: 6px;
 }
 .tcp-location-radius-row {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin-top: 0;
-    padding: 0.75rem 0.9rem;
-    background: rgba(255, 255, 255, 0.97);
-    border-top: 1px solid #e2e8f0;
-    z-index: 6;
-    box-shadow: 0 -2px 12px rgba(15, 23, 42, 0.08);
+    margin-top: 0.9rem;
 }
 .tcp-location-radius-row label {
     display: block;
@@ -724,10 +713,6 @@ $cars_query = car_listings_execute_query( $args );
     font-size: 0.9rem;
     font-weight: 600;
     color: #2a3546;
-}
-.tcp-location-map {
-    padding-bottom: 110px;
-    box-sizing: border-box;
 }
 .tcp-location-radius-controls {
     display: flex;
@@ -1019,8 +1004,8 @@ $cars_query = car_listings_execute_query( $args );
         lat: null,
         lng: null,
         radiusKm: 25,
-        active: false,
-        cityName: ''
+        label: '',
+        active: false
     };
     var locationMap = null;
     var locationCircle = null;
@@ -1153,7 +1138,7 @@ $cars_query = car_listings_execute_query( $args );
             }
         });
         if (locationState.active && locationState.lat && locationState.lng && locationState.radiusKm > 0) {
-            var locationLabel = locationState.cityName ? locationState.cityName : 'Selected area';
+            var locationLabel = locationState.label || 'Selected area';
             html += chip('location_radius', filterLabels.location_radius + ': ' + locationLabel);
             hasAny = true;
         }
@@ -1201,6 +1186,65 @@ $cars_query = car_listings_execute_query( $args );
         $('.tcp-radius-preset[data-radius="' + radiusKm + '"]').addClass('active');
     }
 
+    function syncLocationParamsToUrl() {
+        if (typeof window === 'undefined' || !window.history || !window.URLSearchParams) {
+            return;
+        }
+        var url = new URL(window.location.href);
+        var params = url.searchParams;
+
+        params.delete('loc_lat');
+        params.delete('loc_lng');
+        params.delete('loc_radius');
+        params.delete('loc_label');
+
+        if (locationState.active && locationState.lat && locationState.lng && locationState.radiusKm > 0) {
+            params.set('loc_lat', Number(locationState.lat).toFixed(6));
+            params.set('loc_lng', Number(locationState.lng).toFixed(6));
+            params.set('loc_radius', String(parseInt(locationState.radiusKm, 10)));
+            if (locationState.label) {
+                params.set('loc_label', locationState.label);
+            }
+        }
+
+        window.history.replaceState({}, '', url.toString());
+    }
+
+    function hydrateLocationFromUrl() {
+        if (typeof window === 'undefined' || !window.URLSearchParams) {
+            return false;
+        }
+
+        var params = new URLSearchParams(window.location.search);
+        var lat = parseFloat(params.get('loc_lat') || '');
+        var lng = parseFloat(params.get('loc_lng') || '');
+        var radius = parseInt(params.get('loc_radius') || '', 10);
+        var label = params.get('loc_label') || '';
+
+        if (isNaN(lat) || isNaN(lng)) {
+            return false;
+        }
+
+        if (isNaN(radius) || radius < 5) {
+            radius = 25;
+        } else if (radius > 100) {
+            radius = 100;
+        }
+
+        locationState.lat = lat;
+        locationState.lng = lng;
+        locationState.radiusKm = radius;
+        locationState.label = label;
+        locationState.active = true;
+
+        var searchInput = document.getElementById('tcp-location-search');
+        if (searchInput && label) {
+            searchInput.value = label;
+        }
+
+        return true;
+    }
+
     function getZoomForRadius(radiusKm) {
         if (radiusKm <= 5) return 13;
         if (radiusKm <= 10) return 12;
@@ -1208,41 +1252,6 @@ $cars_query = car_listings_execute_query( $args );
         if (radiusKm <= 50) return 10;
         if (radiusKm <= 75) return 9;
         return 8;
-    }
-
-    function getCityFromAddressComponents(components) {
-        if (!components || !components.length) return '';
-        var byType = function(type) {
-            var comp = components.find(function(item) {
-                return item.types && item.types.indexOf(type) !== -1;
-            });
-            return comp ? comp.long_name : '';
-        };
-        return byType('locality') || byType('administrative_area_level_1') || byType('administrative_area_level_2') || '';
-    }
-
-    function updateLocationSearchFromCenter() {
-        if (!locationGeocoder || !locationState.lat || !locationState.lng) return;
-        var searchInput = document.getElementById('tcp-location-search');
-        if (!searchInput) return;
-
-        locationGeocoder.geocode({
-            location: { lat: locationState.lat, lng: locationState.lng },
-            region: 'CY',
-            language: 'en'
-        }, function(results, status) {
-            if (status !== 'OK' || !results || !results.length) return;
-            var best = results[0];
-            searchInput.value = best.formatted_address || searchInput.value;
-            locationState.cityName = getCityFromAddressComponents(best.address_components || []);
-        });
-    }
-
-    function scheduleReverseGeocode() {
-        if (reverseGeocodeTimer) {
-            clearTimeout(reverseGeocodeTimer);
-        }
-        reverseGeocodeTimer = setTimeout(updateLocationSearchFromCenter, 250);
     }
 
     function syncLocationVisuals(shouldAdjustZoom) {
@@ -1265,6 +1274,55 @@ $cars_query = car_listings_execute_query( $args );
         }
         locationMap.panTo({ lat: lat, lng: lng });
         syncLocationVisuals(!!shouldAdjustZoom);
+    }
+
+    function getLocationLabelFromComponents(components) {
+        var comps = components || [];
+        function get(type) {
+            var comp = comps.find(function(c) {
+                return c.types && c.types.indexOf(type) !== -1;
+            });
+            return comp ? comp.long_name : '';
+        }
+
+        var districtMap = {
+            'Lemesos': 'Limassol',
+            'Lefkosia': 'Nicosia',
+            'Larnaka': 'Larnaca',
+            'Ammochostos': 'Famagusta',
+            'Pafos': 'Paphos'
+        };
+
+        var locality = get('locality') || get('postal_town') || get('administrative_area_level_2');
+        var admin1 = get('administrative_area_level_1');
+        var admin1Mapped = districtMap[admin1] || admin1;
+        return locality || admin1Mapped || '';
+    }
+
+    function reverseGeocodeCenter() {
+        if (!locationMap || !locationGeocoder) {
+            return;
+        }
+
+        var center = locationMap.getCenter();
+        if (!center) {
+            return;
+        }
+
+        locationGeocoder.geocode(
+            { location: center, region: 'CY', language: 'en' },
+            function(results, status) {
+                if (status !== 'OK' || !results || !results.length) {
+                    return;
+                }
+                var result = results[0];
+                var searchInput = document.getElementById('tcp-location-search');
+                if (searchInput) {
+                    searchInput.value = result.formatted_address || '';
+                }
+                locationState.label = getLocationLabelFromComponents(result.address_components || []) || (result.formatted_address || '');
+            }
+        );
     }
 
     function initLocationMap() {
@@ -1309,7 +1367,13 @@ $cars_query = car_listings_execute_query( $args );
                 locationState.lat = center.lat();
                 locationState.lng = center.lng();
                 syncLocationVisuals(false);
-                scheduleReverseGeocode();
+            });
+
+            locationMap.addListener('idle', function() {
+                if (reverseGeocodeTimer) {
+                    clearTimeout(reverseGeocodeTimer);
+                }
+                reverseGeocodeTimer = setTimeout(reverseGeocodeCenter, 120);
             });
 
             var searchInput = document.getElementById('tcp-location-search');
@@ -1325,10 +1389,10 @@ $cars_query = car_listings_execute_query( $args );
                     if (!place.geometry || !place.geometry.location) {
                         return;
                     }
+                    locationState.label = getLocationLabelFromComponents(place.address_components || []) || (place.formatted_address || searchInput.value || '');
                     if (place.formatted_address) {
                         searchInput.value = place.formatted_address;
                     }
-                    locationState.cityName = getCityFromAddressComponents(place.address_components || []);
                     setLocationPoint(place.geometry.location.lat(), place.geometry.location.lng(), true);
                 });
             }
@@ -1338,14 +1402,12 @@ $cars_query = car_listings_execute_query( $args );
         if (shouldUseSaved) {
             locationMap.setCenter({ lat: locationState.lat, lng: locationState.lng });
             syncLocationVisuals(true);
-            scheduleReverseGeocode();
         } else {
             var currentCenter = locationMap.getCenter();
             if (currentCenter) {
                 locationState.lat = currentCenter.lat();
                 locationState.lng = currentCenter.lng();
                 syncLocationVisuals(true);
-                scheduleReverseGeocode();
             }
         }
 
@@ -1392,12 +1454,12 @@ $cars_query = car_listings_execute_query( $args );
         } else if (key === 'location_radius') {
             locationState.active = false;
             locationState.radiusKm = 25;
-            locationState.cityName = '';
-            $('#tcp-location-search').val('');
+            locationState.label = '';
             updateLocationRadiusUI(locationState.radiusKm);
             if (locationCircle) {
                 locationCircle.setRadius(locationState.radiusKm * 1000);
             }
+            syncLocationParamsToUrl();
         } else {
             CarFilters.setState(group, key, '');
             var filterCls = key === 'fuel_type' ? 'fuel' : (key === 'body_type' ? 'body' : key);
@@ -1454,9 +1516,13 @@ $cars_query = car_listings_execute_query( $args );
             closeLocationModal();
             return;
         }
+        if (!locationState.label) {
+            locationState.label = $('#tcp-location-search').val() || 'Selected area';
+        }
         locationState.active = true;
         closeLocationModal();
         buildChips();
+        syncLocationParamsToUrl();
         CarFilters.triggerFilter(group);
     });
 
@@ -1464,6 +1530,7 @@ $cars_query = car_listings_execute_query( $args );
         clearFilter('location_radius');
         closeLocationModal();
         buildChips();
+        syncLocationParamsToUrl();
         CarFilters.triggerFilter(group);
     });
 
@@ -1622,8 +1689,12 @@ $cars_query = car_listings_execute_query( $args );
 
     // Build initial chips on load
     $(document).ready(function() {
+        var hasLocationFromUrl = hydrateLocationFromUrl();
         setTimeout(buildChips, 100);
         updateLocationRadiusUI(locationState.radiusKm);
+        if (hasLocationFromUrl) {
+            loadPage(1, { scroll: false });
+        }
     });
 
     // Scroll modal body to bottom when fuel/body dropdowns are opened
