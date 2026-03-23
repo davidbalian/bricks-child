@@ -165,6 +165,9 @@ $cars_query = car_listings_execute_query( $args );
 <!-- Main content -->
 <div class="tcp-main">
     <h1 class="tcp-heading">Used Cars for Sale in Cyprus</h1>
+    <p class="tcp-results-count" id="tcp-results-count">
+        <?php echo esc_html( number_format_i18n( (int) $cars_query->found_posts ) . ' results found' ); ?>
+    </p>
 
     <div class="car-listings-container"
          id="test-cars-listings"
@@ -632,6 +635,12 @@ $cars_query = car_listings_execute_query( $args );
     color: #2a3546;
     margin: 0 0 1.25rem;
 }
+.tcp-results-count {
+    margin: -0.5rem 0 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #475569;
+}
 .tcp-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -820,6 +829,7 @@ $cars_query = car_listings_execute_query( $args );
     var $pagination = $container.find('.tcp-pagination');
     var $overlay    = $('#tcp-filters-modal-overlay');
     var $chips      = $('#tcp-active-filters');
+    var $results    = $('#tcp-results-count');
     var group       = 'default';
     var MIN_ROWS     = 4;
     var MIN_PER_PAGE = 12;
@@ -842,6 +852,14 @@ $cars_query = car_listings_execute_query( $args );
         atts.posts_per_page = calcPostsPerPage();
         $container.data('atts', atts);
         $container.attr('data-atts', JSON.stringify(atts));
+    }
+
+    function updateResultsCount(total) {
+        var count = parseInt(total, 10);
+        if (isNaN(count) || count < 0) {
+            count = 0;
+        }
+        $results.text(count.toLocaleString() + ' results found');
     }
 
     // Filter label map for chips
@@ -1019,6 +1037,9 @@ $cars_query = car_listings_execute_query( $args );
         }
         $container.data('page', data.current_page || 1);
         $container.data('max-pages', data.max_pages || 1);
+        if (data.found_posts !== undefined) {
+            updateResultsCount(data.found_posts);
+        }
         buildChips();
         closeModal();
     });
@@ -1093,6 +1114,9 @@ $cars_query = car_listings_execute_query( $args );
                     $pagination.html(response.data.pagination_html || '');
                     $container.data('page', response.data.current_page);
                     $container.data('max-pages', response.data.max_pages);
+                    if (response.data.found_posts !== undefined) {
+                        updateResultsCount(response.data.found_posts);
+                    }
                     if (opts.scroll !== false) {
                         $('html, body').animate({ scrollTop: $container.offset().top - 20 }, 300);
                     }
