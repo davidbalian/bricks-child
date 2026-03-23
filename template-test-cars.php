@@ -211,7 +211,7 @@ $cars_query = car_listings_execute_query( $args );
     <div class="cars-seo-content">
 
         <section class="cars-intro">
-            <h2 class="cars-intro-heading">Used Cars for Sale in Cyprus</h2>
+            <h2 class="cars-intro-heading">Buying a Used Car in Cyprus on AutoAgora</h2>
             <p>
                 Browse <strong>600+ used cars for sale in Cyprus</strong> from trusted dealerships and private sellers across Nicosia, Limassol, Larnaca, and Paphos. Whether you're looking for a fuel-efficient hatchback for city driving, a family SUV, or a luxury sedan, AutoAgora makes it easy to compare prices, specs, and photos - all in one place.
             </p>
