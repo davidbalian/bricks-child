@@ -1014,7 +1014,9 @@ get_header();
         var total = $cards.length;
         var overflow = total % cols;
         $cards.show();
-        if (overflow > 0) {
+        // Only hide an incomplete *last* row when there is at least one full row above it.
+        // If total <= cols, overflow === total and slice(0) would hide every card.
+        if (total > cols && overflow > 0) {
             $cards.slice(total - overflow).hide();
         }
     }
