@@ -144,38 +144,30 @@
         },
 
         /**
-         * Build URL with filter parameters as simple query params.
-         * Format: /cars/?make=bmw&model=bmw-m2&price_min=10000&fuel_type=Diesel
+         * Cars listing URL using query params: /cars/?make=…&model=…&price_min=…
+         * @param {boolean} forRedirect Kept for API compatibility; same output as buildResultsUrl.
          */
         buildUrl: function(group, forRedirect) {
-            var state = this.getState(group);
-            var params = new URLSearchParams();
-
-            var omitLandingTaxonomy = !forRedirect && this.matchesLandingContext(state);
-            if (!omitLandingTaxonomy) {
-                if (state.make.slug) params.set('make', state.make.slug);
-                if (state.model.slug) params.set('model', state.model.slug);
-            }
-
-            this.appendNonMakeParams(params, state);
-
-            var baseUrl = forRedirect ? state.redirectUrl : this.getCurrentBasePath();
-            baseUrl = baseUrl.replace(/\/+$/, '') + '/';
-
-            var qs = params.toString();
-            return qs ? baseUrl + '?' + qs : baseUrl;
+            return this.buildResultsUrl(group);
         },
 
         /**
+         * Destination for leaving SEO landing pages / redirect mode: /cars/ with ?make=&model= etc.
          * @param {string} group Filter group id
-         * @param {Object} [extras] Optional: orderby, order, paged (for /cars/ query string)
+         * @param {Object} [extras] Optional: orderby, order, paged
          */
         buildResultsUrl: function(group, extras) {
             extras = extras || {};
             var state = this.getState(group);
             var params = new URLSearchParams();
-            var selectedSlug = state.model.slug || state.make.slug;
-            var baseUrl = (state.resultsBaseUrl || '/cars/').replace(/\/+$/, '');
+            var baseUrl = (state.resultsBaseUrl || state.redirectUrl || '/cars/').replace(/\/+$/, '') + '/';
+
+            if (state.make.slug) {
+                params.set('make', state.make.slug);
+            }
+            if (state.model.slug) {
+                params.set('model', state.model.slug);
+            }
 
             this.appendNonMakeParams(params, state);
 
@@ -190,21 +182,8 @@
                 params.set('paged', paged);
             }
 
-            if (selectedSlug) {
-                baseUrl += '/filter/make:' + encodeURIComponent(selectedSlug) + '/';
-            } else {
-                baseUrl += '/';
-            }
-
             var qs = params.toString();
             return qs ? baseUrl + '?' + qs : baseUrl;
-        },
-
-        /**
-         * Get current page's base path (strips query string)
-         */
-        getCurrentBasePath: function() {
-            return window.location.pathname.replace(/\/+$/, '');
         },
 
         /**
@@ -249,8 +228,7 @@
             // Debounce AJAX requests
             this.debounceTimers[group] = setTimeout(function() {
                 if (state.mode === 'redirect') {
-                    // Redirect mode - navigate to URL
-                    window.location.href = self.buildUrl(group, true);
+                    window.location.href = self.buildResultsUrl(group);
                 } else if (self.hasLandingContext(state)) {
                     // SEO landing pages: always continue browsing on /cars/ with the same filters
                     window.location.href = self.buildResultsUrl(group);
@@ -303,8 +281,7 @@
                     if (response.success) {
                         $wrapper.html(response.data.html);
 
-                        // Update URL without reload (use current page path, not redirect URL)
-                        var url = CarFilters.buildUrl(group, false);
+                        var url = CarFilters.buildResultsUrl(group);
                         history.pushState({ filters: CarFilters.getFilterData(group) }, '', url);
 
                         // Trigger event for other scripts
