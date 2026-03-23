@@ -185,6 +185,43 @@ add_action('wp_ajax_car_filters_get_models', 'car_filters_ajax_get_models');
 add_action('wp_ajax_nopriv_car_filters_get_models', 'car_filters_ajax_get_models');
 
 /**
+ * Apply optional radius filter using stored car_latitude/car_longitude meta.
+ */
+function car_filters_location_radius_clauses($clauses, $query) {
+    global $wpdb;
+
+    $location_filter = $query->get('car_location_radius_filter');
+    if (empty($location_filter) || !is_array($location_filter)) {
+        return $clauses;
+    }
+
+    $lat = isset($location_filter['lat']) ? floatval($location_filter['lat']) : 0.0;
+    $lng = isset($location_filter['lng']) ? floatval($location_filter['lng']) : 0.0;
+    $radius_km = isset($location_filter['radius_km']) ? floatval($location_filter['radius_km']) : 0.0;
+
+    if ($lat === 0.0 || $lng === 0.0 || $radius_km <= 0) {
+        return $clauses;
+    }
+
+    $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS loc_lat_meta ON ({$wpdb->posts}.ID = loc_lat_meta.post_id AND loc_lat_meta.meta_key = 'car_latitude')";
+    $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS loc_lng_meta ON ({$wpdb->posts}.ID = loc_lng_meta.post_id AND loc_lng_meta.meta_key = 'car_longitude')";
+
+    $earth_radius_km = 6371.0;
+    $distance_sql = sprintf(
+        "(%.4F * ACOS(LEAST(1, GREATEST(-1, COS(RADIANS(%.8F)) * COS(RADIANS(CAST(loc_lat_meta.meta_value AS DECIMAL(10,6)))) * COS(RADIANS(CAST(loc_lng_meta.meta_value AS DECIMAL(10,6))) - RADIANS(%.8F)) + SIN(RADIANS(%.8F)) * SIN(RADIANS(CAST(loc_lat_meta.meta_value AS DECIMAL(10,6))))))))",
+        $earth_radius_km,
+        $lat,
+        $lng,
+        $lat
+    );
+
+    $clauses['where'] .= " AND loc_lat_meta.meta_value <> '' AND loc_lng_meta.meta_value <> ''";
+    $clauses['where'] .= " AND {$distance_sql} <= " . floatval($radius_km);
+
+    return $clauses;
+}
+
+/**
  * AJAX handler to filter car listings
  */
 function car_filters_ajax_filter_listings() {
@@ -201,9 +238,11 @@ function car_filters_ajax_filter_listings() {
     $year_max     = isset($_POST['year_max']) ? intval($_POST['year_max']) : 0;
     $fuel_type_raw = isset($_POST['fuel_type']) ? sanitize_text_field($_POST['fuel_type']) : '';
     $body_type_raw = isset($_POST['body_type']) ? sanitize_text_field($_POST['body_type']) : '';
-    $car_city     = isset($_POST['car_city']) ? sanitize_text_field(wp_unslash($_POST['car_city'])) : '';
     $fuel_types   = !empty($fuel_type_raw) ? array_map('trim', explode(',', $fuel_type_raw)) : array();
     $body_types   = !empty($body_type_raw) ? array_map('trim', explode(',', $body_type_raw)) : array();
+    $location_lat = isset($_POST['location_lat']) ? floatval($_POST['location_lat']) : 0.0;
+    $location_lng = isset($_POST['location_lng']) ? floatval($_POST['location_lng']) : 0.0;
+    $location_radius_km = isset($_POST['location_radius_km']) ? floatval($_POST['location_radius_km']) : 0.0;
     $page         = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
 
     // Base listing attributes (passed from the target)
@@ -329,15 +368,6 @@ function car_filters_ajax_filter_listings() {
         }
     }
 
-    // City filter
-    if ($car_city !== '') {
-        $meta_query[] = array(
-            'key'     => 'car_city',
-            'value'   => $car_city,
-            'compare' => '=',
-        );
-    }
-
     // Exclude sold (default behavior)
     if (!isset($atts['show_sold']) || $atts['show_sold'] !== 'true') {
         $meta_query[] = array(
@@ -384,8 +414,23 @@ function car_filters_ajax_filter_listings() {
     }
     $args['order'] = $order;
 
+    $use_location_radius_filter = ($location_lat !== 0.0 && $location_lng !== 0.0 && $location_radius_km > 0);
+    if ($use_location_radius_filter) {
+        $args['car_location_radius_filter'] = array(
+            'lat' => $location_lat,
+            'lng' => $location_lng,
+            'radius_km' => $location_radius_km,
+        );
+    }
+
     // Execute query with featured-first sorting
+    if ($use_location_radius_filter) {
+        add_filter('posts_clauses', 'car_filters_location_radius_clauses', 11, 2);
+    }
     $car_query = car_listings_execute_query($args);
+    if ($use_location_radius_filter) {
+        remove_filter('posts_clauses', 'car_filters_location_radius_clauses', 11, 2);
+    }
 
     // Pre-fetch meta
     if ($car_query->have_posts()) {

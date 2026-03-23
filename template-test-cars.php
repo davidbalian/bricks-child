@@ -10,6 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+if ( defined( 'GOOGLE_MAPS_API_KEY' ) && GOOGLE_MAPS_API_KEY ) {
+    $google_maps_url = 'https://maps.googleapis.com/maps/api/js?key=' . urlencode( GOOGLE_MAPS_API_KEY ) . '&libraries=places&language=en';
+    wp_enqueue_script( 'google-maps', $google_maps_url, array(), null, true );
+}
+
 add_action( 'wp_head', function() {
     if ( ! is_page_template( 'template-test-cars.php' ) ) {
         return;
@@ -112,21 +117,6 @@ $args = array(
     ),
 );
 
-global $wpdb;
-$city_rows = $wpdb->get_col(
-    "
-    SELECT DISTINCT pm.meta_value
-    FROM {$wpdb->postmeta} pm
-    INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
-    WHERE pm.meta_key = 'car_city'
-      AND pm.meta_value <> ''
-      AND p.post_type = 'car'
-      AND p.post_status = 'publish'
-    ORDER BY pm.meta_value ASC
-    "
-);
-$city_options = is_array($city_rows) ? array_map('sanitize_text_field', $city_rows) : array();
-
 $cars_query = car_listings_execute_query( $args );
 ?>
 
@@ -137,17 +127,11 @@ $cars_query = car_listings_execute_query( $args );
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="1" fill="currentColor" stroke="none"/></svg>
             Filters
         </button>
+        <button type="button" class="tcp-filters-btn" id="tcp-location-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.373 7-11a7 7 0 1 0-14 0c0 5.627 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            Location
+        </button>
         <div class="tcp-active-filters" id="tcp-active-filters"></div>
-
-        <div class="tcp-city-filter-wrap">
-            <label for="tcp-city-filter" class="screen-reader-text">City</label>
-            <select id="tcp-city-filter" class="tcp-city-filter" aria-label="Filter by city">
-                <option value="">All Cities</option>
-                <?php foreach ( $city_options as $city_option ) : ?>
-                    <option value="<?php echo esc_attr( $city_option ); ?>"><?php echo esc_html( $city_option ); ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
 
         <div class="tcp-sort" id="tcp-sort">
             <button type="button" class="tcp-sort-btn" id="tcp-sort-btn">
@@ -183,6 +167,35 @@ $cars_query = car_listings_execute_query( $args );
         <div class="tcp-filters-modal-footer">
             <button type="button" class="tcp-modal-apply-btn" id="tcp-modal-apply-btn">Apply Filters</button>
             <button type="button" class="tcp-modal-clear-btn" id="tcp-modal-clear-btn">Clear All</button>
+        </div>
+    </div>
+</div>
+
+<!-- Location modal -->
+<div class="tcp-filters-modal-overlay" id="tcp-location-modal-overlay">
+    <div class="tcp-filters-modal tcp-location-modal">
+        <div class="tcp-filters-modal-header">
+            <h2>Location Radius</h2>
+            <button type="button" class="tcp-filters-modal-close" id="tcp-location-modal-close" aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="tcp-filters-modal-body">
+            <div class="tcp-location-search-wrap">
+                <input type="text" id="tcp-location-search" class="tcp-location-search" placeholder="Search location in Cyprus">
+            </div>
+            <div class="tcp-location-map" id="tcp-location-map"></div>
+            <div class="tcp-location-radius-row">
+                <label for="tcp-location-radius">Radius (km)</label>
+                <div class="tcp-location-radius-controls">
+                    <input type="range" id="tcp-location-radius" min="1" max="100" step="1" value="25">
+                    <span id="tcp-location-radius-value">25 km</span>
+                </div>
+            </div>
+        </div>
+        <div class="tcp-filters-modal-footer">
+            <button type="button" class="tcp-modal-apply-btn" id="tcp-location-apply-btn">Apply Location</button>
+            <button type="button" class="tcp-modal-clear-btn" id="tcp-location-clear-btn">Clear Location</button>
         </div>
     </div>
 </div>
@@ -370,25 +383,6 @@ $cars_query = car_listings_execute_query( $args );
     position: relative;
     flex-shrink: 0;
     margin-left: auto;
-}
-.tcp-city-filter-wrap {
-    flex-shrink: 0;
-}
-.tcp-city-filter {
-    min-width: 170px;
-    padding: 0.5rem 0.75rem;
-    border: 2px solid #dfe2e6;
-    border-radius: 0.5rem;
-    background: #fff;
-    color: #2a3546;
-    font-size: 0.9375rem;
-    font-weight: 500;
-    cursor: pointer;
-}
-.tcp-city-filter:hover,
-.tcp-city-filter:focus {
-    border-color: #bbb;
-    outline: none;
 }
 .tcp-sort-btn {
     display: inline-flex;
@@ -648,6 +642,51 @@ $cars_query = car_listings_execute_query( $args );
 .tcp-filters-modal-body .car-filters-item-body {
     flex: 0 0 calc(50% - 0.5rem);
 }
+.tcp-location-modal {
+    max-width: 760px;
+}
+.tcp-location-search-wrap {
+    margin-bottom: 0.75rem;
+}
+.tcp-location-search {
+    width: 100%;
+    border: 2px solid #dfe2e6;
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.95rem;
+}
+.tcp-location-map {
+    width: 100%;
+    height: 340px;
+    border: 1px solid #dfe2e6;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: #f8fafc;
+}
+.tcp-location-radius-row {
+    margin-top: 0.9rem;
+}
+.tcp-location-radius-row label {
+    display: block;
+    margin-bottom: 0.45rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2a3546;
+}
+.tcp-location-radius-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+.tcp-location-radius-controls input[type="range"] {
+    flex: 1;
+}
+#tcp-location-radius-value {
+    min-width: 60px;
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 600;
+}
 
 @media (max-width: 768px) {
     #tcp-sort-label {
@@ -661,6 +700,9 @@ $cars_query = car_listings_execute_query( $args );
     }
     .tcp-filters-modal-overlay {
         padding: 0;
+    }
+    .tcp-location-map {
+        height: 280px;
     }
 }
 
@@ -872,14 +914,24 @@ $cars_query = car_listings_execute_query( $args );
     var $wrapper    = $container.find('.car-listings-wrapper');
     var $pagination = $container.find('.tcp-pagination');
     var $overlay    = $('#tcp-filters-modal-overlay');
+    var $locationOverlay = $('#tcp-location-modal-overlay');
     var $chips      = $('#tcp-active-filters');
     var $results    = $('#tcp-results-count');
-    var $cityFilter = $('#tcp-city-filter');
     var group       = 'default';
     var MIN_ROWS     = 4;
     var MIN_PER_PAGE = 12;
     var CARD_MIN_W   = 280; // matches minmax(280px, 1fr)
     var GRID_GAP     = 24;  // 1.5rem
+    var locationState = {
+        lat: null,
+        lng: null,
+        radiusKm: 25,
+        active: false
+    };
+    var locationMap = null;
+    var locationMarker = null;
+    var locationCircle = null;
+    var locationAutocomplete = null;
 
     /**
      * Calculate posts_per_page as a multiple of current column count
@@ -918,7 +970,8 @@ $cars_query = car_listings_execute_query( $args );
         year_min: 'Year min',
         year_max: 'Year max',
         fuel_type: 'Fuel',
-        body_type: 'Body'
+        body_type: 'Body',
+        location_radius: 'Location'
     };
 
     /* ── Modal open/close ── */
@@ -934,8 +987,27 @@ $cars_query = car_listings_execute_query( $args );
     $overlay.on('click', function(e) {
         if (e.target === this) closeModal();
     });
+
+    function openLocationModal() {
+        $locationOverlay.addClass('open');
+        $('body').css('overflow', 'hidden');
+        initLocationMap();
+    }
+
+    function closeLocationModal() {
+        $locationOverlay.removeClass('open');
+        $('body').css('overflow', '');
+    }
+
+    $('#tcp-location-btn').on('click', openLocationModal);
+    $('#tcp-location-modal-close').on('click', closeLocationModal);
+    $locationOverlay.on('click', function(e) {
+        if (e.target === this) closeLocationModal();
+    });
+
     $(document).on('keydown', function(e) {
         if (e.key === 'Escape' && $overlay.hasClass('open')) closeModal();
+        if (e.key === 'Escape' && $locationOverlay.hasClass('open')) closeLocationModal();
     });
 
     /* ── Active filter chips ── */
@@ -978,8 +1050,8 @@ $cars_query = car_listings_execute_query( $args );
                 hasAny = true;
             }
         });
-        if ($cityFilter.val()) {
-            html += chip('car_city', 'City: ' + $cityFilter.val());
+        if (locationState.active && locationState.lat && locationState.lng && locationState.radiusKm > 0) {
+            html += chip('location_radius', filterLabels.location_radius + ': ' + locationState.radiusKm + ' km');
             hasAny = true;
         }
 
@@ -1019,6 +1091,107 @@ $cars_query = car_listings_execute_query( $args );
         return 'Model: ' + termId;
     }
 
+    function updateLocationRadiusUI(radiusKm) {
+        $('#tcp-location-radius').val(radiusKm);
+        $('#tcp-location-radius-value').text(radiusKm + ' km');
+    }
+
+    function syncLocationVisuals() {
+        if (!locationMap || !locationMarker || !locationCircle || !locationState.lat || !locationState.lng) {
+            return;
+        }
+        var center = { lat: locationState.lat, lng: locationState.lng };
+        locationMarker.setPosition(center);
+        locationCircle.setCenter(center);
+        locationCircle.setRadius(locationState.radiusKm * 1000);
+        locationMap.panTo(center);
+    }
+
+    function setLocationPoint(lat, lng) {
+        locationState.lat = lat;
+        locationState.lng = lng;
+        if (locationMarker && locationMarker.getMap() === null) {
+            locationMarker.setMap(locationMap);
+        }
+        if (locationCircle && locationCircle.getMap() === null) {
+            locationCircle.setMap(locationMap);
+        }
+        syncLocationVisuals();
+    }
+
+    function initLocationMap() {
+        if (typeof google === 'undefined' || !google.maps) {
+            return;
+        }
+
+        var mapEl = document.getElementById('tcp-location-map');
+        if (!mapEl) {
+            return;
+        }
+
+        if (!locationMap) {
+            var defaultCenter = { lat: 35.1856, lng: 33.3823 };
+            locationMap = new google.maps.Map(mapEl, {
+                center: defaultCenter,
+                zoom: 8,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: false
+            });
+
+            locationMarker = new google.maps.Marker({
+                map: locationMap,
+                draggable: true
+            });
+
+            locationCircle = new google.maps.Circle({
+                map: locationMap,
+                strokeColor: '#0d86e3',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: '#0d86e3',
+                fillOpacity: 0.15,
+                radius: locationState.radiusKm * 1000
+            });
+
+            locationMap.addListener('click', function(e) {
+                setLocationPoint(e.latLng.lat(), e.latLng.lng());
+            });
+
+            locationMarker.addListener('dragend', function(e) {
+                setLocationPoint(e.latLng.lat(), e.latLng.lng());
+            });
+
+            var searchInput = document.getElementById('tcp-location-search');
+            if (searchInput) {
+                locationAutocomplete = new google.maps.places.Autocomplete(searchInput, {
+                    componentRestrictions: { country: 'cy' },
+                    fields: ['geometry'],
+                    types: ['geocode']
+                });
+
+                locationAutocomplete.addListener('place_changed', function() {
+                    var place = locationAutocomplete.getPlace();
+                    if (!place.geometry || !place.geometry.location) {
+                        return;
+                    }
+                    setLocationPoint(place.geometry.location.lat(), place.geometry.location.lng());
+                    locationMap.setZoom(11);
+                });
+            }
+        }
+
+        if (locationState.active && locationState.lat && locationState.lng) {
+            syncLocationVisuals();
+            locationMap.setZoom(11);
+        } else {
+            locationMarker.setMap(null);
+            locationCircle.setMap(null);
+        }
+
+        updateLocationRadiusUI(locationState.radiusKm);
+    }
+
     // Remove single filter chip
     $chips.on('click', '.tcp-chip-remove', function(e) {
         e.stopPropagation();
@@ -1030,7 +1203,7 @@ $cars_query = car_listings_execute_query( $args );
     // Clear all
     $chips.on('click', '#tcp-clear-all', function() {
         ['make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max',
-         'year_min', 'year_max', 'fuel_type', 'body_type', 'car_city'].forEach(function(key) {
+         'year_min', 'year_max', 'fuel_type', 'body_type', 'location_radius'].forEach(function(key) {
             clearFilter(key);
         });
         CarFilters.triggerFilter(group);
@@ -1056,18 +1229,22 @@ $cars_query = car_listings_execute_query( $args );
             var field = parts.join('_');
             var filterCls = field === 'fuel_type' ? 'fuel' : (field === 'body_type' ? 'body' : field);
             $('.car-filter-' + filterCls + ' .car-filter-input-' + bound).val('');
+        } else if (key === 'location_radius') {
+            locationState.active = false;
+            locationState.lat = null;
+            locationState.lng = null;
+            locationState.radiusKm = 25;
+            updateLocationRadiusUI(locationState.radiusKm);
+            if (locationMarker) locationMarker.setMap(null);
+            if (locationCircle) locationCircle.setMap(null);
         } else {
-            if (key === 'car_city') {
-                $cityFilter.val('');
-            } else {
-                CarFilters.setState(group, key, '');
-                var filterCls = key === 'fuel_type' ? 'fuel' : (key === 'body_type' ? 'body' : key);
-                var $dd = $('.car-filter-' + filterCls + ' .car-filter-dropdown');
-                $dd.find('.car-filter-dropdown-option').removeClass('selected');
-                $dd.find('.car-filter-dropdown-option[data-value=""]').addClass('selected');
-                $dd.find('.car-filter-dropdown-text').addClass('placeholder').text($dd.find('select option:first').text());
-                $dd.find('select').val('');
-            }
+            CarFilters.setState(group, key, '');
+            var filterCls = key === 'fuel_type' ? 'fuel' : (key === 'body_type' ? 'body' : key);
+            var $dd = $('.car-filter-' + filterCls + ' .car-filter-dropdown');
+            $dd.find('.car-filter-dropdown-option').removeClass('selected');
+            $dd.find('.car-filter-dropdown-option[data-value=""]').addClass('selected');
+            $dd.find('.car-filter-dropdown-text').addClass('placeholder').text($dd.find('select option:first').text());
+            $dd.find('select').val('');
         }
     }
 
@@ -1077,9 +1254,39 @@ $cars_query = car_listings_execute_query( $args );
     });
     $('#tcp-modal-clear-btn').on('click', function() {
         ['make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max',
-         'year_min', 'year_max', 'fuel_type', 'body_type', 'car_city'].forEach(function(key) {
+         'year_min', 'year_max', 'fuel_type', 'body_type'].forEach(function(key) {
             clearFilter(key);
         });
+        CarFilters.triggerFilter(group);
+    });
+
+    $('#tcp-location-radius').on('input change', function() {
+        var radius = parseInt($(this).val(), 10);
+        if (isNaN(radius) || radius <= 0) {
+            radius = 25;
+        }
+        locationState.radiusKm = radius;
+        updateLocationRadiusUI(radius);
+        if (locationCircle && locationCircle.getMap() !== null) {
+            locationCircle.setRadius(radius * 1000);
+        }
+    });
+
+    $('#tcp-location-apply-btn').on('click', function() {
+        if (!locationState.lat || !locationState.lng) {
+            closeLocationModal();
+            return;
+        }
+        locationState.active = true;
+        closeLocationModal();
+        buildChips();
+        CarFilters.triggerFilter(group);
+    });
+
+    $('#tcp-location-clear-btn').on('click', function() {
+        clearFilter('location_radius');
+        closeLocationModal();
+        buildChips();
         CarFilters.triggerFilter(group);
     });
 
@@ -1149,7 +1356,6 @@ $cars_query = car_listings_execute_query( $args );
             ? CarFilters.getFilterData(group)
             : {};
         var listingAtts = $container.data('atts') || {};
-        var selectedCity = $cityFilter.val() || '';
 
         $wrapper.addClass('car-listings-loading');
 
@@ -1161,7 +1367,9 @@ $cars_query = car_listings_execute_query( $args );
                 nonce: carFiltersConfig.nonce,
                 page: page,
                 listing_atts: JSON.stringify(listingAtts),
-                car_city: selectedCity
+                location_lat: locationState.active ? locationState.lat : '',
+                location_lng: locationState.active ? locationState.lng : '',
+                location_radius_km: locationState.active ? locationState.radiusKm : ''
             }, filterData),
             success: function(response) {
                 if (response.success) {
@@ -1195,10 +1403,6 @@ $cars_query = car_listings_execute_query( $args );
         }
     });
 
-    $cityFilter.on('change', function() {
-        CarFilters.triggerFilter(group);
-    });
-
     // Hide orphan cards from the initial server-side render
     function hideOrphans() {
         var gridW = $wrapper.width();
@@ -1229,20 +1433,20 @@ $cars_query = car_listings_execute_query( $args );
                 /listing_atts=[^&]*/,
                 'listing_atts=' + encodeURIComponent(JSON.stringify(atts))
             );
-            if (settings.data.indexOf('car_city=') !== -1) {
-                settings.data = settings.data.replace(
-                    /car_city=[^&]*/,
-                    'car_city=' + encodeURIComponent($cityFilter.val() || '')
-                );
-            } else {
-                settings.data += '&car_city=' + encodeURIComponent($cityFilter.val() || '');
-            }
+            var latParam = 'location_lat=' + encodeURIComponent(locationState.active ? locationState.lat : '');
+            var lngParam = 'location_lng=' + encodeURIComponent(locationState.active ? locationState.lng : '');
+            var radiusParam = 'location_radius_km=' + encodeURIComponent(locationState.active ? locationState.radiusKm : '');
+            settings.data = settings.data.replace(/&location_lat=[^&]*/g, '');
+            settings.data = settings.data.replace(/&location_lng=[^&]*/g, '');
+            settings.data = settings.data.replace(/&location_radius_km=[^&]*/g, '');
+            settings.data += '&' + latParam + '&' + lngParam + '&' + radiusParam;
         }
     });
 
     // Build initial chips on load
     $(document).ready(function() {
         setTimeout(buildChips, 100);
+        updateLocationRadiusUI(locationState.radiusKm);
     });
 
     // Scroll modal body to bottom when fuel/body dropdowns are opened
