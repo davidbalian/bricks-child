@@ -448,6 +448,122 @@ function autoagora_build_synthetic_car_make_landing_context($term) {
     );
 }
 
+/**
+ * Term IDs for listing queries on car_make landings (same rules as taxonomy-car_make-landing.php).
+ *
+ * @param array $landing View context from autoagora_get_car_make_landing_view_context().
+ * @return int[]
+ */
+function autoagora_car_make_landing_resolve_tax_term_ids(array $landing) {
+    $tax_terms = array();
+
+    $model_slug = isset($landing['model_slug']) ? $landing['model_slug'] : '';
+    if ($model_slug !== '') {
+        $model_term = get_term_by('slug', $model_slug, 'car_make');
+        if ($model_term && !is_wp_error($model_term)) {
+            return array((int) $model_term->term_id);
+        }
+    }
+
+    $make_slug = isset($landing['make_slug']) ? $landing['make_slug'] : '';
+    if ($make_slug === '') {
+        return array();
+    }
+
+    $make_term = get_term_by('slug', $make_slug, 'car_make');
+    if (!$make_term || is_wp_error($make_term)) {
+        return array();
+    }
+
+    $child_ids = get_terms(array(
+        'taxonomy'   => 'car_make',
+        'parent'     => $make_term->term_id,
+        'hide_empty' => false,
+        'fields'     => 'ids',
+    ));
+
+    if (!is_wp_error($child_ids) && !empty($child_ids)) {
+        return array_map('intval', $child_ids);
+    }
+
+    return array((int) $make_term->term_id);
+}
+
+/**
+ * Whether any published, not-sold cars exist for this landing scope.
+ *
+ * @param array $landing View context.
+ */
+function autoagora_car_make_landing_has_listings(array $landing) {
+    $tax_terms = autoagora_car_make_landing_resolve_tax_term_ids($landing);
+    if (empty($tax_terms)) {
+        return false;
+    }
+
+    $query_args = array(
+        'post_type'      => 'car',
+        'post_status'    => 'publish',
+        'posts_per_page' => 1,
+        'fields'         => 'ids',
+        'orderby'        => 'date',
+        'order'          => 'DESC',
+        'meta_query'     => array(
+            'relation' => 'OR',
+            array(
+                'key'     => 'is_sold',
+                'compare' => 'NOT EXISTS',
+            ),
+            array(
+                'key'     => 'is_sold',
+                'value'   => '1',
+                'compare' => '!=',
+            ),
+        ),
+        'tax_query'      => array(
+            array(
+                'taxonomy'         => 'car_make',
+                'field'            => 'term_id',
+                'terms'            => $tax_terms,
+                'include_children' => false,
+            ),
+        ),
+    );
+
+    if (function_exists('car_listings_execute_query')) {
+        $q = car_listings_execute_query($query_args);
+    } else {
+        $q = new WP_Query($query_args);
+    }
+
+    return (int) $q->found_posts > 0;
+}
+
+/**
+ * Empty car_make archives send users to the main cars browse experience.
+ */
+function autoagora_redirect_empty_car_make_archive() {
+    if (!is_tax('car_make') || is_preview()) {
+        return;
+    }
+
+    $landing = autoagora_get_car_make_landing_view_context();
+    if (!$landing) {
+        return;
+    }
+
+    if (!apply_filters('autoagora_redirect_empty_car_make_archive', true, $landing)) {
+        return;
+    }
+
+    if (autoagora_car_make_landing_has_listings($landing)) {
+        return;
+    }
+
+    wp_safe_redirect(trailingslashit(home_url('/cars/')), 302);
+    exit;
+}
+add_action('template_redirect', 'autoagora_redirect_empty_car_make_archive', 5);
+
 function autoagora_get_car_make_landing_sync_option_name() {
     return 'autoagora_car_make_landing_sync_state';
 }

@@ -30,24 +30,7 @@ $listing_atts = array(
 );
 
 // Build taxonomy filter: try model term first, fall back to all models of the make.
-$tax_terms = array();
-$model_term = get_term_by('slug', $landing['model_slug'], 'car_make');
-if ($model_term && !is_wp_error($model_term)) {
-    $tax_terms = array($model_term->term_id);
-} else {
-    $make_term = get_term_by('slug', $landing['make_slug'], 'car_make');
-    if ($make_term && !is_wp_error($make_term)) {
-        $child_ids = get_terms(array(
-            'taxonomy'   => 'car_make',
-            'parent'     => $make_term->term_id,
-            'hide_empty' => false,
-            'fields'     => 'ids',
-        ));
-        $tax_terms = (!is_wp_error($child_ids) && !empty($child_ids))
-            ? $child_ids
-            : array($make_term->term_id);
-    }
-}
+$tax_terms = autoagora_car_make_landing_resolve_tax_term_ids($landing);
 
 $query_args = array(
     'post_type'      => 'car',
