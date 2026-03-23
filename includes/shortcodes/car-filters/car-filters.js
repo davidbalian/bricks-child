@@ -126,6 +126,41 @@
             if (state.body_type) params.set('body_type', state.body_type);
         },
 
+        /**
+         * Sort for redirects when the URL has no cars_* params (e.g. car_make landing).
+         * Prefer listing container data-atts (synced when user picks tcp-sort); else #tcp-sort .selected.
+         */
+        getSortExtrasFromDom: function() {
+            var $containers = $('.car-listings-container[data-atts]');
+            var i;
+            for (i = 0; i < $containers.length; i++) {
+                var atts = $containers.eq(i).data('atts');
+                if (typeof atts === 'string') {
+                    try {
+                        atts = JSON.parse(atts);
+                    } catch (e) {
+                        atts = null;
+                    }
+                }
+                if (atts && typeof atts === 'object' && atts.orderby && atts.order) {
+                    var ord = String(atts.order).toUpperCase();
+                    if (ord === 'ASC' || ord === 'DESC') {
+                        return { orderby: String(atts.orderby), order: ord };
+                    }
+                }
+            }
+            var $sel = $('#tcp-sort .tcp-sort-option.selected');
+            if (!$sel.length) {
+                return {};
+            }
+            var orderby = $sel.attr('data-orderby');
+            var order = String($sel.attr('data-order') || '').toUpperCase();
+            if (!orderby || (order !== 'ASC' && order !== 'DESC')) {
+                return {};
+            }
+            return { orderby: orderby, order: order };
+        },
+
         hasLandingContext: function(state) {
             return !!(state && (state.landingMakeSlug || state.landingModelSlug));
         },
@@ -172,9 +207,18 @@
 
             this.appendNonMakeParams(params, state);
 
-            // Sort: extras wins; else keep current URL (ajaxFilter pushState must not drop cars_* from a full-page load).
+            // Sort: extras wins; else URL (ajaxFilter pushState); else listing data-atts / #tcp-sort (landings have no ?cars_*).
             var sortOrderby = extras.orderby || pageParams.get('cars_orderby') || pageParams.get('orderby');
             var sortOrder = extras.order || pageParams.get('cars_order') || pageParams.get('order');
+            if (!sortOrderby || !sortOrder) {
+                var domSort = this.getSortExtrasFromDom();
+                if (!sortOrderby && domSort.orderby) {
+                    sortOrderby = domSort.orderby;
+                }
+                if (!sortOrder && domSort.order) {
+                    sortOrder = domSort.order;
+                }
+            }
             if (sortOrderby) {
                 params.set('cars_orderby', sortOrderby);
             }
