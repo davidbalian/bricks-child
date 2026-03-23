@@ -186,23 +186,20 @@ $cars_query = car_listings_execute_query( $args );
             </div>
             <div class="tcp-location-map-wrap">
                 <div class="tcp-location-map" id="tcp-location-map"></div>
-                <div class="tcp-location-map-radius-overlay tcp-location-radius-presets">
-                    <button type="button" class="tcp-radius-preset" data-radius="5">+ 5 km</button>
-                    <button type="button" class="tcp-radius-preset" data-radius="10">+ 10 km</button>
-                    <button type="button" class="tcp-radius-preset" data-radius="25">+ 25 km</button>
-                    <button type="button" class="tcp-radius-preset" data-radius="50">+ 50 km</button>
-                    <button type="button" class="tcp-radius-preset" data-radius="100">+ 100 km</button>
-                    <button type="button" class="tcp-radius-preset" data-radius="200">+ 200 km</button>
-                </div>
                 <div class="tcp-location-center-pin" aria-hidden="true"></div>
             </div>
         </div>
         <div class="tcp-filters-modal-footer">
             <div class="tcp-location-radius-row">
                 <label for="tcp-location-radius">Radius (km)</label>
-                <div class="tcp-location-radius-controls">
-                    <input type="range" id="tcp-location-radius" min="1" max="200" step="1" value="25">
-                    <span id="tcp-location-radius-value">25 km</span>
+                <span id="tcp-location-radius-value">25 km</span>
+                <div class="tcp-location-radius-presets">
+                    <button type="button" class="tcp-radius-preset" data-radius="5">5 km</button>
+                    <button type="button" class="tcp-radius-preset" data-radius="10">10 km</button>
+                    <button type="button" class="tcp-radius-preset" data-radius="25">25 km</button>
+                    <button type="button" class="tcp-radius-preset" data-radius="50">50 km</button>
+                    <button type="button" class="tcp-radius-preset" data-radius="100">100 km</button>
+                    <button type="button" class="tcp-radius-preset" data-radius="200">200 km</button>
                 </div>
             </div>
             <button type="button" class="tcp-modal-apply-btn" id="tcp-location-apply-btn">Apply Location</button>
@@ -691,23 +688,6 @@ $cars_query = car_listings_execute_query( $args );
     flex: 1 1 auto;
     min-height: 360px;
 }
-.tcp-location-map-radius-overlay {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    right: 12px;
-    display: flex !important;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    z-index: 6;
-    pointer-events: none;
-}
-.tcp-location-map-radius-overlay .tcp-radius-preset {
-    pointer-events: auto;
-    background: #fff;
-    border: 1px solid #d6dbe2;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-}
 .tcp-location-center-pin {
     position: absolute;
     left: 50%;
@@ -741,30 +721,24 @@ $cars_query = car_listings_execute_query( $args );
 }
 .tcp-location-radius-row label {
     display: block;
-    margin-bottom: 0.45rem;
+    margin-bottom: 0.2rem;
     font-size: 0.9rem;
     font-weight: 600;
     color: #2a3546;
 }
-.tcp-location-radius-controls {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-}
-.tcp-location-radius-controls input[type="range"] {
-    flex: 1;
-}
 #tcp-location-radius-value {
+    display: block;
     min-width: 60px;
+    margin-bottom: 0.45rem;
     font-size: 0.9rem;
     color: #475569;
     font-weight: 600;
 }
 .tcp-location-radius-presets {
-    margin-top: 0.6rem;
+    margin-top: 0;
     display: flex !important;
     flex-wrap: wrap;
-    gap: 0.45rem;
+    gap: 0.4rem;
     align-items: center;
     justify-content: flex-start;
     position: relative;
@@ -778,8 +752,8 @@ $cars_query = car_listings_execute_query( $args );
     background: #fff;
     color: #2a3546;
     border-radius: 999px;
-    padding: 0.3rem 0.6rem;
-    font-size: 0.8rem;
+    padding: 0.32rem 0.55rem;
+    font-size: 0.78rem;
     font-weight: 600;
     cursor: pointer;
     line-height: 1.2;
@@ -820,13 +794,24 @@ $cars_query = car_listings_execute_query( $args );
         max-width: 100%;
     }
     .tcp-location-modal .tcp-filters-modal-body {
-        padding: 0.85rem 0.85rem 0.6rem;
+        padding: 0.75rem 0.75rem 0.5rem;
     }
     .tcp-location-modal .tcp-filters-modal-footer {
-        padding: 0.7rem 0.85rem 0.85rem;
+        padding: 0.6rem 0.75rem 0.75rem;
     }
     .tcp-location-map-wrap {
-        min-height: 300px;
+        min-height: 320px;
+    }
+    .tcp-location-radius-presets {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.35rem;
+    }
+    .tcp-radius-preset {
+        width: 100%;
+        min-height: 34px;
+        font-size: 0.76rem;
+        padding: 0.28rem 0.35rem;
     }
 }
 
@@ -1226,7 +1211,6 @@ $cars_query = car_listings_execute_query( $args );
     }
 
     function updateLocationRadiusUI(radiusKm) {
-        $('#tcp-location-radius').val(radiusKm);
         $('#tcp-location-radius-value').text(radiusKm + ' km');
         $('.tcp-radius-preset').removeClass('active');
         $('.tcp-radius-preset[data-radius="' + radiusKm + '"]').addClass('active');
@@ -1292,15 +1276,15 @@ $cars_query = car_listings_execute_query( $args );
     }
 
     function getZoomForRadius(radiusKm) {
-        if (radiusKm <= 1) return 13.5;
-        if (radiusKm <= 2) return 13.5;
-        if (radiusKm <= 3) return 12.5;
-        if (radiusKm <= 5) return 12.5;
-        if (radiusKm <= 10) return 11.5;
-        if (radiusKm <= 25) return 10.5;
-        if (radiusKm <= 50) return 9.5;
-        if (radiusKm <= 100) return 8.5;
-        return 7.5;
+        if (radiusKm <= 1) return 12.8;
+        if (radiusKm <= 2) return 12.2;
+        if (radiusKm <= 3) return 11.8;
+        if (radiusKm <= 5) return 11.4;
+        if (radiusKm <= 10) return 10.6;
+        if (radiusKm <= 25) return 9.7;
+        if (radiusKm <= 50) return 8.8;
+        if (radiusKm <= 100) return 7.9;
+        return 7.0;
     }
 
     function syncLocationVisuals(shouldAdjustZoom) {
@@ -1530,21 +1514,6 @@ $cars_query = car_listings_execute_query( $args );
             clearFilter(key);
         });
         CarFilters.triggerFilter(group);
-    });
-
-    $('#tcp-location-radius').on('input change', function() {
-        var radius = parseInt($(this).val(), 10);
-        if (isNaN(radius) || radius <= 0) {
-            radius = 25;
-        }
-        locationState.radiusKm = radius;
-        updateLocationRadiusUI(radius);
-        if (locationCircle && locationCircle.getMap() !== null) {
-            locationCircle.setRadius(radius * 1000);
-        }
-        if (locationMap) {
-            locationMap.setZoom(getZoomForRadius(radius));
-        }
     });
 
     $('.tcp-location-radius-presets').on('click', '.tcp-radius-preset', function() {
