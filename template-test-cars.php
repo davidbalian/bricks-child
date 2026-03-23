@@ -191,8 +191,6 @@ $cars_query = car_listings_execute_query( $args );
         </div>
         <div class="tcp-filters-modal-footer">
             <div class="tcp-location-radius-row">
-                <label for="tcp-location-radius">Radius (km)</label>
-                <span id="tcp-location-radius-value">25 km</span>
                 <div class="tcp-location-radius-presets">
                     <button type="button" class="tcp-radius-preset" data-radius="5">5 km</button>
                     <button type="button" class="tcp-radius-preset" data-radius="10">10 km</button>
@@ -719,30 +717,16 @@ $cars_query = car_listings_execute_query( $args );
 .tcp-location-radius-row {
     margin-top: 0;
 }
-.tcp-location-radius-row label {
-    display: block;
-    margin-bottom: 0.2rem;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #2a3546;
-}
-#tcp-location-radius-value {
-    display: block;
-    min-width: 60px;
-    margin-bottom: 0.45rem;
-    font-size: 0.9rem;
-    color: #475569;
-    font-weight: 600;
-}
 .tcp-location-radius-presets {
     margin-top: 0;
-    display: flex !important;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    align-items: center;
-    justify-content: flex-start;
+    display: grid !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.45rem;
+    align-items: stretch;
+    justify-content: stretch;
     position: relative;
     z-index: 3;
+    width: 100%;
 }
 .tcp-radius-preset {
     display: inline-flex !important;
@@ -759,6 +743,7 @@ $cars_query = car_listings_execute_query( $args );
     line-height: 1.2;
     min-height: 30px;
     white-space: nowrap;
+    width: 100%;
 }
 .tcp-radius-preset:hover {
     background: #f8fafc;
