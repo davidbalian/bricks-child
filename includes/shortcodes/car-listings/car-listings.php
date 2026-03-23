@@ -703,7 +703,7 @@ add_action('wp_ajax_nopriv_car_listings_load_more', 'car_listings_ajax_load_more
 
 /**
  * Filter to add featured-first sorting via SQL
- * This adds a LEFT JOIN for is_featured and sorts by it first
+ * Featured posts first; then the query's order (date, price, mileage, year) applies within featured and within non-featured.
  */
 function car_listings_featured_first_orderby($clauses, $query) {
     global $wpdb;
