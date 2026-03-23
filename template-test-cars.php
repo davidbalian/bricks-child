@@ -57,7 +57,7 @@ add_action( 'wp_head', function() {
           "name": "Are used cars in Cyprus left-hand drive or right-hand drive?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Cyprus drives on the left side of the road, but the vast majority of cars on the island are left-hand drive (LHD) — meaning the steering wheel is on the left. This is because most vehicles are imported from mainland Europe and Japan (re-configured). You'll find some right-hand drive cars, especially older Japanese imports, but LHD is the standard."
+            "text": "Cyprus drives on the left side of the road, but the vast majority of cars on the island are left-hand drive (LHD) - meaning the steering wheel is on the left. This is because most vehicles are imported from mainland Europe and Japan (re-configured). You'll find some right-hand drive cars, especially older Japanese imports, but LHD is the standard."
           }
         },
         {
@@ -211,8 +211,9 @@ $cars_query = car_listings_execute_query( $args );
     <div class="cars-seo-content">
 
         <section class="cars-intro">
+            <h2 class="cars-intro-heading">Used Cars for Sale in Cyprus</h2>
             <p>
-                Browse <strong>600+ used cars for sale in Cyprus</strong> from trusted dealerships and private sellers across Nicosia, Limassol, Larnaca, and Paphos. Whether you're looking for a fuel-efficient hatchback for city driving, a family SUV, or a luxury sedan, AutoAgora makes it easy to compare prices, specs, and photos — all in one place.
+                Browse <strong>600+ used cars for sale in Cyprus</strong> from trusted dealerships and private sellers across Nicosia, Limassol, Larnaca, and Paphos. Whether you're looking for a fuel-efficient hatchback for city driving, a family SUV, or a luxury sedan, AutoAgora makes it easy to compare prices, specs, and photos - all in one place.
             </p>
             <p>
                 Use the filters above to narrow your search by make, model, price range, fuel type, mileage, and more. Every listing includes full vehicle details, high-quality photos, and direct contact with the seller. Can't find what you're looking for? <a href="/buyer-requests/">Post a buyer request</a> and let dealers across Cyprus come to you.
@@ -268,7 +269,7 @@ $cars_query = car_listings_execute_query( $args );
                     <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="faq-answer">
-                    <p>Cyprus drives on the left side of the road, but the vast majority of cars on the island are left-hand drive (LHD) — meaning the steering wheel is on the left. This is because most vehicles are imported from mainland Europe and Japan (re-configured). You'll find some right-hand drive cars, especially older Japanese imports, but LHD is the standard.</p>
+                    <p>Cyprus drives on the left side of the road, but the vast majority of cars on the island are left-hand drive (LHD) - meaning the steering wheel is on the left. This is because most vehicles are imported from mainland Europe and Japan (re-configured). You'll find some right-hand drive cars, especially older Japanese imports, but LHD is the standard.</p>
                 </div>
             </div>
 
@@ -707,11 +708,17 @@ $cars_query = car_listings_execute_query( $args );
 .cars-seo-content {
     max-width: 800px;
     margin: 3rem auto 0;
-    padding: 0 1rem;
+    padding: 3rem 1rem 5rem;
 }
 
 .cars-intro {
     margin-bottom: 2.5rem;
+}
+.cars-intro-heading {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2a3546;
+    margin: 0 0 0.75rem;
 }
 .cars-intro p {
     font-size: 1rem;
@@ -735,7 +742,10 @@ $cars_query = car_listings_execute_query( $args );
     font-size: 1.25rem;
     font-weight: 700;
     color: #2a3546;
-    margin: 0 0 0.25rem;
+    margin: 0 0 1.5rem;
+}
+.cars-faq .faq-item:first-child {
+    border-top: none;
 }
 
 .faq-item {
