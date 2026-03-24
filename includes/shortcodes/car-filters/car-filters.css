@@ -252,13 +252,15 @@
 .car-filter-dropdown[data-multiselect="true"] .car-filter-dropdown-option.selected::after {
     content: '';
     position: absolute;
-    left: 0.95rem;
+    left: 0.75rem;
     top: 50%;
-    transform: translateY(-50%) rotate(45deg);
-    width: 5px;
-    height: 9px;
-    border: solid #ffffff;
-    border-width: 0 2px 2px 0;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cpath d='M1.5 5l3 3.5 6-7' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 10px 8px;
 }
 
 .car-filter-dropdown[data-multiselect="true"] .car-filter-dropdown-option[data-value=""].selected::after {
