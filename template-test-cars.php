@@ -96,13 +96,14 @@ $listing_atts = array(
     'card_type'      => 'car_card',
 );
 
+// Merge URL sort params (e.g., after redirect from car make landing page)
+$listing_atts = car_listings_apply_request_sort_to_atts( $listing_atts );
+
 $args = array(
     'post_type'      => 'car',
     'post_status'    => 'publish',
     'posts_per_page' => 24,
     'paged'          => 1,
-    'orderby'        => 'date',
-    'order'          => 'DESC',
     'meta_query'     => array(
         'relation' => 'OR',
         array(
@@ -116,6 +117,28 @@ $args = array(
         ),
     ),
 );
+
+// Apply sorting from $listing_atts (which now includes any URL sort overrides)
+$sort_orderby = isset( $listing_atts['orderby'] ) ? $listing_atts['orderby'] : 'date';
+$sort_order   = isset( $listing_atts['order'] ) ? strtoupper( $listing_atts['order'] ) : 'DESC';
+
+switch ( $sort_orderby ) {
+    case 'price':
+        $args['meta_key'] = 'price';
+        $args['orderby']  = 'meta_value_num';
+        break;
+    case 'mileage':
+        $args['meta_key'] = 'mileage';
+        $args['orderby']  = 'meta_value_num';
+        break;
+    case 'year':
+        $args['meta_key'] = 'year';
+        $args['orderby']  = 'meta_value_num';
+        break;
+    default:
+        $args['orderby'] = 'date';
+}
+$args['order'] = $sort_order;
 
 $cars_query = car_listings_execute_query( $args );
 ?>
