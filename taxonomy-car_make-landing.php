@@ -21,7 +21,7 @@ $group       = 'car-make-landing-' . sanitize_html_class($landing['slug']);
 $listings_id = 'car-make-landing-results';
 
 $listing_atts = array(
-    'posts_per_page'     => 12,
+    'posts_per_page'     => 24,
     'offset'             => 0,
     'featured'           => 'false',
     'favorites'          => 'false',
@@ -45,27 +45,6 @@ $listing_atts = car_listings_apply_request_sort_to_atts($listing_atts);
 // Build query applying all URL filter params (price, mileage, body_type, etc.) on top of make/model defaults
 $query_args = car_listings_build_query_args($listing_atts);
 $cars_query = car_listings_execute_query($query_args);
-
-// Preload LCP image (first card image) to improve Largest Contentful Paint
-if ( ! empty( $cars_query->posts ) ) {
-    $first_id  = $cars_query->posts[0]->ID;
-    $lcp_image = get_the_post_thumbnail_url( $first_id, 'medium' );
-    if ( ! $lcp_image ) {
-        $car_images = get_field( 'car_images', $first_id );
-        if ( ! empty( $car_images ) && is_array( $car_images ) ) {
-            $first = $car_images[0];
-            $img_id = is_array( $first ) && isset( $first['ID'] ) ? $first['ID'] : ( is_numeric( $first ) ? $first : 0 );
-            if ( $img_id ) {
-                $lcp_image = wp_get_attachment_image_url( $img_id, 'medium' );
-            }
-        }
-    }
-    if ( $lcp_image ) {
-        add_action( 'wp_head', function() use ( $lcp_image ) {
-            echo '<link rel="preload" as="image" href="' . esc_url( $lcp_image ) . '">' . "\n";
-        }, 1 );
-    }
-}
 
 // Enqueue car card assets before get_header() so CSS lands in <head>.
 if (function_exists('car_card_enqueue_assets')) {

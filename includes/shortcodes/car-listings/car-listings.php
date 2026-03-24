@@ -443,14 +443,13 @@ function car_listings_render_output($car_query, $atts) {
 
         <?php if ($car_query->have_posts()) : ?>
             <div class="car-listings-wrapper">
-                <?php $card_index = 0; while ($car_query->have_posts()) : $car_query->the_post(); ?>
+                <?php while ($car_query->have_posts()) : $car_query->the_post(); ?>
                     <?php
                     if ($use_car_card) {
                         render_car_card(get_the_ID());
                     } else {
-                        car_listings_render_card(get_the_ID(), $card_index);
+                        car_listings_render_card(get_the_ID());
                     }
-                    $card_index++;
                     ?>
                 <?php endwhile; ?>
             </div>
@@ -472,7 +471,7 @@ function car_listings_render_output($car_query, $atts) {
 /**
  * Render individual car card (minimal template)
  */
-function car_listings_render_card($post_id, $card_index = 99) {
+function car_listings_render_card($post_id) {
     // Get ACF fields
     $make = get_field('make', $post_id);
     $model = get_field('model', $post_id);
@@ -506,14 +505,9 @@ function car_listings_render_card($post_id, $card_index = 99) {
         <a href="<?php echo esc_url(get_permalink($post_id)); ?>" class="car-listings-card-link">
             <div class="car-listings-card-image">
                 <?php if ($image_url) : ?>
-                    <?php
-                    $loading      = $card_index < 3 ? 'eager' : 'lazy';
-                    $fetchprio    = $card_index === 0 ? ' fetchpriority="high"' : '';
-                    ?>
                     <img src="<?php echo esc_url($image_url); ?>"
                          alt="<?php echo esc_attr($clean_year . ' ' . $make . ' ' . $model); ?>"
-                         width="400" height="300"
-                         loading="<?php echo $loading; ?>"<?php echo $fetchprio; ?>>
+                         loading="lazy">
                 <?php else : ?>
                     <div class="car-listings-no-image">No Image</div>
                 <?php endif; ?>
@@ -733,47 +727,8 @@ function car_listings_featured_first_orderby($clauses, $query) {
  * Adds the filter only for this specific query, then removes it
  */
 function car_listings_execute_query($query_args) {
-    // Skip cache for user-specific queries (favorites, own listings)
-    $skip_cache = !empty($query_args['author']);
-    if ($skip_cache) {
-        add_filter('posts_clauses', 'car_listings_featured_first_orderby', 10, 2);
-        $query = new WP_Query($query_args);
-        remove_filter('posts_clauses', 'car_listings_featured_first_orderby', 10, 2);
-        return $query;
-    }
-
-    $cache_key = 'cl_' . md5(serialize($query_args));
-    $cached_ids = get_transient($cache_key);
-
-    if ($cached_ids !== false) {
-        // Re-run a simple __in query so WP_Query methods work normally
-        $query_args_cached = array(
-            'post_type'           => 'car',
-            'post__in'            => $cached_ids ?: array(0),
-            'orderby'             => 'post__in',
-            'posts_per_page'      => $query_args['posts_per_page'],
-            'post_status'         => 'publish',
-            'ignore_sticky_posts' => true,
-        );
-        return new WP_Query($query_args_cached);
-    }
-
     add_filter('posts_clauses', 'car_listings_featured_first_orderby', 10, 2);
     $query = new WP_Query($query_args);
     remove_filter('posts_clauses', 'car_listings_featured_first_orderby', 10, 2);
-
-    $post_ids = wp_list_pluck($query->posts, 'ID');
-    set_transient($cache_key, $post_ids, 5 * MINUTE_IN_SECONDS);
-
     return $query;
-}
-
-/**
- * Flush car listings transient cache when a car post is saved/deleted.
- */
-add_action('save_post_car', 'car_listings_flush_transient_cache');
-add_action('delete_post', 'car_listings_flush_transient_cache');
-function car_listings_flush_transient_cache() {
-    global $wpdb;
-    $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_cl_%' OR option_name LIKE '_transient_timeout_cl_%'");
 }
