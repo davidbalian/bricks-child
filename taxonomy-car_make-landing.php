@@ -706,7 +706,7 @@ body {
         padding-top: 1rem;
         padding-bottom: 0.5rem;
         border-top: 1px solid #e5e7eb;
-        margin-top: 0.25rem;
+        margin-top: 1rem;
     }
     .tcp-active-filters:empty {
         display: none;
