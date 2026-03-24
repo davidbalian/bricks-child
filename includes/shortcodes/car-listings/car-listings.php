@@ -241,6 +241,13 @@ function car_listings_build_query_args($atts) {
                     'terms'    => $models,
                 );
             }
+        } elseif ($make_term && $make_term->parent > 0) {
+            // ?make= param is a model slug (e.g. from /car_make/nissan-note/ redirect) — apply as model filter
+            $tax_query[] = array(
+                'taxonomy' => 'car_make',
+                'field'    => 'term_id',
+                'terms'    => $make_term->term_id,
+            );
         }
     }
 
