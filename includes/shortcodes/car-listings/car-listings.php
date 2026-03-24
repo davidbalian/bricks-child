@@ -312,24 +312,22 @@ function car_listings_build_query_args($atts) {
         );
     }
 
-    // Fuel type from URL
+    // Fuel type from URL (supports multiple comma-separated values)
     $fuel_type = $get_filter_value('fuel_type');
     if (!empty($fuel_type)) {
-        $meta_query[] = array(
-            'key'     => 'fuel_type',
-            'value'   => $fuel_type,
-            'compare' => '=',
-        );
+        $fuel_types = array_map('trim', explode(',', $fuel_type));
+        $meta_query[] = count($fuel_types) === 1
+            ? array('key' => 'fuel_type', 'value' => $fuel_types[0], 'compare' => '=')
+            : array('key' => 'fuel_type', 'value' => $fuel_types, 'compare' => 'IN');
     }
 
-    // Body type from URL
+    // Body type from URL (supports multiple comma-separated values)
     $body_type = $get_filter_value('body_type');
     if (!empty($body_type)) {
-        $meta_query[] = array(
-            'key'     => 'body_type',
-            'value'   => $body_type,
-            'compare' => '=',
-        );
+        $body_types = array_map('trim', explode(',', $body_type));
+        $meta_query[] = count($body_types) === 1
+            ? array('key' => 'body_type', 'value' => $body_types[0], 'compare' => '=')
+            : array('key' => 'body_type', 'value' => $body_types, 'compare' => 'IN');
     }
 
     // Add tax_query if we have conditions

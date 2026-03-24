@@ -22,47 +22,28 @@ $listings_id = 'car-make-landing-results';
 
 $listing_atts = array(
     'posts_per_page'     => 24,
+    'offset'             => 0,
+    'featured'           => 'false',
+    'favorites'          => 'false',
+    'user_id'            => '',
+    'author'             => '',
     'orderby'            => 'date',
     'order'              => 'DESC',
+    'show_sold'          => 'false',
+    'id'                 => $listings_id,
+    'filter_group'       => $group,
     'card_type'          => 'car_card',
     'default_make_slug'  => $landing['make_slug'],
     'default_model_slug' => $landing['model_slug'],
+    'layout'             => 'grid',
+    'infinite_scroll'    => 'false',
 );
 
-// Build taxonomy filter: try model term first, fall back to all models of the make.
-$tax_terms = autoagora_car_make_landing_resolve_tax_term_ids($landing);
+// Merge URL sort params (e.g., after redirect from car make landing page)
+$listing_atts = car_listings_apply_request_sort_to_atts($listing_atts);
 
-$query_args = array(
-    'post_type'      => 'car',
-    'post_status'    => 'publish',
-    'posts_per_page' => 24,
-    'paged'          => 1,
-    'orderby'        => 'date',
-    'order'          => 'DESC',
-    'meta_query'     => array(
-        'relation' => 'OR',
-        array(
-            'key'     => 'is_sold',
-            'compare' => 'NOT EXISTS',
-        ),
-        array(
-            'key'     => 'is_sold',
-            'value'   => '1',
-            'compare' => '!=',
-        ),
-    ),
-);
-if (!empty($tax_terms)) {
-    $query_args['tax_query'] = array(
-        array(
-            'taxonomy'         => 'car_make',
-            'field'            => 'term_id',
-            'terms'            => $tax_terms,
-            'include_children' => false,
-        ),
-    );
-}
-
+// Build query applying all URL filter params (price, mileage, body_type, etc.) on top of make/model defaults
+$query_args = car_listings_build_query_args($listing_atts);
 $cars_query = car_listings_execute_query($query_args);
 
 // Enqueue car card assets before get_header() so CSS lands in <head>.
@@ -182,7 +163,8 @@ get_header();
          id="<?php echo esc_attr($listings_id); ?>"
          data-atts="<?php echo esc_attr(wp_json_encode($listing_atts)); ?>"
          data-page="1"
-         data-max-pages="<?php echo esc_attr($cars_query->max_num_pages); ?>">
+         data-max-pages="<?php echo esc_attr($cars_query->max_num_pages); ?>"
+         data-server-filtered="true">
 
         <div class="car-listings-wrapper tcp-grid">
             <?php

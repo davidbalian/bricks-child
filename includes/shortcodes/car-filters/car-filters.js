@@ -1118,6 +1118,17 @@
                 var group = $(this).data('group');
                 if (!group) return;
 
+                // Check if the server already rendered filtered results for this group.
+                // If so, skip the AJAX re-fetch but still update the UI state.
+                var state = CarFilters.getState(group);
+                var isServerFiltered = false;
+                if (state && state.target) {
+                    isServerFiltered = $('#' + state.target).data('server-filtered') === true;
+                }
+                if (!isServerFiltered) {
+                    isServerFiltered = $('.car-listings-container[data-filter-group="' + group + '"]').data('server-filtered') === true;
+                }
+
                 // Set meta filter values
                 ['price', 'mileage', 'year'].forEach(function(key) {
                     if (parsedUrl[key + '_min']) {
@@ -1175,8 +1186,10 @@
                                                 }
                                             });
 
-                                            // Trigger filter after model is set
-                                            CarFilters.triggerFilter(group);
+                                            // Only re-fetch listings if server didn't already filter them
+                                            if (!isServerFiltered) {
+                                                CarFilters.triggerFilter(group);
+                                            }
                                         }, 500);
                                     }
 
@@ -1195,8 +1208,8 @@
                                         }
                                     });
 
-                                    // Trigger filter after make is set (only if no model to wait for)
-                                    if (!data.model) {
+                                    // Only re-fetch listings if server didn't already filter them (and no model to wait for)
+                                    if (!data.model && !isServerFiltered) {
                                         CarFilters.triggerFilter(group);
                                     }
                                 }
@@ -1253,10 +1266,22 @@
             });
 
             // Trigger filter for non-make params (price, mileage, year, fuel, body)
+            // Only if the server did not already render filtered results
             if (!parsedUrl.makeSlug) {
                 $('.car-filters-container').each(function() {
                     var group = $(this).data('group');
-                    if (group) {
+                    if (!group) return;
+
+                    var state = CarFilters.getState(group);
+                    var isServerFiltered = false;
+                    if (state && state.target) {
+                        isServerFiltered = $('#' + state.target).data('server-filtered') === true;
+                    }
+                    if (!isServerFiltered) {
+                        isServerFiltered = $('.car-listings-container[data-filter-group="' + group + '"]').data('server-filtered') === true;
+                    }
+
+                    if (!isServerFiltered) {
                         CarFilters.triggerFilter(group);
                     }
                 });

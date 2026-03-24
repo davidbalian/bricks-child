@@ -90,57 +90,30 @@ add_action( 'wp_head', function() {
 get_header();
 
 $listing_atts = array(
-    'posts_per_page' => 24,
-    'orderby'        => 'date',
-    'order'          => 'DESC',
-    'card_type'      => 'car_card',
+    'posts_per_page'     => 24,
+    'offset'             => 0,
+    'featured'           => 'false',
+    'favorites'          => 'false',
+    'user_id'            => '',
+    'author'             => '',
+    'orderby'            => 'date',
+    'order'              => 'DESC',
+    'show_sold'          => 'false',
+    'id'                 => 'test-cars-listings',
+    'filter_group'       => '',
+    'card_type'          => 'car_card',
+    'default_make_slug'  => '',
+    'default_model_slug' => '',
+    'layout'             => 'grid',
+    'infinite_scroll'    => 'false',
 );
 
 // Merge URL sort params (e.g., after redirect from car make landing page)
 $listing_atts = car_listings_apply_request_sort_to_atts( $listing_atts );
 
-$args = array(
-    'post_type'      => 'car',
-    'post_status'    => 'publish',
-    'posts_per_page' => 24,
-    'paged'          => 1,
-    'meta_query'     => array(
-        'relation' => 'OR',
-        array(
-            'key'     => 'is_sold',
-            'compare' => 'NOT EXISTS',
-        ),
-        array(
-            'key'     => 'is_sold',
-            'value'   => '1',
-            'compare' => '!=',
-        ),
-    ),
-);
-
-// Apply sorting from $listing_atts (which now includes any URL sort overrides)
-$sort_orderby = isset( $listing_atts['orderby'] ) ? $listing_atts['orderby'] : 'date';
-$sort_order   = isset( $listing_atts['order'] ) ? strtoupper( $listing_atts['order'] ) : 'DESC';
-
-switch ( $sort_orderby ) {
-    case 'price':
-        $args['meta_key'] = 'price';
-        $args['orderby']  = 'meta_value_num';
-        break;
-    case 'mileage':
-        $args['meta_key'] = 'mileage';
-        $args['orderby']  = 'meta_value_num';
-        break;
-    case 'year':
-        $args['meta_key'] = 'year';
-        $args['orderby']  = 'meta_value_num';
-        break;
-    default:
-        $args['orderby'] = 'date';
-}
-$args['order'] = $sort_order;
-
-$cars_query = car_listings_execute_query( $args );
+// Build query applying all URL filter params (make, model, price, mileage, body_type, etc.)
+$query_args = car_listings_build_query_args( $listing_atts );
+$cars_query = car_listings_execute_query( $query_args );
 ?>
 
 <!-- Filters bar -->
@@ -239,7 +212,8 @@ $cars_query = car_listings_execute_query( $args );
          id="test-cars-listings"
          data-atts="<?php echo esc_attr( wp_json_encode( $listing_atts ) ); ?>"
          data-page="1"
-         data-max-pages="<?php echo esc_attr( $cars_query->max_num_pages ); ?>">
+         data-max-pages="<?php echo esc_attr( $cars_query->max_num_pages ); ?>"
+         data-server-filtered="true">
 
         <div class="car-listings-wrapper tcp-grid">
             <?php
