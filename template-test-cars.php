@@ -1628,6 +1628,7 @@ body {
         syncLocationParamsToUrl();
         buildChips();
         closeModal();
+        hideOrphans();
     });
 
     // Also rebuild chips when state changes (before AJAX completes)
@@ -1700,6 +1701,7 @@ body {
             success: function(response) {
                 if (response.success) {
                     $wrapper.html(response.data.html);
+                    hideOrphans();
                     $pagination.html(response.data.pagination_html || '');
                     $container.data('page', response.data.current_page);
                     $container.data('max-pages', response.data.max_pages);
@@ -1740,7 +1742,8 @@ body {
         var overflow = total % cols;
         // Show all first, then hide overflow
         $cards.show();
-        if (overflow > 0) {
+        // Only hide orphans when there is at least one full row
+        if (overflow > 0 && total >= cols) {
             $cards.slice(total - overflow).hide();
         }
     }
