@@ -1628,7 +1628,6 @@ body {
         syncLocationParamsToUrl();
         buildChips();
         closeModal();
-        hideOrphans();
     });
 
     // Also rebuild chips when state changes (before AJAX completes)
@@ -1701,7 +1700,6 @@ body {
             success: function(response) {
                 if (response.success) {
                     $wrapper.html(response.data.html);
-                    hideOrphans();
                     $pagination.html(response.data.pagination_html || '');
                     $container.data('page', response.data.current_page);
                     $container.data('max-pages', response.data.max_pages);
@@ -1730,26 +1728,6 @@ body {
         if (page && page > 0) {
             loadPage(page);
         }
-    });
-
-    // Hide orphan cards from the initial server-side render
-    function hideOrphans() {
-        var gridW = $wrapper.width();
-        if (!gridW) return;
-        var cols = Math.max(1, Math.floor((gridW + GRID_GAP) / (CARD_MIN_W + GRID_GAP)));
-        var $cards = $wrapper.children('.car-card');
-        var total = $cards.length;
-        var overflow = total % cols;
-        // Show all first, then hide overflow
-        $cards.show();
-        // Only hide orphans when there is at least one full row
-        if (overflow > 0 && total >= cols) {
-            $cards.slice(total - overflow).hide();
-        }
-    }
-    // Run once on load for the initial server-rendered cards
-    $(document).ready(function() {
-        hideOrphans();
     });
 
     // Sync posts_per_page before filter AJAX fires

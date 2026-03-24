@@ -1601,24 +1601,6 @@ body {
         }
     });
 
-    function hideOrphans() {
-        var gridW = $wrapper.width();
-        if (!gridW) return;
-        var cols = Math.max(1, Math.floor((gridW + GRID_GAP) / (CARD_MIN_W + GRID_GAP)));
-        var $cards = $wrapper.children('.car-card');
-        var total = $cards.length;
-        var overflow = total % cols;
-        $cards.show();
-        // Only hide an incomplete *last* row when there is at least one full row above it.
-        // If total <= cols, overflow === total and slice(0) would hide every card.
-        if (total > cols && overflow > 0) {
-            $cards.slice(total - overflow).hide();
-        }
-    }
-    $(document).ready(function() {
-        hideOrphans();
-    });
-
     $(document).on('ajaxSend', function(e, xhr, settings) {
         if (settings.data && typeof settings.data === 'string' &&
             settings.data.indexOf('action=car_filters_filter_listings') !== -1) {
