@@ -131,6 +131,10 @@ get_header();
 <!-- Main content -->
 <div class="tcp-main">
     <h1 class="tcp-heading"><?php echo esc_html($landing['h1']); ?></h1>
+    <p class="tcp-results-count" id="tcp-results-count">
+        <?php echo esc_html( number_format_i18n( (int) $cars_query->found_posts ) . ' results found' ); ?>
+    </p>
+    <div class="tcp-no-results-clear" id="tcp-no-results-clear"></div>
 
     <div class="car-listings-container"
          id="<?php echo esc_attr($listings_id); ?>"
@@ -228,6 +232,10 @@ get_header();
 </div>
 
 <style>
+body {
+    background-color: var(--bricks-color-lgsrvt);
+}
+
 /* ============================================
    Filters Bar
    ============================================ */
@@ -536,6 +544,19 @@ get_header();
     #tcp-sort-label {
         display: none;
     }
+    .tcp-filters-bar-inner {
+        flex-wrap: wrap;
+        row-gap: 0;
+    }
+    .tcp-active-filters {
+        order: 10;
+        flex-basis: 100%;
+        width: 100%;
+        padding-bottom: 0.5rem;
+    }
+    .tcp-active-filters:empty {
+        display: none;
+    }
     .tcp-filters-modal {
         max-width: 100%;
         max-height: 100%;
@@ -545,6 +566,36 @@ get_header();
     .tcp-filters-modal-overlay {
         padding: 0;
     }
+}
+
+/* ============================================
+   No-results clear button
+   ============================================ */
+.tcp-no-results-clear {
+    display: none;
+    text-align: center;
+    margin: -0.5rem 0 1.25rem;
+}
+.tcp-no-results-clear.visible {
+    display: block;
+}
+.tcp-clear-all-filters-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.25rem;
+    border: 2px solid #dfe2e6;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #2a3546;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+.tcp-clear-all-filters-btn:hover {
+    border-color: #bbb;
+    background: #f9fafb;
 }
 
 /* ============================================
@@ -560,7 +611,13 @@ get_header();
     font-size: 1.5rem;
     font-weight: 500;
     color: #2a3546;
+    margin: 0 0 0.5rem;
+}
+.tcp-results-count {
     margin: 0 0 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #475569;
 }
 .tcp-grid {
     display: grid;
@@ -760,6 +817,39 @@ get_header();
         $container.attr('data-atts', JSON.stringify(atts));
     }
 
+    var $results        = $('#tcp-results-count');
+    var $noResultsClear = $('#tcp-no-results-clear');
+
+    function updateResultsCount(total) {
+        var count = parseInt(total, 10);
+        if (isNaN(count) || count < 0) count = 0;
+        $results.text(count.toLocaleString() + ' results found');
+        updateClearAllButton(count);
+    }
+
+    function updateClearAllButton(count) {
+        if (count === 0) {
+            if (!$noResultsClear.find('.tcp-clear-all-filters-btn').length) {
+                $noResultsClear.html('<button type="button" class="tcp-clear-all-filters-btn" id="tcp-no-results-clear-btn">Clear all filters</button>');
+            }
+            $noResultsClear.addClass('visible');
+        } else {
+            $noResultsClear.removeClass('visible').empty();
+        }
+    }
+
+    function resetSort() {
+        var $sort = $('#tcp-sort');
+        $sort.find('.tcp-sort-option').removeClass('selected');
+        $sort.find('.tcp-sort-option').first().addClass('selected');
+        $('#tcp-sort-label').text('Newest');
+        var atts = $container.data('atts') || {};
+        atts.orderby = 'date';
+        atts.order = 'DESC';
+        $container.data('atts', atts);
+        $container.attr('data-atts', JSON.stringify(atts));
+    }
+
     var filterLabels = {
         price_min:   'Price min',
         price_max:   'Price max',
@@ -849,6 +939,19 @@ get_header();
          'year_min', 'year_max', 'fuel_type', 'body_type'].forEach(function(key) {
             clearFilter(key);
         });
+        resetSort();
+        unlockFilter();
+        CarFilters.triggerFilter(group);
+    });
+
+    // No-results clear all button
+    $noResultsClear.on('click', '#tcp-no-results-clear-btn', function() {
+        ['price_min', 'price_max', 'mileage_min', 'mileage_max',
+         'year_min', 'year_max', 'fuel_type', 'body_type'].forEach(function(key) {
+            clearFilter(key);
+        });
+        resetSort();
+        unlockFilter();
         CarFilters.triggerFilter(group);
     });
 
@@ -881,6 +984,7 @@ get_header();
          'year_min', 'year_max', 'fuel_type', 'body_type'].forEach(function(key) {
             clearFilter(key);
         });
+        resetSort();
         unlockFilter();
         CarFilters.triggerFilter(group);
     });
@@ -893,6 +997,9 @@ get_header();
         }
         $container.data('page', data.current_page || 1);
         $container.data('max-pages', data.max_pages || 1);
+        if (data.found_posts !== undefined) {
+            updateResultsCount(data.found_posts);
+        }
         buildChips();
         closeModal();
     });
@@ -1037,6 +1144,10 @@ get_header();
 
     $(document).ready(function() {
         setTimeout(buildChips, 100);
+        var initialCount = parseInt($results.text(), 10);
+        if (!isNaN(initialCount)) {
+            updateClearAllButton(initialCount);
+        }
     });
 
     $(document).on('click', '.tcp-filters-modal-body .car-filters-item-fuel .car-filter-dropdown-button, .tcp-filters-modal-body .car-filters-item-body .car-filter-dropdown-button', function() {

@@ -235,6 +235,7 @@ $cars_query = car_listings_execute_query( $args );
     <p class="tcp-results-count" id="tcp-results-count">
         <?php echo esc_html( number_format_i18n( (int) $cars_query->found_posts ) . ' results found' ); ?>
     </p>
+    <div class="tcp-no-results-clear" id="tcp-no-results-clear"></div>
 
     <div class="car-listings-container"
          id="test-cars-listings"
@@ -368,6 +369,10 @@ $cars_query = car_listings_execute_query( $args );
 </div>
 
 <style>
+body {
+    background-color: var(--bricks-color-lgsrvt);
+}
+
 /* ============================================
    Filters Bar
    ============================================ */
@@ -784,6 +789,19 @@ $cars_query = car_listings_execute_query( $args );
     #tcp-sort-label {
         display: none;
     }
+    .tcp-filters-bar-inner {
+        flex-wrap: wrap;
+        row-gap: 0;
+    }
+    .tcp-active-filters {
+        order: 10;
+        flex-basis: 100%;
+        width: 100%;
+        padding-bottom: 0.5rem;
+    }
+    .tcp-active-filters:empty {
+        display: none;
+    }
     .tcp-filters-modal {
         max-width: 100%;
         max-height: 100%;
@@ -821,6 +839,36 @@ $cars_query = car_listings_execute_query( $args );
         font-size: 0.76rem;
         padding: 0.28rem 0.35rem;
     }
+}
+
+/* ============================================
+   No-results clear button
+   ============================================ */
+.tcp-no-results-clear {
+    display: none;
+    text-align: center;
+    margin: -0.5rem 0 1.25rem;
+}
+.tcp-no-results-clear.visible {
+    display: block;
+}
+.tcp-clear-all-filters-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.25rem;
+    border: 2px solid #dfe2e6;
+    border-radius: 0.5rem;
+    background: #fff;
+    color: #2a3546;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+.tcp-clear-all-filters-btn:hover {
+    border-color: #bbb;
+    background: #f9fafb;
 }
 
 /* ============================================
@@ -1070,12 +1118,37 @@ $cars_query = car_listings_execute_query( $args );
         $container.attr('data-atts', JSON.stringify(atts));
     }
 
+    var $noResultsClear = $('#tcp-no-results-clear');
+
     function updateResultsCount(total) {
         var count = parseInt(total, 10);
         if (isNaN(count) || count < 0) {
             count = 0;
         }
         $results.text(count.toLocaleString() + ' results found');
+        updateClearAllButton(count);
+    }
+
+    function updateClearAllButton(count) {
+        if (count === 0) {
+            if (!$noResultsClear.find('.tcp-clear-all-filters-btn').length) {
+                $noResultsClear.html('<button type="button" class="tcp-clear-all-filters-btn" id="tcp-no-results-clear-btn">Clear all filters</button>');
+            }
+            $noResultsClear.addClass('visible');
+        } else {
+            $noResultsClear.removeClass('visible').empty();
+        }
+    }
+
+    function resetSort() {
+        $sort.find('.tcp-sort-option').removeClass('selected');
+        $sort.find('.tcp-sort-option').first().addClass('selected');
+        $sortLabel.text('Newest');
+        var atts = $container.data('atts') || {};
+        atts.orderby = 'date';
+        atts.order = 'DESC';
+        $container.data('atts', atts);
+        $container.attr('data-atts', JSON.stringify(atts));
     }
 
     // Filter label map for chips
@@ -1469,6 +1542,7 @@ $cars_query = car_listings_execute_query( $args );
          'year_min', 'year_max', 'fuel_type', 'body_type', 'location_radius'].forEach(function(key) {
             clearFilter(key);
         });
+        resetSort();
         CarFilters.triggerFilter(group);
     });
 
@@ -1512,6 +1586,16 @@ $cars_query = car_listings_execute_query( $args );
         }
     }
 
+    /* ── No-results clear all button ── */
+    $noResultsClear.on('click', '#tcp-no-results-clear-btn', function() {
+        ['make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max',
+         'year_min', 'year_max', 'fuel_type', 'body_type', 'location_radius'].forEach(function(key) {
+            clearFilter(key);
+        });
+        resetSort();
+        CarFilters.triggerFilter(group);
+    });
+
     /* ── Modal apply / clear buttons ── */
     $('#tcp-modal-apply-btn').on('click', function() {
         CarFilters.triggerFilter(group);
@@ -1521,6 +1605,7 @@ $cars_query = car_listings_execute_query( $args );
          'year_min', 'year_max', 'fuel_type', 'body_type'].forEach(function(key) {
             clearFilter(key);
         });
+        resetSort();
         CarFilters.triggerFilter(group);
     });
 
@@ -1720,6 +1805,10 @@ $cars_query = car_listings_execute_query( $args );
         var hasLocationFromUrl = hydrateLocationFromUrl();
         setTimeout(buildChips, 100);
         updateLocationRadiusUI(locationState.radiusKm);
+        var initialCount = parseInt($results.text(), 10);
+        if (!isNaN(initialCount)) {
+            updateClearAllButton(initialCount);
+        }
         if (hasLocationFromUrl) {
             loadPage(1, { scroll: false });
         }
