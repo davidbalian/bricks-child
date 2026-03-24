@@ -235,8 +235,6 @@ $cars_query = car_listings_execute_query( $args );
     <p class="tcp-results-count" id="tcp-results-count">
         <?php echo esc_html( number_format_i18n( (int) $cars_query->found_posts ) . ' results found' ); ?>
     </p>
-    <div class="tcp-no-results-clear" id="tcp-no-results-clear"></div>
-
     <div class="car-listings-container"
          id="test-cars-listings"
          data-atts="<?php echo esc_attr( wp_json_encode( $listing_atts ) ); ?>"
@@ -844,13 +842,8 @@ body {
 /* ============================================
    No-results clear button
    ============================================ */
-.tcp-no-results-clear {
-    display: none;
-    text-align: center;
-    margin: -0.5rem 0 1.25rem;
-}
-.tcp-no-results-clear.visible {
-    display: block;
+.car-listings-no-results {
+    grid-column: 1 / -1;
 }
 .tcp-clear-all-filters-btn {
     display: inline-flex;
@@ -865,6 +858,9 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: border-color 0.15s, background 0.15s;
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin-top: 0.5rem;
 }
 .tcp-clear-all-filters-btn:hover {
     border-color: #bbb;
@@ -1118,8 +1114,6 @@ body {
         $container.attr('data-atts', JSON.stringify(atts));
     }
 
-    var $noResultsClear = $('#tcp-no-results-clear');
-
     function updateResultsCount(total) {
         var count = parseInt(total, 10);
         if (isNaN(count) || count < 0) {
@@ -1130,13 +1124,12 @@ body {
     }
 
     function updateClearAllButton(count) {
+        $wrapper.find('.tcp-clear-all-filters-btn').remove();
         if (count === 0) {
-            if (!$noResultsClear.find('.tcp-clear-all-filters-btn').length) {
-                $noResultsClear.html('<button type="button" class="tcp-clear-all-filters-btn" id="tcp-no-results-clear-btn">Clear all filters</button>');
+            var $noResults = $wrapper.find('.car-listings-no-results');
+            if ($noResults.length) {
+                $noResults.after('<button type="button" class="tcp-clear-all-filters-btn" id="tcp-no-results-clear-btn">Clear all filters</button>');
             }
-            $noResultsClear.addClass('visible');
-        } else {
-            $noResultsClear.removeClass('visible').empty();
         }
     }
 
@@ -1587,7 +1580,7 @@ body {
     }
 
     /* ── No-results clear all button ── */
-    $noResultsClear.on('click', '#tcp-no-results-clear-btn', function() {
+    $wrapper.on('click', '#tcp-no-results-clear-btn', function() {
         ['make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max',
          'year_min', 'year_max', 'fuel_type', 'body_type', 'location_radius'].forEach(function(key) {
             clearFilter(key);
@@ -1805,9 +1798,9 @@ body {
         var hasLocationFromUrl = hydrateLocationFromUrl();
         setTimeout(buildChips, 100);
         updateLocationRadiusUI(locationState.radiusKm);
-        var initialCount = parseInt($results.text(), 10);
-        if (!isNaN(initialCount)) {
-            updateClearAllButton(initialCount);
+        var initialCountText = parseInt($results.text(), 10);
+        if (!isNaN(initialCountText)) {
+            updateClearAllButton(initialCountText);
         }
         if (hasLocationFromUrl) {
             loadPage(1, { scroll: false });
