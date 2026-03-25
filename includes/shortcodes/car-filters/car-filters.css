@@ -171,7 +171,12 @@
 
 /* Search Input */
 .car-filter-dropdown-search {
-    display: none !important;
+    display: none; /* Hidden by default; enabled when dropdown is open */
+}
+
+/* Show search only while the dropdown menu is open */
+.car-filter-dropdown.open .car-filter-dropdown-search {
+    display: block !important;
 }
 
 /* Options Container */
