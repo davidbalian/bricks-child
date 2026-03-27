@@ -870,8 +870,26 @@ body {
 }
 .tcp-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    justify-content: start;
+    justify-items: stretch;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1.5rem;
+}
+@media (max-width: 1199px) {
+    .tcp-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+@media (max-width: 767px) {
+    .tcp-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+}
+@media (max-width: 479px) {
+    .tcp-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ============================================
