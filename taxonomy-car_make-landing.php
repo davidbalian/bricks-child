@@ -156,6 +156,12 @@ get_header();
 <!-- Main content -->
 <div class="tcp-main">
     <h1 class="tcp-heading"><?php echo esc_html($landing['h1']); ?></h1>
+    <p class="tcp-heading-browse-all">
+        <?php echo esc_html__( 'Looking for another model? ', 'bricks-child' ); ?>
+        <a class="tcp-heading-browse-all-link" href="<?php echo esc_url( trailingslashit( home_url( '/cars/' ) ) ); ?>">
+            <?php esc_html_e( 'Browse all used cars in Cyprus here.', 'bricks-child' ); ?>
+        </a>
+    </p>
     <p class="tcp-results-count" id="tcp-results-count">
         <?php echo esc_html( number_format_i18n( (int) $cars_query->found_posts ) . ' results found' ); ?>
     </p>
@@ -774,6 +780,22 @@ body {
     font-weight: 500;
     color: #2a3546;
     margin: 0 0 0.5rem;
+}
+.tcp-heading-browse-all {
+    margin: 0 0 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #2a3546;
+}
+.tcp-heading-browse-all-link {
+    color: inherit;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 0.12em;
+}
+.tcp-heading-browse-all-link:hover {
+    color: inherit;
+    opacity: 0.85;
 }
 .tcp-results-count {
     margin: 0 0 1.25rem;
