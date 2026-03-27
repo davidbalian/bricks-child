@@ -17,10 +17,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Enqueue styles
  */
 function bricks_child_enqueue_styles() {
-    // Enqueue Font Awesome from CDN first with higher priority
-    wp_enqueue_style( 'font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css', array(), '6.7.2', 'all' );
-    
-    wp_enqueue_style( 'bricks-child-theme-css', get_stylesheet_directory_uri() . '/style.css', array('bricks-frontend', 'font-awesome'), filemtime( get_stylesheet_directory() . '/style.css' ), 'all' );
+    // On cars browse + car_make landings, Bricks already loads Font Awesome icon layers — skip duplicate CDN bundle.
+    $use_bricks_fa_only = function_exists( 'autoagora_is_cars_browse_light_context' ) && autoagora_is_cars_browse_light_context();
+    if ( ! $use_bricks_fa_only ) {
+        wp_enqueue_style( 'font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css', array(), '6.7.2', 'all' );
+    }
+
+    $child_css_deps = array( 'bricks-frontend' );
+    if ( ! $use_bricks_fa_only ) {
+        $child_css_deps[] = 'font-awesome';
+    }
+
+    wp_enqueue_style( 'bricks-child-theme-css', get_stylesheet_directory_uri() . '/style.css', $child_css_deps, filemtime( get_stylesheet_directory() . '/style.css' ), 'all' );
 
     // Favourites Button CSS moved to conditional loading in favorite-button.php
 

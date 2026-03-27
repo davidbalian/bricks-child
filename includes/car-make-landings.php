@@ -1102,3 +1102,26 @@ function autoagora_filter_body_classes($classes) {
     return $classes;
 }
 add_filter('body_class', 'autoagora_filter_body_classes');
+
+/**
+ * Bricks header/footer + custom cars listing body (/cars/, filter routes, car_make taxonomy).
+ * Used to skip duplicate Font Awesome and trim plugin CSS.
+ *
+ * @return bool
+ */
+function autoagora_is_cars_browse_light_context() {
+    if (is_tax('car_make')) {
+        return true;
+    }
+    if (function_exists('autoagora_is_cars_filter_route') && autoagora_is_cars_filter_route()) {
+        return true;
+    }
+    if (is_page()) {
+        global $post;
+        if ($post && isset($post->post_name) && $post->post_name === 'cars') {
+            return true;
+        }
+    }
+
+    return false;
+}

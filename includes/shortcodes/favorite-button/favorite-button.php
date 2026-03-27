@@ -70,7 +70,7 @@ function enqueue_favorite_button_assets() {
         wp_enqueue_style(
             'favorite-button-css',
             get_stylesheet_directory_uri() . '/css/favourites-button.css',
-            array('font-awesome'),
+            array( 'bricks-frontend' ),
             filemtime( get_stylesheet_directory() . '/css/favourites-button.css' )
         );
         

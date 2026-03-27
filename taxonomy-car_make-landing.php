@@ -51,10 +51,7 @@ if (function_exists('car_card_enqueue_assets')) {
     car_card_enqueue_assets();
 }
 
-if ( defined( 'GOOGLE_MAPS_API_KEY' ) && GOOGLE_MAPS_API_KEY ) {
-    $google_maps_url = 'https://maps.googleapis.com/maps/api/js?key=' . urlencode( GOOGLE_MAPS_API_KEY ) . '&libraries=places&language=en&loading=async';
-    wp_enqueue_script( 'google-maps', $google_maps_url, array(), null, true );
-}
+// Google Maps: loaded on first Location modal open via autoagora-car-browse-maps-loader (see includes/core/car-browse-assets.php).
 
 get_header();
 ?>
@@ -1090,14 +1087,23 @@ body {
     function openLocationModal() {
         $locationOverlay.addClass('open');
         $('body').css('overflow', 'hidden');
-        initLocationMap();
-        setTimeout(function() {
-            if (!locationMap || typeof google === 'undefined' || !google.maps) return;
-            google.maps.event.trigger(locationMap, 'resize');
-            if (locationState.lat && locationState.lng) {
-                locationMap.setCenter({ lat: locationState.lat, lng: locationState.lng });
-            }
-        }, 50);
+        function afterMapsReady() {
+            initLocationMap();
+            setTimeout(function() {
+                if (!locationMap || typeof google === 'undefined' || !google.maps) return;
+                google.maps.event.trigger(locationMap, 'resize');
+                if (locationState.lat && locationState.lng) {
+                    locationMap.setCenter({ lat: locationState.lat, lng: locationState.lng });
+                }
+            }, 50);
+        }
+        if (typeof google !== 'undefined' && google.maps) {
+            afterMapsReady();
+        } else if (typeof window.autoagoraLoadCarBrowseMaps === 'function') {
+            window.autoagoraLoadCarBrowseMaps(afterMapsReady);
+        } else {
+            afterMapsReady();
+        }
     }
 
     function closeLocationModal() {
