@@ -445,13 +445,15 @@ function car_filters_ajax_filter_listings() {
     // Render cards
     ob_start();
     if ($car_query->have_posts()) {
+        $listing_card_index = 0;
         while ($car_query->have_posts()) {
             $car_query->the_post();
             if ($use_car_card) {
-                render_car_card(get_the_ID());
+                render_car_card(get_the_ID(), array('listing_index' => $listing_card_index));
             } elseif (function_exists('car_listings_render_card')) {
                 car_listings_render_card(get_the_ID());
             }
+            $listing_card_index++;
         }
     } else {
         echo '<p class="car-listings-no-results">No car listings found matching your criteria.</p>';

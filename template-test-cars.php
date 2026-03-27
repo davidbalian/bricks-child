@@ -221,8 +221,11 @@ $cars_query = car_listings_execute_query( $query_args );
                 $post_ids = wp_list_pluck( $cars_query->posts, 'ID' );
                 update_postmeta_cache( $post_ids );
 
-                while ( $cars_query->have_posts() ) : $cars_query->the_post();
-                    render_car_card( get_the_ID() );
+                $listing_card_index = 0;
+                while ( $cars_query->have_posts() ) :
+                    $cars_query->the_post();
+                    render_car_card( get_the_ID(), array( 'listing_index' => $listing_card_index ) );
+                    $listing_card_index++;
                 endwhile;
             else :
                 ?>

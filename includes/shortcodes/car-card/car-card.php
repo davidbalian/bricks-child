@@ -15,6 +15,21 @@ if (!defined('ABSPATH')) {
 add_shortcode('car_card', 'car_card_shortcode');
 
 /**
+ * Prefer theme-registered car_large (800px) over WP large (1024px+) when that file exists.
+ *
+ * @param int $attachment_id Attachment ID.
+ * @return string Registered size slug.
+ */
+function car_card_best_image_size_for_attachment($attachment_id) {
+    foreach (array('car_large', 'large', 'medium') as $size) {
+        if (wp_get_attachment_image_url($attachment_id, $size)) {
+            return $size;
+        }
+    }
+    return 'full';
+}
+
+/**
  * Shortcode handler
  */
 function car_card_shortcode($atts) {
@@ -34,11 +49,18 @@ function car_card_shortcode($atts) {
 }
 
 /**
- * Main reusable render function — call from any PHP context
+ * Main reusable render function — call from any PHP context.
+ *
+ * @param int   $post_id Post ID.
+ * @param array $context Optional. Pass array( 'listing_index' => 0 ) for the first card in a
+ *                       server-rendered grid so the first slide gets LCP hints (eager + fetchpriority high).
  */
-function render_car_card($post_id) {
+function render_car_card($post_id, $context = array()) {
     // Enqueue assets once
     car_card_enqueue_assets();
+
+    $listing_index      = array_key_exists('listing_index', $context) ? (int) $context['listing_index'] : -1;
+    $is_first_grid_card = ($listing_index === 0);
 
     // Get ACF fields
     $make = get_field('make', $post_id);
@@ -128,12 +150,28 @@ function render_car_card($post_id) {
             <?php if ($slide_count > 0) : ?>
                 <div class="car-card-slider-track">
                     <?php foreach ($slide_ids as $index => $img_id) :
-                        $img_url = wp_get_attachment_image_url($img_id, 'large');
-                        if (!$img_url) continue;
+                        $slide_size     = car_card_best_image_size_for_attachment($img_id);
+                        $slide_img_html = wp_get_attachment_image(
+                            $img_id,
+                            $slide_size,
+                            false,
+                            array(
+                                'alt'         => '',
+                                'decoding'    => 'async',
+                                'draggable'   => 'false',
+                                'sizes'       => '(max-width: 640px) 100vw, min(420px, 50vw)',
+                                'class'       => 'car-card-slide-img',
+                                'loading'     => ($is_first_grid_card && $index === 0) ? 'eager' : 'lazy',
+                                'fetchpriority' => ($is_first_grid_card && $index === 0) ? 'high' : 'low',
+                            )
+                        );
+                        if ($slide_img_html === '') {
+                            continue;
+                        }
                         $is_last = ($index === $slide_count - 1) && ($slide_count === $max_slides);
                     ?>
                         <div class="car-card-slide" data-index="<?php echo $index + 1; ?>">
-                            <img src="<?php echo esc_url($img_url); ?>" alt="" draggable="false" loading="lazy">
+                            <?php echo $slide_img_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_get_attachment_image is escaped by core. ?>
                             <?php if ($is_last) : ?>
                                 <div class="car-card-slide-overlay">
                                     <a href="<?php echo esc_url($permalink); ?>" class="car-card-view-all-btn">View All Images</a>
@@ -168,7 +206,12 @@ function render_car_card($post_id) {
             <h3 class="car-card-title"><?php echo esc_html(get_the_title($post_id)); ?></h3>
 
             <?php if ($mileage) : ?>
-                <div class="car-card-mileage"><i class="ion-ios-speedometer"></i> <?php echo esc_html(number_format(floatval(str_replace(',', '', $mileage)))); ?>km</div>
+                <div class="car-card-mileage">
+                    <span class="car-card-mileage-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l3.5 2"/></svg>
+                    </span>
+                    <?php echo esc_html(number_format(floatval(str_replace(',', '', $mileage)))); ?>km
+                </div>
             <?php endif; ?>
 
             <div class="car-card-specs">

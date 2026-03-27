@@ -443,15 +443,22 @@ function car_listings_render_output($car_query, $atts) {
 
         <?php if ($car_query->have_posts()) : ?>
             <div class="car-listings-wrapper">
-                <?php while ($car_query->have_posts()) : $car_query->the_post(); ?>
+                <?php
+                $listing_card_index = 0;
+                while ($car_query->have_posts()) :
+                    $car_query->the_post();
+                    ?>
                     <?php
                     if ($use_car_card) {
-                        render_car_card(get_the_ID());
+                        render_car_card(get_the_ID(), array('listing_index' => $listing_card_index));
                     } else {
                         car_listings_render_card(get_the_ID());
                     }
                     ?>
-                <?php endwhile; ?>
+                    <?php
+                    $listing_card_index++;
+                endwhile;
+                ?>
             </div>
 
             <?php if ($infinite_scroll && $car_query->max_num_pages > 1) : ?>
@@ -685,13 +692,15 @@ function car_listings_ajax_load_more() {
     if ($car_query->have_posts()) {
         $card_type = isset($atts['card_type']) ? $atts['card_type'] : '';
         $use_car_card = ($card_type === 'car_card') && function_exists('render_car_card');
+        $listing_card_index = 0;
         while ($car_query->have_posts()) {
             $car_query->the_post();
             if ($use_car_card) {
-                render_car_card(get_the_ID());
+                render_car_card(get_the_ID(), array('listing_index' => $listing_card_index));
             } else {
                 car_listings_render_card(get_the_ID());
             }
+            $listing_card_index++;
         }
     }
     $html = ob_get_clean();

@@ -672,3 +672,11 @@ i.fas.fa-heart {
 i.far.fa-heart {
   font-weight: 400 !important; /* Outline heart */
 }
+
+/* Reserve header logo box early (Lighthouse: layout shift from logo + font paint). Bricks outputs 1024×213 attrs but displays smaller. */
+img.bricks-site-logo {
+  width: 125px;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 1024 / 213;
+}

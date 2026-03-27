@@ -172,6 +172,16 @@ function bricks_child_enqueue_styles() {
 add_action( 'wp_enqueue_scripts', 'bricks_child_enqueue_styles', 15 );
 
 /**
+ * Dashicons are only needed for the admin bar. Dropping them for visitors cuts unused CSS on listings and elsewhere.
+ */
+function bricks_child_dequeue_dashicons_when_admin_bar_hidden() {
+	if ( ! is_admin_bar_showing() ) {
+		wp_dequeue_style( 'dashicons' );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'bricks_child_dequeue_dashicons_when_admin_bar_hidden', 100 );
+
+/**
  * Enqueue styles for the custom login page.
  */
 function bricks_child_enqueue_login_styles() {
