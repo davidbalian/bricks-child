@@ -206,12 +206,7 @@ function render_car_card($post_id, $context = array()) {
             <h3 class="car-card-title"><?php echo esc_html(get_the_title($post_id)); ?></h3>
 
             <?php if ($mileage) : ?>
-                <div class="car-card-mileage">
-                    <span class="car-card-mileage-icon" aria-hidden="true">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l3.5 2"/></svg>
-                    </span>
-                    <?php echo esc_html(number_format(floatval(str_replace(',', '', $mileage)))); ?>km
-                </div>
+                <div class="car-card-mileage"><?php echo esc_html(number_format(floatval(str_replace(',', '', $mileage)))); ?>km</div>
             <?php endif; ?>
 
             <div class="car-card-specs">
