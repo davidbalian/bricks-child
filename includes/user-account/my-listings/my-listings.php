@@ -26,9 +26,12 @@ function display_my_listings($atts) {
 
     // AJAX handler for loading listings
     require_once get_stylesheet_directory() . '/includes/user-account/my-listings/MyListingsAjaxHandler.php';
+    require_once get_stylesheet_directory() . '/includes/user-account/my-listings/MyListingsStatsManager.php';
     
     $refresh_manager = new RefreshListingManager();
     $refresh_ui = new RefreshListingUI($refresh_manager);
+    $stats_manager = new MyListingsStatsManager();
+    $user_stats = $stats_manager->get_stats_for_user((int) $current_user->ID);
     
     // Enqueue jQuery
     wp_enqueue_script('jquery');
@@ -96,8 +99,9 @@ function display_my_listings($atts) {
         
         <div class="listings-area">
             <?php
-            // Get current filter from URL parameter
+            // Get current filter/sort from URL parameters
             $current_filter = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : 'all';
+            $current_sort = isset($_GET['sort']) ? sanitize_text_field($_GET['sort']) : 'newest';
             
             // Add filter dropdown
             ?>
@@ -127,11 +131,42 @@ function display_my_listings($atts) {
                         <input type="text" id="listing-search" placeholder="Search listings..." class="search-input">
                     </div>
                 </div>
+                <div class="my-listings-stats" aria-label="My listing performance statistics">
+                    <div class="my-listings-stat-card">
+                        <span class="my-listings-stat-label">Total cars posted</span>
+                        <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['total_listings'])); ?></strong>
+                    </div>
+                    <div class="my-listings-stat-card">
+                        <span class="my-listings-stat-label">Active listings</span>
+                        <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['active_listings'])); ?></strong>
+                    </div>
+                    <div class="my-listings-stat-card">
+                        <span class="my-listings-stat-label">Pending approval</span>
+                        <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['pending_listings'])); ?></strong>
+                    </div>
+                    <div class="my-listings-stat-card">
+                        <span class="my-listings-stat-label">Sold listings</span>
+                        <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['sold_listings'])); ?></strong>
+                    </div>
+                    <div class="my-listings-stat-card">
+                        <span class="my-listings-stat-label">Total views generated</span>
+                        <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['total_views'])); ?></strong>
+                    </div>
+                    <div class="my-listings-stat-card">
+                        <span class="my-listings-stat-label">Unique visitors</span>
+                        <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['unique_views'])); ?></strong>
+                    </div>
+                    <div class="my-listings-stat-card">
+                        <span class="my-listings-stat-label">Total lead clicks</span>
+                        <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['total_leads'])); ?></strong>
+                    </div>
+                    <div class="my-listings-stat-card">
+                        <span class="my-listings-stat-label">Avg. views per listing</span>
+                        <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((float) $user_stats['average_views_per_listing'], 1)); ?></strong>
+                    </div>
+                </div>
 
                 <?php
-                // Get current sort from URL parameter
-                $current_sort = isset($_GET['sort']) ? sanitize_text_field($_GET['sort']) : 'newest';
-                
                 // Determine current page for initial server-side query
                 $current_page = get_query_var('paged') ? get_query_var('paged') : 1;
                 

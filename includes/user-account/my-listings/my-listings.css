@@ -73,6 +73,35 @@
   border: var(--border);
 }
 
+.my-listings-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.my-listings-stat-card {
+  border: var(--border);
+  border-radius: var(--border-radius-medium);
+  background: var(--white);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.my-listings-stat-label {
+  font-size: 0.8rem;
+  color: var(--light-paragraph-color);
+  line-height: 1.3;
+}
+
+.my-listings-stat-value {
+  font-size: 1.25rem;
+  color: var(--text-color);
+  line-height: 1.2;
+}
+
 .status-filter-form,
 .sort-container,
 .search-container {
@@ -256,6 +285,10 @@
   .post-99 {
     padding: 1.5rem 0.5rem !important;
   }
+
+  .my-listings-stats {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+  }
 }
 
 @media (max-width: 599.98px) {
@@ -284,5 +317,9 @@
 
   .search-container {
     width: 100%;
+  }
+
+  .my-listings-stats {
+    grid-template-columns: 1fr;
   }
 }
