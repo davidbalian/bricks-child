@@ -436,6 +436,7 @@ function car_filters_ajax_filter_listings() {
     if ($car_query->have_posts()) {
         $post_ids = wp_list_pluck($car_query->posts, 'ID');
         update_postmeta_cache($post_ids);
+        update_post_thumbnail_cache($car_query);
     }
 
     // Determine which card renderer to use

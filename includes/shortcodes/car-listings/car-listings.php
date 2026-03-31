@@ -425,6 +425,7 @@ function car_listings_render_output($car_query, $atts) {
     if ($car_query->have_posts()) {
         $post_ids = wp_list_pluck($car_query->posts, 'ID');
         update_postmeta_cache($post_ids);
+        update_post_thumbnail_cache($car_query);
     }
 
     // Use ID from attributes (already set in main function)
@@ -685,6 +686,7 @@ function car_listings_ajax_load_more() {
     if ($car_query->have_posts()) {
         $post_ids = wp_list_pluck($car_query->posts, 'ID');
         update_postmeta_cache($post_ids);
+        update_post_thumbnail_cache($car_query);
     }
 
     // Render cards

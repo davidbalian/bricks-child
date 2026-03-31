@@ -217,6 +217,7 @@ $cars_query = car_listings_execute_query( $query_args );
             if ( $cars_query->have_posts() ) :
                 $post_ids = wp_list_pluck( $cars_query->posts, 'ID' );
                 update_postmeta_cache( $post_ids );
+                update_post_thumbnail_cache( $cars_query );
 
                 $listing_card_index = 0;
                 while ( $cars_query->have_posts() ) :

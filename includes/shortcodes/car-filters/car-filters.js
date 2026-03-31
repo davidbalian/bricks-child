@@ -1062,6 +1062,26 @@
         }
     };
 
+    function groupHasActiveFilters(group) {
+        var state = CarFilters.getState(group);
+        if (!state) {
+            return false;
+        }
+
+        return !!(
+            (state.make && state.make.value) ||
+            (state.model && state.model.value) ||
+            state.price_min ||
+            state.price_max ||
+            state.mileage_min ||
+            state.mileage_max ||
+            state.year_min ||
+            state.year_max ||
+            state.fuel_type ||
+            state.body_type
+        );
+    }
+
     /**
      * Initialize everything
      */
@@ -1288,10 +1308,11 @@
             }
         }
 
-        // Fire initial cascade fetch for each group to sync dropdown options
+        // Fire initial cascade fetch only when a group already has active filters.
+        // This avoids expensive option-count queries on a clean first page load.
         $('.car-filters-container').each(function() {
             var group = $(this).data('group');
-            if (group) {
+            if (group && groupHasActiveFilters(group)) {
                 CascadeController.fetchAvailableOptions(group);
             }
         });

@@ -62,16 +62,16 @@ function render_car_card($post_id, $context = array()) {
     $listing_index      = array_key_exists('listing_index', $context) ? (int) $context['listing_index'] : -1;
     $is_first_grid_card = ($listing_index === 0);
 
-    // Get ACF fields
-    $make = get_field('make', $post_id);
-    $model = get_field('model', $post_id);
-    $price = get_field('price', $post_id);
-    $mileage = get_field('mileage', $post_id);
-    $engine_capacity = get_field('engine_capacity', $post_id);
-    $fuel_type = get_field('fuel_type', $post_id);
-    $transmission = get_field('transmission', $post_id);
-    $car_district = get_field('car_district', $post_id);
-    $car_city = get_field('car_city', $post_id);
+    // Read raw meta once to avoid repeated ACF field lookups per card.
+    $make = car_card_get_meta_value($post_id, 'make');
+    $model = car_card_get_meta_value($post_id, 'model');
+    $price = car_card_get_meta_value($post_id, 'price');
+    $mileage = car_card_get_meta_value($post_id, 'mileage');
+    $engine_capacity = car_card_get_meta_value($post_id, 'engine_capacity');
+    $fuel_type = car_card_get_meta_value($post_id, 'fuel_type');
+    $transmission = car_card_get_meta_value($post_id, 'transmission');
+    $car_district = car_card_get_meta_value($post_id, 'car_district');
+    $car_city = car_card_get_meta_value($post_id, 'car_city');
     $permalink = get_permalink($post_id);
 
     // Relative date
@@ -104,12 +104,12 @@ function render_car_card($post_id, $context = array()) {
     }
 
     // Badges & featured
-    $show_full_badge = get_field('fulldetailsbadge', $post_id);
-    $show_extra_badge = get_field('extradetailsbadge', $post_id);
-    $is_featured = get_field('is_featured', $post_id);
+    $show_full_badge = car_card_get_meta_value($post_id, 'fulldetailsbadge');
+    $show_extra_badge = car_card_get_meta_value($post_id, 'extradetailsbadge');
+    $is_featured = car_card_get_meta_value($post_id, 'is_featured');
 
     // Images — handle both ID array and associative array formats
-    $raw_images = get_field('car_images', $post_id, false);
+    $raw_images = get_post_meta($post_id, 'car_images', true);
     $image_ids = array();
 
     if (!empty($raw_images) && is_array($raw_images)) {
@@ -238,6 +238,19 @@ function render_car_card($post_id, $context = array()) {
         </a>
     </article>
     <?php
+}
+
+/**
+ * Fetch a single post meta value for card rendering.
+ *
+ * Uses the WP meta cache primed by listing queries.
+ *
+ * @param int    $post_id  Listing post ID.
+ * @param string $meta_key Meta key.
+ * @return mixed
+ */
+function car_card_get_meta_value($post_id, $meta_key) {
+    return get_post_meta($post_id, $meta_key, true);
 }
 
 /**
