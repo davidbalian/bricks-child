@@ -1,50 +1,48 @@
 /**
  * Dealership Access Message Styles
  */
- 
- .dealership-access {
+ .dealership-claim {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #4b5563;
+  }
+  
+  .dealership-claim__icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 16px 20px;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    background: #f9fafb;
-    margin-bottom: 20px;
-  }
-  
-  .dealership-access__icon {
+    justify-content: center;
     flex-shrink: 0;
+    margin-top: 2px;
   }
   
-  .dealership-access__title {
+  .dealership-claim__text strong {
+    display: block;
     font-weight: 600;
-    margin: 0;
-    font-size: 15px;
     color: #111827;
   }
   
-  .dealership-access__description {
-    margin: 4px 0 0;
-    font-size: 14px;
+  .dealership-claim__text span {
+    display: block;
+    font-size: 13px;
     color: #6b7280;
   }
   
-  .dealership-access__action {
-    margin-left: auto;
-  }
-  
-  .dealership-access__btn {
-    background: #2563eb;
-    color: #fff;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-size: 14px;
+  .dealership-claim a {
+    color: #2563eb;
     text-decoration: none;
-    transition: background 0.2s ease;
   }
   
-  .dealership-access__btn:hover {
-    background: #1d4ed8;
+  .dealership-claim a:hover {
+    text-decoration: underline;
   }
 
