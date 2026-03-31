@@ -37,7 +37,7 @@ function car_single_whatsapp_button_shortcode($atts) {
         $car_year = get_field('year', $post_id); // Assumes ACF fields for car details
         $car_make = get_field('make', $post_id);
         $car_model = get_field('model', $post_id);
-        $message_text = urlencode("Hi, I'm interested in your $car_year $car_make $car_model on AutoAgora.cy.");
+        $message_text = urlencode("Hi, I found your $car_year $car_make $car_model on AutoAgora.cy and I'm interested. Is it still available?");
         $wa_link = "https://wa.me/" . $tel_link_number . "?text=" . $message_text;
         ?>
         <a href="<?php echo esc_url($wa_link); ?>" 
