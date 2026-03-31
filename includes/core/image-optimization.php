@@ -107,8 +107,12 @@ function optimize_car_image_sizes($sizes) {
         if (isset($sizes['medium'])) {
             $car_sizes['medium'] = $sizes['medium'];
         }
-        if (isset($sizes['large'])) {
-            $car_sizes['large'] = $sizes['large'];
+        // Include theme-specific listing sizes when registered.
+        if (isset($sizes['car_medium'])) {
+            $car_sizes['car_medium'] = $sizes['car_medium'];
+        }
+        if (isset($sizes['car_large'])) {
+            $car_sizes['car_large'] = $sizes['car_large'];
         }
         
         return $car_sizes;

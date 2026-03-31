@@ -15,13 +15,13 @@ if (!defined('ABSPATH')) {
 add_shortcode('car_card', 'car_card_shortcode');
 
 /**
- * Prefer theme-registered car_large (800px) over WP large (1024px+) when that file exists.
+ * Prefer smaller card-focused sizes to reduce listing payload.
  *
  * @param int $attachment_id Attachment ID.
  * @return string Registered size slug.
  */
 function car_card_best_image_size_for_attachment($attachment_id) {
-    foreach (array('car_large', 'large', 'medium') as $size) {
+    foreach (array('car_medium', 'medium', 'car_large', 'large', 'thumbnail') as $size) {
         if (wp_get_attachment_image_url($attachment_id, $size)) {
             return $size;
         }
@@ -159,7 +159,7 @@ function render_car_card($post_id, $context = array()) {
                                 'alt'         => '',
                                 'decoding'    => 'async',
                                 'draggable'   => 'false',
-                                'sizes'       => '(max-width: 640px) 100vw, min(420px, 50vw)',
+                                'sizes'       => '(max-width: 767px) 92vw, (max-width: 1200px) 48vw, 420px',
                                 'class'       => 'car-card-slide-img',
                                 'loading'     => ($is_first_grid_card && $index === 0) ? 'eager' : 'lazy',
                                 'fetchpriority' => ($is_first_grid_card && $index === 0) ? 'high' : 'low',
