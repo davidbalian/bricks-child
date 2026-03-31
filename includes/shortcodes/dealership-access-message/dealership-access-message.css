@@ -2,49 +2,45 @@
  * Dealership Access Message Styles
  */
  .dealership-claim {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 8px;
+    row-gap: 2px;
     margin-bottom: 10px;
     font-size: 14px;
+    align-items: center;
   }
   
-  .dealership-claim__icon {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #e5e7eb;
-    position: relative;
-    flex-shrink: 0;
+  /* Top row (icon + title) */
+  .dealership-claim > span {
+    grid-column: 1 / 3;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
   
-  .dealership-claim__icon::after {
-    content: "i";
-    font-size: 11px;
+  /* Icon */
+  .dealership-claim i {
     color: #2563eb;
-    font-weight: 600;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    font-size: 14px;
+    line-height: 1;
   }
   
+  /* Title */
+  .dealership-claim strong {
+    color: #111827;
+    font-weight: 600;
+  }
+  
+  /* Bottom text */
   .dealership-claim__text {
+    grid-column: 2;
     margin: 0;
     line-height: 1.4;
-    color: #374151;
-  }
-  
-  .dealership-claim__text strong {
-    font-weight: 600;
-    color: #111827;
-    margin-right: 6px;
-  }
-  
-  .dealership-claim__text span {
     color: #6b7280;
   }
   
+  /* Link */
   .dealership-claim a {
     color: #2563eb;
     text-decoration: none;
@@ -53,4 +49,3 @@
   .dealership-claim a:hover {
     text-decoration: underline;
   }
-
