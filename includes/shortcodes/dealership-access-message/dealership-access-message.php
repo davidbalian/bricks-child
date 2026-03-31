@@ -118,13 +118,28 @@ function dealership_access_message_shortcode($atts) {
 function get_dealership_access_message_html() {
     ob_start();
     ?>
-    <div class="dealership-access-message">
-        <p class="dealership-access-message-text">
-            ℹ️ Does this dealership belong to you?
-        </p>
-        <p class="dealership-access-message-description">
-            Contact us and gain full access to manage your inventory and dealership profile.
-        </p>
+    <div class="dealership-access">
+        <div class="dealership-access__icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="#3b82f6" stroke-width="2"/>
+                <path d="M12 8h.01M11 12h2v4h-2z" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </div>
+
+        <div class="dealership-access__content">
+            <p class="dealership-access__title">
+                Claim this dealership
+            </p>
+            <p class="dealership-access__description">
+                If this is your business, contact us to gain full access and manage your inventory and profile.
+            </p>
+        </div>
+
+        <div class="dealership-access__action">
+            <a href="/contact" class="dealership-access__btn">
+                Contact us
+            </a>
+        </div>
     </div>
     <?php
     return ob_get_clean();

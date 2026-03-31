@@ -1,25 +1,50 @@
 /**
  * Dealership Access Message Styles
  */
-
-.dealership-access-message {
-    padding: 1rem;
-    margin: 1rem 0;
-    background-color: #f0f7ff;
-    border-left: 4px solid #0066cc;
-    border-radius: 4px;
-}
-
-.dealership-access-message-text {
-    margin: 0 0 0.5rem 0;
+ 
+ .dealership-access {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #f9fafb;
+    margin-bottom: 20px;
+  }
+  
+  .dealership-access__icon {
+    flex-shrink: 0;
+  }
+  
+  .dealership-access__title {
     font-weight: 600;
-    color: #0066cc;
-}
-
-.dealership-access-message-description {
     margin: 0;
-    color: #333;
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
+    font-size: 15px;
+    color: #111827;
+  }
+  
+  .dealership-access__description {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: #6b7280;
+  }
+  
+  .dealership-access__action {
+    margin-left: auto;
+  }
+  
+  .dealership-access__btn {
+    background: #2563eb;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+  
+  .dealership-access__btn:hover {
+    background: #1d4ed8;
+  }
 
