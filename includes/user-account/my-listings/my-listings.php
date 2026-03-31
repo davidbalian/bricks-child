@@ -107,30 +107,6 @@ function display_my_listings($atts) {
             ?>
             <div class="listings-layout">
 
-                <div class="listings-filter">
-                    <form method="get" class="status-filter-form">
-                        <label for="status-filter">Filter by status:</label>
-                        <select name="status" id="status-filter">
-                            <option value="all" <?php selected($current_filter, 'all'); ?>>All Listings</option>
-                            <option value="pending" <?php selected($current_filter, 'pending'); ?>>Pending</option>
-                            <option value="publish" <?php selected($current_filter, 'publish'); ?>>Published</option>
-                            <option value="sold" <?php selected($current_filter, 'sold'); ?>>Sold</option>
-                        </select>
-                    </form>
-                    <div class="sort-container">
-                        <label for="sort-select">Sort by:</label>
-                        <select id="sort-select" class="sort-select">
-                            <option value="newest" <?php selected($current_sort, 'newest'); ?>>Newest First</option>
-                            <option value="oldest" <?php selected($current_sort, 'oldest'); ?>>Oldest First</option>
-                            <option value="price-high" <?php selected($current_sort, 'price-high'); ?>>Price: High to Low</option>
-                            <option value="price-low" <?php selected($current_sort, 'price-low'); ?>>Price: Low to High</option>
-                        </select>
-                    </div>
-                    <div class="search-container">
-                        <label for="listing-search">Search:</label>
-                        <input type="text" id="listing-search" placeholder="Search listings..." class="search-input">
-                    </div>
-                </div>
                 <div class="my-listings-stats" aria-label="My listing performance statistics">
                     <div class="my-listings-stat-card">
                         <span class="my-listings-stat-label">Total cars posted</span>
@@ -157,12 +133,37 @@ function display_my_listings($atts) {
                         <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['unique_views'])); ?></strong>
                     </div>
                     <div class="my-listings-stat-card">
-                        <span class="my-listings-stat-label">Total lead clicks</span>
+                        <span class="my-listings-stat-label">Contact Action Clicks</span>
                         <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['total_leads'])); ?></strong>
                     </div>
                     <div class="my-listings-stat-card">
                         <span class="my-listings-stat-label">Avg. views per listing</span>
                         <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((float) $user_stats['average_views_per_listing'], 1)); ?></strong>
+                    </div>
+                </div>
+
+                <div class="listings-filter">
+                    <form method="get" class="status-filter-form">
+                        <label for="status-filter">Filter by status:</label>
+                        <select name="status" id="status-filter">
+                            <option value="all" <?php selected($current_filter, 'all'); ?>>All Listings</option>
+                            <option value="pending" <?php selected($current_filter, 'pending'); ?>>Pending</option>
+                            <option value="publish" <?php selected($current_filter, 'publish'); ?>>Published</option>
+                            <option value="sold" <?php selected($current_filter, 'sold'); ?>>Sold</option>
+                        </select>
+                    </form>
+                    <div class="sort-container">
+                        <label for="sort-select">Sort by:</label>
+                        <select id="sort-select" class="sort-select">
+                            <option value="newest" <?php selected($current_sort, 'newest'); ?>>Newest First</option>
+                            <option value="oldest" <?php selected($current_sort, 'oldest'); ?>>Oldest First</option>
+                            <option value="price-high" <?php selected($current_sort, 'price-high'); ?>>Price: High to Low</option>
+                            <option value="price-low" <?php selected($current_sort, 'price-low'); ?>>Price: Low to High</option>
+                        </select>
+                    </div>
+                    <div class="search-container">
+                        <label for="listing-search">Search:</label>
+                        <input type="text" id="listing-search" placeholder="Search listings..." class="search-input">
                     </div>
                 </div>
 
