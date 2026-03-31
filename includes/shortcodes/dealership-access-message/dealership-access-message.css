@@ -3,37 +3,45 @@
  */
  .dealership-claim {
     display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 12px;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
     font-size: 14px;
-    color: #4b5563;
   }
   
   .dealership-claim__icon {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: #e5e7eb;
-    color: #2563eb;
-    font-size: 12px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: relative;
     flex-shrink: 0;
-    margin-top: 2px;
+  }
+  
+  .dealership-claim__icon::after {
+    content: "i";
+    font-size: 11px;
+    color: #2563eb;
+    font-weight: 600;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  .dealership-claim__text {
+    margin: 0;
+    line-height: 1.4;
+    color: #374151;
   }
   
   .dealership-claim__text strong {
-    display: block;
     font-weight: 600;
     color: #111827;
+    margin-right: 6px;
   }
   
   .dealership-claim__text span {
-    display: block;
-    font-size: 13px;
     color: #6b7280;
   }
   

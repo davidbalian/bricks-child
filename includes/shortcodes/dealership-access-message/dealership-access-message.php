@@ -119,14 +119,11 @@ function get_dealership_access_message_html() {
     ob_start();
     ?>
     <div class="dealership-claim">
-        <span class="dealership-claim__icon">i</span>
-        <div class="dealership-claim__text">
+        <span class="dealership-claim__icon"></span>
+        <p class="dealership-claim__text">
             <strong>Claim this dealership</strong>
-            <span>
-                If this is your business, 
-                <a href="/contact">contact us</a> to manage your profile.
-            </span>
-        </div>
+            <span>If this is your business, <a href="/contact">contact us</a> to manage your profile.</span>
+        </p>
     </div>
     <?php
     return ob_get_clean();
