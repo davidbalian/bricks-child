@@ -150,7 +150,7 @@ function seller_reviews_display_shortcode($atts) {
             <span class="seller-reviews-empty-message"><?php esc_html_e('No reviews yet', 'bricks-child'); ?></span>
             <?php if ($atts['show_form'] === 'true'): ?>
             <button type="button" class="seller-reviews-see-all-link btn-toggle-review-form">
-                <?php esc_html_e('See all reviews', 'bricks-child'); ?>
+                <?php esc_html_e('Be the first to leave a review', 'bricks-child'); ?>
             </button>
             <?php endif; ?>
         </div>

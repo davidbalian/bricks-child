@@ -203,7 +203,10 @@ class SellerReviewsDatabase {
         
         foreach ($reviews as $review) {
             if ((int) $review->reviewer_id === 0) {
-                $review->reviewer_name = __('Reviewer', 'bricks-child');
+                $guest_label = ! empty($review->reviewer_email) && is_email($review->reviewer_email)
+                    ? $review->reviewer_email
+                    : __('Reviewer', 'bricks-child');
+                $review->reviewer_name = $guest_label;
                 $review->reviewer_username = 'guest';
             } else {
                 $user_info = $this->get_user_display_info((int) $review->reviewer_id);
