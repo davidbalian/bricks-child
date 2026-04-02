@@ -2,10 +2,60 @@
 
 .seller-reviews-container {
   margin: 20px 0;
+}
+
+.seller-reviews-container--has-reviews {
   padding: 20px;
   background: #fff;
   border: 1px solid var(--bricks-color-chsdhg);
   border-radius: 0.75rem;
+}
+
+.seller-reviews-container--empty {
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+/* Empty state: message + "See all reviews" on one row, wraps on narrow widths */
+.seller-reviews-empty-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.seller-reviews-empty-message {
+  font-size: 16px;
+  font-weight: 400;
+  color: #363636;
+}
+
+.seller-reviews-see-all-link {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  color: #363636;
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+  cursor: pointer;
+  line-height: inherit;
+}
+
+.seller-reviews-see-all-link:hover,
+.seller-reviews-see-all-link:focus {
+  color: #363636;
+  text-decoration: underline;
+}
+
+.seller-reviews-see-all-link:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
 
 /* Rating Summary Section */
@@ -160,9 +210,13 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .seller-reviews-container {
+  .seller-reviews-container--has-reviews {
     margin: 15px 0;
     padding: 15px;
+  }
+
+  .seller-reviews-container--empty {
+    margin: 15px 0;
   }
 
   .review-header {

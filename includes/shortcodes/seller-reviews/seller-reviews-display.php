@@ -81,20 +81,21 @@ function seller_reviews_display_shortcode($atts) {
     // Start output buffering
     ob_start();
     ?>
-    <div class="seller-reviews-container" data-seller-id="<?php echo esc_attr($seller_id); ?>">
+    <?php
+    $has_reviews = (int) $reviews_summary['count'] > 0;
+    $container_mod = $has_reviews ? 'seller-reviews-container--has-reviews' : 'seller-reviews-container--empty';
+    ?>
+    <div class="seller-reviews-container <?php echo esc_attr($container_mod); ?>" data-seller-id="<?php echo esc_attr($seller_id); ?>">
         
+        <?php if ($has_reviews): ?>
         <!-- Rating Summary Section -->
         <div class="seller-rating-summary">
             <div class="rating-stars">
                 <?php echo generate_star_rating($reviews_summary['average']); ?>
                 <span class="rating-text">
-                    <?php if ($reviews_summary['count'] > 0): ?>
-                        <?php echo number_format($reviews_summary['average'], 1); ?> 
-                        (<?php echo $reviews_summary['count']; ?> 
-                        <?php echo _n('review', 'reviews', $reviews_summary['count'], 'bricks-child'); ?>)
-                    <?php else: ?>
-                        No reviews yet
-                    <?php endif; ?>
+                    <?php echo number_format($reviews_summary['average'], 1); ?>
+                    (<?php echo $reviews_summary['count']; ?>
+                    <?php echo _n('review', 'reviews', $reviews_summary['count'], 'bricks-child'); ?>)
                 </span>
             </div>
         </div>
@@ -132,14 +133,24 @@ function seller_reviews_display_shortcode($atts) {
         <?php endif; ?>
         
         <?php if ($atts['show_form'] === 'true'): ?>
-        <!-- Review Submission Form Section -->
         <div class="seller-review-form-container">
-            <!-- Always show "See all reviews" button to everyone -->
             <div class="review-form-toggle">
                 <button type="button" class="btn btn-primary btn-toggle-review-form">
                     See all reviews
                 </button>
             </div>
+        </div>
+        <?php endif; ?>
+
+        <?php else: ?>
+        <!-- No reviews: inline message + link-style control (opens same overlay) -->
+        <div class="seller-reviews-empty-inline">
+            <span class="seller-reviews-empty-message"><?php esc_html_e('No reviews yet', 'bricks-child'); ?></span>
+            <?php if ($atts['show_form'] === 'true'): ?>
+            <button type="button" class="seller-reviews-see-all-link btn-toggle-review-form">
+                <?php esc_html_e('See all reviews', 'bricks-child'); ?>
+            </button>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
         
