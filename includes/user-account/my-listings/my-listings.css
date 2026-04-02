@@ -51,6 +51,16 @@
   color: #721c24;
 }
 
+.notice-warning {
+  background-color: #fff3cd;
+  border-left-color: #856404;
+  color: #533f03;
+}
+
+.my-listings-stale-notice {
+  margin-bottom: 1.5rem;
+}
+
 .notice p {
   margin: 0;
 }

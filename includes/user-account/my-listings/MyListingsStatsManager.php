@@ -12,6 +12,8 @@ if (!defined('WPINC')) {
     die;
 }
 
+require_once dirname(__DIR__, 2) . '/user-manage-listings/refresh-listing/RefreshListingManager.php';
+
 class MyListingsStatsManager {
     /**
      * Build aggregate stats for a given user.
@@ -79,6 +81,9 @@ class MyListingsStatsManager {
         $post_status = get_post_status($listing_id);
         if ($post_status === 'publish') {
             $stats['active_listings']++;
+            if ($this->is_published_listing_stale_for_reminder($listing_id)) {
+                $stats['stale_listings']++;
+            }
             return;
         }
 
@@ -99,6 +104,50 @@ class MyListingsStatsManager {
         $stats['unique_views'] += $this->get_int_meta($listing_id, 'unique_views_count');
         $stats['total_leads'] += $this->get_int_meta($listing_id, 'call_button_clicks');
         $stats['total_leads'] += $this->get_int_meta($listing_id, 'whatsapp_button_clicks');
+    }
+
+    /**
+     * "Posted" time shown on car cards: publication_date meta if set, else WP post date string.
+     * Mirrors render_car_card() in car-card.php.
+     *
+     * @param int $listing_id Listing post ID.
+     * @return int|false Unix timestamp or false.
+     */
+    private function get_listing_card_posted_timestamp(int $listing_id) {
+        $publication_date = get_post_meta($listing_id, 'publication_date', true);
+        if (empty($publication_date)) {
+            $publication_date = get_the_date('Y-m-d H:i:s', $listing_id);
+        }
+        if ($publication_date === '') {
+            return false;
+        }
+        $ts = strtotime((string) $publication_date);
+
+        return $ts === false ? false : (int) $ts;
+    }
+
+    /**
+     * Stale if either WP post_date (browse uses orderby date) or the card display date is older
+     * than the refresh cooldown. Refresh updates both in RefreshListingManager::perform_refresh().
+     *
+     * @param int $listing_id Listing post ID.
+     * @return bool
+     */
+    private function is_published_listing_stale_for_reminder(int $listing_id): bool {
+        $cutoff_ts = current_time('timestamp')
+            - (RefreshListingManager::REFRESH_COOLDOWN_DAYS * DAY_IN_SECONDS);
+
+        $sort_ts = get_post_time('U', false, $listing_id);
+        if ($sort_ts !== false && (int) $sort_ts < $cutoff_ts) {
+            return true;
+        }
+
+        $card_ts = $this->get_listing_card_posted_timestamp($listing_id);
+        if ($card_ts !== false && $card_ts < $cutoff_ts) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -128,6 +177,7 @@ class MyListingsStatsManager {
             'active_listings'           => 0,
             'pending_listings'          => 0,
             'sold_listings'             => 0,
+            'stale_listings'            => 0,
             'total_views'               => 0,
             'unique_views'              => 0,
             'total_leads'               => 0,

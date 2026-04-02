@@ -32,6 +32,7 @@ function display_my_listings($atts) {
     $refresh_ui = new RefreshListingUI($refresh_manager);
     $stats_manager = new MyListingsStatsManager();
     $user_stats = $stats_manager->get_stats_for_user((int) $current_user->ID);
+    $stale_listings_count = (int) $user_stats['stale_listings'];
     
     // Enqueue jQuery
     wp_enqueue_script('jquery');
@@ -141,6 +142,27 @@ function display_my_listings($atts) {
                         <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((float) $user_stats['average_views_per_listing'], 1)); ?></strong>
                     </div>
                 </div>
+
+                <?php if ($stale_listings_count > 0) : ?>
+                    <div class="notice notice-warning my-listings-stale-notice" role="status">
+                        <p>
+                            <?php
+                            echo esc_html(
+                                sprintf(
+                                    /* translators: %d: number of stale listings */
+                                    _n(
+                                        'You have %d listing that is old. Refresh it using the Refresh Listing button so your listing can start appearing at the top of the search results again.',
+                                        'You have %d listings that are old. Refresh them using the Refresh Listing button so your listing can start appearing at the top of the search results again.',
+                                        $stale_listings_count,
+                                        'bricks-child'
+                                    ),
+                                    $stale_listings_count
+                                )
+                            );
+                            ?>
+                        </p>
+                    </div>
+                <?php endif; ?>
 
                 <div class="listings-filter">
                     <form method="get" class="status-filter-form">
