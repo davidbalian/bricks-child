@@ -1,7 +1,7 @@
 /* Seller Reviews Display Styles */
 
 .seller-reviews-container {
-  margin: 20px 0;
+  margin: 0;
 }
 
 .seller-reviews-container--has-reviews {
@@ -112,7 +112,7 @@
 
 /* Reviews List */
 .seller-reviews-list {
-  margin: 20px 0;
+  margin: 0;
 }
 
 .seller-reviews-list h4 {
@@ -213,12 +213,7 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .seller-reviews-container--has-reviews {
-    margin: 15px 0;
     padding: 15px;
-  }
-
-  .seller-reviews-container--empty {
-    margin: 15px 0;
   }
 
   .review-header {
