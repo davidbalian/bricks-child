@@ -64,7 +64,10 @@ final class DealershipPageCallButtonShortcode
             padding: .75rem 1.5rem;
             background-color: var(--bricks-color-iztoge);
             border-radius: var(--radius-sm);
-            display: flex;
+            display: inline-flex;
+            width: max-content;
+            max-width: 100%;
+            box-sizing: border-box;
             justify-content: center;
             align-items: center;
             column-gap: .5rem;
