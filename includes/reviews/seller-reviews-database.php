@@ -21,6 +21,8 @@ class SellerReviewsDatabase {
     public function __construct() {
         global $wpdb;
         $this->table_name = $wpdb->prefix . 'seller_reviews';
+
+        $this->ensure_reviewer_email_column_exists();
         
         // Hook into user deletion for cleanup
         add_action('delete_user', array($this, 'cleanup_reviews_on_user_delete'));
@@ -28,47 +30,82 @@ class SellerReviewsDatabase {
         // NOTE: Table creation handled manually like views counter
         // No ongoing checks needed - table assumed to exist after manual setup
     }
+
+    /**
+     * Adds reviewer_email column for guest reviewers (optional for logged-in rows).
+     */
+    private function ensure_reviewer_email_column_exists() {
+        global $wpdb;
+        $exists = $wpdb->get_var($wpdb->prepare(
+            'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+            DB_NAME,
+            $this->table_name,
+            'reviewer_email'
+        ));
+        if (!$exists) {
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $wpdb->query("ALTER TABLE `{$this->table_name}` ADD COLUMN reviewer_email VARCHAR(255) NULL DEFAULT NULL AFTER reviewer_id");
+        }
+    }
     
     /**
      * Submit a new review for a seller
      * 
      * @param int $seller_id The user ID being reviewed
-     * @param int $reviewer_id The user ID leaving the review
+     * @param int $reviewer_id The user ID leaving the review (0 for guests)
      * @param int $rating Rating from 1-5
      * @param string $comment Review comment (optional)
      * @param bool $contacted_seller Whether reviewer contacted the seller
+     * @param string $reviewer_email Guest or contact email (stored for moderation)
+     * @param bool   $relaxed_duplicate_by_email When true (logged-in or guest), one review per seller per email; still falls back to reviewer_id for legacy rows.
      * @return array Results with success boolean and message
      */
-    public function submit_review($seller_id, $reviewer_id, $rating, $comment = '', $contacted_seller = false) {
+    public function submit_review($seller_id, $reviewer_id, $rating, $comment = '', $contacted_seller = false, $reviewer_email = '', $relaxed_duplicate_by_email = false) {
         global $wpdb;
-        
-        // Validate inputs
-        if (!$seller_id || !$reviewer_id || !$rating) {
+
+        $seller_id = (int) $seller_id;
+        $reviewer_id = (int) $reviewer_id;
+        $reviewer_email = sanitize_email($reviewer_email);
+
+        if (!$seller_id || !$rating) {
             return array('success' => false, 'message' => 'Missing required fields');
         }
-        
-        if ($seller_id == $reviewer_id) {
-            return array('success' => false, 'message' => 'Cannot review yourself');
+
+        if ($reviewer_id > 0) {
+            if ($seller_id === $reviewer_id) {
+                return array('success' => false, 'message' => 'Cannot review yourself');
+            }
+        } elseif (!is_email($reviewer_email)) {
+            return array('success' => false, 'message' => 'Valid email is required');
         }
-        
+
         if ($rating < 1 || $rating > 5) {
             return array('success' => false, 'message' => 'Rating must be between 1 and 5');
         }
-        
-        // Check for existing review
-        $existing_review = $wpdb->get_row($wpdb->prepare(
-            "SELECT id, status FROM {$this->table_name} WHERE seller_id = %d AND reviewer_id = %d",
-            $seller_id, $reviewer_id
-        ));
-        
+
+        $existing_review = null;
+        if ($relaxed_duplicate_by_email && is_email($reviewer_email)) {
+            $email_key = strtolower(trim($reviewer_email));
+            $existing_review = $wpdb->get_row($wpdb->prepare(
+                "SELECT id, status FROM {$this->table_name} WHERE seller_id = %d AND reviewer_email IS NOT NULL AND reviewer_email != '' AND LOWER(TRIM(reviewer_email)) = %s",
+                $seller_id,
+                $email_key
+            ));
+        }
+        if (!$existing_review && $reviewer_id > 0) {
+            $existing_review = $wpdb->get_row($wpdb->prepare(
+                "SELECT id, status FROM {$this->table_name} WHERE seller_id = %d AND reviewer_id = %d",
+                $seller_id,
+                $reviewer_id
+            ));
+        }
+
         if ($existing_review) {
-            // If existing review is approved or pending, don't allow new submission
             if ($existing_review->status === 'approved' || $existing_review->status === 'pending') {
                 $status_text = $existing_review->status === 'approved' ? 'approved' : 'pending approval';
                 return array('success' => false, 'message' => "You have already reviewed this seller. Your review is {$status_text}.");
             }
-            
-            // If existing review was rejected, update it with new data
+
             if ($existing_review->status === 'rejected') {
                 $result = $wpdb->update(
                     $this->table_name,
@@ -76,42 +113,43 @@ class SellerReviewsDatabase {
                         'rating' => $rating,
                         'comment' => sanitize_textarea_field($comment),
                         'contacted_seller' => $contacted_seller ? 1 : 0,
-                        'status' => 'pending', // Reset to pending for re-approval
-                        'review_date' => current_time('mysql'), // Update submission time
-                        'admin_notes' => null // Clear any previous admin notes
+                        'status' => 'pending',
+                        'review_date' => current_time('mysql'),
+                        'admin_notes' => null,
+                        'reviewer_email' => $reviewer_email ? $reviewer_email : null,
                     ),
                     array('id' => $existing_review->id),
-                    array('%d', '%s', '%d', '%s', '%s', '%s'),
+                    array('%d', '%s', '%d', '%s', '%s', '%s', '%s'),
                     array('%d')
                 );
-                
+
                 if ($result === false) {
                     return array('success' => false, 'message' => 'Database error: ' . $wpdb->last_error);
                 }
-                
+
                 return array('success' => true, 'message' => 'Review resubmitted successfully. It will be visible after admin approval.');
             }
         }
-        
-        // Insert new review (no existing review found)
+
         $result = $wpdb->insert(
             $this->table_name,
             array(
                 'seller_id' => $seller_id,
                 'reviewer_id' => $reviewer_id,
+                'reviewer_email' => $reviewer_email ? $reviewer_email : null,
                 'rating' => $rating,
                 'comment' => sanitize_textarea_field($comment),
                 'contacted_seller' => $contacted_seller ? 1 : 0,
-                'status' => 'pending', // All reviews start as pending
-                'review_date' => current_time('mysql')
+                'status' => 'pending',
+                'review_date' => current_time('mysql'),
             ),
-            array('%d', '%d', '%d', '%s', '%d', '%s', '%s')
+            array('%d', '%d', '%s', '%d', '%s', '%d', '%s', '%s')
         );
-        
+
         if ($result === false) {
             return array('success' => false, 'message' => 'Database error: ' . $wpdb->last_error);
         }
-        
+
         return array('success' => true, 'message' => 'Review submitted successfully. It will be visible after admin approval.');
     }
     
@@ -163,11 +201,15 @@ class SellerReviewsDatabase {
             $seller_id, $limit, $offset
         ));
         
-        // Add user info to each review
         foreach ($reviews as $review) {
-            $user_info = $this->get_user_display_info($review->reviewer_id);
-            $review->reviewer_name = $user_info['name'];
-            $review->reviewer_username = $user_info['username'];
+            if ((int) $review->reviewer_id === 0) {
+                $review->reviewer_name = __('Reviewer', 'bricks-child');
+                $review->reviewer_username = 'guest';
+            } else {
+                $user_info = $this->get_user_display_info((int) $review->reviewer_id);
+                $review->reviewer_name = $user_info['name'];
+                $review->reviewer_username = $user_info['username'];
+            }
         }
         
         return $reviews ?: array();
@@ -343,15 +385,20 @@ class SellerReviewsDatabase {
             $limit, $offset
         ));
         
-        // Add user info to each review
         foreach ($reviews as $review) {
-            $seller_info = $this->get_user_display_info($review->seller_id);
-            $reviewer_info = $this->get_user_display_info($review->reviewer_id);
-            
+            $seller_info = $this->get_user_display_info((int) $review->seller_id);
+
             $review->seller_name = $seller_info['name'];
             $review->seller_username = $seller_info['username'];
-            $review->reviewer_name = $reviewer_info['name'];
-            $review->reviewer_username = $reviewer_info['username'];
+
+            if ((int) $review->reviewer_id === 0) {
+                $review->reviewer_name = !empty($review->reviewer_email) ? $review->reviewer_email : __('Guest reviewer', 'bricks-child');
+                $review->reviewer_username = 'guest';
+            } else {
+                $reviewer_info = $this->get_user_display_info((int) $review->reviewer_id);
+                $review->reviewer_name = $reviewer_info['name'];
+                $review->reviewer_username = $reviewer_info['username'];
+            }
         }
         
         return $reviews ?: array();
@@ -476,22 +523,28 @@ class SellerReviewsDatabase {
             ));
         }
         
-        // Add user info to each review
         foreach ($reviews as $review) {
-            $seller_info = $this->get_user_display_info($review->seller_id);
-            $reviewer_info = $this->get_user_display_info($review->reviewer_id);
-            
+            $seller_info = $this->get_user_display_info((int) $review->seller_id);
+
             $review->seller_name = $seller_info['name'];
             $review->seller_username = $seller_info['username'];
-            $review->reviewer_name = $reviewer_info['name'];
-            $review->reviewer_username = $reviewer_info['username'];
-            
-            // Get email addresses too
-            $seller_user = get_userdata($review->seller_id);
-            $reviewer_user = get_userdata($review->reviewer_id);
-            
+
+            if ((int) $review->reviewer_id === 0) {
+                $review->reviewer_name = !empty($review->reviewer_email) ? $review->reviewer_email : __('Guest reviewer', 'bricks-child');
+                $review->reviewer_username = 'guest';
+            } else {
+                $reviewer_info = $this->get_user_display_info((int) $review->reviewer_id);
+                $review->reviewer_name = $reviewer_info['name'];
+                $review->reviewer_username = $reviewer_info['username'];
+            }
+
+            $seller_user = get_userdata((int) $review->seller_id);
+            $reviewer_user = ((int) $review->reviewer_id > 0) ? get_userdata((int) $review->reviewer_id) : null;
+
             $review->seller_email = $seller_user ? $seller_user->user_email : '';
-            $review->reviewer_email = $reviewer_user ? $reviewer_user->user_email : '';
+            if ($reviewer_user) {
+                $review->reviewer_email = $reviewer_user->user_email;
+            }
         }
         
         return $reviews ?: array();

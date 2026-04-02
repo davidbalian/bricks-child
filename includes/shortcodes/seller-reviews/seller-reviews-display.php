@@ -49,9 +49,11 @@ function seller_reviews_display_shortcode($atts) {
         );
         
         // Localize script with AJAX URL and nonce
+        $strict_reviews = function_exists('seller_reviews_is_strict_mode') && seller_reviews_is_strict_mode();
         wp_localize_script('seller-reviews-overlay', 'sellerReviewsData', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('submit_seller_review_nonce'),
+            'strictMode' => $strict_reviews,
         ));
     }
     
@@ -224,76 +226,113 @@ function seller_reviews_display_shortcode($atts) {
             
             <!-- Review Form Section -->
             <div class="overlay-review-form-section">
-                <?php if (is_user_logged_in()): ?>
-                    <?php if (get_current_user_id() != $seller_id): ?>
-                        <?php 
+                <?php
+                $strict_reviews = function_exists('seller_reviews_is_strict_mode') && seller_reviews_is_strict_mode();
+                $rid_suffix = (int) $seller_id;
+                ?>
+                <?php if (get_current_user_id() == $seller_id): ?>
+                    <div class="review-notice">
+                        <p>You cannot review yourself.</p>
+                    </div>
+                <?php elseif ($strict_reviews && ! is_user_logged_in()): ?>
+                    <div class="login-prompt">
+                        <p>
+                            <a href="<?php echo esc_url(wp_login_url(get_permalink())); ?>" class="login-link">Log in</a>
+                            to leave a review for this seller.
+                        </p>
+                    </div>
+                <?php elseif ($strict_reviews): ?>
+                        <?php
+                        /* Legacy: login + verified account only. Enable with SELLER_REVIEWS_STRICT_MODE or seller_reviews_strict_mode filter. */
                         $current_user_id = get_current_user_id();
                         $current_user = wp_get_current_user();
                         $email_verified = get_user_meta($current_user_id, 'email_verified', true);
                         $can_review = ($email_verified === '1');
                         ?>
-                        
-                        <h4>Leave a Review</h4>
-                        <form class="seller-review-form" data-seller-id="<?php echo esc_attr($seller_id); ?>">
+                        <h4><?php esc_html_e('Leave a review', 'bricks-child'); ?></h4>
+                        <form class="seller-review-form" data-seller-id="<?php echo esc_attr($seller_id); ?>" data-review-mode="strict">
                             <?php wp_nonce_field('submit_seller_review_nonce', 'seller_review_nonce'); ?>
-                            
                             <div class="form-group">
-                                <label>Rating *</label>
-                                <div class="star-rating-input <?php echo !$can_review ? 'disabled' : ''; ?>">
-                                    <input type="radio" name="rating" value="1" id="star1" <?php echo !$can_review ? 'disabled' : ''; ?>><label for="star1">★</label>
-                                    <input type="radio" name="rating" value="2" id="star2" <?php echo !$can_review ? 'disabled' : ''; ?>><label for="star2">★</label>
-                                    <input type="radio" name="rating" value="3" id="star3" <?php echo !$can_review ? 'disabled' : ''; ?>><label for="star3">★</label>
-                                    <input type="radio" name="rating" value="4" id="star4" <?php echo !$can_review ? 'disabled' : ''; ?>><label for="star4">★</label>
-                                    <input type="radio" name="rating" value="5" id="star5" <?php echo !$can_review ? 'disabled' : ''; ?>><label for="star5">★</label>
+                                <label><?php esc_html_e('Rating', 'bricks-child'); ?> *</label>
+                                <div class="star-rating-input <?php echo ! $can_review ? 'disabled' : ''; ?>">
+                                    <input type="radio" name="rating" value="1" id="star1-<?php echo esc_attr($rid_suffix); ?>" <?php echo ! $can_review ? 'disabled' : ''; ?>><label for="star1-<?php echo esc_attr($rid_suffix); ?>">★</label>
+                                    <input type="radio" name="rating" value="2" id="star2-<?php echo esc_attr($rid_suffix); ?>" <?php echo ! $can_review ? 'disabled' : ''; ?>><label for="star2-<?php echo esc_attr($rid_suffix); ?>">★</label>
+                                    <input type="radio" name="rating" value="3" id="star3-<?php echo esc_attr($rid_suffix); ?>" <?php echo ! $can_review ? 'disabled' : ''; ?>><label for="star3-<?php echo esc_attr($rid_suffix); ?>">★</label>
+                                    <input type="radio" name="rating" value="4" id="star4-<?php echo esc_attr($rid_suffix); ?>" <?php echo ! $can_review ? 'disabled' : ''; ?>><label for="star4-<?php echo esc_attr($rid_suffix); ?>">★</label>
+                                    <input type="radio" name="rating" value="5" id="star5-<?php echo esc_attr($rid_suffix); ?>" <?php echo ! $can_review ? 'disabled' : ''; ?>><label for="star5-<?php echo esc_attr($rid_suffix); ?>">★</label>
                                 </div>
                             </div>
-                            
                             <div class="form-group">
-                                <label for="review-comment">Your Review (optional)</label>
-                                <textarea id="review-comment" name="comment" placeholder="Share your experience with this seller..." maxlength="140" <?php echo !$can_review ? 'disabled' : ''; ?>></textarea>
-                                <small>140 characters maximum</small>
+                                <label for="review-comment-<?php echo esc_attr($rid_suffix); ?>"><?php esc_html_e('Your review (optional)', 'bricks-child'); ?></label>
+                                <textarea id="review-comment-<?php echo esc_attr($rid_suffix); ?>" name="comment" placeholder="<?php echo esc_attr__('Share your experience…', 'bricks-child'); ?>" maxlength="140" <?php echo ! $can_review ? 'disabled' : ''; ?>></textarea>
+                                <small><?php esc_html_e('140 characters maximum', 'bricks-child'); ?></small>
                             </div>
-                            
                             <div class="form-group">
                                 <label class="checkbox-label">
-                                    <input type="checkbox" name="contacted_seller" value="1" <?php echo !$can_review ? 'disabled' : ''; ?>>
-                                    I contacted this seller
+                                    <input type="checkbox" name="contacted_seller" value="1" <?php echo ! $can_review ? 'disabled' : ''; ?>>
+                                    <?php esc_html_e('I contacted this seller', 'bricks-child'); ?>
                                 </label>
                             </div>
-                            
                             <div class="form-actions">
-                                <button type="submit" class="btn btn-primary btn-submit-review" <?php echo !$can_review ? 'disabled' : ''; ?>>Submit Review</button>
-                                
-                                <?php if (!$can_review): ?>
-                                    <?php 
-                                    if (function_exists('get_email_verification_banner_html')) {
-                                        echo get_email_verification_banner_html($current_user->user_email, array(
-                                            'id' => '', // No ID for this instance
-                                            'message_html' => '<a href="' . home_url('/my-account') . '" class="verify-email-link">Verify your email</a> to leave a review.',
-                                            'show_send_button' => false,
-                                            'show_dismiss_button' => false,
-                                            'wrapper_style' => 'margin-top: 10px; width: 100%;',
-                                            'container_style' => 'justify-content: flex-start;'
-                                        ));
-                                    }
+                                <button type="submit" class="btn btn-primary btn-submit-review" <?php echo ! $can_review ? 'disabled' : ''; ?>><?php esc_html_e('Submit', 'bricks-child'); ?></button>
+                                <?php if (! $can_review && function_exists('get_email_verification_banner_html')): ?>
+                                    <?php
+                                    echo get_email_verification_banner_html($current_user->user_email, array(
+                                        'id' => '',
+                                        'message_html' => '<a href="' . esc_url(home_url('/my-account')) . '" class="verify-email-link">' . esc_html__('Verify your email', 'bricks-child') . '</a> ' . esc_html__('to leave a review.', 'bricks-child'),
+                                        'show_send_button' => false,
+                                        'show_dismiss_button' => false,
+                                        'wrapper_style' => 'margin-top: 10px; width: 100%;',
+                                        'container_style' => 'justify-content: flex-start;',
+                                    ));
                                     ?>
                                 <?php endif; ?>
-                                
                                 <div class="form-messages"></div>
                             </div>
                         </form>
-                    <?php else: ?>
-                        <div class="review-notice">
-                            <p>You cannot review yourself.</p>
-                        </div>
-                    <?php endif; ?>
                 <?php else: ?>
-                    <div class="login-prompt">
-                        <p>
-                            <a href="<?php echo wp_login_url(get_permalink()); ?>" class="login-link">Login</a> 
-                            to leave a review for this seller.
-                        </p>
-                    </div>
+                    <h4><?php esc_html_e('Leave a quick review', 'bricks-child'); ?></h4>
+                    <form class="seller-review-form" data-seller-id="<?php echo esc_attr($seller_id); ?>" data-review-mode="open">
+                        <?php wp_nonce_field('submit_seller_review_nonce', 'seller_review_nonce'); ?>
+                        <div class="form-group">
+                            <label for="reviewer-email-<?php echo esc_attr($rid_suffix); ?>"><?php esc_html_e('Your email', 'bricks-child'); ?> *</label>
+                            <input
+                                type="email"
+                                id="reviewer-email-<?php echo esc_attr($rid_suffix); ?>"
+                                name="reviewer_email"
+                                required
+                                autocomplete="email"
+                                placeholder="<?php echo esc_attr__('you@example.com', 'bricks-child'); ?>"
+                                value="<?php echo is_user_logged_in() ? esc_attr(wp_get_current_user()->user_email) : ''; ?>"
+                            >
+                            <small><?php esc_html_e('For moderation only; it is not shown on your public review.', 'bricks-child'); ?></small>
+                        </div>
+                        <div class="form-group">
+                            <label><?php esc_html_e('Rating', 'bricks-child'); ?> *</label>
+                            <div class="star-rating-input">
+                                <input type="radio" name="rating" value="1" id="open-star1-<?php echo esc_attr($rid_suffix); ?>"><label for="open-star1-<?php echo esc_attr($rid_suffix); ?>">★</label>
+                                <input type="radio" name="rating" value="2" id="open-star2-<?php echo esc_attr($rid_suffix); ?>"><label for="open-star2-<?php echo esc_attr($rid_suffix); ?>">★</label>
+                                <input type="radio" name="rating" value="3" id="open-star3-<?php echo esc_attr($rid_suffix); ?>"><label for="open-star3-<?php echo esc_attr($rid_suffix); ?>">★</label>
+                                <input type="radio" name="rating" value="4" id="open-star4-<?php echo esc_attr($rid_suffix); ?>"><label for="open-star4-<?php echo esc_attr($rid_suffix); ?>">★</label>
+                                <input type="radio" name="rating" value="5" id="open-star5-<?php echo esc_attr($rid_suffix); ?>"><label for="open-star5-<?php echo esc_attr($rid_suffix); ?>">★</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="review-comment-open-<?php echo esc_attr($rid_suffix); ?>"><?php esc_html_e('Comment (optional)', 'bricks-child'); ?></label>
+                            <textarea id="review-comment-open-<?php echo esc_attr($rid_suffix); ?>" name="comment" placeholder="<?php echo esc_attr__('Share your experience…', 'bricks-child'); ?>" maxlength="140"></textarea>
+                            <small><?php esc_html_e('140 characters maximum', 'bricks-child'); ?></small>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="contacted_seller" value="1">
+                                <?php esc_html_e('I contacted this seller', 'bricks-child'); ?>
+                            </label>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-submit-review"><?php esc_html_e('Submit', 'bricks-child'); ?></button>
+                            <div class="form-messages"></div>
+                        </div>
+                    </form>
                 <?php endif; ?>
             </div>
             

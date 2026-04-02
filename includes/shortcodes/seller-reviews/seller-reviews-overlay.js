@@ -91,21 +91,22 @@ jQuery(document).ready(function($) {
         var $button = $form.find('.btn-submit-review');
         var $messages = $form.find('.form-messages');
         
-        // Check if form is disabled (user email not verified)
-        if ($button.is(':disabled')) {
+        // Strict mode: form disabled until email verified
+        if (typeof sellerReviewsData.strictMode !== 'undefined' && sellerReviewsData.strictMode && $button.is(':disabled')) {
             $messages.html('<div class="error">Please verify your email before leaving a review.</div>');
             return;
         }
-        
+
+        var submitLabel = $button.text();
+
         // Get form data
         var sellerId = $form.data('seller-id');
         var rating = $form.find('input[name="rating"]:checked').val();
         var comment = $form.find('textarea[name="comment"]').val();
         var contactedSeller = $form.find('input[name="contacted_seller"]').is(':checked') ? 1 : 0;
         var nonce = $form.find('input[name="seller_review_nonce"]').val();
+        var reviewerEmail = $form.find('input[name="reviewer_email"]').val() || '';
 
-        
-        
         // Validate rating
         if (!rating) {
             $messages.html('<div class="error">Please select a rating.</div>');
@@ -115,19 +116,24 @@ jQuery(document).ready(function($) {
         // Disable submit button
         $button.prop('disabled', true).text('Submitting...');
         $messages.html('');
-        
+
+        var postData = {
+            action: 'submit_seller_review',
+            seller_id: sellerId,
+            rating: rating,
+            comment: comment,
+            contacted_seller: contactedSeller,
+            seller_review_nonce: nonce
+        };
+        if (reviewerEmail) {
+            postData.reviewer_email = reviewerEmail;
+        }
+
         // Submit via AJAX
         $.ajax({
             url: sellerReviewsData.ajaxurl,
             type: 'POST',
-            data: {
-                action: 'submit_seller_review',
-                seller_id: sellerId,
-                rating: rating,
-                comment: comment,
-                contacted_seller: contactedSeller,
-                seller_review_nonce: nonce
-            },
+            data: postData,
             success: function(response) {
                 if (response.success) {
                     $messages.html('<div class="success">' + response.data.message + '</div>');
@@ -149,7 +155,7 @@ jQuery(document).ready(function($) {
                 $messages.html('<div class="error">An error occurred. Please try again.</div>');
             },
             complete: function() {
-                $button.prop('disabled', false).text('Submit Review');
+                $button.prop('disabled', false).text(submitLabel);
             }
         });
     });

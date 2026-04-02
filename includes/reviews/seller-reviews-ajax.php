@@ -13,8 +13,9 @@ if (!defined('ABSPATH')) {
 // Include the handler functions
 require_once get_stylesheet_directory() . '/includes/reviews/seller-reviews-handler.php';
 
-// Register AJAX handlers for seller review submission (logged-in users only)
+// Seller review submission: logged-in and guests (when not in strict mode)
 add_action('wp_ajax_submit_seller_review', 'handle_submit_seller_review');
+add_action('wp_ajax_nopriv_submit_seller_review', 'handle_submit_seller_review');
 
 // Register AJAX handlers for admin review management (logged-in users only)
 add_action('wp_ajax_approve_seller_review', 'handle_admin_approve_review');

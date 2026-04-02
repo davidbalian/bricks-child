@@ -15,9 +15,25 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Check if user can leave reviews
- * Requires both login and verified email
- * 
+ * Strict review mode: only logged-in users with verified email may review (legacy behavior).
+ * Default is off so guests can submit with email only; enable later via wp-config or filter.
+ *
+ * wp-config: define('SELLER_REVIEWS_STRICT_MODE', true);
+ * Or: add_filter('seller_reviews_strict_mode', '__return_true');
+ *
+ * @return bool
+ */
+function seller_reviews_is_strict_mode() {
+    if (defined('SELLER_REVIEWS_STRICT_MODE') && SELLER_REVIEWS_STRICT_MODE) {
+        return true;
+    }
+    return (bool) apply_filters('seller_reviews_strict_mode', false);
+}
+
+/**
+ * Strict mode only: user may leave reviews if logged in and email_verified meta is set.
+ * Default (relaxed) submissions do not use this.
+ *
  * @param int $user_id The user ID to check
  * @return bool Whether user can leave reviews
  */
@@ -45,26 +61,52 @@ function handle_submit_seller_review() {
         return;
     }
     
-    // Check if user is logged in
-    if (!is_user_logged_in()) {
-        wp_send_json_error(array('message' => 'You must be logged in to leave a review'));
-        return;
+    $strict = seller_reviews_is_strict_mode();
+
+    if ($strict) {
+        if (!is_user_logged_in()) {
+            wp_send_json_error(array('message' => 'You must be logged in to leave a review'));
+            return;
+        }
+        $reviewer_id = get_current_user_id();
+        if (!can_user_leave_review($reviewer_id)) {
+            wp_send_json_error(array('message' => 'Please verify your email before leaving a review.'));
+            return;
+        }
+    } else {
+        $reviewer_id = is_user_logged_in() ? get_current_user_id() : 0;
     }
-    
-    $reviewer_id = get_current_user_id();
-    
-    // Check if user can leave reviews
-    if (!can_user_leave_review($reviewer_id)) {
-        wp_send_json_error(array('message' => 'You must be logged in to leave reviews'));
-        return;
-    }
-    
+
     // Get and validate form data
     $seller_id = isset($_POST['seller_id']) ? intval($_POST['seller_id']) : 0;
     $rating = isset($_POST['rating']) ? intval($_POST['rating']) : 0;
     $comment = isset($_POST['comment']) ? sanitize_textarea_field($_POST['comment']) : '';
     $contacted_seller = isset($_POST['contacted_seller']) && $_POST['contacted_seller'] == '1';
-    
+    $reviewer_email_raw = isset($_POST['reviewer_email']) ? sanitize_email(wp_unslash($_POST['reviewer_email'])) : '';
+
+    if (!$strict) {
+        if ($reviewer_id > 0) {
+            $u = wp_get_current_user();
+            if (empty($reviewer_email_raw) && $u && $u->user_email) {
+                $reviewer_email_raw = $u->user_email;
+            }
+        }
+        if (!is_email($reviewer_email_raw)) {
+            wp_send_json_error(array('message' => 'Please enter a valid email address.'));
+            return;
+        }
+
+        if ($reviewer_id === 0) {
+            $ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '';
+            $rate_key = 'seller_review_guest_' . md5($ip);
+            $recent = (int) get_transient($rate_key);
+            if ($recent >= 10) {
+                wp_send_json_error(array('message' => 'Too many review attempts. Please try again later.'));
+                return;
+            }
+        }
+    }
+
     // Validate required fields
     if (!$seller_id || !$rating) {
         wp_send_json_error(array('message' => 'Seller and rating are required'));
@@ -94,6 +136,11 @@ function handle_submit_seller_review() {
         wp_send_json_error(array('message' => 'You cannot review yourself'));
         return;
     }
+
+    if (!$strict && !empty($seller->user_email) && strtolower($seller->user_email) === strtolower($reviewer_email_raw)) {
+        wp_send_json_error(array('message' => 'You cannot review your own account using this email.'));
+        return;
+    }
     
     // Get database instance
     global $seller_reviews_database;
@@ -102,14 +149,30 @@ function handle_submit_seller_review() {
         $seller_reviews_database = new SellerReviewsDatabase();
     }
     
-    // Submit the review
+    if ($strict && $reviewer_id > 0) {
+        $ud = get_userdata($reviewer_id);
+        $stored_email = ($ud && $ud->user_email) ? $ud->user_email : '';
+    } else {
+        $stored_email = $reviewer_email_raw;
+    }
+
+    // Submit the review (relaxed: duplicate by submitted email for everyone; strict: legacy reviewer_id rules)
     $result = $seller_reviews_database->submit_review(
         $seller_id,
         $reviewer_id,
         $rating,
         $comment,
-        $contacted_seller
+        $contacted_seller,
+        $stored_email,
+        !$strict
     );
+
+    if ($result['success'] && !$strict && $reviewer_id === 0) {
+        $ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '';
+        $rate_key = 'seller_review_guest_' . md5($ip);
+        $recent = (int) get_transient($rate_key);
+        set_transient($rate_key, $recent + 1, HOUR_IN_SECONDS);
+    }
     
     if ($result['success']) {
         wp_send_json_success(array(

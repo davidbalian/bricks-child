@@ -105,6 +105,9 @@ function display_reviews_table($status) {
                         <td>
                             <strong><?php echo esc_html($review->reviewer_name ?: 'Unknown'); ?></strong><br>
                             <small style="color: #666;">@<?php echo esc_html($review->reviewer_username ?: 'unknown'); ?></small>
+                            <?php if (! empty($review->reviewer_email) && is_email($review->reviewer_email)): ?>
+                                <br><small style="color: #2271b1;"><?php echo esc_html($review->reviewer_email); ?></small>
+                            <?php endif; ?>
                         </td>
                         <td>
                             <strong><?php echo esc_html($review->seller_name ?: 'Unknown'); ?></strong><br>
