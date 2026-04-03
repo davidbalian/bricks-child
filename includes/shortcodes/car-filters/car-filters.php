@@ -45,6 +45,8 @@ function car_filters_shortcode($atts) {
         'button_text'  => 'Search Cars',
         'landing_make_slug' => '',
         'landing_model_slug' => '',
+        'city_landing'       => 'false',
+        'default_car_city'  => '',
     ), $atts, 'car_filters');
 
     // Enqueue assets
@@ -73,6 +75,8 @@ function car_filters_shortcode($atts) {
         'results_base_url' => $atts['results_base_url'],
         'landing_make_slug' => $atts['landing_make_slug'],
         'landing_model_slug' => $atts['landing_model_slug'],
+        'city_landing'      => $atts['city_landing'],
+        'default_car_city'  => $atts['default_car_city'],
     );
 
     $instance_id = 'car-filters-' . wp_rand(1000, 9999);
@@ -87,7 +91,9 @@ function car_filters_shortcode($atts) {
          data-redirect-url="<?php echo esc_attr($atts['redirect_url']); ?>"
          data-results-base-url="<?php echo esc_attr($atts['results_base_url']); ?>"
          data-landing-make-slug="<?php echo esc_attr($atts['landing_make_slug']); ?>"
-         data-landing-model-slug="<?php echo esc_attr($atts['landing_model_slug']); ?>">
+         data-landing-model-slug="<?php echo esc_attr($atts['landing_model_slug']); ?>"
+         data-city-landing="<?php echo esc_attr($atts['city_landing'] === 'true' ? '1' : '0'); ?>"
+         data-default-car-city="<?php echo esc_attr($atts['default_car_city']); ?>">
 
         <div class="car-filters-wrapper">
             <?php
@@ -364,6 +370,18 @@ function car_filters_ajax_filter_listings() {
                 'key'     => 'body_type',
                 'value'   => $body_types,
                 'compare' => 'IN',
+            );
+        }
+    }
+
+    // ACF car_city (from listing_atts — city landings and /cars/?car_city=).
+    if (!empty($atts['default_car_city'])) {
+        $city_meta = sanitize_text_field($atts['default_car_city']);
+        if ($city_meta !== '') {
+            $meta_query[] = array(
+                'key'     => 'car_city',
+                'value'   => $city_meta,
+                'compare' => '=',
             );
         }
     }

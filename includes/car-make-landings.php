@@ -1110,6 +1110,9 @@ add_filter('body_class', 'autoagora_filter_body_classes');
  * @return bool
  */
 function autoagora_is_cars_browse_light_context() {
+    if (function_exists('autoagora_is_city_cars_landing_template') && autoagora_is_city_cars_landing_template()) {
+        return true;
+    }
     if (is_tax('car_make')) {
         return true;
     }

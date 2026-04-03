@@ -101,9 +101,14 @@ $listing_atts = array(
     'card_type'          => 'car_card',
     'default_make_slug'  => '',
     'default_model_slug' => '',
+    'default_car_city'   => '',
     'layout'             => 'grid',
     'infinite_scroll'    => 'false',
 );
+
+if ( isset( $_GET['car_city'] ) && $_GET['car_city'] !== '' ) {
+    $listing_atts['default_car_city'] = sanitize_text_field( wp_unslash( $_GET['car_city'] ) );
+}
 
 // Merge URL sort params (e.g., after redirect from car make landing page)
 $listing_atts = car_listings_apply_request_sort_to_atts( $listing_atts );

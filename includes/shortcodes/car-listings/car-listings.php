@@ -37,6 +37,7 @@ function car_listings_shortcode($atts) {
         'card_type'       => '',
         'default_make_slug' => '',
         'default_model_slug' => '',
+        'default_car_city'   => '',
     ), $atts, 'car_listings');
 
     // Generate instance ID if not provided
@@ -335,6 +336,21 @@ function car_listings_build_query_args($atts) {
         $meta_query[] = count($body_types) === 1
             ? array('key' => 'body_type', 'value' => $body_types[0], 'compare' => '=')
             : array('key' => 'body_type', 'value' => $body_types, 'compare' => 'IN');
+    }
+
+    // City (ACF car_city): URL wins over shortcode default (city landings / browse after redirect).
+    $car_city_filter = '';
+    if (isset($_GET['car_city']) && $_GET['car_city'] !== '') {
+        $car_city_filter = sanitize_text_field(wp_unslash($_GET['car_city']));
+    } elseif (!empty($atts['default_car_city'])) {
+        $car_city_filter = sanitize_text_field($atts['default_car_city']);
+    }
+    if ($car_city_filter !== '') {
+        $meta_query[] = array(
+            'key'     => 'car_city',
+            'value'   => $car_city_filter,
+            'compare' => '=',
+        );
     }
 
     // Add tax_query if we have conditions

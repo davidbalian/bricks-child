@@ -39,7 +39,9 @@
                     redirectUrl: '/cars/',
                     resultsBaseUrl: '/cars/',
                     landingMakeSlug: '',
-                    landingModelSlug: ''
+                    landingModelSlug: '',
+                    cityLanding: false,
+                    defaultCarCity: ''
                 };
                 this.subscribers[group] = [];
             }
@@ -206,6 +208,13 @@
                 }
             });
 
+            var carCityParam = pageParams.get('car_city');
+            if (carCityParam !== null && carCityParam !== '') {
+                params.set('car_city', carCityParam);
+            } else if (state.defaultCarCity) {
+                params.set('car_city', state.defaultCarCity);
+            }
+
             if (state.make.slug) {
                 params.set('make', state.make.slug);
             }
@@ -291,6 +300,8 @@
             // Debounce AJAX requests
             this.debounceTimers[group] = setTimeout(function() {
                 if (state.mode === 'redirect') {
+                    window.location.href = self.buildResultsUrl(group);
+                } else if (state.cityLanding) {
                     window.location.href = self.buildResultsUrl(group);
                 } else if (self.hasLandingContext(state)) {
                     // SEO landing pages: always continue browsing on /cars/ with the same filters
@@ -1101,6 +1112,8 @@
             var resultsBaseUrl = $(this).data('results-base-url');
             var landingMakeSlug = $(this).data('landing-make-slug');
             var landingModelSlug = $(this).data('landing-model-slug');
+            var cityLanding = $(this).data('city-landing');
+            var defaultCarCity = $(this).data('default-car-city');
 
             if (group) {
                 var state = CarFilters.initGroup(group);
@@ -1110,6 +1123,12 @@
                 if (resultsBaseUrl) state.resultsBaseUrl = resultsBaseUrl;
                 if (landingMakeSlug) state.landingMakeSlug = landingMakeSlug;
                 if (landingModelSlug) state.landingModelSlug = landingModelSlug;
+                if (cityLanding === 1 || cityLanding === '1' || cityLanding === true) {
+                    state.cityLanding = true;
+                }
+                if (defaultCarCity) {
+                    state.defaultCarCity = String(defaultCarCity);
+                }
             }
         });
 

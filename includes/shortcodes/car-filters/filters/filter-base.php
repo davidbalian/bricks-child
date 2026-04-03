@@ -27,6 +27,8 @@ function car_filter_get_default_atts() {
         'results_base_url' => '/cars/',
         'landing_make_slug' => '',
         'landing_model_slug' => '',
+        'city_landing'      => 'false',
+        'default_car_city'  => '',
     );
 }
 
