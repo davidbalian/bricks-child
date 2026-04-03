@@ -447,13 +447,14 @@ function car_listings_render_output($car_query, $atts) {
     // Use ID from attributes (already set in main function)
     $instance_id = $atts['id'];
     $filter_group = $atts['filter_group'];
+    $current_page = max(1, (int) $car_query->get('paged'));
     ?>
 
     <div class="car-listings-container <?php echo esc_attr($layout_class); ?>"
          id="<?php echo esc_attr($instance_id); ?>"
          data-layout="<?php echo esc_attr($layout); ?>"
          data-infinite-scroll="<?php echo $infinite_scroll ? 'true' : 'false'; ?>"
-         data-page="1"
+         data-page="<?php echo esc_attr((string) $current_page); ?>"
          data-max-pages="<?php echo esc_attr($car_query->max_num_pages); ?>"
          data-atts="<?php echo esc_attr(wp_json_encode($atts)); ?>"
          <?php if (!empty($filter_group)) : ?>data-filter-group="<?php echo esc_attr($filter_group); ?>"<?php endif; ?>>

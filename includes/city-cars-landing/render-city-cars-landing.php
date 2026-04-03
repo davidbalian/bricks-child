@@ -49,6 +49,7 @@ function autoagora_render_city_cars_landing($slug) {
     $listing_atts = car_listings_apply_request_sort_to_atts($listing_atts);
     $query_args   = car_listings_build_query_args($listing_atts);
     $cars_query   = car_listings_execute_query($query_args);
+    $current_page = max(1, (int) $cars_query->get('paged'));
 
     if (function_exists('car_card_enqueue_assets')) {
         car_card_enqueue_assets();
@@ -169,7 +170,7 @@ function autoagora_render_city_cars_landing($slug) {
     <div class="car-listings-container"
          id="<?php echo esc_attr($listings_id); ?>"
          data-atts="<?php echo esc_attr(wp_json_encode($listing_atts)); ?>"
-         data-page="1"
+         data-page="<?php echo esc_attr((string) $current_page); ?>"
          data-max-pages="<?php echo esc_attr($cars_query->max_num_pages); ?>"
          data-server-filtered="true">
 
@@ -200,7 +201,7 @@ function autoagora_render_city_cars_landing($slug) {
                 echo paginate_links(
                     array(
                         'total'     => $cars_query->max_num_pages,
-                        'current'   => 1,
+                        'current'   => $current_page,
                         'prev_text' => __('Previous', 'bricks-child'),
                         'next_text' => __('Next', 'bricks-child'),
                         'type'      => 'list',

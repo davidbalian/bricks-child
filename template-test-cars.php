@@ -115,7 +115,8 @@ $listing_atts = car_listings_apply_request_sort_to_atts( $listing_atts );
 
 // Build query applying all URL filter params (make, model, price, mileage, body_type, etc.)
 $query_args = car_listings_build_query_args( $listing_atts );
-$cars_query = car_listings_execute_query( $query_args );
+$cars_query   = car_listings_execute_query( $query_args );
+$current_page = max( 1, (int) $cars_query->get( 'paged' ) );
 ?>
 
 <!-- Filters bar -->
@@ -213,7 +214,7 @@ $cars_query = car_listings_execute_query( $query_args );
     <div class="car-listings-container"
          id="test-cars-listings"
          data-atts="<?php echo esc_attr( wp_json_encode( $listing_atts ) ); ?>"
-         data-page="1"
+         data-page="<?php echo esc_attr( (string) $current_page ); ?>"
          data-max-pages="<?php echo esc_attr( $cars_query->max_num_pages ); ?>"
          data-server-filtered="true">
 
@@ -244,7 +245,7 @@ $cars_query = car_listings_execute_query( $query_args );
             if ( $cars_query->max_num_pages > 1 ) {
                 echo paginate_links( array(
                     'total'     => $cars_query->max_num_pages,
-                    'current'   => 1,
+                    'current'   => $current_page,
                     'prev_text' => 'Previous',
                     'next_text' => 'Next',
                     'type'      => 'list',
