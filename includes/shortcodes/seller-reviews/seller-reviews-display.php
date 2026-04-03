@@ -305,7 +305,6 @@ function seller_reviews_display_shortcode($atts) {
                                 placeholder="<?php echo esc_attr__('you@example.com', 'bricks-child'); ?>"
                                 value="<?php echo is_user_logged_in() ? esc_attr(wp_get_current_user()->user_email) : ''; ?>"
                             >
-                            <small><?php esc_html_e('For moderation only; it is not shown on your public review.', 'bricks-child'); ?></small>
                         </div>
                         <div class="form-group">
                             <label><?php esc_html_e('Rating', 'bricks-child'); ?> *</label>
