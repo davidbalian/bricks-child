@@ -396,6 +396,17 @@ function car_listings_build_query_args($atts) {
         $paged = max(1, intval(wp_unslash($_GET['paged'])));
     } elseif (isset($_GET['page']) && $_GET['page'] !== '' && is_numeric($_GET['page'])) {
         $paged = max(1, intval(wp_unslash($_GET['page'])));
+    } else {
+        // Pretty permalinks: /cars/page/2/ sets main-query `page` (singular Page); archives use `paged`.
+        $qv_paged = (int) get_query_var('paged');
+        if ($qv_paged > 0) {
+            $paged = max(1, $qv_paged);
+        } else {
+            $qv_page = (int) get_query_var('page');
+            if ($qv_page > 0) {
+                $paged = max(1, $qv_page);
+            }
+        }
     }
     if ($paged > 1) {
         $args['paged'] = $paged;
