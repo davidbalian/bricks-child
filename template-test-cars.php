@@ -1789,7 +1789,10 @@ body {
             updateClearAllButton(initialCountText);
         }
         if (hasLocationFromUrl) {
-            loadPage(1, { scroll: false });
+            var initialListingsPage = (window.CarFilters && CarFilters.resolveListingsPageFromContainerOrUrl)
+                ? CarFilters.resolveListingsPageFromContainerOrUrl($container)
+                : (parseInt($container.attr('data-page'), 10) || 1);
+            loadPage(initialListingsPage, { scroll: false });
         }
     });
 

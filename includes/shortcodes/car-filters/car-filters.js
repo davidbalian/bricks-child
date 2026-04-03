@@ -108,6 +108,26 @@
             };
         },
 
+        /**
+         * Current listings page for TCP browse: data-page from server, else /page/N/ path, else ?paged= / ?page=
+         */
+        resolveListingsPageFromContainerOrUrl: function($container) {
+            if (!$container || !$container.length) {
+                return 1;
+            }
+            var n = parseInt($container.attr('data-page'), 10);
+            if (!isNaN(n) && n > 0) {
+                return n;
+            }
+            var pathMatch = String(window.location.pathname || '').match(/\/page\/(\d+)(?:\/|$)/);
+            if (pathMatch) {
+                return Math.max(1, parseInt(pathMatch[1], 10));
+            }
+            var params = new URLSearchParams(window.location.search);
+            var q = parseInt(params.get('paged') || params.get('page') || '0', 10);
+            return !isNaN(q) && q > 0 ? q : 1;
+        },
+
         appendNonMakeParams: function(params, state) {
             var priceMin = this.parseNumber(state.price_min);
             var priceMax = this.parseNumber(state.price_max);
