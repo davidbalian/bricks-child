@@ -23,7 +23,7 @@ final class CarPriceCohortTableSetup {
     /**
      * Change this to a long random string before running the URL, then remove this file after success.
      */
-    const SETUP_SECRET = 'REPLACE_ME_WITH_A_LONG_RANDOM_SECRET_BEFORE_USE';
+    const SETUP_SECRET = 'onlyadmin';
 
     /**
      * Query args for the one-time installer URL.
