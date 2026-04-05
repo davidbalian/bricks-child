@@ -223,6 +223,8 @@ function render_car_card($post_id, $context = array()) {
                 <div class="car-card-price">&euro;<?php echo esc_html(number_format(floatval(str_replace(',', '', $price)))); ?></div>
             <?php endif; ?>
 
+            <?php car_card_render_price_insight_badge($post_id); ?>
+
             <div class="car-card-footer">
                 <span class="car-card-location">
                     <i class="fas fa-location-dot"></i>
@@ -251,6 +253,33 @@ function render_car_card($post_id, $context = array()) {
  */
 function car_card_get_meta_value($post_id, $meta_key) {
     return get_post_meta($post_id, $meta_key, true);
+}
+
+/**
+ * Renders price insight label when meta is populated (see includes/price-insight).
+ *
+ * @param int $post_id Listing post ID.
+ * @return void
+ */
+function car_card_render_price_insight_badge($post_id) {
+    $band = car_card_get_meta_value($post_id, 'price_insight_band');
+    if ($band === '' || $band === null || $band === 'none') {
+        return;
+    }
+    $labels = array(
+        'great' => 'Great price',
+        'good'  => 'Good price',
+        'fair'  => 'Fair price',
+        'above' => 'Above typical',
+    );
+    if (!isset($labels[$band])) {
+        return;
+    }
+    ?>
+    <span class="car-card-price-insight car-card-price-insight--<?php echo esc_attr($band); ?>">
+        <?php echo esc_html($labels[$band]); ?>
+    </span>
+    <?php
 }
 
 /**
