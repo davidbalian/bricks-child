@@ -55,12 +55,14 @@ final class CarPriceCohortKeyFactory {
             return null;
         }
 
+        $year_bin = self::year_bin_label($year);
+
         $mileage_km = self::float_mileage_km($post_id);
         $mile_bin = self::mileage_bin_label($mileage_km);
 
         $engine_bin = self::engine_bin_label($post_id);
 
-        return array($make_slug, $model_slug, (string) $year, $mile_bin, $engine_bin);
+        return array($make_slug, $model_slug, $year_bin, $mile_bin, $engine_bin);
     }
 
     /**
@@ -100,6 +102,19 @@ final class CarPriceCohortKeyFactory {
     private static function float_mileage_km($post_id) {
         $raw = function_exists('get_field') ? get_field('mileage', $post_id) : get_post_meta($post_id, 'mileage', true);
         return floatval(str_replace(',', '', (string) $raw));
+    }
+
+    /**
+     * @param int $year Registration year.
+     * @return string e.g. y2015 when width is 5 (bands 2015–2019, 2020–2024, …).
+     */
+    private static function year_bin_label($year) {
+        $w = (int) CarPriceInsightConfig::YEAR_BUCKET_WIDTH_YEARS;
+        if ($w < 1) {
+            return (string) $year;
+        }
+        $start = (int) (floor((int) $year / $w) * $w);
+        return 'y' . $start;
     }
 
     /**

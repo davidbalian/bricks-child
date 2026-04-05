@@ -128,6 +128,37 @@
     margin-bottom: 8px;
 }
 
+/* Price insight badge (same labels as car-card; meta from price-insight rebuild) */
+.car-listings-card-content .car-card-price-insight {
+    display: inline-block;
+    margin-bottom: 8px;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.car-listings-card-content .car-card-price-insight--great {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.car-listings-card-content .car-card-price-insight--good {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.car-listings-card-content .car-card-price-insight--fair {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.car-listings-card-content .car-card-price-insight--above {
+    background: #ffedd5;
+    color: #9a3412;
+}
+
 .car-listings-card-location {
     font-size: 14px;
     color: #6b7280;

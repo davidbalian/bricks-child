@@ -14,10 +14,16 @@ final class CarPriceInsightConfig {
     const TABLE_BASENAME = 'car_price_cohorts';
 
     /** Minimum listings in a cohort before we assign a band (not none). */
-    const MIN_COHORT_N = 2;
+    const MIN_COHORT_N = 5;
 
     /** Mileage bucket width in km (listing mileage assumed km). */
-    const MILEAGE_BUCKET_KM = 20000;
+    const MILEAGE_BUCKET_KM = 50000;
+
+    /**
+     * Years are grouped into bands of this width (e.g. 5 → 2015–2019 share one key).
+     * Use 5 for ~±2 years within a band; use 7 for a wider ~±3 year spread.
+     */
+    const YEAR_BUCKET_WIDTH_YEARS = 5;
 
     /**
      * Price vs median ratio upper bounds for each band (listing price / median).

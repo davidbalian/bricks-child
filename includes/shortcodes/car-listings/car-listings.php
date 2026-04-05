@@ -574,6 +574,10 @@ function car_listings_render_card($post_id) {
                     </div>
                 <?php endif; ?>
 
+                <?php if (function_exists('car_card_render_price_insight_badge')) : ?>
+                    <?php car_card_render_price_insight_badge($post_id); ?>
+                <?php endif; ?>
+
                 <?php if ($car_city) : ?>
                     <div class="car-listings-card-location">
                         <?php echo esc_html($car_city); ?>
