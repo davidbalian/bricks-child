@@ -14,7 +14,7 @@ final class CarPriceInsightConfig {
     const TABLE_BASENAME = 'car_price_cohorts';
 
     /** Minimum listings in a cohort before we assign a band (not none). */
-    const MIN_COHORT_N = 5;
+    const MIN_COHORT_N = 2;
 
     /** Mileage bucket width in km (listing mileage assumed km). */
     const MILEAGE_BUCKET_KM = 20000;
