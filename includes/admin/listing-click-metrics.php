@@ -2,8 +2,7 @@
 /**
  * Listing Click Metrics Admin Page
  *
- * Displays WhatsApp click rate (WCR), listing page views, and WhatsApp clicks
- * for car listings. Phone/call counts remain in the database for other features.
+ * Displays contact click rate (WhatsApp + phone), listing page views, and per-channel clicks.
  */
 
 if (!defined('ABSPATH')) {
@@ -15,6 +14,7 @@ if (!defined('ABSPATH')) {
  */
 final class ListingClickMetricsRepository
 {
+    private const PHONE_META_KEY = 'call_button_clicks';
     private const WHATSAPP_META_KEY = 'whatsapp_button_clicks';
     /** Cached total listing page loads (see CarViewsDatabase, view_type = total). */
     private const PAGE_VIEWS_META_KEY = 'total_views_count';
@@ -23,7 +23,7 @@ final class ListingClickMetricsRepository
     /**
      * Sum listing page views and WhatsApp clicks across all car listings (same scope as the table).
      *
-     * @return array{total_page_views: int, total_whatsapp_clicks: int}
+     * @return array{total_page_views: int, total_whatsapp_clicks: int, total_phone_clicks: int}
      */
     public function fetchSiteWideTotals(): array
     {
@@ -34,7 +34,8 @@ final class ListingClickMetricsRepository
                 "
                 SELECT
                     COALESCE(SUM(CAST(pm_v.meta_value AS UNSIGNED)), 0) AS total_page_views,
-                    COALESCE(SUM(CAST(pm_w.meta_value AS UNSIGNED)), 0) AS total_whatsapp_clicks
+                    COALESCE(SUM(CAST(pm_w.meta_value AS UNSIGNED)), 0) AS total_whatsapp_clicks,
+                    COALESCE(SUM(CAST(pm_p.meta_value AS UNSIGNED)), 0) AS total_phone_clicks
                 FROM {$wpdb->posts} AS p
                 LEFT JOIN {$wpdb->postmeta} AS pm_v
                     ON pm_v.post_id = p.ID
@@ -42,11 +43,15 @@ final class ListingClickMetricsRepository
                 LEFT JOIN {$wpdb->postmeta} AS pm_w
                     ON pm_w.post_id = p.ID
                     AND pm_w.meta_key = %s
+                LEFT JOIN {$wpdb->postmeta} AS pm_p
+                    ON pm_p.post_id = p.ID
+                    AND pm_p.meta_key = %s
                 WHERE p.post_type = %s
                   AND p.post_status IN ('publish', 'pending', 'draft')
                 ",
                 self::PAGE_VIEWS_META_KEY,
                 self::WHATSAPP_META_KEY,
+                self::PHONE_META_KEY,
                 self::POST_TYPE
             ),
             ARRAY_A
@@ -56,19 +61,21 @@ final class ListingClickMetricsRepository
             return [
                 'total_page_views' => 0,
                 'total_whatsapp_clicks' => 0,
+                'total_phone_clicks' => 0,
             ];
         }
 
         return [
             'total_page_views' => (int) ($row['total_page_views'] ?? 0),
             'total_whatsapp_clicks' => (int) ($row['total_whatsapp_clicks'] ?? 0),
+            'total_phone_clicks' => (int) ($row['total_phone_clicks'] ?? 0),
         ];
     }
 
     /**
      * Fetch listing stats sorted by the requested metric.
      *
-     * @param string $orderBy whatsapp|views|wcr
+     * @param string $orderBy whatsapp|phone|views|contact|wcr
      * @param int    $limit   Maximum rows to return.
      *
      * @return array<int, object>
@@ -91,8 +98,13 @@ final class ListingClickMetricsRepository
                 NULLIF(author.display_name, '') AS poster_display_name,
                 NULLIF(first_name_meta.meta_value, '') AS poster_first_name,
                 NULLIF(last_name_meta.meta_value, '') AS poster_last_name,
+                COALESCE(CAST(phone_meta.meta_value AS UNSIGNED), 0)    AS phone_clicks,
                 COALESCE(CAST(wa_meta.meta_value AS UNSIGNED), 0)        AS whatsapp_clicks,
-                COALESCE(CAST(views_meta.meta_value AS UNSIGNED), 0)     AS page_views
+                COALESCE(CAST(views_meta.meta_value AS UNSIGNED), 0)     AS page_views,
+                (
+                    COALESCE(CAST(phone_meta.meta_value AS UNSIGNED), 0) +
+                    COALESCE(CAST(wa_meta.meta_value AS UNSIGNED), 0)
+                ) AS contact_clicks
             FROM {$wpdb->posts} AS p
             LEFT JOIN {$wpdb->users} AS author
                 ON author.ID = p.post_author
@@ -102,6 +114,9 @@ final class ListingClickMetricsRepository
             LEFT JOIN {$wpdb->usermeta} AS last_name_meta
                 ON last_name_meta.user_id = author.ID
                 AND last_name_meta.meta_key = 'last_name'
+            LEFT JOIN {$wpdb->postmeta} AS phone_meta
+                ON phone_meta.post_id = p.ID
+                AND phone_meta.meta_key = %s
             LEFT JOIN {$wpdb->postmeta} AS wa_meta
                 ON wa_meta.post_id = p.ID
                 AND wa_meta.meta_key = %s
@@ -114,6 +129,7 @@ final class ListingClickMetricsRepository
             LIMIT %d
             ",
             esc_html__('User #', 'bricks-child'),
+            self::PHONE_META_KEY,
             self::WHATSAPP_META_KEY,
             self::PAGE_VIEWS_META_KEY,
             self::POST_TYPE,
@@ -132,8 +148,13 @@ final class ListingClickMetricsRepository
     {
         $map = [
             'whatsapp' => 'whatsapp_clicks DESC',
+            'phone' => 'phone_clicks DESC',
+            'contact' => 'contact_clicks DESC',
             'views' => 'page_views DESC',
-            'wcr' => '(COALESCE(CAST(wa_meta.meta_value AS UNSIGNED), 0) / NULLIF(COALESCE(CAST(views_meta.meta_value AS UNSIGNED), 0), 0)) DESC',
+            'wcr' => '((
+                    COALESCE(CAST(phone_meta.meta_value AS UNSIGNED), 0) +
+                    COALESCE(CAST(wa_meta.meta_value AS UNSIGNED), 0)
+                ) / NULLIF(COALESCE(CAST(views_meta.meta_value AS UNSIGNED), 0), 0)) DESC',
         ];
 
         return $map[$orderBy] ?? $map['wcr'];
@@ -194,16 +215,17 @@ final class ListingClickMetricsPage
         $limit = $this->getLimitSelection();
         $listings = $this->repository->fetchListings($orderBy, $limit);
         $siteWide = $this->repository->fetchSiteWideTotals();
-        $overallWcr = $this->computeWcrPercent($siteWide['total_whatsapp_clicks'], $siteWide['total_page_views']);
+        $totalContactClicks = $siteWide['total_whatsapp_clicks'] + $siteWide['total_phone_clicks'];
+        $overallContactRate = $this->computeContactClickRatePercent($totalContactClicks, $siteWide['total_page_views']);
 
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e('Listing metrics (WhatsApp conversion)', 'bricks-child'); ?></h1>
+            <h1><?php esc_html_e('Listing metrics (contact conversion)', 'bricks-child'); ?></h1>
             <p class="description">
-                <?php esc_html_e('WhatsApp clicks (ACF: whatsapp_button_clicks) and listing page views (total_views_count from the car views tracker). WCR = WhatsApp clicks ÷ listing page views.', 'bricks-child'); ?>
+                <?php esc_html_e('Contact click rate uses WhatsApp (whatsapp_button_clicks) plus phone (call_button_clicks), divided by listing page views (total_views_count from the car views tracker).', 'bricks-child'); ?>
             </p>
 
-            <div class="listing-metrics-wcr-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 1.25rem 0 1.5rem;">
+            <div class="listing-metrics-wcr-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 1.25rem 0 1.5rem;">
                 <div class="notice" style="margin: 0; padding: 12px 14px;">
                     <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; color: #646970;">
                         <?php esc_html_e('Total listing page views', 'bricks-child'); ?>
@@ -220,21 +242,29 @@ final class ListingClickMetricsPage
                         <?php echo esc_html(number_format_i18n($siteWide['total_whatsapp_clicks'])); ?>
                     </div>
                 </div>
-                <div class="notice notice-<?php echo esc_attr($this->wcrNoticeVariant($overallWcr)); ?>" style="margin: 0; padding: 12px 14px; border-left-width: 4px;">
+                <div class="notice" style="margin: 0; padding: 12px 14px;">
                     <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; color: #646970;">
-                        <?php esc_html_e('WhatsApp click rate (WCR)', 'bricks-child'); ?>
+                        <?php esc_html_e('Total phone clicks', 'bricks-child'); ?>
                     </div>
                     <div style="font-size: 28px; font-weight: 600; line-height: 1.2;">
-                        <?php echo esc_html($this->formatWcrPercent($overallWcr)); ?>
+                        <?php echo esc_html(number_format_i18n($siteWide['total_phone_clicks'])); ?>
+                    </div>
+                </div>
+                <div class="notice notice-<?php echo esc_attr($this->contactRateNoticeVariant($overallContactRate)); ?>" style="margin: 0; padding: 12px 14px; border-left-width: 4px;">
+                    <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; color: #646970;">
+                        <?php esc_html_e('Contact click rate', 'bricks-child'); ?>
+                    </div>
+                    <div style="font-size: 28px; font-weight: 600; line-height: 1.2;">
+                        <?php echo esc_html($this->formatContactRatePercent($overallContactRate)); ?>
                     </div>
                     <p style="margin: 8px 0 0; font-size: 13px;">
-                        <?php echo esc_html($this->wcrInterpretationLabel($overallWcr)); ?>
+                        <?php echo esc_html($this->contactRateInterpretationLabel($overallContactRate)); ?>
                     </p>
                 </div>
             </div>
 
             <p class="description" style="max-width: 720px;">
-                <?php esc_html_e('WCR guide: under 2% — conversion (UI / trust / urgency); 2–5% — decent; 5–10% — very good; 10%+ — strong.', 'bricks-child'); ?>
+                <?php esc_html_e('Contact rate guide (WhatsApp + phone ÷ views): under 2% — conversion (UI / trust / urgency); 2–5% — decent; 5–10% — very good; 10%+ — strong.', 'bricks-child'); ?>
             </p>
 
             <form method="get" style="margin-bottom: 1rem; display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
@@ -244,9 +274,11 @@ final class ListingClickMetricsPage
                 <label>
                     <?php esc_html_e('Order by', 'bricks-child'); ?><br>
                     <select name="click_order">
-                        <?php $this->renderOrderOption('wcr', __('WhatsApp click rate (WCR)', 'bricks-child'), $orderBy); ?>
+                        <?php $this->renderOrderOption('wcr', __('Contact click rate (WhatsApp + phone)', 'bricks-child'), $orderBy); ?>
+                        <?php $this->renderOrderOption('contact', __('Total contact clicks', 'bricks-child'), $orderBy); ?>
                         <?php $this->renderOrderOption('views', __('Listing page views', 'bricks-child'), $orderBy); ?>
                         <?php $this->renderOrderOption('whatsapp', __('WhatsApp clicks', 'bricks-child'), $orderBy); ?>
+                        <?php $this->renderOrderOption('phone', __('Phone clicks', 'bricks-child'), $orderBy); ?>
                     </select>
                 </label>
 
@@ -265,21 +297,24 @@ final class ListingClickMetricsPage
                         <th><?php esc_html_e('Poster', 'bricks-child'); ?></th>
                         <th><?php esc_html_e('Listing page views', 'bricks-child'); ?></th>
                         <th><?php esc_html_e('WhatsApp clicks', 'bricks-child'); ?></th>
-                        <th><?php esc_html_e('WCR', 'bricks-child'); ?></th>
+                        <th><?php esc_html_e('Phone clicks', 'bricks-child'); ?></th>
+                        <th><?php esc_html_e('Contact rate', 'bricks-child'); ?></th>
                         <th><?php esc_html_e('Actions', 'bricks-child'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($listings)) : ?>
                         <tr>
-                            <td colspan="6"><?php esc_html_e('No listings found.', 'bricks-child'); ?></td>
+                            <td colspan="8"><?php esc_html_e('No listings found.', 'bricks-child'); ?></td>
                         </tr>
                     <?php else : ?>
                         <?php foreach ($listings as $listing) : ?>
                             <?php
                             $pageViews = (int) ($listing->page_views ?? 0);
                             $wa = (int) ($listing->whatsapp_clicks ?? 0);
-                            $rowWcr = $this->computeWcrPercent($wa, $pageViews);
+                            $phone = (int) ($listing->phone_clicks ?? 0);
+                            $contactClicks = $wa + $phone;
+                            $rowContactRate = $this->computeContactClickRatePercent($contactClicks, $pageViews);
                             ?>
                             <tr>
                                 <td>
@@ -293,9 +328,10 @@ final class ListingClickMetricsPage
                                 </td>
                                 <td><?php echo esc_html(number_format_i18n($pageViews)); ?></td>
                                 <td><?php echo esc_html(number_format_i18n($wa)); ?></td>
+                                <td><?php echo esc_html(number_format_i18n($phone)); ?></td>
                                 <td>
-                                    <span class="listing-wcr-pill" style="<?php echo esc_attr($this->wcrPillStyles($rowWcr)); ?>">
-                                        <?php echo esc_html($this->formatWcrPercent($rowWcr)); ?>
+                                    <span class="listing-contact-rate-pill" style="<?php echo esc_attr($this->contactRatePillStyles($rowContactRate)); ?>">
+                                        <?php echo esc_html($this->formatContactRatePercent($rowContactRate)); ?>
                                     </span>
                                 </td>
                                 <td>
@@ -329,19 +365,19 @@ final class ListingClickMetricsPage
     }
 
     /**
-     * @param int $whatsappClicks WhatsApp tap count.
-     * @param int $pageViews      Listing page views (total_views_count).
+     * @param int $contactClicks WhatsApp + phone taps.
+     * @param int $pageViews       Listing page views (total_views_count).
      */
-    private function computeWcrPercent(int $whatsappClicks, int $pageViews): ?float
+    private function computeContactClickRatePercent(int $contactClicks, int $pageViews): ?float
     {
         if ($pageViews < 1) {
             return null;
         }
 
-        return ($whatsappClicks / $pageViews) * 100.0;
+        return ($contactClicks / $pageViews) * 100.0;
     }
 
-    private function formatWcrPercent(?float $percent): string
+    private function formatContactRatePercent(?float $percent): string
     {
         if ($percent === null) {
             return '—';
@@ -351,9 +387,9 @@ final class ListingClickMetricsPage
     }
 
     /**
-     * WordPress admin notice variant for the overall WCR box.
+     * WordPress admin notice variant for the overall contact rate box.
      */
-    private function wcrNoticeVariant(?float $percent): string
+    private function contactRateNoticeVariant(?float $percent): string
     {
         if ($percent === null) {
             return 'info';
@@ -374,10 +410,10 @@ final class ListingClickMetricsPage
         return 'success';
     }
 
-    private function wcrInterpretationLabel(?float $percent): string
+    private function contactRateInterpretationLabel(?float $percent): string
     {
         if ($percent === null) {
-            return __('Not enough listing page views yet to calculate WCR.', 'bricks-child');
+            return __('Not enough listing page views yet to calculate contact rate.', 'bricks-child');
         }
 
         if ($percent < 2.0) {
@@ -392,13 +428,13 @@ final class ListingClickMetricsPage
             return __('5–10% — very good.', 'bricks-child');
         }
 
-        return __('10%+ — strong WhatsApp conversion.', 'bricks-child');
+        return __('10%+ — strong contact conversion.', 'bricks-child');
     }
 
     /**
-     * Inline styles for per-row WCR badge (admin has limited palette).
+     * Inline styles for per-row contact rate badge (admin has limited palette).
      */
-    private function wcrPillStyles(?float $percent): string
+    private function contactRatePillStyles(?float $percent): string
     {
         if ($percent === null) {
             return 'display:inline-block;padding:2px 8px;border-radius:4px;background:#f0f0f1;color:#50575e;font-weight:600;';
@@ -445,7 +481,7 @@ final class ListingClickMetricsPage
     private function getOrderSelection(): string
     {
         $selection = isset($_GET['click_order']) ? sanitize_key($_GET['click_order']) : self::DEFAULT_ORDER;
-        $allowed = ['whatsapp', 'views', 'wcr'];
+        $allowed = ['whatsapp', 'phone', 'contact', 'views', 'wcr'];
 
         return in_array($selection, $allowed, true) ? $selection : self::DEFAULT_ORDER;
     }
