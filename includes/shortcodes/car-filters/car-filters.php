@@ -13,6 +13,7 @@ if (!defined('ABSPATH')) {
 // Load base functions
 require_once __DIR__ . '/filters/filter-base.php';
 require_once __DIR__ . '/../car-card/car-card-listing-payload.php';
+require_once __DIR__ . '/car-filters-perf-log.php';
 
 // Load individual filters
 require_once __DIR__ . '/filters/filter-make.php';
@@ -171,6 +172,7 @@ function car_filters_enqueue_assets() {
         wp_localize_script('car-filters-js', 'carFiltersConfig', array(
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce'   => wp_create_nonce('car_filters_nonce'),
+            'perfLog' => car_filters_perf_log_is_enabled(),
         ));
     }
 }
@@ -247,6 +249,8 @@ function car_filters_location_radius_clauses($clauses, $query) {
  */
 function car_filters_ajax_filter_listings() {
     check_ajax_referer('car_filters_nonce', 'nonce');
+
+    $perf = Car_Filters_Perf_Logger::maybe_start();
 
     // Get filter parameters
     $make_id      = isset($_POST['make']) ? intval($_POST['make']) : 0;
@@ -456,6 +460,10 @@ function car_filters_ajax_filter_listings() {
         );
     }
 
+    if ($perf) {
+        $perf->mark('prepare_query_args');
+    }
+
     // Execute query with featured-first sorting
     if ($use_location_radius_filter) {
         add_filter('posts_clauses', 'car_filters_location_radius_clauses', 11, 2);
@@ -465,11 +473,19 @@ function car_filters_ajax_filter_listings() {
         remove_filter('posts_clauses', 'car_filters_location_radius_clauses', 11, 2);
     }
 
+    if ($perf) {
+        $perf->mark('car_listings_execute_query');
+    }
+
     // Pre-fetch meta
     if ($car_query->have_posts()) {
         $post_ids = wp_list_pluck($car_query->posts, 'ID');
         update_postmeta_cache($post_ids);
         update_post_thumbnail_cache($car_query);
+    }
+
+    if ($perf) {
+        $perf->mark('update_meta_and_thumbnail_cache');
     }
 
     // Determine which card renderer to use
@@ -495,6 +511,9 @@ function car_filters_ajax_filter_listings() {
                 $listing_card_index++;
             }
         }
+        if ($perf) {
+            $perf->mark('build_json_cards_payload');
+        }
     }
 
     // Render cards (HTML path — legacy cards or when JSON not requested)
@@ -516,6 +535,9 @@ function car_filters_ajax_filter_listings() {
             echo '<p class="car-listings-no-results">No car listings found matching your criteria.</p>';
         }
         $html = ob_get_clean();
+        if ($perf) {
+            $perf->mark('render_cards_html');
+        }
     }
 
     // Build pagination HTML if multiple pages
@@ -532,6 +554,10 @@ function car_filters_ajax_filter_listings() {
         ));
     }
 
+    if ($perf) {
+        $perf->mark('pagination_html');
+    }
+
     wp_reset_postdata();
 
     $response = array(
@@ -545,6 +571,20 @@ function car_filters_ajax_filter_listings() {
         $response['cards'] = $cards_payload;
     } else {
         $response['html'] = $html;
+    }
+
+    if ($perf) {
+        $perf->commit(array(
+            'page'               => $page,
+            'make_id'            => $make_id,
+            'model_id'           => $model_id,
+            'response_format'    => isset($_POST['response_format']) ? sanitize_key(wp_unslash($_POST['response_format'])) : '',
+            'json_cards'         => $json_cards ? 'yes' : 'no',
+            'location_radius'    => $use_location_radius_filter ? 'yes' : 'no',
+            'card_type'          => isset($atts['card_type']) ? (string) $atts['card_type'] : '',
+            'found_posts'        => (int) $car_query->found_posts,
+            'posts_in_response'  => (int) $car_query->post_count,
+        ));
     }
 
     wp_send_json_success($response);

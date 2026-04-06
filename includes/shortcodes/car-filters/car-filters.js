@@ -362,6 +362,8 @@
             // Show loading state
             $wrapper.addClass('car-listings-loading');
 
+            var perfAjaxStart = (typeof performance !== 'undefined' && performance.now) ? performance.now() : null;
+
             $.ajax({
                 url: carFiltersConfig.ajaxUrl,
                 type: 'POST',
@@ -374,10 +376,21 @@
                 },
                 success: function(response) {
                     if (response.success) {
+                        var perfRenderStart = (typeof performance !== 'undefined' && performance.now) ? performance.now() : null;
+
                         if (response.data.cards && window.carListingCardsRender) {
                             window.carListingCardsRender.renderInto($wrapper[0], response.data.cards);
                         } else if (response.data.html) {
                             $wrapper.html(response.data.html);
+                        }
+
+                        if (carFiltersConfig.perfLog && perfAjaxStart !== null && typeof performance !== 'undefined' && performance.now) {
+                            var afterRender = performance.now();
+                            var roundtripMs = Math.round(afterRender - perfAjaxStart);
+                            var renderMs = perfRenderStart !== null ? Math.round(afterRender - perfRenderStart) : null;
+                            console.info('[CarFilters perf] browser roundtrip_including_render_ms=' + roundtripMs +
+                                (renderMs !== null ? '  dom_update_ms=' + renderMs : '') +
+                                '  (server timing is in uploads/car-filters-perf.log when CAR_FILTERS_PERF_LOG is on)');
                         }
 
                         var url = CarFilters.buildResultsUrl(group);
