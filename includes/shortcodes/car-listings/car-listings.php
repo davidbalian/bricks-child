@@ -765,13 +765,15 @@ function car_listings_featured_first_orderby($clauses, $query) {
     return $clauses;
 }
 
+require_once __DIR__ . '/car-listings-query-cache.php';
+
 /**
  * Execute a car listings query with featured-first sorting
  * Adds the filter only for this specific query, then removes it
+ *
+ * Uses transient cache of ordered post IDs (see car-listings-query-cache.php) so
+ * repeat requests with the same filter/sort do not re-run the heavy SQL.
  */
 function car_listings_execute_query($query_args) {
-    add_filter('posts_clauses', 'car_listings_featured_first_orderby', 10, 2);
-    $query = new WP_Query($query_args);
-    remove_filter('posts_clauses', 'car_listings_featured_first_orderby', 10, 2);
-    return $query;
+    return car_listings_query_cache_execute($query_args);
 }
