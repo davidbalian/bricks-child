@@ -368,12 +368,17 @@
                 data: {
                     action: 'car_filters_filter_listings',
                     nonce: carFiltersConfig.nonce,
+                    response_format: 'json',
                     ...this.getFilterData(group),
                     listing_atts: JSON.stringify(listingAtts)
                 },
                 success: function(response) {
                     if (response.success) {
-                        $wrapper.html(response.data.html);
+                        if (response.data.cards && window.carListingCardsRender) {
+                            window.carListingCardsRender.renderInto($wrapper[0], response.data.cards);
+                        } else if (response.data.html) {
+                            $wrapper.html(response.data.html);
+                        }
 
                         var url = CarFilters.buildResultsUrl(group);
                         history.pushState({ filters: CarFilters.getFilterData(group) }, '', url);

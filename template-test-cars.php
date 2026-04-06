@@ -117,6 +117,11 @@ $listing_atts = car_listings_apply_request_sort_to_atts( $listing_atts );
 $query_args = car_listings_build_query_args( $listing_atts );
 $cars_query   = car_listings_execute_query( $query_args );
 $current_page = max( 1, (int) $cars_query->get( 'paged' ) );
+
+// Ensure car-card assets load even when the initial query returns zero posts (AJAX may inject cards next).
+if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_card' && function_exists( 'car_card_enqueue_assets' ) ) {
+    car_card_enqueue_assets();
+}
 ?>
 
 <!-- Filters bar -->
@@ -1719,6 +1724,7 @@ body {
             data: $.extend({
                 action: 'car_filters_filter_listings',
                 nonce: carFiltersConfig.nonce,
+                response_format: 'json',
                 page: page,
                 listing_atts: JSON.stringify(listingAtts),
                 location_lat: locationState.active ? locationState.lat : '',
@@ -1727,7 +1733,11 @@ body {
             }, filterData),
             success: function(response) {
                 if (response.success) {
-                    $wrapper.html(response.data.html);
+                    if (response.data.cards && window.carListingCardsRender) {
+                        window.carListingCardsRender.renderInto($wrapper[0], response.data.cards);
+                    } else if (response.data.html) {
+                        $wrapper.html(response.data.html);
+                    }
                     $pagination.html(response.data.pagination_html || '');
                     $container.data('page', response.data.current_page);
                     $container.data('max-pages', response.data.max_pages);
@@ -1776,6 +1786,9 @@ body {
             settings.data = settings.data.replace(/&location_lng=[^&]*/g, '');
             settings.data = settings.data.replace(/&location_radius_km=[^&]*/g, '');
             settings.data += '&' + latParam + '&' + lngParam + '&' + radiusParam;
+            if (settings.data.indexOf('response_format=') === -1) {
+                settings.data += '&response_format=json';
+            }
         }
     });
 

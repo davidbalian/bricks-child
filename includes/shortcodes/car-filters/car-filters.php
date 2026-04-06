@@ -12,6 +12,7 @@ if (!defined('ABSPATH')) {
 
 // Load base functions
 require_once __DIR__ . '/filters/filter-base.php';
+require_once __DIR__ . '/../car-card/car-card-listing-payload.php';
 
 // Load individual filters
 require_once __DIR__ . '/filters/filter-make.php';
@@ -142,12 +143,26 @@ function car_filters_enqueue_assets() {
         );
     }
 
+    $car_filters_deps = array('jquery');
+
+    // JSON card renderer (must load before car-filters.js)
+    if (file_exists($base_path . 'car-listing-cards-render.js')) {
+        wp_enqueue_script(
+            'car-listing-cards-render',
+            $base_url . 'car-listing-cards-render.js',
+            array(),
+            filemtime($base_path . 'car-listing-cards-render.js'),
+            true
+        );
+        $car_filters_deps[] = 'car-listing-cards-render';
+    }
+
     // Enqueue JS
     if (file_exists($base_path . 'car-filters.js')) {
         wp_enqueue_script(
             'car-filters-js',
             $base_url . 'car-filters.js',
-            array('jquery'),
+            $car_filters_deps,
             filemtime($base_path . 'car-filters.js'),
             true
         );
@@ -460,24 +475,48 @@ function car_filters_ajax_filter_listings() {
     // Determine which card renderer to use
     $card_type = isset($atts['card_type']) ? $atts['card_type'] : '';
     $use_car_card = ($card_type === 'car_card') && function_exists('render_car_card');
+    $want_json = isset($_POST['response_format']) && sanitize_key(wp_unslash($_POST['response_format'])) === 'json';
+    $json_cards = $want_json && $use_car_card && function_exists('car_card_build_listing_json_payload');
 
-    // Render cards
-    ob_start();
-    if ($car_query->have_posts()) {
-        $listing_card_index = 0;
-        while ($car_query->have_posts()) {
-            $car_query->the_post();
-            if ($use_car_card) {
-                render_car_card(get_the_ID(), array('listing_index' => $listing_card_index));
-            } elseif (function_exists('car_listings_render_card')) {
-                car_listings_render_card(get_the_ID());
+    $cards_payload = array();
+    if ($json_cards) {
+        $user_id = get_current_user_id();
+        $favorite_raw = $user_id ? get_user_meta($user_id, 'favorite_cars', true) : array();
+        $favorite_raw = is_array($favorite_raw) ? $favorite_raw : array();
+        $favorite_lookup = array_flip(array_map('intval', $favorite_raw));
+
+        if ($car_query->have_posts()) {
+            $listing_card_index = 0;
+            while ($car_query->have_posts()) {
+                $car_query->the_post();
+                $pid = get_the_ID();
+                $is_fav = isset($favorite_lookup[$pid]);
+                $cards_payload[] = car_card_build_listing_json_payload($pid, $listing_card_index, $is_fav);
+                $listing_card_index++;
             }
-            $listing_card_index++;
         }
-    } else {
-        echo '<p class="car-listings-no-results">No car listings found matching your criteria.</p>';
     }
-    $html = ob_get_clean();
+
+    // Render cards (HTML path — legacy cards or when JSON not requested)
+    $html = '';
+    if (!$json_cards) {
+        ob_start();
+        if ($car_query->have_posts()) {
+            $listing_card_index = 0;
+            while ($car_query->have_posts()) {
+                $car_query->the_post();
+                if ($use_car_card) {
+                    render_car_card(get_the_ID(), array('listing_index' => $listing_card_index));
+                } elseif (function_exists('car_listings_render_card')) {
+                    car_listings_render_card(get_the_ID());
+                }
+                $listing_card_index++;
+            }
+        } else {
+            echo '<p class="car-listings-no-results">No car listings found matching your criteria.</p>';
+        }
+        $html = ob_get_clean();
+    }
 
     // Build pagination HTML if multiple pages
     $pagination_html = '';
@@ -495,13 +534,20 @@ function car_filters_ajax_filter_listings() {
 
     wp_reset_postdata();
 
-    wp_send_json_success(array(
-        'html'            => $html,
+    $response = array(
         'pagination_html' => $pagination_html,
         'found_posts'     => $car_query->found_posts,
         'max_pages'       => $car_query->max_num_pages,
         'current_page'    => $page,
-    ));
+    );
+
+    if ($json_cards) {
+        $response['cards'] = $cards_payload;
+    } else {
+        $response['html'] = $html;
+    }
+
+    wp_send_json_success($response);
 }
 add_action('wp_ajax_car_filters_filter_listings', 'car_filters_ajax_filter_listings');
 add_action('wp_ajax_nopriv_car_filters_filter_listings', 'car_filters_ajax_filter_listings');

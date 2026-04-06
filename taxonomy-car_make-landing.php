@@ -1611,14 +1611,19 @@ body {
             url: carFiltersConfig.ajaxUrl,
             type: 'POST',
             data: $.extend({
-                action:       'car_filters_filter_listings',
-                nonce:        carFiltersConfig.nonce,
-                page:         page,
-                listing_atts: JSON.stringify(listingAtts)
+                action:           'car_filters_filter_listings',
+                nonce:            carFiltersConfig.nonce,
+                response_format:  'json',
+                page:             page,
+                listing_atts:     JSON.stringify(listingAtts)
             }, filterData),
             success: function(response) {
                 if (response.success) {
-                    $wrapper.html(response.data.html);
+                    if (response.data.cards && window.carListingCardsRender) {
+                        window.carListingCardsRender.renderInto($wrapper[0], response.data.cards);
+                    } else if (response.data.html) {
+                        $wrapper.html(response.data.html);
+                    }
                     $pagination.html(response.data.pagination_html || '');
                     $container.data('page', response.data.current_page);
                     $container.data('max-pages', response.data.max_pages);
@@ -1665,6 +1670,9 @@ body {
             settings.data = settings.data.replace(/&location_lng=[^&]*/g, '');
             settings.data = settings.data.replace(/&location_radius_km=[^&]*/g, '');
             settings.data += '&' + latParam + '&' + lngParam + '&' + radiusParam;
+            if (settings.data.indexOf('response_format=') === -1) {
+                settings.data += '&response_format=json';
+            }
         }
     });
 
