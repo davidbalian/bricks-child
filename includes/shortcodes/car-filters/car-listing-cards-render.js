@@ -203,7 +203,7 @@
 
         var loc = document.createElement('span');
         loc.className = 'car-card-location';
-        loc.innerHTML = '<i class="fas fa-location-dot"></i> ' + escapeHtml(c.loc || '');
+        loc.innerHTML = '<img src="https://autoagora.cy/wp-content/uploads/2026/04/location-pill-filled.svg" alt="" class="car-card-location-icon"> ' + escapeHtml(c.loc || '');
         foot.appendChild(loc);
 
         var dateSpan = document.createElement('span');
