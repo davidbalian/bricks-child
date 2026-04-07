@@ -1,447 +1,456 @@
 /* Single Car Template Gallery Styles */
 .single-car-gallery-container {
-  width: 100%;
-  max-width: 100%;
-  margin: 0;
-  position: relative;
-  overflow: hidden;
-  box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    box-sizing: border-box;
 }
 
-/* Wrapper to prevent overflow issues */
 .single-car-gallery-wrapper {
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
-  position: relative;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    position: relative;
 }
 
 /* Main slider wrapper */
 .main-slider-wrapper {
-  position: relative;
-  margin-bottom: 20px;
+    position: relative;
+    margin-bottom: 10px;
 }
 
 /* Main slider */
-.single-car-main-slider {
-  background: #f5f5f5;
-  border-radius: 4px;
-  overflow: hidden;
+.scg-main-slider {
+    position: relative;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #f5f5f5;
 }
 
-.single-car-main-slider .swiper-slide {
-  position: relative;
-  display: block !important;
-  width: 100%;
-  aspect-ratio: 4/3;
-  overflow: hidden;
+/* Track */
+.scg-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.2s ease;
+    will-change: transform;
+    touch-action: pan-y pinch-zoom;
+    cursor: grab;
 }
 
-.single-car-main-slider .swiper-slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+.scg-track:active {
+    cursor: grabbing;
+}
+
+/* Slides */
+.scg-slide {
+    min-width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.scg-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    user-select: none;
+    pointer-events: none;
 }
 
 /* Navigation arrows */
-.slider-arrows .custom-prev-btn,
-.slider-arrows .custom-next-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-  background: white;
-  color: black;
-  border: none;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  transition: all 0.1s ease;
+.custom-prev-btn,
+.custom-next-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    background: white;
+    color: black;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: background 0.1s ease, transform 0.1s ease;
 }
 
-.slider-arrows .custom-prev-btn:hover,
-.slider-arrows .custom-next-btn:hover {
-  background: #f0f0f0;
-  transform: translateY(-50%) scale(1.05);
+.custom-prev-btn:hover,
+.custom-next-btn:hover {
+    background: #f0f0f0;
+    transform: translateY(-50%) scale(1.05);
 }
 
-.slider-arrows .custom-prev-btn:active,
-.slider-arrows .custom-next-btn:active {
-  transform: translateY(-50%) scale(1.02);
+.custom-prev-btn:active,
+.custom-next-btn:active {
+    transform: translateY(-50%) scale(1.02);
 }
 
-.slider-arrows .custom-prev-btn {
-  left: 20px;
+.custom-prev-btn {
+    left: 20px;
 }
 
-.slider-arrows .custom-next-btn {
-  right: 20px;
+.custom-next-btn {
+    right: 20px;
+}
+
+.scg-arrow-hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* Photo counter */
 .photo-counter {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  background: white;
-  color: black;
-  padding: 8px 15px;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 500;
-  z-index: 2;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    color: black;
+    padding: 8px 15px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 2;
+    user-select: none;
+    pointer-events: none;
 }
 
 /* View all images button */
 .view-all-button {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  z-index: 2;
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 2;
 }
 
 .view-all-button button {
-  background: white;
-  color: black;
-  padding: 8px 15px;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.1s ease;
+    background: white;
+    color: black;
+    padding: 8px 15px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.1s ease;
 }
 
 .view-all-button button:hover {
-  opacity: 0.8;
+    opacity: 0.8;
 }
 
-/* Thumbnail slider wrapper */
+/* Thumbnail strip */
 .thumbnail-slider-wrapper {
-  margin-top: 20px;
+    margin-top: 10px;
 }
 
-/* Thumbnail slider */
-
-.single-car-thumbnail-slider .thumbnail {
-  padding: 0 5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.scg-thumbs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
 }
 
-.single-car-thumbnail-slider .thumbnail img {
-  width: 100%;
-  aspect-ratio: 4/3;
-  object-fit: cover;
-  border-radius: 2px;
-  border: 1px solid transparent;
-  transition: all 0.1s ease;
+.scg-thumbs::-webkit-scrollbar {
+    display: none;
 }
 
-.single-car-thumbnail-slider .thumbnail:hover img {
-  border-color: #007cba;
-  opacity: 0.8;
+.scg-thumb {
+    flex: 0 0 calc(20% - 5px);
+    cursor: pointer;
 }
 
-.single-car-thumbnail-slider .swiper-slide-thumb-active .thumbnail img {
-  border-color: #007cba;
-  box-shadow: 0 0 0 px rgba(0, 124, 186, 0.3);
+.scg-thumb img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    border-radius: 2px;
+    border: 2px solid transparent;
+    transition: border-color 0.1s ease, opacity 0.1s ease;
+    display: block;
+    user-select: none;
 }
 
-/* Swiper slider overrides */
-.single-car-main-slider .swiper-pagination {
-  display: none !important;
+.scg-thumb:hover img {
+    border-color: #007cba;
+    opacity: 0.8;
 }
 
-.single-car-main-slider .swiper-button-prev,
-.single-car-main-slider .swiper-button-next {
-  display: none !important;
+.scg-thumb-active img {
+    border-color: #007cba;
 }
 
-/* Hide any default Swiper arrows that might appear */
-.swiper-button-prev:not(.custom-prev-btn),
-.swiper-button-next:not(.custom-next-btn) {
-  display: none !important;
-}
-
-.single-car-thumbnail-slider .swiper-pagination {
-  display: none !important;
-}
-
-.single-car-thumbnail-slider .swiper-button-prev,
-.single-car-thumbnail-slider .swiper-button-next {
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  z-index: 10;
-}
-
-.single-car-thumbnail-slider .swiper-button-prev:after,
-.single-car-thumbnail-slider .swiper-button-next:after {
-  font-size: 14px;
-  color: white;
-}
-
-.single-car-thumbnail-slider .swiper-button-prev {
-  left: -15px;
-}
-
-.single-car-thumbnail-slider .swiper-button-next {
-  right: -15px;
-}
-
-/* Responsive adjustments */
+/* Responsive */
 @media (max-width: 768px) {
-  .slider-arrows .custom-prev-btn,
-  .slider-arrows .custom-next-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-  }
+    .custom-prev-btn,
+    .custom-next-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
 
-  .slider-arrows .custom-prev-btn {
-    left: 10px;
-  }
+    .custom-prev-btn { left: 10px; }
+    .custom-next-btn { right: 10px; }
 
-  .slider-arrows .custom-next-btn {
-    right: 10px;
-  }
+    .photo-counter {
+        bottom: 10px;
+        right: 10px;
+        padding: 6px 12px;
+        font-size: 12px;
+    }
 
-  .photo-counter {
-    bottom: 10px;
-    right: 10px;
-    padding: 6px 12px;
-    font-size: 12px;
-  }
+    .view-all-button {
+        bottom: 10px;
+        left: 10px;
+    }
 
-  .view-all-button {
-    bottom: 10px;
-    left: 10px;
-  }
+    .view-all-button button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
 
-  .view-all-button button {
-    padding: 6px 12px;
-    font-size: 12px;
-  }
+    .scg-thumb {
+        flex: 0 0 calc(25% - 5px);
+    }
 }
 
-/* All images maintain 4:3 aspect ratio automatically - no additional mobile overrides needed */
-
-/* Lightbox Styles */
+/* ── Lightbox ── */
 .gallery-lightbox {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 10001;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .lightbox-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(10px);
-  cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
 }
 
 .lightbox-content {
-  position: relative;
-  width: 95%;
-  max-width: 900px;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  z-index: 1;
+    position: relative;
+    width: 95%;
+    max-width: 900px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
 }
 
 .lightbox-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    color: white;
 }
 
 .lightbox-counter {
-  background: white;
-  color: black;
-  padding: 8px 15px;
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 500;
+    background: white;
+    color: black;
+    padding: 8px 15px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    user-select: none;
 }
 
 .lightbox-close {
-  background: white;
-  color: black;
-  border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  transition: opacity 0.1s ease;
+    background: white;
+    color: black;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: opacity 0.1s ease;
 }
 
 .lightbox-close:hover {
-  opacity: 0.8;
+    opacity: 0.8;
 }
 
 /* Lightbox main slider */
 .lightbox-main-slider-wrapper {
-  position: relative;
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  margin-bottom: 20px;
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto 20px;
 }
 
-.lightbox-main-slider .swiper-slide {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4/3;
-  overflow: hidden;
-  border-radius: 4px;
+.lb-track-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
 }
 
-.lightbox-main-slider .swiper-slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+.lb-track {
+    display: flex;
+    transition: transform 0.2s ease;
+    will-change: transform;
+    touch-action: pan-y pinch-zoom;
+    cursor: grab;
+}
+
+.lb-track:active {
+    cursor: grabbing;
+}
+
+.lb-slide {
+    min-width: 100%;
+    flex-shrink: 0;
+}
+
+.lb-slide img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    display: block;
+    border-radius: 4px;
+    user-select: none;
+    pointer-events: none;
 }
 
 /* Lightbox arrows */
 .lightbox-arrows .lightbox-prev-btn,
 .lightbox-arrows .lightbox-next-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-  background: white;
-  color: black;
-  border: none;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  transition: all 0.1s ease;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    background: white;
+    color: black;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: background 0.1s ease, transform 0.1s ease;
 }
 
 .lightbox-arrows .lightbox-prev-btn:hover,
 .lightbox-arrows .lightbox-next-btn:hover {
-  background: #f0f0f0;
-  transform: translateY(-50%) scale(1.05);
+    background: #f0f0f0;
+    transform: translateY(-50%) scale(1.05);
 }
 
 .lightbox-arrows .lightbox-prev-btn:active,
 .lightbox-arrows .lightbox-next-btn:active {
-  transform: translateY(-50%) scale(1.02);
+    transform: translateY(-50%) scale(1.02);
 }
 
-.lightbox-arrows .lightbox-prev-btn {
-  left: 20px;
-}
+.lightbox-arrows .lightbox-prev-btn { left: 20px; }
+.lightbox-arrows .lightbox-next-btn { right: 20px; }
 
-.lightbox-arrows .lightbox-next-btn {
-  right: 20px;
-}
-
-/* Lightbox thumbnail slider */
+/* Lightbox thumbnails */
 .lightbox-thumbnail-wrapper {
-  width: 100%;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-.lightbox-thumbnail-slider .thumbnail {
-  padding: 0 5px;
-  cursor: pointer;
-  transition: all 0.1s ease;
+.lb-thumbs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 0 2px;
 }
 
-.lightbox-thumbnail-slider .thumbnail img {
-  width: 100%;
-  aspect-ratio: 4/3;
-  object-fit: cover;
-  border-radius: 2px;
-  border: 1px solid transparent;
-  transition: all 0.1s ease;
+.lb-thumbs::-webkit-scrollbar {
+    display: none;
 }
 
-.lightbox-thumbnail-slider .thumbnail:hover img {
-  border-color: #007cba;
-  opacity: 0.8;
+.lb-thumb {
+    flex: 0 0 calc(20% - 5px);
+    cursor: pointer;
 }
 
-.lightbox-thumbnail-slider .swiper-slide-thumb-active .thumbnail img {
-  border-color: #007cba;
-  box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.3);
+.lb-thumb img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    border-radius: 2px;
+    border: 2px solid transparent;
+    transition: border-color 0.1s ease, opacity 0.1s ease;
+    display: block;
+    user-select: none;
 }
 
-/* Prevent body scroll when lightbox is open */
+.lb-thumb:hover img {
+    border-color: #007cba;
+    opacity: 0.8;
+}
+
+.lb-thumb-active img {
+    border-color: #007cba;
+}
+
 body.lightbox-open {
-  overflow: hidden;
+    overflow: hidden;
 }
 
-/* Mobile lightbox adjustments */
+/* Mobile lightbox */
 @media (max-width: 768px) {
-  .lightbox-content {
-    width: 95%;
-    max-height: 95vh;
-  }
+    .lightbox-content {
+        width: 95%;
+        max-height: 95vh;
+    }
 
-  .lightbox-header {
-    padding: 15px;
-  }
+    .lightbox-header {
+        padding: 15px;
+    }
 
-  .lightbox-counter {
-    padding: 6px 12px;
-    font-size: 12px;
-  }
+    .lightbox-counter {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
 
-  .lightbox-close {
-    width: 35px;
-    height: 35px;
-    font-size: 16px;
-  }
+    .lightbox-close {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
 
-  .lightbox-main-slider-wrapper {
-    max-width: 350px;
-  }
+    .lightbox-main-slider-wrapper {
+        max-width: 350px;
+    }
 
-  .lightbox-arrows .lightbox-prev-btn,
-  .lightbox-arrows .lightbox-next-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-  }
+    .lightbox-arrows .lightbox-prev-btn,
+    .lightbox-arrows .lightbox-next-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
 
-  .lightbox-arrows .lightbox-prev-btn {
-    left: 10px;
-  }
+    .lightbox-arrows .lightbox-prev-btn { left: 10px; }
+    .lightbox-arrows .lightbox-next-btn { right: 10px; }
 
-  .lightbox-arrows .lightbox-next-btn {
-    right: 10px;
-  }
+    .lb-thumb {
+        flex: 0 0 calc(25% - 5px);
+    }
 }
