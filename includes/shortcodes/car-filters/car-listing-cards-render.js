@@ -184,18 +184,18 @@
         appendSpecs(specsEl, c.specs);
         body.appendChild(specsEl);
 
-        if (c.price) {
-            var price = document.createElement('div');
-            price.className = 'car-card-price';
-            price.innerHTML = '&euro;' + escapeHtml(c.price);
-            body.appendChild(price);
-        }
-
         if (c.pi && PI_LABELS[c.pi]) {
             var pi = document.createElement('span');
             pi.className = 'car-card-price-insight car-card-price-insight--' + c.pi;
             pi.textContent = PI_LABELS[c.pi];
             body.appendChild(pi);
+        }
+
+        if (c.price) {
+            var price = document.createElement('div');
+            price.className = 'car-card-price';
+            price.innerHTML = '&euro;' + escapeHtml(c.price);
+            body.appendChild(price);
         }
 
         var foot = document.createElement('div');

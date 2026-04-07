@@ -219,11 +219,11 @@ function render_car_card($post_id, $context = array()) {
                 ?>
             </div>
 
+            <?php car_card_render_price_insight_badge($post_id); ?>
+
             <?php if ($price) : ?>
                 <div class="car-card-price">&euro;<?php echo esc_html(number_format(floatval(str_replace(',', '', $price)))); ?></div>
             <?php endif; ?>
-
-            <?php car_card_render_price_insight_badge($post_id); ?>
 
             <div class="car-card-footer">
                 <span class="car-card-location">
