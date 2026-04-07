@@ -17,6 +17,8 @@
         groups: {},
         subscribers: {},
         debounceTimers: {},
+        activeAjaxRequests: {},
+        requestSeqByGroup: {},
 
         /**
          * Initialize a filter group
@@ -362,9 +364,16 @@
             // Show loading state
             $wrapper.addClass('car-listings-loading');
 
+            // Prevent stale responses from overwriting newer filter selections.
+            var currentSeq = (this.requestSeqByGroup[group] || 0) + 1;
+            this.requestSeqByGroup[group] = currentSeq;
+            if (this.activeAjaxRequests[group] && this.activeAjaxRequests[group].readyState !== 4) {
+                this.activeAjaxRequests[group].abort();
+            }
+
             var perfAjaxStart = (typeof performance !== 'undefined' && performance.now) ? performance.now() : null;
 
-            $.ajax({
+            var xhr = $.ajax({
                 url: carFiltersConfig.ajaxUrl,
                 type: 'POST',
                 data: {
@@ -375,6 +384,9 @@
                     listing_atts: JSON.stringify(listingAtts)
                 },
                 success: function(response) {
+                    if (currentSeq !== CarFilters.requestSeqByGroup[group]) {
+                        return;
+                    }
                     if (response.success) {
                         var perfRenderStart = (typeof performance !== 'undefined' && performance.now) ? performance.now() : null;
 
@@ -402,12 +414,18 @@
                 },
                 error: function(xhr, status, error) {
                     if (status === 'abort') return;
+                    if (currentSeq !== CarFilters.requestSeqByGroup[group]) return;
                     console.error('CarFilters: AJAX error', error);
                 },
                 complete: function() {
+                    if (currentSeq !== CarFilters.requestSeqByGroup[group]) {
+                        return;
+                    }
+                    delete CarFilters.activeAjaxRequests[group];
                     $wrapper.removeClass('car-listings-loading');
                 }
             });
+            this.activeAjaxRequests[group] = xhr;
         },
 
         /**

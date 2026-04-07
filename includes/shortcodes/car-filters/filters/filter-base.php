@@ -304,7 +304,11 @@ function car_filter_render_range($args) {
  */
 function car_filter_get_makes() {
     $cache_key = 'car_filter_makes';
-    $makes = wp_cache_get($cache_key);
+    $transient_key = 'car_filter_makes_v1';
+    $makes = wp_cache_get($cache_key, 'car_filters');
+    if (false === $makes) {
+        $makes = get_transient($transient_key);
+    }
 
     if (false === $makes) {
         global $wpdb;
@@ -326,11 +330,31 @@ function car_filter_get_makes() {
         ";
 
         $makes = $wpdb->get_results($query);
-        wp_cache_set($cache_key, $makes, '', 300); // Cache for 5 minutes
+        wp_cache_set($cache_key, $makes, 'car_filters', 600);
+        set_transient($transient_key, $makes, 600);
     }
 
     return $makes ? $makes : array();
 }
+
+/**
+ * Invalidate cached make counts when car or taxonomy data changes.
+ */
+function car_filter_invalidate_makes_cache() {
+    wp_cache_delete('car_filter_makes', 'car_filters');
+    delete_transient('car_filter_makes_v1');
+}
+add_action('save_post_car', 'car_filter_invalidate_makes_cache');
+add_action('before_delete_post', function($post_id) {
+    if (get_post_type($post_id) === 'car') {
+        car_filter_invalidate_makes_cache();
+    }
+});
+add_action('set_object_terms', function($object_id, $terms, $tt_ids, $taxonomy) {
+    if ($taxonomy === 'car_make' && get_post_type($object_id) === 'car') {
+        car_filter_invalidate_makes_cache();
+    }
+}, 10, 4);
 
 /**
  * Get models for a specific make
