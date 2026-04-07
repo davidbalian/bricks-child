@@ -348,11 +348,15 @@
     flex-shrink: 0;
 }
 
+.car-card-price-insight + .car-card-price {
+    padding-top: 0.25rem;
+}
+
 /* Price insight (cohort vs median) */
 .car-card-price-insight {
     display: inline-block;
     width: fit-content;
-    margin-bottom: 0.25rem;
+    margin-top: 1rem;
     padding: 0.2rem 0.5rem;
     border-radius: 0.35rem;
     font-size: 0.7rem;
