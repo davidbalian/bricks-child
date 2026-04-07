@@ -171,20 +171,10 @@ function car_listings_build_query_args($atts) {
     }
 
     // === SOLD LISTINGS FILTER ===
-    // Simplified: exclude only cars explicitly marked as sold (is_sold = '1')
+    // Keep the same behavior (include rows where is_sold is missing OR != '1'),
+    // but implement it via a dedicated SQL clause to avoid wide postmeta fan-out joins.
     if ($atts['show_sold'] !== 'true') {
-        $meta_query[] = array(
-            'relation' => 'OR',
-            array(
-                'key'     => 'is_sold',
-                'compare' => 'NOT EXISTS'
-            ),
-            array(
-                'key'     => 'is_sold',
-                'value'   => '1',
-                'compare' => '!='
-            )
-        );
+        $args['car_exclude_sold'] = true;
     }
 
     // === URL PARAMETER FILTERS (for filter integration) ===
@@ -761,6 +751,27 @@ function car_listings_featured_first_orderby($clauses, $query) {
 
     // Prepend featured sorting to orderby (featured=1 first, then NULL/0)
     $clauses['orderby'] = "CASE WHEN featured_meta.meta_value = '1' THEN 0 ELSE 1 END ASC, " . $clauses['orderby'];
+
+    return $clauses;
+}
+
+/**
+ * Exclude listings explicitly marked as sold.
+ *
+ * Semantics are identical to the old meta_query:
+ * - include if no is_sold row exists
+ * - include if is_sold != '1'
+ * - exclude only is_sold = '1'
+ */
+function car_listings_exclude_sold_clauses($clauses, $query) {
+    if (!$query->get('car_exclude_sold')) {
+        return $clauses;
+    }
+
+    global $wpdb;
+
+    $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS sold_meta ON ({$wpdb->posts}.ID = sold_meta.post_id AND sold_meta.meta_key = 'is_sold')";
+    $clauses['where'] .= " AND (sold_meta.post_id IS NULL OR sold_meta.meta_value <> '1')";
 
     return $clauses;
 }

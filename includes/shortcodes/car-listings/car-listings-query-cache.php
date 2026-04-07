@@ -68,7 +68,9 @@ function car_listings_query_cache_normalize_for_key(array $args) {
  */
 function car_listings_query_cache_run_wp_query(array $query_args) {
     add_filter('posts_clauses', 'car_listings_featured_first_orderby', 10, 2);
+    add_filter('posts_clauses', 'car_listings_exclude_sold_clauses', 12, 2);
     $query = new WP_Query($query_args);
+    remove_filter('posts_clauses', 'car_listings_exclude_sold_clauses', 12, 2);
     remove_filter('posts_clauses', 'car_listings_featured_first_orderby', 10, 2);
     return $query;
 }

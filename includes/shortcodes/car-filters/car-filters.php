@@ -405,20 +405,10 @@ function car_filters_ajax_filter_listings() {
         }
     }
 
-    // Exclude sold (default behavior)
+    // Exclude sold (default behavior). This is applied in SQL clauses
+    // to avoid broad postmeta fan-out joins in generated WP meta_query SQL.
     if (!isset($atts['show_sold']) || $atts['show_sold'] !== 'true') {
-        $meta_query[] = array(
-            'relation' => 'OR',
-            array(
-                'key'     => 'is_sold',
-                'compare' => 'NOT EXISTS'
-            ),
-            array(
-                'key'     => 'is_sold',
-                'value'   => '1',
-                'compare' => '!='
-            )
-        );
+        $args['car_exclude_sold'] = true;
     }
 
     if (count($meta_query) > 1) {
