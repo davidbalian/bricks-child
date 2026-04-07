@@ -48,12 +48,33 @@
     height: 100%;
     flex-shrink: 0;
     position: relative;
+    overflow: hidden;
+}
+
+/* Blurred background — same image, darker overlay, 25px blur */
+.scg-slide-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.1); /* overflow into parent to hide blur edges */
+    filter: blur(25px);
+    z-index: 0;
+}
+
+.scg-slide-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
 }
 
 .scg-slide img {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     display: block;
     user-select: none;
     pointer-events: none;
@@ -161,7 +182,7 @@
 }
 
 .scg-thumb {
-    flex: 0 0 calc(20% - 5px);
+    flex: 0 0 calc((100% - 36px) / 7);
     cursor: pointer;
 }
 
@@ -215,7 +236,7 @@
     }
 
     .scg-thumb {
-        flex: 0 0 calc(25% - 5px);
+        flex: 0 0 calc((100% - 18px) / 4);
     }
 }
 

@@ -44,6 +44,7 @@ function single_car_template_gallery_shortcode( $atts ) {
                             $image_alt = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
                             ?>
                             <div class="scg-slide">
+                                <div class="scg-slide-bg" style="background-image:url('<?php echo esc_url( $image_url ); ?>')"></div>
                                 <img src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>" loading="lazy" />
                             </div>
                         <?php endforeach; ?>
