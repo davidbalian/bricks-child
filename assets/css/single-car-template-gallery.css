@@ -54,15 +54,13 @@
     justify-content: center;
 }
 
-/* Blurred background — same image as foreground, aligned with contain (not cover) */
+/* Blurred background — full-bleed cover, lighter blur */
 .scg-slide-bg {
     position: absolute;
     inset: 0;
-    background-size: contain;
-    background-repeat: no-repeat;
+    background-size: cover;
     background-position: center;
-    transform: scale(1.08); /* slight overscan to soften blur edge halos */
-    filter: blur(25px);
+    filter: blur(12px);
     z-index: 0;
 }
 
