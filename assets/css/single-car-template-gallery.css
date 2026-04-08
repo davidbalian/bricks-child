@@ -133,7 +133,7 @@
     background: white;
     color: black;
     padding: 8px 15px;
-    border-radius: var(--radius-md);
+    border-radius: 9999px;
     font-size: 14px;
     font-weight: 500;
     z-index: 2;
@@ -149,20 +149,36 @@
     z-index: 2;
 }
 
-.view-all-button button {
+.view-all-button .scg-view-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
     background: white;
     color: black;
     padding: 8px 15px;
-    border-radius: var(--radius-md);
+    border-radius: 9999px;
     font-size: 14px;
     font-weight: 500;
     border: none;
     cursor: pointer;
-    transition: opacity 0.1s ease;
+    transition: gap 0.28s ease;
+    box-sizing: border-box;
 }
 
-.view-all-button button:hover {
-    opacity: 0.8;
+.view-all-button .scg-view-all-btn:hover {
+    gap: 1rem;
+}
+
+.view-all-button .scg-view-all-icon {
+    flex-shrink: 0;
+    display: block;
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+.view-all-button .scg-view-all-label {
+    line-height: 1;
 }
 
 /* Thumbnail strip */
@@ -237,9 +253,14 @@
         left: 10px;
     }
 
-    .view-all-button button {
+    .view-all-button .scg-view-all-btn {
         padding: 6px 12px;
         font-size: 12px;
+    }
+
+    .view-all-button .scg-view-all-icon {
+        width: 16px;
+        height: 16px;
     }
 
     .scg-thumb {
@@ -300,7 +321,7 @@
     background: white;
     color: black;
     padding: 8px 15px;
-    border-radius: var(--radius-md);
+    border-radius: 9999px;
     font-size: 14px;
     font-weight: 500;
     user-select: none;

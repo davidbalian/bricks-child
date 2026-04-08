@@ -26,6 +26,13 @@ function single_car_template_gallery_shortcode( $atts ) {
 
     $total = count( $car_images );
 
+    $site_host = wp_parse_url( home_url(), PHP_URL_HOST );
+    if ( $site_host && stripos( $site_host, 'staging2' ) !== false ) {
+        $scg_expand_icon_url = 'https://staging2.autoagora.cy/wp-content/uploads/2026/04/expand-icon.svg';
+    } else {
+        $scg_expand_icon_url = 'https://autoagora.cy/wp-content/uploads/2026/04/expand-icon.svg';
+    }
+
     $theme_dir = get_stylesheet_directory_uri();
     wp_enqueue_style( 'single-car-gallery-css', $theme_dir . '/assets/css/single-car-template-gallery.css', array(), filemtime( get_stylesheet_directory() . '/assets/css/single-car-template-gallery.css' ) );
     wp_enqueue_script( 'single-car-gallery-js', $theme_dir . '/assets/js/single-car-template-gallery.js', array(), filemtime( get_stylesheet_directory() . '/assets/js/single-car-template-gallery.js' ), true );
@@ -66,7 +73,10 @@ function single_car_template_gallery_shortcode( $atts ) {
 
                     <!-- View all images button -->
                     <div class="view-all-button">
-                        <button type="button" aria-label="View all images">View all images</button>
+                        <button type="button" class="scg-view-all-btn" aria-label="View all images">
+                            <img src="<?php echo esc_url( $scg_expand_icon_url ); ?>" alt="" class="scg-view-all-icon" width="18" height="18" decoding="async" />
+                            <span class="scg-view-all-label">View All</span>
+                        </button>
                     </div>
                 </div>
             </div>
