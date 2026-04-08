@@ -430,8 +430,9 @@
 /* Lightbox thumbnails */
 .lightbox-thumbnail-wrapper {
     width: 100%;
-    max-width: none;
-    margin: 0 auto;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
     flex-shrink: 0;
     box-sizing: border-box;
 }
