@@ -3,6 +3,8 @@
  */
 var scgActiveContainer = null;
 var scgGlobalKeydownBound = false;
+/** Saved scroll position while lightbox scroll-lock is active (mobile / iOS). */
+var scgLightboxScrollLockY = null;
 
 /**
  * Scroll a thumb horizontally inside its strip only (updates strip.scrollLeft).
@@ -231,8 +233,16 @@ function initGallery(container) {
                 '</div>' +
             '</div>';
 
-        document.body.insertAdjacentHTML('beforeend', lbHTML);
+        scgLightboxScrollLockY = window.pageYOffset || document.documentElement.scrollTop || 0;
+        document.documentElement.classList.add('lightbox-open');
         document.body.classList.add('lightbox-open');
+        document.body.style.position = 'fixed';
+        document.body.style.top = '-' + scgLightboxScrollLockY + 'px';
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.width = '100%';
+
+        document.body.insertAdjacentHTML('beforeend', lbHTML);
 
         var lb       = document.querySelector('.gallery-lightbox');
         var lbTrack  = lb.querySelector('.lb-track');
@@ -317,8 +327,23 @@ function initGallery(container) {
 
         function closeLightbox() {
             var lbEl = document.querySelector('.gallery-lightbox');
-            if (lbEl) { lbEl.remove(); document.body.classList.remove('lightbox-open'); }
+            if (lbEl) lbEl.remove();
             document.removeEventListener('keydown', handleLbKey);
+
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.left = '';
+            document.body.style.right = '';
+            document.body.style.width = '';
+
+            document.documentElement.classList.remove('lightbox-open');
+            document.body.classList.remove('lightbox-open');
+
+            if (scgLightboxScrollLockY !== null) {
+                var y = scgLightboxScrollLockY;
+                scgLightboxScrollLockY = null;
+                window.scrollTo(0, y);
+            }
         }
 
         var closeBtn = lb.querySelector('.lightbox-close');

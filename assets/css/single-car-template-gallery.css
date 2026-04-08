@@ -272,22 +272,21 @@
 /* ── Lightbox ── */
 .gallery-lightbox {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
-    height: 100%;
+    height: 100svh;
+    height: 100dvh;
     z-index: 10001;
     display: flex;
     align-items: center;
     justify-content: center;
+    overscroll-behavior: none;
+    box-sizing: border-box;
 }
 
 .lightbox-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background: rgba(0, 0, 0, 0.95);
     backdrop-filter: blur(10px);
     cursor: pointer;
@@ -297,9 +296,11 @@
     position: relative;
     width: 95%;
     max-width: 1440px;
-    /* Explicit height so flex children (main slider) get a real budget and nothing spills past the viewport */
-    height: 90vh;
-    max-height: 90vh;
+    /* svh fallback, dvh tracks mobile browser chrome; flex children need a bounded height */
+    height: 90svh;
+    height: 90dvh;
+    max-height: 90svh;
+    max-height: 90dvh;
     min-height: 0;
     display: flex;
     flex-direction: column;
@@ -493,16 +494,20 @@
     border-color: #007cba;
 }
 
+html.lightbox-open,
 body.lightbox-open {
     overflow: hidden;
+    overscroll-behavior: none;
 }
 
 /* Mobile lightbox */
 @media (max-width: 768px) {
     .lightbox-content {
         width: 95%;
-        height: 95vh;
-        max-height: 95vh;
+        height: 95svh;
+        height: 95dvh;
+        max-height: 95svh;
+        max-height: 95dvh;
     }
 
     .lightbox-header {
