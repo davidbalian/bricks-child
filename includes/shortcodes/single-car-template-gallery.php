@@ -45,7 +45,9 @@ function single_car_template_gallery_shortcode( $atts ) {
                             ?>
                             <div class="scg-slide">
                                 <div class="scg-slide-bg" style="background-image:url('<?php echo esc_url( $image_url ); ?>')"></div>
-                                <img class="scg-main-image" src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>" loading="lazy" />
+                                <div class="scg-main-image-frame">
+                                    <img class="scg-main-image" src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>" loading="lazy" />
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     </div>

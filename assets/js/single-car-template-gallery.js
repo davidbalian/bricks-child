@@ -1,10 +1,35 @@
 /**
  * Single Car Template Gallery — vanilla JS slider (same engine as car-card slider)
  */
+var scgActiveContainer = null;
+var scgGlobalKeydownBound = false;
+
+function scgBindGlobalKeydown() {
+    if (scgGlobalKeydownBound) return;
+    scgGlobalKeydownBound = true;
+    document.addEventListener('keydown', function (e) {
+        if (document.querySelector('.gallery-lightbox')) return;
+        var c = scgActiveContainer;
+        if (!c || typeof c._scgGoToRelative !== 'function') return;
+        if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            c._scgGoToRelative(-1);
+        }
+        if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            c._scgGoToRelative(1);
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
-    var container = document.querySelector('.single-car-gallery-container');
-    if (!container) return;
-    initGallery(container);
+    var containers = document.querySelectorAll('.single-car-gallery-container');
+    if (!containers.length) return;
+    containers.forEach(function (container) {
+        initGallery(container);
+    });
+    scgActiveContainer = containers[0];
+    scgBindGlobalKeydown();
 });
 
 function initGallery(container) {
@@ -19,6 +44,10 @@ function initGallery(container) {
     var thumbs     = container.querySelectorAll('.scg-thumb');
 
     if (!track || total === 0) return;
+
+    container.addEventListener('pointerdown', function () {
+        scgActiveContainer = container;
+    }, true);
 
     // ── Core goTo ──
     function goTo(i) {
@@ -63,12 +92,9 @@ function initGallery(container) {
         });
     });
 
-    // ── Keyboard ──
-    document.addEventListener('keydown', function (e) {
-        if (document.querySelector('.gallery-lightbox')) return; // lightbox handles its own keys
-        if (e.key === 'ArrowLeft')  { e.preventDefault(); goTo(current - 1); }
-        if (e.key === 'ArrowRight') { e.preventDefault(); goTo(current + 1); }
-    });
+    container._scgGoToRelative = function (delta) {
+        goTo(current + delta);
+    };
 
     // ── Pointer / swipe (identical to car-card) ──
     var startX = 0, startY = 0, dx = 0, dragging = false, locked = false, isHorizontal = false;
