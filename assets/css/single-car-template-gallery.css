@@ -78,6 +78,8 @@
     display: block;
     user-select: none;
     pointer-events: none;
+    /* Subpixel / compositing hint; isolated to img so .scg-track translateX is unaffected */
+    transform: scale(1.001);
 }
 
 /* Navigation arrows */
