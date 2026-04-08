@@ -5,9 +5,9 @@
     'use strict';
 
     var PI_LABELS = {
-        great: 'Great price',
-        good: 'Good price',
-        fair: 'Fair price',
+        great: 'Great Deal',
+        good: 'Good Deal',
+        fair: 'Fair Deal',
         above: 'Above typical'
     };
 
@@ -64,9 +64,21 @@
         slider.setAttribute('data-total', String(c.ti));
         slider.setAttribute('data-slides', String(c.sc));
 
-        if (c.bf || c.be) {
+        if (c.fr || c.pop || c.bf || c.be) {
             var badges = document.createElement('div');
             badges.className = 'car-card-badges';
+            if (c.fr) {
+                var bfresh = document.createElement('span');
+                bfresh.className = 'car-card-badge badge-fresh';
+                bfresh.textContent = 'Fresh';
+                badges.appendChild(bfresh);
+            }
+            if (c.pop) {
+                var bpop = document.createElement('span');
+                bpop.className = 'car-card-badge badge-popular';
+                bpop.textContent = 'Popular';
+                badges.appendChild(bpop);
+            }
             if (c.bf) {
                 var b1 = document.createElement('span');
                 b1.className = 'car-card-badge badge-full';

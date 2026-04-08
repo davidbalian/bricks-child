@@ -74,6 +74,8 @@ function car_card_build_listing_json_payload($post_id, $listing_index, $is_favor
 
     $show_full_badge = car_card_get_meta_value($post_id, 'fulldetailsbadge');
     $show_extra_badge = car_card_get_meta_value($post_id, 'extradetailsbadge');
+    $fresh_badge = car_card_get_meta_value($post_id, 'fresh_badge');
+    $popular_badge = car_card_get_meta_value($post_id, 'popular_badge');
     $is_featured = car_card_get_meta_value($post_id, 'is_featured');
 
     $raw_images = get_post_meta($post_id, 'car_images', true);
@@ -164,6 +166,8 @@ function car_card_build_listing_json_payload($post_id, $listing_index, $is_favor
         'fav'              => $is_favorite ? 1 : 0,
         'bf'               => !empty($show_full_badge) ? 1 : 0,
         'be'               => !empty($show_extra_badge) ? 1 : 0,
+        'fr'               => ($fresh_badge === '1') ? 1 : 0,
+        'pop'              => ($popular_badge === '1') ? 1 : 0,
         'feat'             => !empty($is_featured) ? 1 : 0,
         'pi'               => $band,
         'idx'              => (int) $listing_index,

@@ -106,6 +106,8 @@ function render_car_card($post_id, $context = array()) {
     // Badges & featured
     $show_full_badge = car_card_get_meta_value($post_id, 'fulldetailsbadge');
     $show_extra_badge = car_card_get_meta_value($post_id, 'extradetailsbadge');
+    $fresh_badge = car_card_get_meta_value($post_id, 'fresh_badge');
+    $popular_badge = car_card_get_meta_value($post_id, 'popular_badge');
     $is_featured = car_card_get_meta_value($post_id, 'is_featured');
 
     // Images — handle both ID array and associative array formats
@@ -132,8 +134,14 @@ function render_car_card($post_id, $context = array()) {
         <div class="car-card-slider" data-total="<?php echo esc_attr($total_images); ?>" data-slides="<?php echo esc_attr($slide_count); ?>">
 
             <!-- Badges (top-left) -->
-            <?php if ($show_full_badge || $show_extra_badge) : ?>
+            <?php if ($fresh_badge === '1' || $popular_badge === '1' || $show_full_badge || $show_extra_badge) : ?>
                 <div class="car-card-badges">
+                    <?php if ($fresh_badge === '1') : ?>
+                        <span class="car-card-badge badge-fresh">Fresh</span>
+                    <?php endif; ?>
+                    <?php if ($popular_badge === '1') : ?>
+                        <span class="car-card-badge badge-popular">Popular</span>
+                    <?php endif; ?>
                     <?php if ($show_full_badge) : ?>
                         <span class="car-card-badge badge-full">Full Details</span>
                     <?php endif; ?>
@@ -267,9 +275,9 @@ function car_card_render_price_insight_badge($post_id) {
         return;
     }
     $labels = array(
-        'great' => 'Great price',
-        'good'  => 'Good price',
-        'fair'  => 'Fair price',
+        'great' => 'Great Deal',
+        'good'  => 'Good Deal',
+        'fair'  => 'Fair Deal',
         'above' => 'Above typical',
     );
     if (!isset($labels[$band])) {

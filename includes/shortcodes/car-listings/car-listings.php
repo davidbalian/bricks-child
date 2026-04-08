@@ -421,8 +421,10 @@ function car_listings_build_query_args($atts) {
             $args['orderby'] = 'meta_value_num';
             break;
         case 'score':
-            $args['meta_key'] = 'listing_rank_score';
-            $args['orderby'] = 'meta_value_num';
+            // Score ordering is injected via SQL clauses with LEFT JOIN fallback
+            // so listings without rank meta are still visible.
+            $args['orderby'] = 'date';
+            $args['order'] = 'DESC';
             break;
         default:
             $args['orderby'] = 'date';
@@ -761,6 +763,28 @@ function car_listings_featured_first_orderby($clauses, $query) {
 
     // Prepend featured sorting to orderby (featured=1 first, then NULL/0)
     $clauses['orderby'] = "CASE WHEN featured_meta.meta_value = '1' THEN 0 ELSE 1 END ASC, " . $clauses['orderby'];
+
+    return $clauses;
+}
+
+/**
+ * Score-first ordering for "Best Match".
+ *
+ * Priority:
+ * 1) New listings (0-3 days) first
+ * 2) Higher listing_rank_score first
+ * 3) Newer post_date first (tie-break)
+ */
+function car_listings_score_orderby_clauses($clauses, $query) {
+    global $wpdb;
+
+    $requested_orderby = (string) $query->get('_car_listings_orderby');
+    if ($requested_orderby !== 'score') {
+        return $clauses;
+    }
+
+    $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS rank_meta ON ({$wpdb->posts}.ID = rank_meta.post_id AND rank_meta.meta_key = 'listing_rank_score')";
+    $clauses['orderby'] = "CASE WHEN {$wpdb->posts}.post_date >= (UTC_TIMESTAMP() - INTERVAL 3 DAY) THEN 0 ELSE 1 END ASC, CAST(COALESCE(NULLIF(rank_meta.meta_value, ''), '0') AS DECIMAL(12,2)) DESC, {$wpdb->posts}.post_date DESC";
 
     return $clauses;
 }
