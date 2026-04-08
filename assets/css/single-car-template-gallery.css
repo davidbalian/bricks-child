@@ -165,7 +165,7 @@
     font-weight: 500;
     border: none;
     cursor: pointer;
-    transition: gap 0.28s ease;
+    transition: gap 0.1s ease;
     box-sizing: border-box;
 }
 
