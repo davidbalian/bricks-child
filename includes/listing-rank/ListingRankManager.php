@@ -97,6 +97,7 @@ final class ListingRankManager
     {
         $deal = self::dealScore($post_id);
         $age_days = self::ageDays($post_id);
+        $recency_bucket = self::recencyBucket($age_days);
         $freshness = self::freshnessScore($age_days);
         $new_boost = $age_days <= 3 ? 50.0 : 0.0;
         $engagement = self::engagementScore($post_id);
@@ -106,6 +107,7 @@ final class ListingRankManager
 
         update_post_meta($post_id, 'listing_rank_score', (string) round($score, 2));
         update_post_meta($post_id, 'listing_rank_updated_at', current_time('mysql'));
+        update_post_meta($post_id, 'listing_rank_recency_bucket', (string) $recency_bucket);
         update_post_meta($post_id, 'fresh_badge', $age_days <= self::FRESH_BADGE_DAYS ? '1' : '0');
         update_post_meta($post_id, 'popular_badge', $engagement >= self::POPULAR_THRESHOLD ? '1' : '0');
     }
@@ -118,11 +120,26 @@ final class ListingRankManager
 
     private static function ageDays(int $post_id): int
     {
-        $ts = (int) get_post_time('U', true, $post_id);
+        $raw_publication = (string) get_post_meta($post_id, 'publication_date', true);
+        $ts = $raw_publication !== '' ? (int) strtotime($raw_publication) : 0;
+        if ($ts <= 0) {
+            $ts = (int) get_post_time('U', true, $post_id);
+        }
         if ($ts <= 0) {
             return 9999;
         }
         return (int) floor((time() - $ts) / DAY_IN_SECONDS);
+    }
+
+    private static function recencyBucket(int $age_days): int
+    {
+        if ($age_days <= 0) {
+            return 0; // today
+        }
+        if ($age_days <= 3) {
+            return 1; // 1-3 days
+        }
+        return 2; // older
     }
 
     private static function freshnessScore(int $age_days): float
