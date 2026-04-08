@@ -221,6 +221,11 @@ final class ListingClickMetricsPage
         ?>
         <div class="wrap">
             <h1><?php esc_html_e('Listing metrics (contact conversion)', 'bricks-child'); ?></h1>
+            <p>
+                <a class="button button-secondary" href="<?php echo esc_url(admin_url('edit.php?post_type=car&page=cars-report')); ?>">
+                    <?php esc_html_e('Open Cars Report', 'bricks-child'); ?>
+                </a>
+            </p>
             <p class="description">
                 <?php esc_html_e('Contact click rate uses WhatsApp (whatsapp_button_clicks) plus phone (call_button_clicks), divided by listing page views (total_views_count from the car views tracker).', 'bricks-child'); ?>
             </p>
