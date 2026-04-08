@@ -28,7 +28,7 @@ function car_listings_shortcode($atts) {
         'favorites'       => 'false',
         'user_id'         => '',
         'author'          => '',            // 'current' for logged-in user
-        'orderby'         => 'date',        // date, price, mileage, year
+        'orderby'         => 'score',       // score, date, price, mileage, year
         'order'           => 'DESC',
         'show_sold'       => 'false',
         'offset'          => 0,
@@ -81,7 +81,7 @@ function car_listings_shortcode($atts) {
  * @return array
  */
 function car_listings_apply_request_sort_to_atts(array $atts) {
-    $valid_orderby = array('date', 'price', 'mileage', 'year');
+    $valid_orderby = array('score', 'date', 'price', 'mileage', 'year');
 
     $orderby_get = '';
     if (isset($_GET['cars_orderby']) && $_GET['cars_orderby'] !== '') {
@@ -354,8 +354,8 @@ function car_listings_build_query_args($atts) {
     }
 
     // === SORTING ===
-    $valid_orderby = array('date', 'price', 'mileage', 'year');
-    $orderby = in_array($atts['orderby'], $valid_orderby) ? $atts['orderby'] : 'date';
+    $valid_orderby = array('score', 'date', 'price', 'mileage', 'year');
+    $orderby = in_array($atts['orderby'], $valid_orderby) ? $atts['orderby'] : 'score';
     $order = strtoupper($atts['order']) === 'ASC' ? 'ASC' : 'DESC';
 
     // URL overrides (e.g. redirects from car_make landing pages). Prefer cars_* — WP reserves orderby/order.
@@ -418,6 +418,10 @@ function car_listings_build_query_args($atts) {
             break;
         case 'year':
             $args['meta_key'] = 'year';
+            $args['orderby'] = 'meta_value_num';
+            break;
+        case 'score':
+            $args['meta_key'] = 'listing_rank_score';
             $args['orderby'] = 'meta_value_num';
             break;
         default:
@@ -685,7 +689,7 @@ function car_listings_ajax_load_more() {
         'favorites'       => 'false',
         'user_id'         => '',
         'author'          => '',
-        'orderby'         => 'date',
+        'orderby'         => 'score',
         'order'           => 'DESC',
         'show_sold'       => 'false',
         'offset'          => 0,
@@ -745,6 +749,12 @@ add_action('wp_ajax_nopriv_car_listings_load_more', 'car_listings_ajax_load_more
  */
 function car_listings_featured_first_orderby($clauses, $query) {
     global $wpdb;
+
+    // Score mode is already the relevance order; do not prepend featured-first.
+    $requested_orderby = (string) $query->get('_car_listings_orderby');
+    if ($requested_orderby === 'score' || (string) $query->get('meta_key') === 'listing_rank_score') {
+        return $clauses;
+    }
 
     // Add LEFT JOIN for is_featured meta
     $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS featured_meta ON ({$wpdb->posts}.ID = featured_meta.post_id AND featured_meta.meta_key = 'is_featured')";

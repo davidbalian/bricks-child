@@ -109,6 +109,7 @@ function handle_car_call_button_click() {
     $updated = update_field('call_button_clicks', $new_count, $post_id);
     
     if ($updated) {
+        do_action('bricks_child_listing_rank_queue_single', $post_id, 60);
         listing_notification_manager()->maybeSendContactClickNotification($post_id);
         wp_send_json_success(array(
             'message' => 'Click tracked successfully',

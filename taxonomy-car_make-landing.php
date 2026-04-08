@@ -27,7 +27,7 @@ $listing_atts = array(
     'favorites'          => 'false',
     'user_id'            => '',
     'author'             => '',
-    'orderby'            => 'date',
+    'orderby'            => 'score',
     'order'              => 'DESC',
     'show_sold'          => 'false',
     'id'                 => $listings_id,
@@ -73,10 +73,11 @@ get_header();
         <div class="tcp-sort" id="tcp-sort">
             <button type="button" class="tcp-sort-btn" id="tcp-sort-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
-                <span id="tcp-sort-label">Newest</span>
+                <span id="tcp-sort-label">Best Match</span>
             </button>
             <div class="tcp-sort-menu" id="tcp-sort-menu">
-                <button type="button" class="tcp-sort-option selected" data-orderby="date" data-order="DESC">Newest</button>
+                <button type="button" class="tcp-sort-option selected" data-orderby="score" data-order="DESC">Best Match</button>
+                <button type="button" class="tcp-sort-option" data-orderby="date" data-order="DESC">Newest</button>
                 <button type="button" class="tcp-sort-option" data-orderby="date" data-order="ASC">Oldest</button>
                 <button type="button" class="tcp-sort-option" data-orderby="price" data-order="ASC">Price: Low to High</button>
                 <button type="button" class="tcp-sort-option" data-orderby="price" data-order="DESC">Price: High to Low</button>
@@ -1051,9 +1052,9 @@ body {
         var $sort = $('#tcp-sort');
         $sort.find('.tcp-sort-option').removeClass('selected');
         $sort.find('.tcp-sort-option').first().addClass('selected');
-        $('#tcp-sort-label').text('Newest');
+        $('#tcp-sort-label').text('Best Match');
         var atts = $container.data('atts') || {};
-        atts.orderby = 'date';
+        atts.orderby = 'score';
         atts.order = 'DESC';
         $container.data('atts', atts);
         $container.attr('data-atts', JSON.stringify(atts));

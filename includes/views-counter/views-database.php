@@ -200,6 +200,7 @@ class CarViewsDatabase {
         
         $count = (int) $count;
         update_post_meta($car_id, 'total_views_count', $count);
+        do_action('bricks_child_listing_rank_queue_single', (int) $car_id, 120);
         
         return $count;
     }

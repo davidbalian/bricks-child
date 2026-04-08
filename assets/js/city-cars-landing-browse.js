@@ -120,7 +120,7 @@
         $sort.find('.tcp-sort-option').first().addClass('selected');
         $('#tcp-sort-label').text(sortNewestLabel);
         var atts = $container.data('atts') || {};
-        atts.orderby = 'date';
+        atts.orderby = 'score';
         atts.order = 'DESC';
         $container.data('atts', atts);
         $container.attr('data-atts', JSON.stringify(atts));

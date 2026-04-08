@@ -33,7 +33,7 @@ function autoagora_render_city_cars_landing($slug) {
         'favorites'          => 'false',
         'user_id'            => '',
         'author'             => '',
-        'orderby'            => 'date',
+        'orderby'            => 'score',
         'order'              => 'DESC',
         'show_sold'          => 'false',
         'id'                 => $listings_id,
@@ -76,10 +76,11 @@ function autoagora_render_city_cars_landing($slug) {
         <div class="tcp-sort" id="tcp-sort">
             <button type="button" class="tcp-sort-btn" id="tcp-sort-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
-                <span id="tcp-sort-label"><?php esc_html_e('Newest', 'bricks-child'); ?></span>
+                <span id="tcp-sort-label"><?php esc_html_e('Best Match', 'bricks-child'); ?></span>
             </button>
             <div class="tcp-sort-menu" id="tcp-sort-menu">
-                <button type="button" class="tcp-sort-option selected" data-orderby="date" data-order="DESC"><?php esc_html_e('Newest', 'bricks-child'); ?></button>
+                <button type="button" class="tcp-sort-option selected" data-orderby="score" data-order="DESC"><?php esc_html_e('Best Match', 'bricks-child'); ?></button>
+                <button type="button" class="tcp-sort-option" data-orderby="date" data-order="DESC"><?php esc_html_e('Newest', 'bricks-child'); ?></button>
                 <button type="button" class="tcp-sort-option" data-orderby="date" data-order="ASC"><?php esc_html_e('Oldest', 'bricks-child'); ?></button>
                 <button type="button" class="tcp-sort-option" data-orderby="price" data-order="ASC"><?php esc_html_e('Price: Low to High', 'bricks-child'); ?></button>
                 <button type="button" class="tcp-sort-option" data-orderby="price" data-order="DESC"><?php esc_html_e('Price: High to Low', 'bricks-child'); ?></button>

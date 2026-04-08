@@ -420,7 +420,7 @@ function car_filters_ajax_filter_listings() {
     }
 
     // Sorting
-    $orderby = isset($atts['orderby']) ? $atts['orderby'] : 'date';
+    $orderby = isset($atts['orderby']) ? $atts['orderby'] : 'score';
     $order = isset($atts['order']) ? strtoupper($atts['order']) : 'DESC';
 
     switch ($orderby) {
@@ -434,6 +434,10 @@ function car_filters_ajax_filter_listings() {
             break;
         case 'year':
             $args['meta_key'] = 'year';
+            $args['orderby'] = 'meta_value_num';
+            break;
+        case 'score':
+            $args['meta_key'] = 'listing_rank_score';
             $args['orderby'] = 'meta_value_num';
             break;
         default:
