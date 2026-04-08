@@ -441,15 +441,15 @@
     gap: 6px;
     overflow-x: auto;
     scrollbar-width: none;
-    padding: 0 2px;
 }
 
 .lb-thumbs::-webkit-scrollbar {
     display: none;
 }
 
+/* Match inline gallery: 7 visible columns, same flex math as .scg-thumb */
 .lb-thumb {
-    flex: 0 0 calc(20% - 5px);
+    flex: 0 0 calc((100% - 36px) / 7);
     cursor: pointer;
 }
 
@@ -510,7 +510,8 @@ body.lightbox-open {
     .lightbox-arrows .lightbox-prev-btn { left: 10px; }
     .lightbox-arrows .lightbox-next-btn { right: 10px; }
 
+    /* Match inline gallery mobile: 4 columns */
     .lb-thumb {
-        flex: 0 0 calc(25% - 5px);
+        flex: 0 0 calc((100% - 18px) / 4);
     }
 }
