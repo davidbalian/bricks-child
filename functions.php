@@ -365,6 +365,27 @@ require_once get_stylesheet_directory() . '/includes/shortcodes/car-listings/car
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-filters/car-filters.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/autocy-bulk-upload/autocy-bulk-upload.php';
 
+/**
+ * Register custom "Expired" status for car listings.
+ */
+add_action('init', function () {
+    register_post_status('expired', array(
+        'label'                     => _x('Expired', 'post status', 'bricks-child'),
+        'public'                    => false,
+        'internal'                  => false,
+        'protected'                 => true,
+        'private'                   => false,
+        'exclude_from_search'       => true,
+        'show_in_admin_all_list'    => true,
+        'show_in_admin_status_list' => true,
+        'label_count'               => _n_noop(
+            'Expired <span class="count">(%s)</span>',
+            'Expired <span class="count">(%s)</span>',
+            'bricks-child'
+        ),
+    ));
+});
+
 
 // =========================================================================
 // Bricks Builder Specific Filters
