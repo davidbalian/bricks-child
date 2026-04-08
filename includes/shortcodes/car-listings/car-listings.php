@@ -774,7 +774,8 @@ function car_listings_featured_first_orderby($clauses, $query) {
  * 1) Listings posted today first
  * 2) Then listings from the last 1-3 days
  * 3) Then older listings
- * Within each bucket: higher listing_rank_score first, then newer post_date.
+ * Uses publication_date meta when present (falls back to post_date).
+ * Within each bucket: higher listing_rank_score first, then newer effective date.
  */
 function car_listings_score_orderby_clauses($clauses, $query) {
     global $wpdb;
@@ -785,7 +786,9 @@ function car_listings_score_orderby_clauses($clauses, $query) {
     }
 
     $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS rank_meta ON ({$wpdb->posts}.ID = rank_meta.post_id AND rank_meta.meta_key = 'listing_rank_score')";
-    $clauses['orderby'] = "CASE WHEN DATE({$wpdb->posts}.post_date) = CURDATE() THEN 0 WHEN {$wpdb->posts}.post_date >= (CURDATE() - INTERVAL 3 DAY) THEN 1 ELSE 2 END ASC, CAST(COALESCE(NULLIF(rank_meta.meta_value, ''), '0') AS DECIMAL(12,2)) DESC, {$wpdb->posts}.post_date DESC";
+    $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS publication_meta ON ({$wpdb->posts}.ID = publication_meta.post_id AND publication_meta.meta_key = 'publication_date')";
+    $effective_date_sql = "COALESCE(NULLIF(publication_meta.meta_value, ''), {$wpdb->posts}.post_date)";
+    $clauses['orderby'] = "CASE WHEN DATE({$effective_date_sql}) = CURDATE() THEN 0 WHEN {$effective_date_sql} >= (CURDATE() - INTERVAL 3 DAY) THEN 1 ELSE 2 END ASC, CAST(COALESCE(NULLIF(rank_meta.meta_value, ''), '0') AS DECIMAL(12,2)) DESC, {$effective_date_sql} DESC";
 
     return $clauses;
 }
