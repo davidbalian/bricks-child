@@ -276,7 +276,8 @@
     width: 100%;
     height: 100svh;
     height: 100dvh;
-    z-index: 10001;
+    /* Max 32-bit signed int — above theme builders, sticky chrome, most modals */
+    z-index: 2147483647;
     display: flex;
     align-items: center;
     justify-content: center;
