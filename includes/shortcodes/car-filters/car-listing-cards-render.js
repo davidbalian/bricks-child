@@ -64,21 +64,9 @@
         slider.setAttribute('data-total', String(c.ti));
         slider.setAttribute('data-slides', String(c.sc));
 
-        if (c.fr || c.pop || c.bf || c.be) {
+        if (c.bf || c.be) {
             var badges = document.createElement('div');
             badges.className = 'car-card-badges';
-            if (c.fr) {
-                var bfresh = document.createElement('span');
-                bfresh.className = 'car-card-badge badge-fresh';
-                bfresh.textContent = 'Fresh';
-                badges.appendChild(bfresh);
-            }
-            if (c.pop) {
-                var bpop = document.createElement('span');
-                bpop.className = 'car-card-badge badge-popular';
-                bpop.textContent = 'Popular';
-                badges.appendChild(bpop);
-            }
             if (c.bf) {
                 var b1 = document.createElement('span');
                 b1.className = 'car-card-badge badge-full';
@@ -196,11 +184,28 @@
         appendSpecs(specsEl, c.specs);
         body.appendChild(specsEl);
 
-        if (c.pi && PI_LABELS[c.pi]) {
-            var pi = document.createElement('span');
-            pi.className = 'car-card-price-insight car-card-price-insight--' + c.pi;
-            pi.textContent = PI_LABELS[c.pi];
-            body.appendChild(pi);
+        if (c.pi || c.fr || c.pop) {
+            var signalWrap = document.createElement('div');
+            signalWrap.className = 'car-card-signal-badges';
+            if (c.pi && PI_LABELS[c.pi]) {
+                var pi = document.createElement('span');
+                pi.className = 'car-card-price-insight car-card-price-insight--' + c.pi;
+                pi.textContent = PI_LABELS[c.pi];
+                signalWrap.appendChild(pi);
+            }
+            if (c.fr) {
+                var fr = document.createElement('span');
+                fr.className = 'car-card-signal-badge car-card-signal-badge--fresh';
+                fr.textContent = 'Fresh Listing';
+                signalWrap.appendChild(fr);
+            }
+            if (c.pop) {
+                var pop = document.createElement('span');
+                pop.className = 'car-card-signal-badge car-card-signal-badge--popular';
+                pop.textContent = 'Popular';
+                signalWrap.appendChild(pop);
+            }
+            body.appendChild(signalWrap);
         }
 
         if (c.price) {

@@ -354,9 +354,8 @@
 
 /* Price insight (cohort vs median) */
 .car-card-price-insight {
-    display: inline-block;
-    width: fit-content;
-    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
     padding: 0.2rem 0.5rem;
     border-radius: 0.35rem;
     font-size: 0.7rem;
@@ -382,6 +381,41 @@
 .car-card-price-insight--above {
     background: #ffedd5;
     color: #9a3412;
+}
+
+.car-card-signal-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.7rem;
+    margin-bottom: 0.45rem;
+}
+
+.car-card-signal-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+}
+
+.car-card-signal-badge--fresh {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #86efac;
+}
+
+.car-card-signal-badge--popular {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.car-card-signal-badges + .car-card-price {
+    padding-top: 0.45rem;
 }
 
 @media (max-width: 768px) {

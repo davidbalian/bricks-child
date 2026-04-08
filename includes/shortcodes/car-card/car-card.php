@@ -134,14 +134,8 @@ function render_car_card($post_id, $context = array()) {
         <div class="car-card-slider" data-total="<?php echo esc_attr($total_images); ?>" data-slides="<?php echo esc_attr($slide_count); ?>">
 
             <!-- Badges (top-left) -->
-            <?php if ($fresh_badge === '1' || $popular_badge === '1' || $show_full_badge || $show_extra_badge) : ?>
+            <?php if ($show_full_badge || $show_extra_badge) : ?>
                 <div class="car-card-badges">
-                    <?php if ($fresh_badge === '1') : ?>
-                        <span class="car-card-badge badge-fresh">Fresh</span>
-                    <?php endif; ?>
-                    <?php if ($popular_badge === '1') : ?>
-                        <span class="car-card-badge badge-popular">Popular</span>
-                    <?php endif; ?>
                     <?php if ($show_full_badge) : ?>
                         <span class="car-card-badge badge-full">Full Details</span>
                     <?php endif; ?>
@@ -227,7 +221,15 @@ function render_car_card($post_id, $context = array()) {
                 ?>
             </div>
 
-            <?php car_card_render_price_insight_badge($post_id); ?>
+            <div class="car-card-signal-badges">
+                <?php car_card_render_price_insight_badge($post_id); ?>
+                <?php if ($fresh_badge === '1') : ?>
+                    <span class="car-card-signal-badge car-card-signal-badge--fresh">Fresh Listing</span>
+                <?php endif; ?>
+                <?php if ($popular_badge === '1') : ?>
+                    <span class="car-card-signal-badge car-card-signal-badge--popular">Popular</span>
+                <?php endif; ?>
+            </div>
 
             <?php if ($price) : ?>
                 <div class="car-card-price">&euro;<?php echo esc_html(number_format(floatval(str_replace(',', '', $price)))); ?></div>

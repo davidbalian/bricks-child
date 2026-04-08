@@ -771,7 +771,7 @@ function car_listings_featured_first_orderby($clauses, $query) {
  * Score-first ordering for "Best Match".
  *
  * Priority:
- * 1) New listings (0-3 days) first
+ * 1) Listings posted today first
  * 2) Higher listing_rank_score first
  * 3) Newer post_date first (tie-break)
  */
@@ -784,7 +784,7 @@ function car_listings_score_orderby_clauses($clauses, $query) {
     }
 
     $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS rank_meta ON ({$wpdb->posts}.ID = rank_meta.post_id AND rank_meta.meta_key = 'listing_rank_score')";
-    $clauses['orderby'] = "CASE WHEN {$wpdb->posts}.post_date >= (UTC_TIMESTAMP() - INTERVAL 3 DAY) THEN 0 ELSE 1 END ASC, CAST(COALESCE(NULLIF(rank_meta.meta_value, ''), '0') AS DECIMAL(12,2)) DESC, {$wpdb->posts}.post_date DESC";
+    $clauses['orderby'] = "CASE WHEN DATE({$wpdb->posts}.post_date) = CURDATE() THEN 0 ELSE 1 END ASC, CAST(COALESCE(NULLIF(rank_meta.meta_value, ''), '0') AS DECIMAL(12,2)) DESC, {$wpdb->posts}.post_date DESC";
 
     return $clauses;
 }
