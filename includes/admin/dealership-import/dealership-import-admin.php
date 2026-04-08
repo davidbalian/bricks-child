@@ -157,16 +157,14 @@ final class DealershipImportAdminBootstrap
         );
         set_transient(self::transientKey($token), $payload, HOUR_IN_SECONDS);
 
-        wp_safe_redirect(
-            add_query_arg(
-                array(
-                    'page'         => self::PAGE_SLUG,
-                    'import_token' => $token,
-                ),
-                admin_url('admin.php')
-            )
+        $redirect_url = add_query_arg(
+            array(
+                'page'         => self::PAGE_SLUG,
+                'import_token' => $token,
+            ),
+            admin_url('admin.php')
         );
-        exit;
+        echo '<script>window.location.href=' . wp_json_encode(esc_url_raw($redirect_url)) . ';</script>';
     }
 
     private static function handlePreviewStep(): void
@@ -282,18 +280,16 @@ final class DealershipImportAdminBootstrap
         }
         delete_transient(self::transientKey($token));
 
-        wp_safe_redirect(
-            add_query_arg(
-                array(
-                    'page'        => self::PAGE_SLUG,
-                    'import_done' => '1',
-                    'applied'     => $applied,
-                    'skipped'     => $skipped,
-                ),
-                admin_url('admin.php')
-            )
+        $redirect_url = add_query_arg(
+            array(
+                'page'        => self::PAGE_SLUG,
+                'import_done' => '1',
+                'applied'     => $applied,
+                'skipped'     => $skipped,
+            ),
+            admin_url('admin.php')
         );
-        exit;
+        echo '<script>window.location.href=' . wp_json_encode(esc_url_raw($redirect_url)) . ';</script>';
     }
 
     /**
