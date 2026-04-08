@@ -68,6 +68,7 @@
     box-sizing: border-box;
 }
 
+/* Single clip from .scg-main-slider; img border-radius + scale caused corner hairlines vs 1px border */
 .single-car-gallery-wrapper .scg-main-slider .scg-slide .scg-main-image-frame .scg-main-image {
     max-width: 100%;
     max-height: 100%;
@@ -76,11 +77,8 @@
     object-fit: contain !important;
     object-position: center;
     display: block;
-    border-radius: 0.75rem;
     user-select: none;
     pointer-events: none;
-    /* Subpixel / compositing hint; isolated to img so .scg-track translateX is unaffected */
-    transform: scale(1.001);
 }
 
 /* Navigation arrows */
@@ -391,6 +389,7 @@
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
+    background: #fff;
 }
 
 .gallery-lightbox .lb-slide img {
@@ -401,7 +400,6 @@
     object-fit: contain !important;
     object-position: center;
     display: block;
-    border-radius: 0.75rem;
     user-select: none;
     pointer-events: none;
 }
