@@ -53,10 +53,10 @@ function single_car_template_gallery_shortcode( $atts ) {
                     </div>
 
                     <!-- Navigation arrows -->
-                    <button class="custom-prev-btn" aria-label="Previous image">
+                    <button type="button" class="custom-prev-btn" aria-label="Previous image">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <button class="custom-next-btn" aria-label="Next image">
+                    <button type="button" class="custom-next-btn" aria-label="Next image">
                         <i class="fas fa-chevron-right"></i>
                     </button>
 

@@ -4,6 +4,29 @@
 var scgActiveContainer = null;
 var scgGlobalKeydownBound = false;
 
+/**
+ * Scroll a thumb horizontally inside its strip only (updates strip.scrollLeft).
+ * Avoids scrollIntoView, which also scrolls the window/document to bring the element into view.
+ */
+function scgScrollThumbIntoStrip(strip, thumb) {
+    if (!strip || !thumb || !strip.contains(thumb)) return;
+    var pad = 6;
+    var s = strip.getBoundingClientRect();
+    var t = thumb.getBoundingClientRect();
+    if (t.left < s.left + pad) {
+        strip.scrollLeft += t.left - s.left - pad;
+    } else if (t.right > s.right - pad) {
+        strip.scrollLeft += t.right - s.right + pad;
+    }
+}
+
+function scgPreventNavButtonFocusScroll(btn) {
+    if (!btn) return;
+    btn.addEventListener('mousedown', function (e) {
+        if (e.button === 0) e.preventDefault();
+    });
+}
+
 function scgBindGlobalKeydown() {
     if (scgGlobalKeydownBound) return;
     scgGlobalKeydownBound = true;
@@ -41,7 +64,8 @@ function initGallery(container) {
     var btnPrev    = container.querySelector('.custom-prev-btn');
     var btnNext    = container.querySelector('.custom-next-btn');
     var counterEl  = container.querySelector('.current-slide');
-    var thumbs     = container.querySelectorAll('.scg-thumb');
+    var thumbs       = container.querySelectorAll('.scg-thumb');
+    var thumbsStrip  = container.querySelector('.scg-thumbs');
 
     if (!track || total === 0) return;
 
@@ -65,11 +89,13 @@ function initGallery(container) {
         thumbs.forEach(function (th, idx) {
             var isActive = idx === current;
             th.classList.toggle('scg-thumb-active', isActive);
-            if (isActive) th.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+            if (isActive && thumbsStrip) scgScrollThumbIntoStrip(thumbsStrip, th);
         });
     }
 
     // ── Arrows ──
+    scgPreventNavButtonFocusScroll(btnPrev);
+    scgPreventNavButtonFocusScroll(btnNext);
     if (btnPrev) {
         btnPrev.addEventListener('click', function (e) {
             e.preventDefault();
@@ -195,8 +221,8 @@ function initGallery(container) {
                             '<div class="lb-track">' + slidesHTML + '</div>' +
                         '</div>' +
                         '<div class="lightbox-arrows">' +
-                            '<button class="lightbox-prev-btn" aria-label="Previous image"><i class="fas fa-chevron-left"></i></button>' +
-                            '<button class="lightbox-next-btn" aria-label="Next image"><i class="fas fa-chevron-right"></i></button>' +
+                            '<button type="button" class="lightbox-prev-btn" aria-label="Previous image"><i class="fas fa-chevron-left"></i></button>' +
+                            '<button type="button" class="lightbox-next-btn" aria-label="Next image"><i class="fas fa-chevron-right"></i></button>' +
                         '</div>' +
                     '</div>' +
                     '<div class="lightbox-thumbnail-wrapper">' +
@@ -212,8 +238,9 @@ function initGallery(container) {
         var lbTrack  = lb.querySelector('.lb-track');
         var lbThumbs = lb.querySelectorAll('.lb-thumb');
         var lbCurEl  = lb.querySelector('.lightbox-current');
-        var lbPrev   = lb.querySelector('.lightbox-prev-btn');
-        var lbNext   = lb.querySelector('.lightbox-next-btn');
+        var lbPrev        = lb.querySelector('.lightbox-prev-btn');
+        var lbNext        = lb.querySelector('.lightbox-next-btn');
+        var lbThumbsStrip = lb.querySelector('.lb-thumbs');
 
         function lbGoTo(i) {
             if (i < 0) i = 0;
@@ -224,12 +251,14 @@ function initGallery(container) {
             lbThumbs.forEach(function (th, idx) {
                 var isActive = idx === lbCurrent;
                 th.classList.toggle('lb-thumb-active', isActive);
-                if (isActive) th.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+                if (isActive && lbThumbsStrip) scgScrollThumbIntoStrip(lbThumbsStrip, th);
             });
             if (lbPrev) lbPrev.classList.toggle('scg-arrow-hidden', lbCurrent === 0);
             if (lbNext) lbNext.classList.toggle('scg-arrow-hidden', lbCurrent === lbTotal - 1);
         }
 
+        scgPreventNavButtonFocusScroll(lbPrev);
+        scgPreventNavButtonFocusScroll(lbNext);
         if (lbPrev) lbPrev.addEventListener('click', function (e) { e.preventDefault(); lbGoTo(lbCurrent - 1); });
         if (lbNext) lbNext.addEventListener('click', function (e) { e.preventDefault(); lbGoTo(lbCurrent + 1); });
 
