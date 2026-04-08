@@ -54,13 +54,13 @@
     justify-content: center;
 }
 
-/* Blurred background — full-bleed cover, lighter blur */
+/* Blurred background — full-bleed cover */
 .scg-slide-bg {
     position: absolute;
     inset: 0;
     background-size: cover;
     background-position: center;
-    filter: blur(12px);
+    filter: blur(25px);
     z-index: 0;
 }
 
