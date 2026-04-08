@@ -130,7 +130,8 @@
 .photo-counter {
     position: absolute;
     bottom: 20px;
-    right: 20px;
+    left: 20px;
+    right: auto;
     background: white;
     color: black;
     padding: 8px 15px;
@@ -147,7 +148,8 @@
 .view-all-button {
     position: absolute;
     bottom: 20px;
-    left: 20px;
+    right: 20px;
+    left: auto;
     z-index: 2;
 }
 
@@ -245,14 +247,16 @@
 
     .photo-counter {
         bottom: 10px;
-        right: 10px;
+        left: 10px;
+        right: auto;
         padding: 6px 12px;
         font-size: 12px;
     }
 
     .view-all-button {
         bottom: 10px;
-        left: 10px;
+        right: 10px;
+        left: auto;
     }
 
     .view-all-button .scg-view-all-btn {
@@ -362,7 +366,7 @@
     min-height: 0;
     width: 100%;
     overflow: hidden;
-    border-radius: 0.75rem;
+    background: transparent;
     box-sizing: border-box;
 }
 
@@ -389,7 +393,7 @@
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    background: #fff;
+    background: transparent;
 }
 
 .gallery-lightbox .lb-slide img {
@@ -400,6 +404,7 @@
     object-fit: contain !important;
     object-position: center;
     display: block;
+    border-radius: 0.75rem;
     user-select: none;
     pointer-events: none;
 }
