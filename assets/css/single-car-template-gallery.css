@@ -281,11 +281,16 @@
 .lightbox-content {
     position: relative;
     width: 95%;
-    max-width: 900px;
+    max-width: 1440px;
+    /* Explicit height so flex children (main slider) get a real budget and nothing spills past the viewport */
+    height: 90vh;
     max-height: 90vh;
+    min-height: 0;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     z-index: 1;
+    box-sizing: border-box;
 }
 
 .lightbox-header {
@@ -294,6 +299,8 @@
     align-items: center;
     padding: 20px;
     color: white;
+    flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 .lightbox-counter {
@@ -325,26 +332,36 @@
     opacity: 0.8;
 }
 
-/* Lightbox main slider */
+/* Lightbox main slider — flex fills space between header and thumbs so images stay within viewport */
 .lightbox-main-slider-wrapper {
     position: relative;
+    flex: 1 1 0;
+    min-height: 0;
     width: 100%;
-    max-width: 600px;
-    margin: 0 auto 20px;
+    margin: 0 0 16px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
 .lb-track-wrap {
     position: relative;
+    flex: 1 1 0;
+    min-height: 0;
+    width: 100%;
     overflow: hidden;
     border-radius: 4px;
+    box-sizing: border-box;
 }
 
 .lb-track {
     display: flex;
+    height: 100%;
     transition: transform 0.2s ease;
     will-change: transform;
     touch-action: pan-y pinch-zoom;
     cursor: grab;
+    box-sizing: border-box;
 }
 
 .lb-track:active {
@@ -353,13 +370,22 @@
 
 .lb-slide {
     min-width: 100%;
+    width: 100%;
+    height: 100%;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
 }
 
-.lb-slide img {
-    width: 100%;
-    aspect-ratio: 4/3;
-    object-fit: contain;
+.gallery-lightbox .lb-slide img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain !important;
+    object-position: center;
     display: block;
     border-radius: 4px;
     user-select: none;
@@ -404,8 +430,10 @@
 /* Lightbox thumbnails */
 .lightbox-thumbnail-wrapper {
     width: 100%;
-    max-width: 600px;
+    max-width: none;
     margin: 0 auto;
+    flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 .lb-thumbs {
@@ -453,6 +481,7 @@ body.lightbox-open {
 @media (max-width: 768px) {
     .lightbox-content {
         width: 95%;
+        height: 95vh;
         max-height: 95vh;
     }
 
@@ -469,10 +498,6 @@ body.lightbox-open {
         width: 35px;
         height: 35px;
         font-size: 16px;
-    }
-
-    .lightbox-main-slider-wrapper {
-        max-width: 350px;
     }
 
     .lightbox-arrows .lightbox-prev-btn,
