@@ -1,6 +1,6 @@
 <?php
 /**
- * Builds a CSV export of all users with the dealership role.
+ * Builds a CSV export of dealership users with configurable columns.
  *
  * @package Bricks Child
  */
@@ -9,37 +9,19 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once __DIR__ . '/DealershipExportColumnCatalog.php';
+
 final class DealershipUsersCsvExporter
 {
-    /** Meta keys surfaced as dedicated columns (excluded from other_user_meta_json). */
-    private const EXPLICIT_META_KEYS = array(
-        'first_name',
-        'last_name',
-        'phone_number',
-        'secondary_phone',
-        'dealership_name',
-        'email_verified',
-        'latest_email_verification_timestamp',
-        'autoagora_dealer',
-        '_account_logo_attachment_id',
-        'notify_activity_milestones',
-        'notify_7_day_reminders',
-        'seller_average_rating',
-        'seller_review_count',
-        'favorite_cars',
-        'car_form_templates',
-    );
-
-    /** Never include these keys in other_user_meta_json. */
-    private const OTHER_META_DENYLIST = array(
-        'session_tokens',
-    );
-
     /**
-     * Sends CSV download headers and writes UTF-8 BOM + rows to php://output.
+     * @param list<array{id:string,header:string,source:string,key:string,group:string}> $columns
      */
-    public function sendDownloadResponse(): void
+    public function sendDownloadResponse(array $columns): void
     {
+        if ($columns === array()) {
+            return;
+        }
+
         $filename = 'dealerships-export-' . gmdate('Y-m-d-His') . '.csv';
 
         nocache_headers();
@@ -56,14 +38,23 @@ final class DealershipUsersCsvExporter
         $users = $this->loadDealershipUsers();
         $author_ids = wp_list_pluck($users, 'ID');
         $car_counts = $this->fetchPublishedCarCountsByAuthor($author_ids);
+        $other_exclude = DealershipExportColumnCatalog::keysExcludedFromOtherMetaBlob($columns);
 
-        fputcsv($out, $this->getHeaderRow());
+        $headers = array();
+        foreach ($columns as $col) {
+            $headers[] = $col['header'];
+        }
+        fputcsv($out, $headers);
 
         foreach ($users as $user) {
             if (!$user instanceof WP_User) {
                 continue;
             }
-            fputcsv($out, $this->buildDataRow($user, $car_counts));
+            $row = array();
+            foreach ($columns as $col) {
+                $row[] = $this->resolveCell($user, $col, $car_counts, $other_exclude);
+            }
+            fputcsv($out, $row);
         }
 
         fclose($out);
@@ -87,7 +78,7 @@ final class DealershipUsersCsvExporter
 
     /**
      * @param list<int> $user_ids
-     * @return array<int, int> post_author => count
+     * @return array<int, int>
      */
     private function fetchPublishedCarCountsByAuthor(array $user_ids): array
     {
@@ -118,153 +109,113 @@ final class DealershipUsersCsvExporter
     }
 
     /**
-     * @return list<string>
+     * @param array<int, int> $car_counts
+     * @param list<string> $other_exclude_keys
      */
-    private function getHeaderRow(): array
+    private function resolveCell(WP_User $user, array $col, array $car_counts, array $other_exclude_keys): string
     {
-        return array(
-            'user_id',
-            'user_login',
-            'user_email',
-            'user_registered',
-            'display_name',
-            'user_nicename',
-            'user_url',
-            'user_status',
-            'first_name',
-            'last_name',
-            'phone_number',
-            'secondary_phone',
-            'dealership_name',
-            'email_verified',
-            'latest_email_verification_timestamp',
-            'autoagora_dealer',
-            '_account_logo_attachment_id',
-            'account_logo_url',
-            'notify_activity_milestones',
-            'notify_7_day_reminders',
-            'seller_average_rating',
-            'seller_review_count',
-            'favorite_cars',
-            'car_form_templates',
-            'published_car_listings_count',
-            'other_user_meta_json',
-        );
+        $uid = (int) $user->ID;
+        $source = $col['source'] ?? '';
+        $key = $col['key'] ?? '';
+
+        if ($source === 'core') {
+            return $this->formatCoreValue($user, $key);
+        }
+        if ($source === 'derived') {
+            return $this->resolveDerived($uid, $key, $car_counts, $other_exclude_keys);
+        }
+        if ($source === 'meta') {
+            return $this->formatMetaValue(get_user_meta($uid, $key, true));
+        }
+        if ($source === 'acf') {
+            if (function_exists('get_field')) {
+                return $this->formatMetaValue(get_field($key, 'user_' . $uid));
+            }
+
+            return $this->formatMetaValue(get_user_meta($uid, $key, true));
+        }
+
+        return '';
+    }
+
+    private function formatCoreValue(WP_User $user, string $key): string
+    {
+        if ($key === 'ID') {
+            return (string) (int) $user->ID;
+        }
+        if ($key === 'user_status') {
+            return (string) (int) $user->user_status;
+        }
+        if (!property_exists($user, $key)) {
+            return '';
+        }
+
+        return (string) $user->$key;
     }
 
     /**
      * @param array<int, int> $car_counts
-     * @return list<string|int|float>
+     * @param list<string> $other_exclude_keys
      */
-    private function buildDataRow(WP_User $user, array $car_counts): array
-    {
-        $uid = (int) $user->ID;
+    private function resolveDerived(
+        int $user_id,
+        string $key,
+        array $car_counts,
+        array $other_exclude_keys
+    ): string {
+        if ($key === 'published_car_listings_count') {
+            return (string) (isset($car_counts[$user_id]) ? $car_counts[$user_id] : 0);
+        }
+        if ($key === 'account_logo_url') {
+            $logo_id = (int) get_user_meta($user_id, '_account_logo_attachment_id', true);
 
-        $logo_id = (int) get_user_meta($uid, '_account_logo_attachment_id', true);
-        $logo_url = $logo_id > 0 ? (string) wp_get_attachment_url($logo_id) : '';
+            return $logo_id > 0 ? (string) wp_get_attachment_url($logo_id) : '';
+        }
+        if ($key === 'other_user_meta_json') {
+            return $this->buildOtherUserMetaJson($user_id, $other_exclude_keys);
+        }
 
-        return array(
-            $uid,
-            $user->user_login,
-            $user->user_email,
-            $user->user_registered,
-            $user->display_name,
-            $user->user_nicename,
-            $user->user_url,
-            (int) $user->user_status,
-            $this->scalarMeta($uid, 'first_name'),
-            $this->scalarMeta($uid, 'last_name'),
-            $this->scalarMeta($uid, 'phone_number'),
-            $this->scalarMeta($uid, 'secondary_phone'),
-            $this->scalarMeta($uid, 'dealership_name'),
-            $this->scalarMeta($uid, 'email_verified'),
-            $this->scalarMeta($uid, 'latest_email_verification_timestamp'),
-            $this->formatCellValue($this->resolveAutoagoraDealer($uid)),
-            $logo_id > 0 ? (string) $logo_id : '',
-            $logo_url,
-            $this->scalarMeta($uid, 'notify_activity_milestones'),
-            $this->scalarMeta($uid, 'notify_7_day_reminders'),
-            $this->scalarMeta($uid, 'seller_average_rating'),
-            $this->scalarMeta($uid, 'seller_review_count'),
-            $this->formatMetaForDedicatedColumn($uid, 'favorite_cars'),
-            $this->formatMetaForDedicatedColumn($uid, 'car_form_templates'),
-            isset($car_counts[$uid]) ? $car_counts[$uid] : 0,
-            $this->buildOtherUserMetaJson($uid),
-        );
+        return '';
     }
 
-    private function scalarMeta(int $user_id, string $key): string
+    /**
+     * @param mixed $raw
+     */
+    private function formatMetaValue($raw): string
     {
-        $raw = get_user_meta($user_id, $key, true);
         if ($raw === '' || $raw === null) {
             return '';
         }
         if (is_array($raw) || is_object($raw)) {
-            return wp_json_encode($raw, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $encoded = wp_json_encode($raw, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+            return $encoded !== false ? $encoded : '';
+        }
+        if (is_bool($raw)) {
+            return $raw ? '1' : '0';
         }
 
         return (string) $raw;
     }
 
-    private function formatMetaForDedicatedColumn(int $user_id, string $key): string
-    {
-        $raw = get_user_meta($user_id, $key, true);
-        if ($raw === '' || $raw === null) {
-            return '';
-        }
-
-        return $this->formatCellValue($raw);
-    }
-
     /**
-     * @param mixed $value
+     * @param list<string> $exclude_keys
      */
-    private function formatCellValue($value): string
-    {
-        if ($value === '' || $value === null) {
-            return '';
-        }
-        if (is_array($value) || is_object($value)) {
-            $encoded = wp_json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-
-            return $encoded !== false ? $encoded : '';
-        }
-
-        if (is_bool($value)) {
-            return $value ? '1' : '0';
-        }
-
-        return (string) $value;
-    }
-
-    /**
-     * @return mixed
-     */
-    private function resolveAutoagoraDealer(int $user_id)
-    {
-        if (function_exists('get_field')) {
-            $acf = get_field('autoagora_dealer', 'user_' . $user_id);
-            if ($acf !== null && $acf !== false && $acf !== '') {
-                return $acf;
-            }
-        }
-
-        return get_user_meta($user_id, 'autoagora_dealer', true);
-    }
-
-    private function buildOtherUserMetaJson(int $user_id): string
+    private function buildOtherUserMetaJson(int $user_id, array $exclude_keys): string
     {
         $all_meta = get_user_meta($user_id);
         if (!is_array($all_meta)) {
             return '{}';
         }
 
-        $exclude = array_merge(self::EXPLICIT_META_KEYS, self::OTHER_META_DENYLIST);
-        $exclude_lookup = array_fill_keys($exclude, true);
+        $exclude_lookup = array_fill_keys($exclude_keys, true);
 
         $other = array();
         foreach ($all_meta as $meta_key => $values) {
             if (isset($exclude_lookup[$meta_key])) {
+                continue;
+            }
+            if (preg_match('/^field_[a-f0-9]{8,}$/i', $meta_key)) {
                 continue;
             }
             if (!is_array($values)) {
