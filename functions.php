@@ -376,6 +376,7 @@ add_action('init', function () {
         'protected'                 => true,
         'private'                   => false,
         'exclude_from_search'       => true,
+        'show_in_rest'              => true,
         'show_in_admin_all_list'    => true,
         'show_in_admin_status_list' => true,
         'label_count'               => _n_noop(
@@ -385,6 +386,49 @@ add_action('init', function () {
         ),
     ));
 });
+
+/**
+ * Expose "Expired" in car admin status dropdowns (list Quick/Bulk Edit + classic editor).
+ *
+ * WordPress fires admin_footer-{suffix} without ".php" (e.g. admin_footer-edit). We use
+ * admin_footer + screen checks so list + post screens are covered reliably.
+ */
+add_action(
+    'admin_footer',
+    function () {
+        if (! is_admin()) {
+            return;
+        }
+        global $pagenow, $typenow;
+        if ($typenow !== 'car') {
+            return;
+        }
+        if (! in_array($pagenow, array('edit.php', 'post.php', 'post-new.php'), true)) {
+            return;
+        }
+        ?>
+        <script>
+        jQuery(function ($) {
+            function appendExpiredOption($select) {
+                if (!$select.length || $select.find('option[value="expired"]').length) {
+                    return;
+                }
+                $select.append($('<option></option>').val('expired').text('<?php echo esc_js(__('Expired', 'bricks-child')); ?>'));
+            }
+            appendExpiredOption($('select#post_status[name="post_status"]'));
+            appendExpiredOption($('select[name="_status"]'));
+            appendExpiredOption($('select[name="post_status"]').not('#post_status'));
+            $(document).on('click', '.editinline', function () {
+                setTimeout(function () {
+                    appendExpiredOption($('#inline-edit select[name="_status"]'));
+                }, 0);
+            });
+        });
+        </script>
+        <?php
+    },
+    100
+);
 
 
 // =========================================================================
