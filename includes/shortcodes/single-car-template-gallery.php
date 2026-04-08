@@ -74,7 +74,7 @@ function single_car_template_gallery_shortcode( $atts ) {
                     <!-- View all images button -->
                     <div class="view-all-button">
                         <button type="button" class="scg-view-all-btn" aria-label="View all images">
-                            <img src="<?php echo esc_url( $scg_expand_icon_url ); ?>" alt="" class="scg-view-all-icon" width="18" height="18" decoding="async" />
+                            <img src="<?php echo esc_url( $scg_expand_icon_url ); ?>" alt="" class="scg-view-all-icon" width="14" height="14" decoding="async" />
                             <span class="scg-view-all-label">View All</span>
                         </button>
                     </div>

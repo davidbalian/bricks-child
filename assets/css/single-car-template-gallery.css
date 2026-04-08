@@ -166,14 +166,14 @@
 }
 
 .view-all-button .scg-view-all-btn:hover {
-    gap: 1rem;
+    gap: 0.6rem;
 }
 
 .view-all-button .scg-view-all-icon {
     flex-shrink: 0;
     display: block;
-    width: 18px;
-    height: 18px;
+    width: 14px;
+    height: 14px;
     object-fit: contain;
 }
 
@@ -256,11 +256,6 @@
     .view-all-button .scg-view-all-btn {
         padding: 6px 12px;
         font-size: 12px;
-    }
-
-    .view-all-button .scg-view-all-icon {
-        width: 16px;
-        height: 16px;
     }
 
     .scg-thumb {
