@@ -196,4 +196,7 @@ function handle_create_dealership_form() {
         wp_redirect(admin_url("admin.php?page=dealerships&message=$message"));
     }
     exit;
-} 
+}
+
+require_once __DIR__ . '/dealership-export/dealership-export-admin.php';
+require_once __DIR__ . '/dealership-import/dealership-import-admin.php';

@@ -184,13 +184,6 @@
         appendSpecs(specsEl, c.specs);
         body.appendChild(specsEl);
 
-        if (c.price) {
-            var price = document.createElement('div');
-            price.className = 'car-card-price';
-            price.innerHTML = '&euro;' + escapeHtml(c.price);
-            body.appendChild(price);
-        }
-
         if (c.pi && PI_LABELS[c.pi]) {
             var pi = document.createElement('span');
             pi.className = 'car-card-price-insight car-card-price-insight--' + c.pi;
@@ -198,12 +191,19 @@
             body.appendChild(pi);
         }
 
+        if (c.price) {
+            var price = document.createElement('div');
+            price.className = 'car-card-price';
+            price.innerHTML = '&euro;' + escapeHtml(c.price);
+            body.appendChild(price);
+        }
+
         var foot = document.createElement('div');
         foot.className = 'car-card-footer';
 
         var loc = document.createElement('span');
         loc.className = 'car-card-location';
-        loc.innerHTML = '<i class="fas fa-location-dot"></i> ' + escapeHtml(c.loc || '');
+        loc.innerHTML = '<img src="https://autoagora.cy/wp-content/uploads/2026/04/location-pill-filled.svg" alt="" class="car-card-location-icon"> ' + escapeHtml(c.loc || '');
         foot.appendChild(loc);
 
         var dateSpan = document.createElement('span');

@@ -233,7 +233,7 @@
             var carCityParam = pageParams.get('car_city');
             if (carCityParam !== null && carCityParam !== '') {
                 params.set('car_city', carCityParam);
-            } else if (state.defaultCarCity) {
+            } else if (state.defaultCarCity && pageParams.get('loc_lat')) {
                 params.set('car_city', state.defaultCarCity);
             }
 

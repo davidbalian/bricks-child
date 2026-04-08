@@ -219,15 +219,15 @@ function render_car_card($post_id, $context = array()) {
                 ?>
             </div>
 
+            <?php car_card_render_price_insight_badge($post_id); ?>
+
             <?php if ($price) : ?>
                 <div class="car-card-price">&euro;<?php echo esc_html(number_format(floatval(str_replace(',', '', $price)))); ?></div>
             <?php endif; ?>
 
-            <?php car_card_render_price_insight_badge($post_id); ?>
-
             <div class="car-card-footer">
                 <span class="car-card-location">
-                    <i class="fas fa-location-dot"></i>
+                    <img src="https://autoagora.cy/wp-content/uploads/2026/04/location-pill-filled.svg" alt="" class="car-card-location-icon">
                     <?php
                     $location_parts = array();
                     if ($car_district) $location_parts[] = esc_html($car_district);

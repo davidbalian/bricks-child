@@ -30,7 +30,7 @@
 /* ── Slides track ── */
 .car-card-slider-track {
     display: flex;
-    transition: transform 0.2s ease;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform;
     touch-action: pan-y pinch-zoom;
     -webkit-user-drag: none;
@@ -316,6 +316,16 @@
     white-space: nowrap;
     flex: 1;
     min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.car-card-location-icon {
+    width: 0.75rem;
+    height: 0.75rem;
+    flex-shrink: 0;
+    filter: brightness(0) saturate(100%) invert(15%) sepia(15%) saturate(1200%) hue-rotate(180deg) brightness(95%);
 }
 
 .car-card-date {
@@ -338,10 +348,15 @@
     flex-shrink: 0;
 }
 
+.car-card-price-insight + .car-card-price {
+    padding-top: 0.25rem;
+}
+
 /* Price insight (cohort vs median) */
 .car-card-price-insight {
     display: inline-block;
-    margin-top: 0.35rem;
+    width: fit-content;
+    margin-top: 1rem;
     padding: 0.2rem 0.5rem;
     border-radius: 0.35rem;
     font-size: 0.7rem;
