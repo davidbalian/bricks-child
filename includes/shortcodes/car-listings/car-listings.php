@@ -772,8 +772,9 @@ function car_listings_featured_first_orderby($clauses, $query) {
  *
  * Priority:
  * 1) Listings posted today first
- * 2) Higher listing_rank_score first
- * 3) Newer post_date first (tie-break)
+ * 2) Then listings from the last 1-3 days
+ * 3) Then older listings
+ * Within each bucket: higher listing_rank_score first, then newer post_date.
  */
 function car_listings_score_orderby_clauses($clauses, $query) {
     global $wpdb;
@@ -784,7 +785,7 @@ function car_listings_score_orderby_clauses($clauses, $query) {
     }
 
     $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS rank_meta ON ({$wpdb->posts}.ID = rank_meta.post_id AND rank_meta.meta_key = 'listing_rank_score')";
-    $clauses['orderby'] = "CASE WHEN DATE({$wpdb->posts}.post_date) = CURDATE() THEN 0 ELSE 1 END ASC, CAST(COALESCE(NULLIF(rank_meta.meta_value, ''), '0') AS DECIMAL(12,2)) DESC, {$wpdb->posts}.post_date DESC";
+    $clauses['orderby'] = "CASE WHEN DATE({$wpdb->posts}.post_date) = CURDATE() THEN 0 WHEN {$wpdb->posts}.post_date >= (CURDATE() - INTERVAL 3 DAY) THEN 1 ELSE 2 END ASC, CAST(COALESCE(NULLIF(rank_meta.meta_value, ''), '0') AS DECIMAL(12,2)) DESC, {$wpdb->posts}.post_date DESC";
 
     return $clauses;
 }
