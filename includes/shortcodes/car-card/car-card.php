@@ -106,7 +106,6 @@ function render_car_card($post_id, $context = array()) {
     // Badges & featured
     $show_full_badge = car_card_get_meta_value($post_id, 'fulldetailsbadge');
     $show_extra_badge = car_card_get_meta_value($post_id, 'extradetailsbadge');
-    $fresh_badge = car_card_get_meta_value($post_id, 'fresh_badge');
     $popular_badge = car_card_get_meta_value($post_id, 'popular_badge');
     $is_featured = car_card_get_meta_value($post_id, 'is_featured');
 
@@ -223,9 +222,6 @@ function render_car_card($post_id, $context = array()) {
 
             <div class="car-card-signal-badges">
                 <?php car_card_render_price_insight_badge($post_id); ?>
-                <?php if ($fresh_badge === '1') : ?>
-                    <span class="car-card-signal-badge car-card-signal-badge--fresh">Fresh Listing</span>
-                <?php endif; ?>
                 <?php if ($popular_badge === '1') : ?>
                     <span class="car-card-signal-badge car-card-signal-badge--popular">Popular</span>
                 <?php endif; ?>

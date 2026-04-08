@@ -4,7 +4,7 @@ This document describes the listing ranking system used on cars browse pages.
 
 ## Purpose
 
-Default browse ordering is now `Best Match` (`score DESC`) instead of featured-first + newest.
+Default browse ordering is now `Best Match` instead of featured-first + newest.
 
 The score is persisted on each car post as meta to keep listing queries fast.
 
@@ -12,7 +12,7 @@ The score is persisted on each car post as meta to keep listing queries fast.
 
 - `listing_rank_score` (number)
 - `listing_rank_updated_at` (datetime, `Y-m-d H:i:s`)
-- `fresh_badge` (`'1'` or `'0'`)
+- `listing_rank_recency_bucket` (`0|1|2`)
 - `popular_badge` (`'1'` or `'0'`)
 
 ## Formula
@@ -58,8 +58,18 @@ Meta keys:
 
 ## Badge Flags
 
-- `fresh_badge = 1` when listing age is `<= 7` days, else `0`
 - `popular_badge = 1` when engagement score is `>= 120`, else `0`
+- `fresh_badge` setting was removed by product request.
+
+## Recency Bucket
+
+`listing_rank_recency_bucket` is precomputed and used in SQL ordering:
+
+- `0` => posted today
+- `1` => posted in last 1-3 days
+- `2` => older than 3 days
+
+Age uses `publication_date` meta when present, otherwise `post_date`.
 
 ## Runtime + Scheduling
 
@@ -86,9 +96,12 @@ Single-car recompute is queued when:
 
 `score` is now a first-class sort mode in listings/filter query args:
 
-- `meta_key = listing_rank_score`
-- `orderby = meta_value_num`
-- `order = DESC` for `Best Match`
+- query args still pass `orderby=score`
+- SQL ordering is injected via `posts_clauses` with LEFT JOINs so missing meta does not hide listings
+- effective ORDER BY:
+  1) `listing_rank_recency_bucket ASC` (`0`, then `1`, then `2`)
+  2) `listing_rank_score DESC`
+  3) `post_date DESC` tie-break
 
 When orderby is `score`, featured-first SQL override is intentionally skipped.
 
@@ -100,6 +113,15 @@ Pages now default to:
 - sort value: `orderby=score&order=DESC`
 
 `Newest`, `Price`, `Mileage`, and `Year` sorts remain available.
+
+## Card/UI Signals
+
+- Price insight labels are rendered as:
+  - `Great Deal`
+  - `Good Deal`
+  - `Fair Deal`
+- `Popular` is rendered next to deal badges in the card body (`car-card-signal-badges`), horizontally.
+- `Full Details` and `Extra Details` remain in the slider top-left corner.
 
 ## Manual Rebuild
 

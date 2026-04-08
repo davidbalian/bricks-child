@@ -184,7 +184,7 @@
         appendSpecs(specsEl, c.specs);
         body.appendChild(specsEl);
 
-        if (c.pi || c.fr || c.pop) {
+        if (c.pi || c.pop) {
             var signalWrap = document.createElement('div');
             signalWrap.className = 'car-card-signal-badges';
             if (c.pi && PI_LABELS[c.pi]) {
@@ -192,12 +192,6 @@
                 pi.className = 'car-card-price-insight car-card-price-insight--' + c.pi;
                 pi.textContent = PI_LABELS[c.pi];
                 signalWrap.appendChild(pi);
-            }
-            if (c.fr) {
-                var fr = document.createElement('span');
-                fr.className = 'car-card-signal-badge car-card-signal-badge--fresh';
-                fr.textContent = 'Fresh Listing';
-                signalWrap.appendChild(fr);
             }
             if (c.pop) {
                 var pop = document.createElement('span');

@@ -22,7 +22,6 @@ final class ListingRankManager
         'none'  => 0.0,
     );
 
-    private const FRESH_BADGE_DAYS = 7;
     private const POPULAR_THRESHOLD = 120.0;
     private const BADGE_FULL_BONUS = 8.0;
     private const BADGE_EXTRA_BONUS = 5.0;
@@ -108,7 +107,8 @@ final class ListingRankManager
         update_post_meta($post_id, 'listing_rank_score', (string) round($score, 2));
         update_post_meta($post_id, 'listing_rank_updated_at', current_time('mysql'));
         update_post_meta($post_id, 'listing_rank_recency_bucket', (string) $recency_bucket);
-        update_post_meta($post_id, 'fresh_badge', $age_days <= self::FRESH_BADGE_DAYS ? '1' : '0');
+        // Fresh badge setting removed by product request.
+        delete_post_meta($post_id, 'fresh_badge');
         update_post_meta($post_id, 'popular_badge', $engagement >= self::POPULAR_THRESHOLD ? '1' : '0');
     }
 
