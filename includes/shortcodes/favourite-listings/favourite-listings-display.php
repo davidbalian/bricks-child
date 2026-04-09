@@ -72,7 +72,7 @@ $args = array(
     'post_status' => 'publish',
     'post__in' => $favorite_car_ids, // Only get favorite cars
     'no_found_rows' => false, // We need pagination
-    'meta_query' => ListingStateManager::meta_query_exclude_sold(),
+    'meta_query' => ListingStateManager::meta_query_active_only(),
 );
 
 // Get car listings

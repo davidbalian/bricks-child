@@ -170,10 +170,10 @@ function car_listings_build_query_args($atts) {
         }
     }
 
-    // === SOLD LISTINGS FILTER ===
-    // Exclude sold: listing_state = sold (SQL clause avoids meta_query fan-out).
+    // === LISTING STATE (marketplace) ===
+    // Require listing_state = active (SQL clause avoids meta_query fan-out).
     if ($atts['show_sold'] !== 'true') {
-        $args['car_exclude_sold'] = true;
+        $args['car_listing_state_active_only'] = true;
     }
 
     // === URL PARAMETER FILTERS (for filter integration) ===
@@ -795,20 +795,18 @@ function car_listings_score_orderby_clauses($clauses, $query) {
 }
 
 /**
- * Exclude listings explicitly marked as sold.
- *
- * Exclude sold: listing_state = sold.
+ * Restrict to cars with listing_state = active (marketplace queries).
  */
-function car_listings_exclude_sold_clauses($clauses, $query) {
-    if (!$query->get('car_exclude_sold')) {
+function car_listings_active_listing_state_clauses($clauses, $query) {
+    if (!$query->get('car_listing_state_active_only')) {
         return $clauses;
     }
 
     global $wpdb;
 
-    $state_key = ListingStateManager::FIELD_NAME;
-    $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS listing_state_meta ON ({$wpdb->posts}.ID = listing_state_meta.post_id AND listing_state_meta.meta_key = '{$state_key}')";
-    $clauses['where'] .= " AND (listing_state_meta.post_id IS NULL OR listing_state_meta.meta_value NOT IN ('sold','expired'))";
+    $state_key   = ListingStateManager::FIELD_NAME;
+    $active      = ListingStateManager::STATE_ACTIVE;
+    $clauses['join'] .= " INNER JOIN {$wpdb->postmeta} AS listing_state_meta ON ({$wpdb->posts}.ID = listing_state_meta.post_id AND listing_state_meta.meta_key = '{$state_key}' AND listing_state_meta.meta_value = '{$active}')";
 
     return $clauses;
 }

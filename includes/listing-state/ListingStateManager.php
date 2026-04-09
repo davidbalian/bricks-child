@@ -70,36 +70,27 @@ final class ListingStateManager
     }
 
     /**
-     * WP_Query meta_query: hide sold and expired from marketplace-style queries.
+     * Single meta_query clause: listing_state must equal active (marketplace-style lists).
      *
      * @return array<string,mixed>
      */
-    public static function meta_query_exclude_sold(): array
+    public static function meta_query_active_clause(): array
     {
         return array(
-            'relation' => 'AND',
-            self::meta_query_not_listing_state(self::STATE_SOLD),
-            self::meta_query_not_listing_state(self::STATE_EXPIRED),
+            'key'     => self::FIELD_NAME,
+            'value'   => self::STATE_ACTIVE,
+            'compare' => '=',
         );
     }
 
     /**
-     * @return array<string,mixed>
+     * WP_Query meta_query: only posts with listing_state = active.
+     *
+     * @return array<int,array<string,mixed>>
      */
-    private static function meta_query_not_listing_state(string $state): array
+    public static function meta_query_active_only(): array
     {
-        return array(
-            'relation' => 'OR',
-            array(
-                'key'     => self::FIELD_NAME,
-                'compare' => 'NOT EXISTS',
-            ),
-            array(
-                'key'     => self::FIELD_NAME,
-                'value'   => $state,
-                'compare' => '!=',
-            ),
-        );
+        return array( self::meta_query_active_clause() );
     }
 
     /**

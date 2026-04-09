@@ -206,7 +206,7 @@ class MyListingsAjaxHandler {
             } else {
                 $args['post_status'] = $status;
                 if ($status === 'publish') {
-                    $args['meta_query'] = ListingStateManager::meta_query_exclude_sold();
+                    $args['meta_query'] = ListingStateManager::meta_query_active_only();
                 }
             }
         }

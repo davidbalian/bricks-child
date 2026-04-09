@@ -94,8 +94,6 @@ final class Autoagora_Car_Category_Redirect_Resolver {
      * @param WP_Term|null $make_term  Parent car_make term.
      */
     private static function has_similar_available_listings(int $post_id, $model_term, $make_term): bool {
-        $exclude_sold = ListingStateManager::meta_query_exclude_sold();
-
         $args = array(
             'post_type'           => 'car',
             'post_status'         => 'publish',
@@ -103,7 +101,7 @@ final class Autoagora_Car_Category_Redirect_Resolver {
             'posts_per_page'      => 1,
             'fields'              => 'ids',
             'ignore_sticky_posts' => true,
-            'meta_query'          => array($exclude_sold),
+            'meta_query'          => ListingStateManager::meta_query_active_only(),
         );
 
         if ($model_term instanceof WP_Term) {

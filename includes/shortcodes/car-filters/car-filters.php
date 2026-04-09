@@ -405,10 +405,10 @@ function car_filters_ajax_filter_listings() {
         }
     }
 
-    // Exclude sold (default behavior). This is applied in SQL clauses
+    // Marketplace: require listing_state = active (SQL clauses on the query)
     // to avoid broad postmeta fan-out joins in generated WP meta_query SQL.
     if (!isset($atts['show_sold']) || $atts['show_sold'] !== 'true') {
-        $args['car_exclude_sold'] = true;
+        $args['car_listing_state_active_only'] = true;
     }
 
     if (count($meta_query) > 1) {

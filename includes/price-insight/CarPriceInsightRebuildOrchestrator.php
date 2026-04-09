@@ -99,7 +99,7 @@ final class CarPriceInsightRebuildOrchestrator {
                 'no_found_rows'          => true,
                 'update_post_meta_cache' => false,
                 'update_post_term_cache' => false,
-                'meta_query'             => ListingStateManager::meta_query_exclude_sold(),
+                'meta_query'             => ListingStateManager::meta_query_active_only(),
             )
         );
         $ids = $query->posts;

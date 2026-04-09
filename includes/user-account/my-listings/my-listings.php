@@ -235,7 +235,7 @@ function display_my_listings($atts) {
                     } else {
                         $args['post_status'] = $current_filter;
                         if ($current_filter === 'publish') {
-                            $args['meta_query'] = ListingStateManager::meta_query_exclude_sold();
+                            $args['meta_query'] = ListingStateManager::meta_query_active_only();
                         }
                     }
                 }
