@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 }
 
 require_once __DIR__ . '/cars-report-bulk-expire-manager.php';
+require_once __DIR__ . '/cars-report-listing-state-sync.php';
 
 final class CarsReportRepository
 {
@@ -212,6 +213,7 @@ final class CarsReportAdminPage
         $instance = new self(new CarsReportRepository());
         add_action('admin_menu', [$instance, 'registerSubmenu']);
         add_action('admin_init', [$instance, 'handleBulkExpirePost']);
+        CarsReportListingStateSyncCoordinator::register(self::SLUG);
     }
 
     public function registerSubmenu(): void
@@ -246,6 +248,7 @@ final class CarsReportAdminPage
             </p>
 
             <?php $this->renderBulkExpireNotice(); ?>
+            <?php CarsReportListingStateSyncCoordinator::renderNotice(); ?>
 
             <form method="get" style="margin: 1rem 0 1.25rem; display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
                 <input type="hidden" name="post_type" value="car" />
@@ -258,6 +261,7 @@ final class CarsReportAdminPage
             </form>
 
             <?php $this->renderBulkExpireForm($oldAfterDays); ?>
+            <?php CarsReportListingStateSyncCoordinator::renderForm(self::SLUG); ?>
 
             <?php $this->renderOverviewCards($overview, $oldAfterDays); ?>
 
@@ -447,7 +451,7 @@ final class CarsReportAdminPage
                 echo esc_html(
                     sprintf(
                         /* translators: %d: number of listings */
-                        _n('%d listing was set to Expired.', '%d listings were set to Expired.', $count, 'bricks-child'),
+                        _n('%d listing was marked expired (listing_state).', '%d listings were marked expired (listing_state).', $count, 'bricks-child'),
                         $count
                     )
                 );
@@ -463,7 +467,7 @@ final class CarsReportAdminPage
         <div style="margin: 0 0 1.25rem; padding: 12px 14px; border: 1px solid #c3c4c7; border-radius: 4px; background: #fff; max-width: 720px;">
             <h2 style="margin: 0 0 8px; font-size: 14px;"><?php esc_html_e('Bulk expire by activity age', 'bricks-child'); ?></h2>
             <p class="description" style="margin-top: 0;">
-                <?php esc_html_e('Uses publication_date when set; otherwise the post date. Sold listings are skipped. Only published listings are moved to Expired.', 'bricks-child'); ?>
+                <?php esc_html_e('Sets listing_state to expired for matching published cars (they stay published but are hidden from the marketplace). Uses publication_date when set; otherwise the post date. Skips sold and already-expired.', 'bricks-child'); ?>
             </p>
             <form method="post" action="<?php echo esc_url(admin_url('edit.php')); ?>">
                 <?php wp_nonce_field('brick_child_cars_report_bulk_expire'); ?>
@@ -475,7 +479,7 @@ final class CarsReportAdminPage
                     name="brick_child_cars_report_bulk_expire"
                     value="1"
                     class="button button-secondary"
-                    onclick="return confirm('<?php echo esc_js(__('Move all matching published listings to Expired? You can change status again from the editor or list screen.', 'bricks-child')); ?>');"
+                    onclick="return confirm('<?php echo esc_js(__('Mark all matching listings as expired (listing_state)? They remain published; sellers can set listing_state back to active after editing.', 'bricks-child')); ?>');"
                 >
                     <?php
                     echo esc_html(

@@ -58,9 +58,13 @@ class RefreshListingManager {
         if (get_post_status($post_id) !== 'publish') {
             return false;
         }
+
+        if (ListingStateManager::is_marked_expired((int) $post_id)) {
+            return false;
+        }
         
         // Check if listing is sold
-        if (get_field('is_sold', $post_id)) {
+        if (ListingStateManager::is_marked_sold((int) $post_id)) {
             return false;
         }
         

@@ -202,28 +202,11 @@ class MyListingsAjaxHandler {
         // Apply status filter
         if ($status !== 'all') {
             if ($status === 'sold') {
-                $args['meta_query'] = array(
-                    array(
-                        'key'     => 'is_sold',
-                        'value'   => '1',
-                        'compare' => '=',
-                    ),
-                );
+                $args['meta_query'] = ListingStateManager::meta_query_sold_only();
             } else {
                 $args['post_status'] = $status;
                 if ($status === 'publish') {
-                    $args['meta_query'] = array(
-                        'relation' => 'OR',
-                        array(
-                            'key'     => 'is_sold',
-                            'value'   => '0',
-                            'compare' => '=',
-                        ),
-                        array(
-                            'key'     => 'is_sold',
-                            'compare' => 'NOT EXISTS',
-                        ),
-                    );
+                    $args['meta_query'] = ListingStateManager::meta_query_exclude_sold();
                 }
             }
         }
@@ -303,7 +286,8 @@ class MyListingsAjaxHandler {
             $all_images = array_merge($all_images, $additional_images);
         }
 
-        $is_sold = get_field('is_sold', $post_id);
+        $is_sold     = ListingStateManager::is_marked_sold($post_id);
+        $is_expired  = ListingStateManager::is_marked_expired($post_id);
         $post_status = get_post_status($post_id);
 
         // View counts (cached in post meta by CarViewsDatabase)
@@ -354,6 +338,8 @@ class MyListingsAjaxHandler {
                         <?php
                         if ($is_sold) {
                             echo ' status-sold';
+                        } elseif ($is_expired) {
+                            echo ' status-expired';
                         } elseif ($post_status === 'pending') {
                             echo ' status-pending';
                         } elseif ($post_status === 'publish') {
@@ -364,6 +350,8 @@ class MyListingsAjaxHandler {
                         <?php
                         if ($is_sold) {
                             echo 'SOLD';
+                        } elseif ($is_expired) {
+                            echo 'EXPIRED';
                         } else {
                             echo $post_status === 'publish' ? 'Published' : esc_html(ucfirst($post_status));
                         }
@@ -377,8 +365,8 @@ class MyListingsAjaxHandler {
                     <?php
                     endif;
 
-                    // Show refresh status for published listings
-                    if ($post_status === 'publish') {
+                    // Show refresh status for published listings (not expired)
+                    if ($post_status === 'publish' && ! $is_expired) {
                         echo $refresh_ui->render_refresh_status($post_id);
                     }
                     ?>
@@ -388,12 +376,12 @@ class MyListingsAjaxHandler {
                         <i class="fas fa-pencil-alt"></i> Edit
                     </a>
                     <?php
-                    // Show refresh button for published, unsold listings
-                    if ($post_status === 'publish' && !$is_sold) {
+                    // Show refresh button for published, unsold, non-expired listings
+                    if ($post_status === 'publish' && ! $is_sold && ! $is_expired) {
                         echo $refresh_ui->render_refresh_button($post_id);
                     }
 
-                    if ($post_status === 'publish') {
+                    if ($post_status === 'publish' && ! $is_expired) {
                         $button_text = $is_sold ? ' Mark as Available' : ' Mark as Sold';
                         $button_class = $is_sold
                             ? 'btn btn-primary available-button'

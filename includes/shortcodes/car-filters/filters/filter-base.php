@@ -500,19 +500,7 @@ function car_filter_build_constrained_post_ids($filters, $exclude_keys = array()
         }
     }
 
-    // Exclude sold
-    $meta_query[] = array(
-        'relation' => 'OR',
-        array(
-            'key'     => 'is_sold',
-            'compare' => 'NOT EXISTS',
-        ),
-        array(
-            'key'     => 'is_sold',
-            'value'   => '1',
-            'compare' => '!=',
-        ),
-    );
+    $meta_query[] = ListingStateManager::meta_query_exclude_sold();
 
     if (count($meta_query) > 1) {
         $args['meta_query'] = $meta_query;

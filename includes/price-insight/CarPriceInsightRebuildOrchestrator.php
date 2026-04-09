@@ -99,18 +99,7 @@ final class CarPriceInsightRebuildOrchestrator {
                 'no_found_rows'          => true,
                 'update_post_meta_cache' => false,
                 'update_post_term_cache' => false,
-                'meta_query'             => array(
-                    'relation' => 'OR',
-                    array(
-                        'key'     => 'is_sold',
-                        'compare' => 'NOT EXISTS',
-                    ),
-                    array(
-                        'key'     => 'is_sold',
-                        'value'   => '1',
-                        'compare' => '!=',
-                    ),
-                ),
+                'meta_query'             => ListingStateManager::meta_query_exclude_sold(),
             )
         );
         $ids = $query->posts;
@@ -191,8 +180,7 @@ final class CarPriceInsightRebuildOrchestrator {
      * @return bool
      */
     private static function is_in_market($post_id) {
-        $sold = function_exists('get_field') ? get_field('is_sold', $post_id) : get_post_meta($post_id, 'is_sold', true);
-        if ($sold === 1 || $sold === '1' || $sold === true) {
+        if (ListingStateManager::is_marked_sold($post_id) || ListingStateManager::is_marked_expired($post_id)) {
             return false;
         }
         return get_post_status($post_id) === 'publish';

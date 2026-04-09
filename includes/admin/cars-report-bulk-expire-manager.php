@@ -13,9 +13,9 @@ final class CarsReportBulkExpireManager
     private const POST_TYPE = 'car';
 
     /**
-     * Set post_status to expired for published cars whose activity date is older than $minAgeDays.
+     * Set listing_state to expired for stale published cars (post stays publish; hidden from marketplace).
      *
-     * Skips listings marked sold (is_sold = 1).
+     * Skips sold and already-expired listing_state.
      *
      * @return int Number of listings updated.
      */
@@ -28,14 +28,10 @@ final class CarsReportBulkExpireManager
             if ($post_id <= 0) {
                 continue;
             }
-            $updated = wp_update_post(
-                array(
-                    'ID' => $post_id,
-                    'post_status' => 'expired',
-                ),
-                true
-            );
-            if (! is_wp_error($updated)) {
+            if (! class_exists('ListingStateManager')) {
+                continue;
+            }
+            if (ListingStateManager::assign_state($post_id, ListingStateManager::STATE_EXPIRED)) {
                 $count++;
             }
         }
@@ -63,10 +59,16 @@ final class CarsReportBulkExpireManager
             WHERE p.post_type = %s
               AND p.post_status = 'publish'
               AND NOT EXISTS (
-                  SELECT 1 FROM {$wpdb->postmeta} AS sold
-                  WHERE sold.post_id = p.ID
-                    AND sold.meta_key = 'is_sold'
-                    AND sold.meta_value = '1'
+                  SELECT 1 FROM {$wpdb->postmeta} AS ls_sold
+                  WHERE ls_sold.post_id = p.ID
+                    AND ls_sold.meta_key = 'listing_state'
+                    AND ls_sold.meta_value = 'sold'
+              )
+              AND NOT EXISTS (
+                  SELECT 1 FROM {$wpdb->postmeta} AS ls_exp
+                  WHERE ls_exp.post_id = p.ID
+                    AND ls_exp.meta_key = 'listing_state'
+                    AND ls_exp.meta_value = 'expired'
               )
               AND COALESCE(
                   NULLIF(

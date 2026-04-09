@@ -72,9 +72,13 @@ class MyListingsStatsManager {
      * @return void
      */
     private function accumulate_status_stats(array &$stats, int $listing_id): void {
-        $is_sold = (int) get_post_meta($listing_id, 'is_sold', true) === 1;
-        if ($is_sold) {
+        if (ListingStateManager::is_marked_sold($listing_id)) {
             $stats['sold_listings']++;
+            return;
+        }
+
+        if (ListingStateManager::is_marked_expired($listing_id)) {
+            $stats['expired_listings']++;
             return;
         }
 
@@ -177,6 +181,7 @@ class MyListingsStatsManager {
             'active_listings'           => 0,
             'pending_listings'          => 0,
             'sold_listings'             => 0,
+            'expired_listings'          => 0,
             'stale_listings'            => 0,
             'total_views'               => 0,
             'unique_views'              => 0,

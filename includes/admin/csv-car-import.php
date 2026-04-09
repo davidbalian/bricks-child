@@ -328,7 +328,7 @@ function import_car($car, $author) {
         if (is_wp_error($post_id)) {
             return array('success' => false, 'error' => $post_id->get_error_message());
         }
-        
+
         // Update ACF fields (only if ACF is available)
         if (function_exists('update_field')) {
             $fields = array('make', 'model', 'year', 'price', 'mileage', 'fuel_type', 'transmission', 

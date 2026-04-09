@@ -70,23 +70,7 @@ final class ListingReminderScheduler
             'orderby' => 'post_date',
             'order' => 'DESC',
             'fields' => 'ids',
-            'meta_query' => [
-                'relation' => 'OR',
-                [
-                    'key' => 'is_sold',
-                    'compare' => 'NOT EXISTS'
-                ],
-                [
-                    'key' => 'is_sold',
-                    'value' => '',
-                    'compare' => '='
-                ],
-                [
-                    'key' => 'is_sold',
-                    'value' => '0',
-                    'compare' => '='
-                ]
-            ]
+            'meta_query' => ListingStateManager::meta_query_exclude_sold(),
         ]);
 
         return is_wp_error($query) ? [] : $query->posts;

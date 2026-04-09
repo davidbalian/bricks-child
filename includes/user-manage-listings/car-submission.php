@@ -314,7 +314,7 @@ function handle_add_car_listing() {
         wp_redirect(add_query_arg('error', 'post_creation', wp_get_referer()));
         exit;
     }
-    
+
     // Add post meta for all the car details
     update_field('make', $make, $post_id);
     update_field('model', $model, $post_id);

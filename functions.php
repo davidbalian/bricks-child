@@ -16,6 +16,7 @@ define('BRICKS_CHILD_THEME_VERSION', '1.0.0');
 // =========================================================================
 // IMPORTANT: Ensure these files and the '/vendor' directory exist in your Bricks child theme folder.
 require_once get_stylesheet_directory() . '/vendor/autoload.php';
+require_once get_stylesheet_directory() . '/includes/listing-state/init.php';
 require_once get_stylesheet_directory() . '/includes/core/google-maps-assets.php';
 require_once get_stylesheet_directory() . '/includes/core/car-listing-redirects.php';
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/listing-details-badge-manager.php';
@@ -364,72 +365,6 @@ require_once get_stylesheet_directory() . '/includes/listing-rank/ListingRankMan
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-listings/car-listings.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-filters/car-filters.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/autocy-bulk-upload/autocy-bulk-upload.php';
-
-/**
- * Register custom "Expired" status for car listings.
- */
-add_action('init', function () {
-    register_post_status('expired', array(
-        'label'                     => _x('Expired', 'post status', 'bricks-child'),
-        'public'                    => false,
-        'internal'                  => false,
-        'protected'                 => true,
-        'private'                   => false,
-        'exclude_from_search'       => true,
-        'show_in_rest'              => true,
-        'show_in_admin_all_list'    => true,
-        'show_in_admin_status_list' => true,
-        'label_count'               => _n_noop(
-            'Expired <span class="count">(%s)</span>',
-            'Expired <span class="count">(%s)</span>',
-            'bricks-child'
-        ),
-    ));
-});
-
-/**
- * Expose "Expired" in car admin status dropdowns (list Quick/Bulk Edit + classic editor).
- *
- * WordPress fires admin_footer-{suffix} without ".php" (e.g. admin_footer-edit). We use
- * admin_footer + screen checks so list + post screens are covered reliably.
- */
-add_action(
-    'admin_footer',
-    function () {
-        if (! is_admin()) {
-            return;
-        }
-        global $pagenow, $typenow;
-        if ($typenow !== 'car') {
-            return;
-        }
-        if (! in_array($pagenow, array('edit.php', 'post.php', 'post-new.php'), true)) {
-            return;
-        }
-        ?>
-        <script>
-        jQuery(function ($) {
-            function appendExpiredOption($select) {
-                if (!$select.length || $select.find('option[value="expired"]').length) {
-                    return;
-                }
-                $select.append($('<option></option>').val('expired').text('<?php echo esc_js(__('Expired', 'bricks-child')); ?>'));
-            }
-            appendExpiredOption($('select#post_status[name="post_status"]'));
-            appendExpiredOption($('select[name="_status"]'));
-            appendExpiredOption($('select[name="post_status"]').not('#post_status'));
-            $(document).on('click', '.editinline', function () {
-                setTimeout(function () {
-                    appendExpiredOption($('#inline-edit select[name="_status"]'));
-                }, 0);
-            });
-        });
-        </script>
-        <?php
-    },
-    100
-);
-
 
 // =========================================================================
 // Bricks Builder Specific Filters

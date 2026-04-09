@@ -171,8 +171,7 @@ function car_listings_build_query_args($atts) {
     }
 
     // === SOLD LISTINGS FILTER ===
-    // Keep the same behavior (include rows where is_sold is missing OR != '1'),
-    // but implement it via a dedicated SQL clause to avoid wide postmeta fan-out joins.
+    // Exclude sold: listing_state = sold (SQL clause avoids meta_query fan-out).
     if ($atts['show_sold'] !== 'true') {
         $args['car_exclude_sold'] = true;
     }
@@ -511,7 +510,7 @@ function car_listings_render_card($post_id) {
     $year = get_field('year', $post_id);
     $mileage = get_field('mileage', $post_id);
     $car_city = get_field('car_city', $post_id);
-    $is_sold = get_field('is_sold', $post_id);
+    $is_sold = ListingStateManager::is_marked_sold((int) $post_id);
 
     // Get featured image
     $image_url = get_the_post_thumbnail_url($post_id, 'medium');
@@ -798,10 +797,7 @@ function car_listings_score_orderby_clauses($clauses, $query) {
 /**
  * Exclude listings explicitly marked as sold.
  *
- * Semantics are identical to the old meta_query:
- * - include if no is_sold row exists
- * - include if is_sold != '1'
- * - exclude only is_sold = '1'
+ * Exclude sold: listing_state = sold.
  */
 function car_listings_exclude_sold_clauses($clauses, $query) {
     if (!$query->get('car_exclude_sold')) {
@@ -810,8 +806,9 @@ function car_listings_exclude_sold_clauses($clauses, $query) {
 
     global $wpdb;
 
-    $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS sold_meta ON ({$wpdb->posts}.ID = sold_meta.post_id AND sold_meta.meta_key = 'is_sold')";
-    $clauses['where'] .= " AND (sold_meta.post_id IS NULL OR sold_meta.meta_value <> '1')";
+    $state_key = ListingStateManager::FIELD_NAME;
+    $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS listing_state_meta ON ({$wpdb->posts}.ID = listing_state_meta.post_id AND listing_state_meta.meta_key = '{$state_key}')";
+    $clauses['where'] .= " AND (listing_state_meta.post_id IS NULL OR listing_state_meta.meta_value NOT IN ('sold','expired'))";
 
     return $clauses;
 }

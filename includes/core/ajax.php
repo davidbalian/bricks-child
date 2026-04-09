@@ -490,6 +490,11 @@ function handle_mark_car_as_sold() {
         return;
     }
 
+    if (ListingStateManager::is_marked_expired($car_id)) {
+        wp_send_json_error('This listing is expired. Reactivate it from the editor before changing sold status.');
+        return;
+    }
+
     // Get the new status
     $status = isset($_POST['status']) ? sanitize_text_field($_POST['status']) : 'sold';
     if (!in_array($status, array('sold', 'available'))) {
@@ -497,9 +502,12 @@ function handle_mark_car_as_sold() {
         return;
     }
 
-    // Update car status using ACF field
-    update_field('is_sold', $status === 'sold' ? 1 : 0, $car_id);
-    
+    if ($status === 'sold') {
+        ListingStateManager::assign_state($car_id, ListingStateManager::STATE_SOLD);
+    } else {
+        ListingStateManager::assign_state($car_id, ListingStateManager::STATE_ACTIVE);
+    }
+
     wp_send_json_success();
 }
 
@@ -533,17 +541,20 @@ function handle_toggle_car_status() {
         return;
     }
 
+    if (ListingStateManager::is_marked_expired($car_id)) {
+        wp_send_json_error('This listing is expired. Reactivate it from the editor before changing sold status.');
+        return;
+    }
+
     // Get the new status
     $mark_as_sold = isset($_POST['mark_as_sold']) ? filter_var($_POST['mark_as_sold'], FILTER_VALIDATE_BOOLEAN) : false;
 
-    // Update the ACF field - ensure we're using the correct value format
-    $result = update_field('is_sold', $mark_as_sold ? '1' : '0', $car_id);
-    
-    if ($result) {
+    $state = $mark_as_sold ? ListingStateManager::STATE_SOLD : ListingStateManager::STATE_ACTIVE;
+    if (ListingStateManager::assign_state($car_id, $state)) {
         wp_send_json_success();
-    } else {
-        wp_send_json_error('Failed to update car status');
     }
+
+    wp_send_json_error('Failed to update car status');
 } 
 
 /**

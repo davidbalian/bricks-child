@@ -507,18 +507,7 @@ function autoagora_car_make_landing_has_listings(array $landing) {
         'fields'         => 'ids',
         'orderby'        => 'date',
         'order'          => 'DESC',
-        'meta_query'     => array(
-            'relation' => 'OR',
-            array(
-                'key'     => 'is_sold',
-                'compare' => 'NOT EXISTS',
-            ),
-            array(
-                'key'     => 'is_sold',
-                'value'   => '1',
-                'compare' => '!=',
-            ),
-        ),
+        'meta_query'     => ListingStateManager::meta_query_exclude_sold(),
         'tax_query'      => array(
             array(
                 'taxonomy'         => 'car_make',

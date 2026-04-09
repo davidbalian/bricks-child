@@ -94,18 +94,7 @@ final class Autoagora_Car_Category_Redirect_Resolver {
      * @param WP_Term|null $make_term  Parent car_make term.
      */
     private static function has_similar_available_listings(int $post_id, $model_term, $make_term): bool {
-        $exclude_sold = array(
-            'relation' => 'OR',
-            array(
-                'key'     => 'is_sold',
-                'compare' => 'NOT EXISTS',
-            ),
-            array(
-                'key'     => 'is_sold',
-                'value'   => '1',
-                'compare' => '!=',
-            ),
-        );
+        $exclude_sold = ListingStateManager::meta_query_exclude_sold();
 
         $args = array(
             'post_type'           => 'car',
@@ -144,13 +133,7 @@ final class Autoagora_Car_Category_Redirect_Resolver {
     }
 
     public static function listing_is_marked_sold(int $post_id): bool {
-        if (!function_exists('get_field')) {
-            return false;
-        }
-
-        $flag = get_field('is_sold', $post_id);
-
-        return $flag === 1 || $flag === '1' || $flag === true;
+        return ListingStateManager::is_marked_sold($post_id);
     }
 
     public static function car_rewrite_slug(): string {
@@ -210,6 +193,7 @@ final class Autoagora_Car_Listing_Redirect_Coordinator {
     public static function register(): void {
         add_action('wp_trash_post', array(__CLASS__, 'on_trash'), 10, 1);
         add_action('before_delete_post', array(__CLASS__, 'on_before_delete'), 10, 2);
+        add_action('template_redirect', array(__CLASS__, 'redirect_expired_singular'), 1);
         add_action('template_redirect', array(__CLASS__, 'redirect_sold_singular'), 1);
         add_action('template_redirect', array(__CLASS__, 'redirect_deleted_car_404'), 2);
     }
@@ -238,6 +222,25 @@ final class Autoagora_Car_Listing_Redirect_Coordinator {
 
         $target = Autoagora_Car_Category_Redirect_Resolver::resolve_target_url($post_id);
         Autoagora_Deleted_Car_Redirect_Store::save($post->post_name, $target);
+    }
+
+    public static function redirect_expired_singular(): void {
+        if (! is_singular('car')) {
+            return;
+        }
+
+        $post_id = (int) get_queried_object_id();
+        if ($post_id <= 0) {
+            return;
+        }
+
+        if (! class_exists('ListingStateManager') || ! ListingStateManager::is_marked_expired($post_id)) {
+            return;
+        }
+
+        $target = Autoagora_Car_Category_Redirect_Resolver::resolve_target_url($post_id);
+        wp_safe_redirect($target, 301);
+        exit;
     }
 
     public static function redirect_sold_singular(): void {

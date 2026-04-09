@@ -126,6 +126,10 @@ function display_my_listings($atts) {
                         <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['sold_listings'])); ?></strong>
                     </div>
                     <div class="my-listings-stat-card">
+                        <span class="my-listings-stat-label">Expired listings</span>
+                        <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) ($user_stats['expired_listings'] ?? 0))); ?></strong>
+                    </div>
+                    <div class="my-listings-stat-card">
                         <span class="my-listings-stat-label">Total views generated</span>
                         <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['total_views'])); ?></strong>
                     </div>
@@ -227,28 +231,11 @@ function display_my_listings($atts) {
                 // Apply status filter
                 if ($current_filter !== 'all') {
                     if ($current_filter === 'sold') {
-                        $args['meta_query'] = array(
-                            array(
-                                'key' => 'is_sold',
-                                'value' => '1',
-                                'compare' => '='
-                            )
-                        );
+                        $args['meta_query'] = ListingStateManager::meta_query_sold_only();
                     } else {
                         $args['post_status'] = $current_filter;
                         if ($current_filter === 'publish') {
-                            $args['meta_query'] = array(
-                                'relation' => 'OR',
-                                array(
-                                    'key' => 'is_sold',
-                                    'value' => '0',
-                                    'compare' => '='
-                                ),
-                                array(
-                                    'key' => 'is_sold',
-                                    'compare' => 'NOT EXISTS'
-                                )
-                            );
+                            $args['meta_query'] = ListingStateManager::meta_query_exclude_sold();
                         }
                     }
                 }
