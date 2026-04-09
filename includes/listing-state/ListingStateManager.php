@@ -117,66 +117,6 @@ final class ListingStateManager
     }
 
     /**
-     * One-time migration: set listing_state from legacy is_sold + post status, then remove is_sold meta.
-     *
-     * @return array{processed:int, changed:int}
-     */
-    public static function sync_all_from_legacy_is_sold_meta(): array
-    {
-        $ids = get_posts(
-            array(
-                'post_type'      => 'car',
-                'post_status'    => 'any',
-                'posts_per_page' => -1,
-                'fields'         => 'ids',
-                'no_found_rows'  => true,
-            )
-        );
-        if (! is_array($ids)) {
-            return array('processed' => 0, 'changed' => 0);
-        }
-
-        $changed = 0;
-        foreach ($ids as $post_id) {
-            $post_id = (int) $post_id;
-            $legacy  = get_post_meta($post_id, 'is_sold', true);
-            $sold_on = $legacy === 1 || $legacy === '1' || $legacy === true;
-            $status  = get_post_status($post_id);
-            $was_custom_expired = ($status === 'expired');
-            if ($was_custom_expired) {
-                wp_update_post(
-                    array(
-                        'ID'          => $post_id,
-                        'post_status' => 'publish',
-                    )
-                );
-            }
-
-            if ($sold_on) {
-                $target = self::STATE_SOLD;
-            } elseif ($was_custom_expired) {
-                $target = self::STATE_EXPIRED;
-            } else {
-                $target = self::STATE_ACTIVE;
-            }
-
-            $current = self::read_state_value($post_id);
-            if ($current !== $target) {
-                if (self::assign_state($post_id, $target)) {
-                    $changed++;
-                }
-            }
-
-            delete_post_meta($post_id, 'is_sold');
-        }
-
-        return array(
-            'processed' => count($ids),
-            'changed'   => $changed,
-        );
-    }
-
-    /**
      * @return string Normalized state slug or '' if unset/invalid in meta.
      */
     private static function read_state_value(int $post_id): string

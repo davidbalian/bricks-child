@@ -9,7 +9,6 @@ if (!defined('ABSPATH')) {
 }
 
 require_once __DIR__ . '/cars-report-bulk-expire-manager.php';
-require_once __DIR__ . '/cars-report-listing-state-sync.php';
 
 final class CarsReportRepository
 {
@@ -247,11 +246,77 @@ final class CarsReportRepository
             'active'  => $active,
         );
     }
+
+    /**
+     * Cars with listing_state = sold|expired (publish, pending, draft).
+     *
+     * @return array<int, object>
+     */
+    public function fetchListingsByListingState(string $state, int $limit = 300): array
+    {
+        $allowed = array('sold', 'expired');
+        if (! in_array($state, $allowed, true)) {
+            return array();
+        }
+
+        global $wpdb;
+
+        $safe_limit = max(1, min(500, $limit));
+        $meta_key   = class_exists('ListingStateManager') ? ListingStateManager::FIELD_NAME : 'listing_state';
+
+        $query = $wpdb->prepare(
+            "
+            SELECT
+                p.ID,
+                p.post_title,
+                p.post_status,
+                p.post_date_gmt,
+                TIMESTAMPDIFF(DAY, p.post_date_gmt, UTC_TIMESTAMP()) AS age_days,
+                COALESCE(CAST(views_meta.meta_value AS UNSIGNED), 0) AS page_views,
+                (
+                    COALESCE(CAST(phone_meta.meta_value AS UNSIGNED), 0) +
+                    COALESCE(CAST(wa_meta.meta_value AS UNSIGNED), 0)
+                ) AS contact_clicks
+            FROM {$wpdb->posts} AS p
+            INNER JOIN {$wpdb->postmeta} AS ls
+                ON ls.post_id = p.ID AND ls.meta_key = %s AND ls.meta_value = %s
+            LEFT JOIN {$wpdb->postmeta} AS views_meta
+                ON views_meta.post_id = p.ID
+                AND views_meta.meta_key = %s
+            LEFT JOIN {$wpdb->postmeta} AS phone_meta
+                ON phone_meta.post_id = p.ID
+                AND phone_meta.meta_key = %s
+            LEFT JOIN {$wpdb->postmeta} AS wa_meta
+                ON wa_meta.post_id = p.ID
+                AND wa_meta.meta_key = %s
+            WHERE p.post_type = %s
+              AND p.post_status IN ('publish', 'pending', 'draft')
+            ORDER BY p.post_modified_gmt DESC
+            LIMIT %d
+            ",
+            $meta_key,
+            $state,
+            self::VIEWS_META_KEY,
+            self::PHONE_META_KEY,
+            self::WHATSAPP_META_KEY,
+            self::POST_TYPE,
+            $safe_limit
+        );
+
+        $rows = $wpdb->get_results($query); // phpcs:ignore WordPress.DB
+        return is_array($rows) ? $rows : array();
+    }
 }
 
 final class CarsReportAdminPage
 {
     private const SLUG = 'cars-report';
+
+    private const TAB_OVERVIEW = 'overview';
+
+    private const TAB_EXPIRED = 'expired';
+
+    private const TAB_SOLD = 'sold';
     private const DEFAULT_OLD_DAYS = 90;
     private const MIN_OLD_DAYS = 15;
     private const MAX_OLD_DAYS = 365;
@@ -268,7 +333,6 @@ final class CarsReportAdminPage
         $instance = new self(new CarsReportRepository());
         add_action('admin_menu', [$instance, 'registerSubmenu']);
         add_action('admin_init', [$instance, 'handleBulkExpirePost']);
-        CarsReportListingStateSyncCoordinator::register(self::SLUG);
     }
 
     public function registerSubmenu(): void
@@ -285,16 +349,12 @@ final class CarsReportAdminPage
 
     public function renderPage(): void
     {
-        if (!current_user_can('manage_options')) {
+        if (! current_user_can('manage_options')) {
             wp_die(__('You do not have permission to access this page.', 'bricks-child'));
         }
 
         $oldAfterDays = $this->resolveOldAfterDays();
-        $overview = $this->repository->fetchOverview($oldAfterDays);
-        $statusRows = $this->repository->fetchStatusBreakdown();
-        $topMakes = $this->repository->fetchTopMakeBreakdown(10);
-        $oldestRows = $this->repository->fetchOldestListings($oldAfterDays, 30);
-        $listingStateCounts = $this->repository->fetchListingStateCounts();
+        $tab          = $this->resolveCurrentTab();
 
         ?>
         <div class="wrap">
@@ -303,74 +363,182 @@ final class CarsReportAdminPage
                 <?php esc_html_e('Use this report to detect aging inventory, monitor upload flow, and prioritize listing cleanup.', 'bricks-child'); ?>
             </p>
 
-            <?php $this->renderBulkExpireNotice(); ?>
-            <?php CarsReportListingStateSyncCoordinator::renderNotice(); ?>
+            <?php $this->renderTabsNav($tab, $oldAfterDays); ?>
 
-            <form method="get" style="margin: 1rem 0 1.25rem; display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
-                <input type="hidden" name="post_type" value="car" />
-                <input type="hidden" name="page" value="<?php echo esc_attr(self::SLUG); ?>" />
-                <label>
-                    <?php esc_html_e('Consider listing old after (days)', 'bricks-child'); ?><br />
-                    <input type="number" name="old_after_days" min="<?php echo esc_attr(self::MIN_OLD_DAYS); ?>" max="<?php echo esc_attr(self::MAX_OLD_DAYS); ?>" value="<?php echo esc_attr($oldAfterDays); ?>" />
-                </label>
-                <?php submit_button(__('Apply', 'bricks-child'), 'secondary', '', false); ?>
-            </form>
-
-            <?php $this->renderBulkExpireForm($oldAfterDays); ?>
-            <?php CarsReportListingStateSyncCoordinator::renderForm(self::SLUG); ?>
-
-            <?php $this->renderOverviewCards($overview, $oldAfterDays, $listingStateCounts); ?>
-
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:16px;">
-                <?php $this->renderStatusTable($statusRows); ?>
-                <?php $this->renderTopMakesTable($topMakes); ?>
-            </div>
-
-            <h2 style="margin-top: 1.5rem;"><?php esc_html_e('Oldest listings (priority actions)', 'bricks-child'); ?></h2>
-            <table class="widefat striped">
-                <thead>
-                    <tr>
-                        <th><?php esc_html_e('Listing', 'bricks-child'); ?></th>
-                        <th><?php esc_html_e('Age (days)', 'bricks-child'); ?></th>
-                        <th><?php esc_html_e('Status', 'bricks-child'); ?></th>
-                        <th><?php esc_html_e('Views', 'bricks-child'); ?></th>
-                        <th><?php esc_html_e('Contact clicks', 'bricks-child'); ?></th>
-                        <th><?php esc_html_e('Actions', 'bricks-child'); ?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php if (empty($oldestRows)) : ?>
-                    <tr>
-                        <td colspan="6"><?php esc_html_e('No old listings for this threshold.', 'bricks-child'); ?></td>
-                    </tr>
-                <?php else : ?>
-                    <?php foreach ($oldestRows as $listing) : ?>
-                        <tr>
-                            <td>
-                                <strong><?php echo esc_html($listing->post_title ?: sprintf(__('Listing #%d', 'bricks-child'), $listing->ID)); ?></strong>
-                                <div style="font-size:12px;color:#646970;">
-                                    <?php echo esc_html(get_date_from_gmt((string) $listing->post_date_gmt, 'Y-m-d H:i')); ?>
-                                </div>
-                            </td>
-                            <td><?php echo esc_html(number_format_i18n((int) ($listing->age_days ?? 0))); ?></td>
-                            <td><?php echo esc_html($this->humanizeStatus((string) ($listing->post_status ?? ''))); ?></td>
-                            <td><?php echo esc_html(number_format_i18n((int) ($listing->page_views ?? 0))); ?></td>
-                            <td><?php echo esc_html(number_format_i18n((int) ($listing->contact_clicks ?? 0))); ?></td>
-                            <td>
-                                <a class="button button-small" href="<?php echo esc_url(get_edit_post_link((int) $listing->ID)); ?>">
-                                    <?php esc_html_e('Edit', 'bricks-child'); ?>
-                                </a>
-                                <a class="button button-small" href="<?php echo esc_url(get_permalink((int) $listing->ID)); ?>" target="_blank" rel="noopener noreferrer">
-                                    <?php esc_html_e('View', 'bricks-child'); ?>
-                                </a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-                </tbody>
-            </table>
+            <?php if ($tab === self::TAB_OVERVIEW) : ?>
+                <?php $this->renderOverviewTab($oldAfterDays); ?>
+            <?php elseif ($tab === self::TAB_EXPIRED) : ?>
+                <?php
+                $rows = $this->repository->fetchListingsByListingState('expired');
+                $this->renderStateListingsSection(
+                    __('Expired listings (listing_state)', 'bricks-child'),
+                    __('No cars with listing_state = expired.', 'bricks-child'),
+                    $rows
+                );
+                ?>
+            <?php else : ?>
+                <?php
+                $rows = $this->repository->fetchListingsByListingState('sold');
+                $this->renderStateListingsSection(
+                    __('Sold listings (listing_state)', 'bricks-child'),
+                    __('No cars with listing_state = sold.', 'bricks-child'),
+                    $rows
+                );
+                ?>
+            <?php endif; ?>
         </div>
         <?php
+    }
+
+    private function renderOverviewTab(int $oldAfterDays): void
+    {
+        $overview           = $this->repository->fetchOverview($oldAfterDays);
+        $statusRows         = $this->repository->fetchStatusBreakdown();
+        $topMakes           = $this->repository->fetchTopMakeBreakdown(10);
+        $oldestRows         = $this->repository->fetchOldestListings($oldAfterDays, 30);
+        $listingStateCounts = $this->repository->fetchListingStateCounts();
+
+        $this->renderBulkExpireNotice();
+
+        ?>
+        <form method="get" style="margin: 1rem 0 1.25rem; display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
+            <input type="hidden" name="post_type" value="car" />
+            <input type="hidden" name="page" value="<?php echo esc_attr(self::SLUG); ?>" />
+            <input type="hidden" name="tab" value="<?php echo esc_attr(self::TAB_OVERVIEW); ?>" />
+            <label>
+                <?php esc_html_e('Consider listing old after (days)', 'bricks-child'); ?><br />
+                <input type="number" name="old_after_days" min="<?php echo esc_attr(self::MIN_OLD_DAYS); ?>" max="<?php echo esc_attr(self::MAX_OLD_DAYS); ?>" value="<?php echo esc_attr($oldAfterDays); ?>" />
+            </label>
+            <?php submit_button(__('Apply', 'bricks-child'), 'secondary', '', false); ?>
+        </form>
+
+        <?php $this->renderBulkExpireForm($oldAfterDays); ?>
+
+        <?php $this->renderOverviewCards($overview, $oldAfterDays, $listingStateCounts); ?>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:16px;">
+            <?php $this->renderStatusTable($statusRows); ?>
+            <?php $this->renderTopMakesTable($topMakes); ?>
+        </div>
+
+        <h2 style="margin-top: 1.5rem;"><?php esc_html_e('Oldest listings (priority actions)', 'bricks-child'); ?></h2>
+        <?php
+        $this->renderListingsDataTable(
+            $oldestRows,
+            __('No old listings for this threshold.', 'bricks-child')
+        );
+    }
+
+    /**
+     * @param array<int, object> $rows
+     */
+    private function renderStateListingsSection(string $title, string $empty_message, array $rows): void
+    {
+        ?>
+        <h2 style="margin-top: 1rem;"><?php echo esc_html($title); ?></h2>
+        <p class="description">
+            <?php esc_html_e('WordPress post status (publish / pending / draft) is shown in the table; listing_state is the ACF field used on the marketplace.', 'bricks-child'); ?>
+        </p>
+        <?php
+        $this->renderListingsDataTable($rows, $empty_message);
+    }
+
+    /**
+     * @param array<int, object> $rows
+     */
+    private function renderListingsDataTable(array $rows, string $empty_message): void
+    {
+        ?>
+        <table class="widefat striped">
+            <thead>
+                <tr>
+                    <th><?php esc_html_e('Listing', 'bricks-child'); ?></th>
+                    <th><?php esc_html_e('Age (days)', 'bricks-child'); ?></th>
+                    <th><?php esc_html_e('Post status', 'bricks-child'); ?></th>
+                    <th><?php esc_html_e('Views', 'bricks-child'); ?></th>
+                    <th><?php esc_html_e('Contact clicks', 'bricks-child'); ?></th>
+                    <th><?php esc_html_e('Actions', 'bricks-child'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php if (empty($rows)) : ?>
+                <tr>
+                    <td colspan="6"><?php echo esc_html($empty_message); ?></td>
+                </tr>
+            <?php else : ?>
+                <?php foreach ($rows as $listing) : ?>
+                    <tr>
+                        <td>
+                            <strong><?php echo esc_html($listing->post_title ?: sprintf(__('Listing #%d', 'bricks-child'), $listing->ID)); ?></strong>
+                            <div style="font-size:12px;color:#646970;">
+                                <?php echo esc_html(get_date_from_gmt((string) $listing->post_date_gmt, 'Y-m-d H:i')); ?>
+                            </div>
+                        </td>
+                        <td><?php echo esc_html(number_format_i18n((int) ($listing->age_days ?? 0))); ?></td>
+                        <td><?php echo esc_html($this->humanizeStatus((string) ($listing->post_status ?? ''))); ?></td>
+                        <td><?php echo esc_html(number_format_i18n((int) ($listing->page_views ?? 0))); ?></td>
+                        <td><?php echo esc_html(number_format_i18n((int) ($listing->contact_clicks ?? 0))); ?></td>
+                        <td>
+                            <a class="button button-small" href="<?php echo esc_url(get_edit_post_link((int) $listing->ID)); ?>">
+                                <?php esc_html_e('Edit', 'bricks-child'); ?>
+                            </a>
+                            <a class="button button-small" href="<?php echo esc_url(get_permalink((int) $listing->ID)); ?>" target="_blank" rel="noopener noreferrer">
+                                <?php esc_html_e('View', 'bricks-child'); ?>
+                            </a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            </tbody>
+        </table>
+        <?php
+    }
+
+    private function renderTabsNav(string $current_tab, int $oldAfterDays): void
+    {
+        $tabs = array(
+            self::TAB_OVERVIEW => __('Overview', 'bricks-child'),
+            self::TAB_EXPIRED  => __('Expired', 'bricks-child'),
+            self::TAB_SOLD     => __('Sold', 'bricks-child'),
+        );
+        ?>
+        <h2 class="nav-tab-wrapper" style="margin-bottom: 1rem;">
+            <?php foreach ($tabs as $slug => $label) : ?>
+                <a
+                    href="<?php echo esc_url($this->carsReportTabUrl($slug, $oldAfterDays)); ?>"
+                    class="nav-tab<?php echo $current_tab === $slug ? ' nav-tab-active' : ''; ?>"
+                >
+                    <?php echo esc_html($label); ?>
+                </a>
+            <?php endforeach; ?>
+        </h2>
+        <?php
+    }
+
+    private function carsReportTabUrl(string $tab, int $oldAfterDays): string
+    {
+        return add_query_arg(
+            array(
+                'post_type'      => 'car',
+                'page'           => self::SLUG,
+                'tab'            => $tab,
+                'old_after_days' => $oldAfterDays,
+            ),
+            admin_url('edit.php')
+        );
+    }
+
+    private function resolveCurrentTab(): string
+    {
+        if (! isset($_GET['tab'])) {
+            return self::TAB_OVERVIEW;
+        }
+        $tab = sanitize_key((string) wp_unslash($_GET['tab']));
+        if (in_array($tab, array(self::TAB_OVERVIEW, self::TAB_EXPIRED, self::TAB_SOLD), true)) {
+            return $tab;
+        }
+
+        return self::TAB_OVERVIEW;
     }
 
     /**
@@ -508,10 +676,11 @@ final class CarsReportAdminPage
         wp_safe_redirect(
             add_query_arg(
                 array(
-                    'post_type' => 'car',
-                    'page' => self::SLUG,
+                    'post_type'      => 'car',
+                    'page'           => self::SLUG,
+                    'tab'            => self::TAB_OVERVIEW,
                     'old_after_days' => $days,
-                    'cars_expired' => $updated,
+                    'cars_expired'   => $updated,
                 ),
                 admin_url('edit.php')
             )
@@ -554,6 +723,7 @@ final class CarsReportAdminPage
                 <?php wp_nonce_field('brick_child_cars_report_bulk_expire'); ?>
                 <input type="hidden" name="post_type" value="car" />
                 <input type="hidden" name="cars_report_page" value="<?php echo esc_attr(self::SLUG); ?>" />
+                <input type="hidden" name="tab" value="<?php echo esc_attr(self::TAB_OVERVIEW); ?>" />
                 <input type="hidden" name="old_after_days" value="<?php echo esc_attr((string) $oldAfterDays); ?>" />
                 <button
                     type="submit"
