@@ -8,6 +8,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once __DIR__ . '/cars-report-bulk-expire-manager.php';
+
 final class CarsReportRepository
 {
     private const POST_TYPE = 'car';
@@ -209,6 +211,7 @@ final class CarsReportAdminPage
     {
         $instance = new self(new CarsReportRepository());
         add_action('admin_menu', [$instance, 'registerSubmenu']);
+        add_action('admin_init', [$instance, 'handleBulkExpirePost']);
     }
 
     public function registerSubmenu(): void
@@ -242,6 +245,8 @@ final class CarsReportAdminPage
                 <?php esc_html_e('Use this report to detect aging inventory, monitor upload flow, and prioritize listing cleanup.', 'bricks-child'); ?>
             </p>
 
+            <?php $this->renderBulkExpireNotice(); ?>
+
             <form method="get" style="margin: 1rem 0 1.25rem; display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
                 <input type="hidden" name="post_type" value="car" />
                 <input type="hidden" name="page" value="<?php echo esc_attr(self::SLUG); ?>" />
@@ -251,6 +256,8 @@ final class CarsReportAdminPage
                 </label>
                 <?php submit_button(__('Apply', 'bricks-child'), 'secondary', '', false); ?>
             </form>
+
+            <?php $this->renderBulkExpireForm($oldAfterDays); ?>
 
             <?php $this->renderOverviewCards($overview, $oldAfterDays); ?>
 
@@ -380,6 +387,107 @@ final class CarsReportAdminPage
                 <?php endif; ?>
                 </tbody>
             </table>
+        </div>
+        <?php
+    }
+
+    public function handleBulkExpirePost(): void
+    {
+        if (! isset($_POST['brick_child_cars_report_bulk_expire'])) {
+            return;
+        }
+
+        if (! isset($_POST['_wpnonce']) || ! wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), 'brick_child_cars_report_bulk_expire')) {
+            wp_die(esc_html__('Security check failed.', 'bricks-child'), '', array('response' => 403));
+        }
+
+        if (! current_user_can('manage_options')) {
+            wp_die(esc_html__('You do not have permission to access this page.', 'bricks-child'), '', array('response' => 403));
+        }
+
+        if (! isset($_POST['cars_report_page']) || sanitize_key((string) wp_unslash($_POST['cars_report_page'])) !== self::SLUG) {
+            return;
+        }
+
+        $days = isset($_POST['old_after_days']) ? absint(wp_unslash($_POST['old_after_days'])) : self::DEFAULT_OLD_DAYS;
+        if ($days < self::MIN_OLD_DAYS) {
+            $days = self::MIN_OLD_DAYS;
+        }
+        if ($days > self::MAX_OLD_DAYS) {
+            $days = self::MAX_OLD_DAYS;
+        }
+
+        $manager = new CarsReportBulkExpireManager();
+        $updated = $manager->expirePublishedCarsOlderThanDays($days);
+
+        wp_safe_redirect(
+            add_query_arg(
+                array(
+                    'post_type' => 'car',
+                    'page' => self::SLUG,
+                    'old_after_days' => $days,
+                    'cars_expired' => $updated,
+                ),
+                admin_url('edit.php')
+            )
+        );
+        exit;
+    }
+
+    private function renderBulkExpireNotice(): void
+    {
+        if (! isset($_GET['cars_expired'])) {
+            return;
+        }
+        $count = absint(wp_unslash($_GET['cars_expired']));
+        ?>
+        <div class="notice notice-success is-dismissible">
+            <p>
+                <?php
+                echo esc_html(
+                    sprintf(
+                        /* translators: %d: number of listings */
+                        _n('%d listing was set to Expired.', '%d listings were set to Expired.', $count, 'bricks-child'),
+                        $count
+                    )
+                );
+                ?>
+            </p>
+        </div>
+        <?php
+    }
+
+    private function renderBulkExpireForm(int $oldAfterDays): void
+    {
+        ?>
+        <div style="margin: 0 0 1.25rem; padding: 12px 14px; border: 1px solid #c3c4c7; border-radius: 4px; background: #fff; max-width: 720px;">
+            <h2 style="margin: 0 0 8px; font-size: 14px;"><?php esc_html_e('Bulk expire by activity age', 'bricks-child'); ?></h2>
+            <p class="description" style="margin-top: 0;">
+                <?php esc_html_e('Matches the same dates as “Refresh listing”: last refresh (last_refresh_date), otherwise publication_date, otherwise the post date. Sold listings are skipped. Only published listings are moved to Expired.', 'bricks-child'); ?>
+            </p>
+            <form method="post" action="<?php echo esc_url(admin_url('edit.php')); ?>">
+                <?php wp_nonce_field('brick_child_cars_report_bulk_expire'); ?>
+                <input type="hidden" name="post_type" value="car" />
+                <input type="hidden" name="cars_report_page" value="<?php echo esc_attr(self::SLUG); ?>" />
+                <input type="hidden" name="old_after_days" value="<?php echo esc_attr((string) $oldAfterDays); ?>" />
+                <button
+                    type="submit"
+                    name="brick_child_cars_report_bulk_expire"
+                    value="1"
+                    class="button button-secondary"
+                    onclick="return confirm('<?php echo esc_js(__('Move all matching published listings to Expired? You can change status again from the editor or list screen.', 'bricks-child')); ?>');"
+                >
+                    <?php
+                    echo esc_html(
+                        sprintf(
+                            /* translators: %d: day threshold */
+                            __('Expire published listings older than %d days', 'bricks-child'),
+                            $oldAfterDays
+                        )
+                    );
+                    ?>
+                </button>
+            </form>
         </div>
         <?php
     }
