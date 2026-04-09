@@ -2,14 +2,11 @@
 /**
  * Bulk-expires published car listings past an activity-date threshold.
  *
- * Activity date matches RefreshListingManager::perform_refresh(): last_refresh_date meta,
- * else publication_date meta, else post_date (all kept in sync on refresh).
+ * Activity date: publication_date meta if set, otherwise post_date.
  */
 if (!defined('ABSPATH')) {
     exit;
 }
-
-require_once dirname(__DIR__) . '/user-manage-listings/refresh-listing/RefreshListingManager.php';
 
 final class CarsReportBulkExpireManager
 {
@@ -57,7 +54,6 @@ final class CarsReportBulkExpireManager
         $cutoff_ts = current_time('timestamp') - ($safe_days * DAY_IN_SECONDS);
         $cutoff = wp_date('Y-m-d H:i:s', $cutoff_ts);
 
-        $lr_key = RefreshListingManager::META_KEY_LAST_REFRESH;
         $pub_key = 'publication_date';
 
         $query = $wpdb->prepare(
@@ -78,16 +74,10 @@ final class CarsReportBulkExpireManager
                        WHERE post_id = p.ID AND meta_key = %s LIMIT 1),
                       ''
                   ),
-                  NULLIF(
-                      (SELECT meta_value FROM {$wpdb->postmeta}
-                       WHERE post_id = p.ID AND meta_key = %s LIMIT 1),
-                      ''
-                  ),
                   p.post_date
               ) <= %s
             ",
             self::POST_TYPE,
-            $lr_key,
             $pub_key,
             $cutoff
         );
