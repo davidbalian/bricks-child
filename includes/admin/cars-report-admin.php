@@ -463,7 +463,7 @@ final class CarsReportAdminPage
         <div style="margin: 0 0 1.25rem; padding: 12px 14px; border: 1px solid #c3c4c7; border-radius: 4px; background: #fff; max-width: 720px;">
             <h2 style="margin: 0 0 8px; font-size: 14px;"><?php esc_html_e('Bulk expire by activity age', 'bricks-child'); ?></h2>
             <p class="description" style="margin-top: 0;">
-                <?php esc_html_e('Matches the same dates as “Refresh listing”: last refresh (last_refresh_date), otherwise publication_date, otherwise the post date. Sold listings are skipped. Only published listings are moved to Expired.', 'bricks-child'); ?>
+                <?php esc_html_e('Uses publication_date when set; otherwise the post date. Sold listings are skipped. Only published listings are moved to Expired.', 'bricks-child'); ?>
             </p>
             <form method="post" action="<?php echo esc_url(admin_url('edit.php')); ?>">
                 <?php wp_nonce_field('brick_child_cars_report_bulk_expire'); ?>
