@@ -192,6 +192,61 @@ final class CarsReportRepository
         $rows = $wpdb->get_results($query); // phpcs:ignore WordPress.DB
         return is_array($rows) ? $rows : [];
     }
+
+    /**
+     * Count cars by listing_state meta (same post_status scope as overview: publish, pending, draft).
+     *
+     * "active" = all cars in scope minus sold and expired (includes missing listing_state or other values).
+     *
+     * @return array{total:int,sold:int,expired:int,active:int}
+     */
+    public function fetchListingStateCounts(): array
+    {
+        global $wpdb;
+
+        $meta_key = class_exists('ListingStateManager') ? ListingStateManager::FIELD_NAME : 'listing_state';
+
+        $total = (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "
+                SELECT COUNT(*)
+                FROM {$wpdb->posts} AS p
+                WHERE p.post_type = %s
+                  AND p.post_status IN ('publish', 'pending', 'draft')
+                ",
+                self::POST_TYPE
+            )
+        );
+
+        $sold_sql = "
+            SELECT COUNT(DISTINCT p.ID)
+            FROM {$wpdb->posts} AS p
+            INNER JOIN {$wpdb->postmeta} AS m
+                ON m.post_id = p.ID AND m.meta_key = %s AND m.meta_value = 'sold'
+            WHERE p.post_type = %s
+              AND p.post_status IN ('publish', 'pending', 'draft')
+        ";
+        $sold = (int) $wpdb->get_var($wpdb->prepare($sold_sql, $meta_key, self::POST_TYPE)); // phpcs:ignore WordPress.DB
+
+        $expired_sql = "
+            SELECT COUNT(DISTINCT p.ID)
+            FROM {$wpdb->posts} AS p
+            INNER JOIN {$wpdb->postmeta} AS m
+                ON m.post_id = p.ID AND m.meta_key = %s AND m.meta_value = 'expired'
+            WHERE p.post_type = %s
+              AND p.post_status IN ('publish', 'pending', 'draft')
+        ";
+        $expired = (int) $wpdb->get_var($wpdb->prepare($expired_sql, $meta_key, self::POST_TYPE)); // phpcs:ignore WordPress.DB
+
+        $active = max(0, $total - $sold - $expired);
+
+        return array(
+            'total'   => $total,
+            'sold'    => $sold,
+            'expired' => $expired,
+            'active'  => $active,
+        );
+    }
 }
 
 final class CarsReportAdminPage
@@ -239,6 +294,7 @@ final class CarsReportAdminPage
         $statusRows = $this->repository->fetchStatusBreakdown();
         $topMakes = $this->repository->fetchTopMakeBreakdown(10);
         $oldestRows = $this->repository->fetchOldestListings($oldAfterDays, 30);
+        $listingStateCounts = $this->repository->fetchListingStateCounts();
 
         ?>
         <div class="wrap">
@@ -263,7 +319,7 @@ final class CarsReportAdminPage
             <?php $this->renderBulkExpireForm($oldAfterDays); ?>
             <?php CarsReportListingStateSyncCoordinator::renderForm(self::SLUG); ?>
 
-            <?php $this->renderOverviewCards($overview, $oldAfterDays); ?>
+            <?php $this->renderOverviewCards($overview, $oldAfterDays, $listingStateCounts); ?>
 
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:16px;">
                 <?php $this->renderStatusTable($statusRows); ?>
@@ -319,8 +375,9 @@ final class CarsReportAdminPage
 
     /**
      * @param array{total:int,old_total:int,fresh_total:int,old_percent:float,avg_age_days:float,uploaded_7_days:int,uploaded_30_days:int} $overview
+     * @param array{total:int,sold:int,expired:int,active:int}                                      $listingStateCounts
      */
-    private function renderOverviewCards(array $overview, int $oldAfterDays): void
+    private function renderOverviewCards(array $overview, int $oldAfterDays, array $listingStateCounts): void
     {
         $oldPercentClass = $overview['old_percent'] >= 50.0 ? 'notice-error' : ($overview['old_percent'] >= 30.0 ? 'notice-warning' : 'notice-success');
         ?>
@@ -331,6 +388,30 @@ final class CarsReportAdminPage
             <?php $this->renderCard(__('Uploaded last 7 days', 'bricks-child'), number_format_i18n($overview['uploaded_7_days']), 'notice-info'); ?>
             <?php $this->renderCard(__('Uploaded last 30 days', 'bricks-child'), number_format_i18n($overview['uploaded_30_days']), 'notice-info'); ?>
             <?php $this->renderCard(__('Average listing age', 'bricks-child'), sprintf(_x('%s days', 'listing age in days', 'bricks-child'), number_format_i18n($overview['avg_age_days'], 1)), 'notice-info'); ?>
+        </div>
+
+        <h2 style="margin: 1.5rem 0 0.5rem;"><?php esc_html_e('By listing_state', 'bricks-child'); ?></h2>
+        <p class="description" style="margin-top: 0;">
+            <?php esc_html_e('Counts use the same cars as “Total listings” (publish, pending, draft). Active = all of those minus sold and expired (includes cars with no listing_state set).', 'bricks-child'); ?>
+        </p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:4px;">
+            <?php
+            $this->renderCard(
+                __('Active', 'bricks-child'),
+                number_format_i18n((int) ($listingStateCounts['active'] ?? 0)),
+                'notice-success'
+            );
+            $this->renderCard(
+                __('Sold', 'bricks-child'),
+                number_format_i18n((int) ($listingStateCounts['sold'] ?? 0)),
+                'notice-warning'
+            );
+            $this->renderCard(
+                __('Expired', 'bricks-child'),
+                number_format_i18n((int) ($listingStateCounts['expired'] ?? 0)),
+                'notice-error'
+            );
+            ?>
         </div>
         <?php
     }
