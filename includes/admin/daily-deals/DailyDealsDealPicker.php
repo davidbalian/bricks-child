@@ -1,6 +1,6 @@
 <?php
 /**
- * Picks published active listings for social "daily deals" using rank + freshness, with daily variety.
+ * Picks published active listings for social "daily deals" (newest-first like /cars/ date sort), with daily variety.
  */
 if (!defined('ABSPATH')) {
     exit;
@@ -61,6 +61,8 @@ final class DailyDealsDealPicker
         $active = ListingStateManager::STATE_ACTIVE;
 
         $placeholders = implode(',', array_fill(0, count($bands), '%s'));
+        // Same ordering as /cars/ with Newest (date DESC): featured first, then newest post_date (WP date order).
+        // Rank score is only a tie-breaker when timestamps match (see car_listings_featured_first_orderby).
         $sql = "
             SELECT p.ID
             FROM {$wpdb->posts} AS p
@@ -68,16 +70,16 @@ final class DailyDealsDealPicker
                 ON ls.post_id = p.ID AND ls.meta_key = %s AND ls.meta_value = %s
             INNER JOIN {$wpdb->postmeta} AS band
                 ON band.post_id = p.ID AND band.meta_key = 'price_insight_band' AND band.meta_value IN ($placeholders)
+            LEFT JOIN {$wpdb->postmeta} AS featured_meta
+                ON featured_meta.post_id = p.ID AND featured_meta.meta_key = 'is_featured'
             LEFT JOIN {$wpdb->postmeta} AS rank_meta
                 ON rank_meta.post_id = p.ID AND rank_meta.meta_key = 'listing_rank_score'
-            LEFT JOIN {$wpdb->postmeta} AS recency_meta
-                ON recency_meta.post_id = p.ID AND recency_meta.meta_key = 'listing_rank_recency_bucket'
             WHERE p.post_type = 'car'
               AND p.post_status = 'publish'
             ORDER BY
-                CAST(COALESCE(NULLIF(recency_meta.meta_value, ''), '2') AS UNSIGNED) ASC,
-                CAST(COALESCE(NULLIF(rank_meta.meta_value, ''), '0') AS DECIMAL(12,2)) DESC,
-                p.post_date_gmt DESC
+                CASE WHEN featured_meta.meta_value = '1' THEN 0 ELSE 1 END ASC,
+                p.post_date DESC,
+                CAST(COALESCE(NULLIF(rank_meta.meta_value, ''), '0') AS DECIMAL(12,2)) DESC
             LIMIT %d
         ";
 
@@ -162,7 +164,7 @@ final class DailyDealsDealPicker
     }
 
     /**
-     * Stable pseudo-shuffle: same site + day + listing IDs → same order; pool already rank/freshness ordered.
+     * Stable pseudo-shuffle: same site + day + listing IDs → same order; pool is newest-first (cars date sort).
      *
      * @param list<array<string,mixed>> $rows
      * @return list<array<string,mixed>>

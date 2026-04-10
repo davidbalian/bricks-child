@@ -69,7 +69,7 @@ final class DailyDealsAdminPage
         <div class="wrap">
             <h1><?php esc_html_e('Daily Deals', 'bricks-child'); ?></h1>
             <p class="description">
-                <?php esc_html_e('Pick five active listings priced as good or great deals (with rank + freshness ordering), shuffle deterministically by UTC day, then copy text and images for social posts.', 'bricks-child'); ?>
+                <?php esc_html_e('Pick five active listings priced as good or great deals, ordered like /cars/ “Newest” (featured first, then newest listing date), shuffle deterministically by UTC day, then copy text and images for social posts.', 'bricks-child'); ?>
             </p>
             <p>
                 <a href="<?php echo esc_url(admin_url('edit.php?post_type=car&page=cars-report')); ?>">
