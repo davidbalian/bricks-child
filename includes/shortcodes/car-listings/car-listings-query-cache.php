@@ -163,7 +163,7 @@ function car_listings_query_cache_execute(array $query_args) {
     }
 
     $gen = (int) get_option('car_listings_query_cache_gen', 1);
-    $cache_version = (string) apply_filters('car_listings_query_cache_version', 'v5');
+    $cache_version = (string) apply_filters('car_listings_query_cache_version', 'v4');
     $norm = car_listings_query_cache_normalize_for_key($query_args);
     $key = 'car_lq_' . $cache_version . '_' . $gen . '_' . md5(wp_json_encode($norm));
 

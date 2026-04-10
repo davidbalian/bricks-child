@@ -12,8 +12,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once __DIR__ . '/car-listings-best-match-order.php';
-
 // Register the shortcode
 add_shortcode('car_listings', 'car_listings_shortcode');
 
@@ -771,10 +769,14 @@ function car_listings_featured_first_orderby($clauses, $query) {
 /**
  * Score-first ordering for "Best Match".
  *
- * Priority (same rules as ListingRankManager::ageDays + recencyBucket, computed live in SQL):
- * 1) Bucket 0 — under 24 hours since publication_date (or post_date_gmt if unset)
- * 2) Bucket 1 — 1–3 days
- * 3) Bucket 2 — older
+ * Priority:
+ * 1) Listings posted today first
+ * 2) Then listings from the last 1-3 days
+ * 3) Then older listings
+ * Recency bucket is precomputed by ListingRankManager:
+ * - 0 = today
+ * - 1 = 1-3 days
+ * - 2 = older
  * Within each bucket: higher listing_rank_score first, then newer post_date.
  */
 function car_listings_score_orderby_clauses($clauses, $query) {
@@ -786,8 +788,8 @@ function car_listings_score_orderby_clauses($clauses, $query) {
     }
 
     $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS rank_meta ON ({$wpdb->posts}.ID = rank_meta.post_id AND rank_meta.meta_key = 'listing_rank_score')";
-    $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS listing_pub_meta ON ({$wpdb->posts}.ID = listing_pub_meta.post_id AND listing_pub_meta.meta_key = 'publication_date')";
-    $clauses['orderby'] = car_listings_best_match_orderby_sql($wpdb->posts);
+    $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS recency_meta ON ({$wpdb->posts}.ID = recency_meta.post_id AND recency_meta.meta_key = 'listing_rank_recency_bucket')";
+    $clauses['orderby'] = "CAST(COALESCE(NULLIF(recency_meta.meta_value, ''), '2') AS UNSIGNED) ASC, CAST(COALESCE(NULLIF(rank_meta.meta_value, ''), '0') AS DECIMAL(12,2)) DESC, {$wpdb->posts}.post_date DESC";
 
     return $clauses;
 }
