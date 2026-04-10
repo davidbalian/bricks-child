@@ -53,8 +53,8 @@ final class CarsDailyDealsStickerStore
      */
     public static function getStickerLayersForComposite(): array
     {
-        $ids  = self::getAttachmentIds();
-        $map  = array(
+        $ids = self::getAttachmentIds();
+        $map = array(
             'top_left'     => 'top_left',
             'top_right'    => 'top_right',
             'bottom_left'  => 'bottom_left',
@@ -86,13 +86,18 @@ final class CarsDailyDealsStickerStore
 }
 
 /**
- * Composites corner PNG/WebP/JPEG stickers onto a listing photo; outputs JPEG.
+ * Composites corner stickers; full-frame branded JPEG and Instagram 1080×1080 (letterboxed).
  */
 final class CarsDailyDealsImageCompositor
 {
     private const MAX_WIDTH_RATIO = 0.28;
 
     private const MARGIN_RATIO = 0.02;
+
+    /** Instagram feed square (px); photo is scaled to fit inside (nothing cropped). */
+    private const INSTAGRAM_SQUARE = 1080;
+
+    private const INSTAGRAM_BG_HEX = '#111111';
 
     public static function canComposite(): bool
     {
@@ -104,8 +109,6 @@ final class CarsDailyDealsImageCompositor
     }
 
     /**
-     * Writes a composited JPEG to a new temp file, or returns false to use the original.
-     *
      * @param string $sourcePath Server path to listing image.
      * @return string|false Absolute path to temp JPEG, or false if no stickers / failure.
      */
@@ -117,80 +120,118 @@ final class CarsDailyDealsImageCompositor
         }
 
         if (class_exists('Imagick')) {
-            return self::compositeImagick($sourcePath, $layers);
+            return self::compositeFullFrameImagick($sourcePath, $layers);
         }
 
-        return self::compositeGd($sourcePath, $layers);
+        return self::compositeFullFrameGd($sourcePath, $layers);
+    }
+
+    /**
+     * 1080×1080 JPEG: full photo visible (letterboxed), optional corner stickers on top.
+     *
+     * @param string $sourcePath Server path to listing image.
+     * @return string|false
+     */
+    public static function instagramSquareToTempJpeg(string $sourcePath)
+    {
+        if (!is_readable($sourcePath) || !self::canComposite()) {
+            return false;
+        }
+
+        $layers = CarsDailyDealsStickerStore::getStickerLayersForComposite();
+
+        if (class_exists('Imagick')) {
+            return self::instagramSquareImagick($sourcePath, $layers);
+        }
+
+        return self::instagramSquareGd($sourcePath, $layers);
     }
 
     /**
      * @param array<int, array{path:string, position:string}> $layers
      * @return string|false
      */
-    private static function compositeImagick(string $sourcePath, array $layers)
+    private static function compositeFullFrameImagick(string $sourcePath, array $layers)
     {
         try {
             $base = new Imagick($sourcePath);
             $base->setImageColorspace(Imagick::COLORSPACE_SRGB);
-
             $bw = max(1, (int) $base->getImageWidth());
             $bh = max(1, (int) $base->getImageHeight());
-            $margin = (int) max(8, round(min($bw, $bh) * self::MARGIN_RATIO));
-            $maxW     = max(40, (int) round($bw * self::MAX_WIDTH_RATIO));
+            self::applyStickerLayersImagick($base, $bw, $bh, $layers);
+            return self::writeImagickJpegTemp($base);
+        } catch (Throwable $e) {
+            return false;
+        }
+    }
 
-            foreach ($layers as $layer) {
-                $ov = new Imagick($layer['path']);
-                $ov->setImageColorspace(Imagick::COLORSPACE_SRGB);
-                $ow = max(1, (int) $ov->getImageWidth());
-                $scale_h = (int) round(($maxW / $ow) * (int) $ov->getImageHeight());
-                $ov->resizeImage($maxW, $scale_h, Imagick::FILTER_LANCZOS, 1);
+    /**
+     * @param \Imagick                                        $base
+     * @param array<int, array{path:string, position:string}> $layers
+     */
+    private static function applyStickerLayersImagick($base, int $bw, int $bh, array $layers): void
+    {
+        $margin = (int) max(8, round(min($bw, $bh) * self::MARGIN_RATIO));
+        $maxW   = max(40, (int) round($bw * self::MAX_WIDTH_RATIO));
 
-                $sw = (int) $ov->getImageWidth();
-                $sh = (int) $ov->getImageHeight();
-                $x  = $margin;
-                $y  = $margin;
-                switch ($layer['position']) {
-                    case 'top_right':
-                        $x = $bw - $sw - $margin;
-                        $y = $margin;
-                        break;
-                    case 'bottom_left':
-                        $x = $margin;
-                        $y = $bh - $sh - $margin;
-                        break;
-                    case 'bottom_right':
-                        $x = $bw - $sw - $margin;
-                        $y = $bh - $sh - $margin;
-                        break;
-                    case 'top_left':
-                    default:
-                        $x = $margin;
-                        $y = $margin;
-                        break;
-                }
+        foreach ($layers as $layer) {
+            $ov = new Imagick($layer['path']);
+            $ov->setImageColorspace(Imagick::COLORSPACE_SRGB);
+            $ow = max(1, (int) $ov->getImageWidth());
+            $scale_h = (int) round(($maxW / $ow) * (int) $ov->getImageHeight());
+            $ov->resizeImage($maxW, $scale_h, Imagick::FILTER_LANCZOS, 1);
 
-                $base->compositeImage($ov, Imagick::COMPOSITE_OVER, $x, $y);
-                $ov->clear();
-                $ov->destroy();
+            $sw = (int) $ov->getImageWidth();
+            $sh = (int) $ov->getImageHeight();
+            $x  = $margin;
+            $y  = $margin;
+            switch ($layer['position']) {
+                case 'top_right':
+                    $x = $bw - $sw - $margin;
+                    $y = $margin;
+                    break;
+                case 'bottom_left':
+                    $x = $margin;
+                    $y = $bh - $sh - $margin;
+                    break;
+                case 'bottom_right':
+                    $x = $bw - $sw - $margin;
+                    $y = $bh - $sh - $margin;
+                    break;
+                case 'top_left':
+                default:
+                    $x = $margin;
+                    $y = $margin;
+                    break;
             }
 
+            $base->compositeImage($ov, Imagick::COMPOSITE_OVER, $x, $y);
+            $ov->clear();
+            $ov->destroy();
+        }
+    }
+
+    /**
+     * @param \Imagick $base
+     * @return string|false
+     */
+    private static function writeImagickJpegTemp($base)
+    {
+        try {
             $base->setImageFormat('jpeg');
             $base->setImageCompressionQuality(90);
-
             $tmp = wp_tempnam('dd-branded-');
             if (! $tmp) {
                 $base->clear();
                 $base->destroy();
                 return false;
             }
-
             if (! $base->writeImage($tmp)) {
                 $base->clear();
                 $base->destroy();
                 @unlink($tmp);
                 return false;
             }
-
             $base->clear();
             $base->destroy();
             return $tmp;
@@ -203,7 +244,7 @@ final class CarsDailyDealsImageCompositor
      * @param array<int, array{path:string, position:string}> $layers
      * @return string|false
      */
-    private static function compositeGd(string $sourcePath, array $layers)
+    private static function compositeFullFrameGd(string $sourcePath, array $layers)
     {
         $binary = @file_get_contents($sourcePath);
         if ($binary === false) {
@@ -223,7 +264,30 @@ final class CarsDailyDealsImageCompositor
         }
 
         imagealphablending($base, true);
+        self::applyStickerLayersGd($base, $bw, $bh, $layers);
 
+        $tmp = wp_tempnam('dd-branded-');
+        if (! $tmp) {
+            imagedestroy($base);
+            return false;
+        }
+
+        $ok = imagejpeg($base, $tmp, 90);
+        imagedestroy($base);
+        if (! $ok) {
+            @unlink($tmp);
+            return false;
+        }
+
+        return $tmp;
+    }
+
+    /**
+     * @param resource|\GdImage $base
+     * @param array<int, array{path:string, position:string}> $layers
+     */
+    private static function applyStickerLayersGd($base, int $bw, int $bh, array $layers): void
+    {
         $margin = (int) max(8, round(min($bw, $bh) * self::MARGIN_RATIO));
         $maxW   = max(40, (int) round($bw * self::MAX_WIDTH_RATIO));
 
@@ -247,8 +311,8 @@ final class CarsDailyDealsImageCompositor
                 continue;
             }
 
-            $nw = $maxW;
-            $nh = (int) round(($maxW / $ow) * $oh);
+            $nw     = $maxW;
+            $nh     = (int) round(($maxW / $ow) * $oh);
             $scaled = imagescale($ov, $nw, $nh, IMG_BILINEAR_FIXED);
             imagedestroy($ov);
             if ($scaled === false) {
@@ -282,15 +346,121 @@ final class CarsDailyDealsImageCompositor
             imagecopy($base, $scaled, $x, $y, 0, 0, $sw, $sh);
             imagedestroy($scaled);
         }
+    }
 
-        $tmp = wp_tempnam('dd-branded-');
-        if (! $tmp) {
-            imagedestroy($base);
+    /**
+     * @param array<int, array{path:string, position:string}> $layers
+     * @return string|false
+     */
+    private static function instagramSquareImagick(string $sourcePath, array $layers)
+    {
+        try {
+            $size = (int) apply_filters('bricks_child_daily_deals_instagram_square_size', self::INSTAGRAM_SQUARE);
+            if ($size < 600 || $size > 4096) {
+                $size = self::INSTAGRAM_SQUARE;
+            }
+            $bgHex = (string) apply_filters('bricks_child_daily_deals_instagram_bg_hex', self::INSTAGRAM_BG_HEX);
+
+            $canvas = new Imagick();
+            $canvas->newImage($size, $size, new ImagickPixel($bgHex));
+            $canvas->setImageColorspace(Imagick::COLORSPACE_SRGB);
+
+            $src = new Imagick($sourcePath);
+            $src->setImageColorspace(Imagick::COLORSPACE_SRGB);
+            $sw = max(1, (int) $src->getImageWidth());
+            $sh = max(1, (int) $src->getImageHeight());
+            $scale = min($size / $sw, $size / $sh);
+            $newW  = (int) max(1, round($sw * $scale));
+            $newH  = (int) max(1, round($sh * $scale));
+            $src->resizeImage($newW, $newH, Imagick::FILTER_LANCZOS, 1);
+            $x = (int) floor(($size - $newW) / 2);
+            $y = (int) floor(($size - $newH) / 2);
+            $canvas->compositeImage($src, Imagick::COMPOSITE_OVER, $x, $y);
+            $src->clear();
+            $src->destroy();
+
+            if ($layers !== array()) {
+                self::applyStickerLayersImagick($canvas, $size, $size, $layers);
+            }
+
+            return self::writeImagickJpegTemp($canvas);
+        } catch (Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
+     * @param array<int, array{path:string, position:string}> $layers
+     * @return string|false
+     */
+    private static function instagramSquareGd(string $sourcePath, array $layers)
+    {
+        $size = (int) apply_filters('bricks_child_daily_deals_instagram_square_size', self::INSTAGRAM_SQUARE);
+        if ($size < 600 || $size > 4096) {
+            $size = self::INSTAGRAM_SQUARE;
+        }
+
+        $hex = strtoupper(ltrim((string) apply_filters('bricks_child_daily_deals_instagram_bg_hex', self::INSTAGRAM_BG_HEX), '#'));
+        if (strlen($hex) !== 6 || ! ctype_xdigit($hex)) {
+            $hex = '111111';
+        }
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
+
+        $binary = @file_get_contents($sourcePath);
+        if ($binary === false) {
             return false;
         }
 
-        $ok = imagejpeg($base, $tmp, 90);
-        imagedestroy($base);
+        $src = @imagecreatefromstring($binary);
+        if ($src === false) {
+            return false;
+        }
+
+        $sw = imagesx($src);
+        $sh = imagesy($src);
+        if ($sw < 1 || $sh < 1) {
+            imagedestroy($src);
+            return false;
+        }
+
+        $scale = min($size / $sw, $size / $sh);
+        $newW  = max(1, (int) round($sw * $scale));
+        $newH  = max(1, (int) round($sh * $scale));
+        $scaled = imagescale($src, $newW, $newH, IMG_BILINEAR_FIXED);
+        imagedestroy($src);
+        if ($scaled === false) {
+            return false;
+        }
+
+        $canvas = imagecreatetruecolor($size, $size);
+        if ($canvas === false) {
+            imagedestroy($scaled);
+            return false;
+        }
+
+        $bg = imagecolorallocate($canvas, $r, $g, $b);
+        imagefill($canvas, 0, 0, $bg);
+        imagealphablending($canvas, true);
+
+        $x = (int) floor(($size - $newW) / 2);
+        $y = (int) floor(($size - $newH) / 2);
+        imagecopy($canvas, $scaled, $x, $y, 0, 0, $newW, $newH);
+        imagedestroy($scaled);
+
+        if ($layers !== array()) {
+            self::applyStickerLayersGd($canvas, $size, $size, $layers);
+        }
+
+        $tmp = wp_tempnam('dd-ig-');
+        if (! $tmp) {
+            imagedestroy($canvas);
+            return false;
+        }
+
+        $ok = imagejpeg($canvas, $tmp, 92);
+        imagedestroy($canvas);
         if (! $ok) {
             @unlink($tmp);
             return false;

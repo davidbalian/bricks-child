@@ -11,34 +11,28 @@ if (!defined('ABSPATH')) {
 
 require_once __DIR__ . '/cars-daily-deals-snapshot.php';
 require_once __DIR__ . '/cars-daily-deals-composite.php';
+require_once __DIR__ . '/cars-daily-deals-download-handlers.php';
 require_once __DIR__ . '/cars-daily-deals-sticker-settings-view.php';
 
 final class CarsDailyDealsAdminPage
 {
     private const SLUG = 'cars-daily-deals';
 
-    private const ACTION_ZIP = 'bricks_child_daily_deals_zip';
-
     private const ACTION_SAVE_STICKERS = 'bricks_child_daily_deals_save_stickers';
-
-    private const ACTION_DOWNLOAD = 'bricks_child_daily_deals_download';
 
     private const NONCE_FETCH = 'bricks_child_daily_deals_fetch';
 
-    private const NONCE_ZIP = 'bricks_child_daily_deals_zip';
-
     private const NONCE_STICKERS = 'bricks_child_daily_deals_stickers';
-
-    private const NONCE_DOWNLOAD = 'bricks_child_daily_deals_download';
 
     public static function bootstrap(): void
     {
         $page = new self();
         add_action('admin_menu', array($page, 'registerSubmenu'));
         add_action('admin_enqueue_scripts', array($page, 'enqueueAdminAssets'));
-        add_action('admin_post_' . self::ACTION_ZIP, array($page, 'handleZipDownload'));
+        add_action('admin_post_' . CarsDailyDealsDownloadHandlers::ACTION_ZIP, array('CarsDailyDealsDownloadHandlers', 'handleZipDownload'));
         add_action('admin_post_' . self::ACTION_SAVE_STICKERS, array($page, 'handleSaveStickers'));
-        add_action('admin_post_' . self::ACTION_DOWNLOAD, array($page, 'handleSingleDownload'));
+        add_action('admin_post_' . CarsDailyDealsDownloadHandlers::ACTION_DOWNLOAD, array('CarsDailyDealsDownloadHandlers', 'handleSingleDownload'));
+        add_action('admin_post_' . CarsDailyDealsDownloadHandlers::ACTION_DOWNLOAD_IG, array('CarsDailyDealsDownloadHandlers', 'handleInstagramDownload'));
     }
 
     public function registerSubmenu(): void
@@ -164,13 +158,20 @@ JS;
 
             <?php if (! empty($items)) : ?>
                 <?php
-                $zip_nonce = wp_create_nonce(self::NONCE_ZIP);
+                $zip_nonce = wp_create_nonce(CarsDailyDealsDownloadHandlers::NONCE_ZIP);
                 $use_branded_dl = CarsDailyDealsStickerStore::hasAnySticker()
                     && CarsDailyDealsImageCompositor::canComposite();
+                $can_ig         = CarsDailyDealsImageCompositor::canComposite();
                 ?>
-                <?php if ($use_branded_dl) : ?>
+                <?php if ($use_branded_dl || $can_ig) : ?>
                     <p class="description" style="max-width:720px;">
-                        <?php esc_html_e('Downloads use your corner stickers (saved above) and export as JPEG. The grid preview still shows the original photo.', 'bricks-child'); ?>
+                        <?php
+                        if ($use_branded_dl) {
+                            esc_html_e('“Download with stickers” and Instagram (1080×1080) use your corner assets. The Instagram version fits the entire photo on a square canvas with letterboxing (no cropping). The grid preview still shows the original photo.', 'bricks-child');
+                        } else {
+                            esc_html_e('Instagram (1080×1080) fits the full photo inside a square feed canvas with letterboxing (no cropping). Add stickers above to include them on exports.', 'bricks-child');
+                        }
+                        ?>
                     </p>
                 <?php elseif (CarsDailyDealsStickerStore::hasAnySticker() && ! CarsDailyDealsImageCompositor::canComposite()) : ?>
                     <div class="notice notice-warning"><p><?php esc_html_e('Stickers are set, but this server cannot composite images (enable the GD or Imagick PHP extension). Downloads will be the original files.', 'bricks-child'); ?></p></div>
@@ -181,17 +182,30 @@ JS;
                         $pid = (int) ($row['id'] ?? 0);
                         $img = (string) ($row['image_url'] ?? '');
                         $path_ok = ((string) ($row['image_path'] ?? '')) !== '' && is_readable((string) ($row['image_path'] ?? ''));
-                        $dl_url  = '';
+                        $dl_url = '';
                         if ($img !== '' && $use_branded_dl && $path_ok) {
                             $dl_url = wp_nonce_url(
                                 add_query_arg(
                                     array(
-                                        'action'  => self::ACTION_DOWNLOAD,
+                                        'action'  => CarsDailyDealsDownloadHandlers::ACTION_DOWNLOAD,
                                         'post_id' => $pid,
                                     ),
                                     admin_url('admin-post.php')
                                 ),
-                                self::NONCE_DOWNLOAD
+                                CarsDailyDealsDownloadHandlers::NONCE_DOWNLOAD
+                            );
+                        }
+                        $ig_url = '';
+                        if ($img !== '' && $can_ig && $path_ok) {
+                            $ig_url = wp_nonce_url(
+                                add_query_arg(
+                                    array(
+                                        'action'  => CarsDailyDealsDownloadHandlers::ACTION_DOWNLOAD_IG,
+                                        'post_id' => $pid,
+                                    ),
+                                    admin_url('admin-post.php')
+                                ),
+                                CarsDailyDealsDownloadHandlers::NONCE_DOWNLOAD_IG
                             );
                         }
                         ?>
@@ -208,6 +222,11 @@ JS;
                             </p>
                             <div style="display:flex;flex-wrap:wrap;gap:6px;">
                                 <?php if ($img !== '') : ?>
+                                    <?php if ($ig_url !== '') : ?>
+                                        <a class="button button-small" href="<?php echo esc_url($ig_url); ?>">
+                                            <?php esc_html_e('Instagram (1080×1080)', 'bricks-child'); ?>
+                                        </a>
+                                    <?php endif; ?>
                                     <?php if ($dl_url !== '') : ?>
                                         <a class="button button-small" href="<?php echo esc_url($dl_url); ?>">
                                             <?php esc_html_e('Download with stickers', 'bricks-child'); ?>
@@ -242,14 +261,34 @@ JS;
                 <?php if (! $zip_available) : ?>
                     <p class="description"><?php esc_html_e('ZIP is not available on this server; use the per-image download buttons above.', 'bricks-child'); ?></p>
                 <?php else : ?>
-                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-                        <input type="hidden" name="action" value="<?php echo esc_attr(self::ACTION_ZIP); ?>" />
+                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="margin-bottom:10px;">
+                        <input type="hidden" name="action" value="<?php echo esc_attr(CarsDailyDealsDownloadHandlers::ACTION_ZIP); ?>" />
                         <input type="hidden" name="_wpnonce" value="<?php echo esc_attr($zip_nonce); ?>" />
+                        <input type="hidden" name="zip_format" value="original" />
                         <?php foreach ($items as $row) : ?>
                             <input type="hidden" name="post_ids[]" value="<?php echo esc_attr((string) (int) ($row['id'] ?? 0)); ?>" />
                         <?php endforeach; ?>
                         <?php submit_button(__('Download all as ZIP', 'bricks-child'), 'secondary', 'submit', false); ?>
                     </form>
+                    <?php if ($can_ig) : ?>
+                        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                            <input type="hidden" name="action" value="<?php echo esc_attr(CarsDailyDealsDownloadHandlers::ACTION_ZIP); ?>" />
+                            <input type="hidden" name="_wpnonce" value="<?php echo esc_attr($zip_nonce); ?>" />
+                            <input type="hidden" name="zip_format" value="instagram" />
+                            <?php foreach ($items as $row) : ?>
+                                <input type="hidden" name="post_ids[]" value="<?php echo esc_attr((string) (int) ($row['id'] ?? 0)); ?>" />
+                            <?php endforeach; ?>
+                            <?php
+                            submit_button(
+                                __('Download all as ZIP (Instagram 1080×1080)', 'bricks-child'),
+                                'secondary',
+                                'submit',
+                                false
+                            );
+                            ?>
+                        </form>
+                        <p class="description"><?php esc_html_e('Instagram ZIP: each file is a square JPEG with the full photo visible (letterboxed) and your stickers applied if configured.', 'bricks-child'); ?></p>
+                    <?php endif; ?>
                 <?php endif; ?>
 
                 <script>
@@ -313,162 +352,6 @@ JS;
                 admin_url('edit.php')
             )
         );
-        exit;
-    }
-
-    public function handleSingleDownload(): void
-    {
-        if (! isset($_GET['_wpnonce']) || ! wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), self::NONCE_DOWNLOAD)) {
-            wp_die(esc_html__('Security check failed.', 'bricks-child'), '', array('response' => 403));
-        }
-
-        if (! current_user_can('manage_options')) {
-            wp_die(esc_html__('You do not have permission to access this page.', 'bricks-child'), '', array('response' => 403));
-        }
-
-        $post_id = isset($_GET['post_id']) ? absint(wp_unslash($_GET['post_id'])) : 0;
-        if ($post_id <= 0) {
-            wp_die(esc_html__('Invalid listing.', 'bricks-child'), '', array('response' => 400));
-        }
-
-        $builder = new CarsDailyDealsSnapshotBuilder();
-        $items   = $builder->fetchFirstCarsFromBrowseQuery(5);
-        $allowed = array();
-        foreach ($items as $row) {
-            $allowed[] = (int) ($row['id'] ?? 0);
-        }
-        if (! in_array($post_id, $allowed, true)) {
-            wp_die(esc_html__('Listing is not in the current top deals set. Fetch deals again.', 'bricks-child'), '', array('response' => 400));
-        }
-
-        $path = '';
-        foreach ($items as $row) {
-            if ((int) ($row['id'] ?? 0) === $post_id) {
-                $path = (string) ($row['image_path'] ?? '');
-                break;
-            }
-        }
-
-        if ($path === '' || ! is_readable($path)) {
-            wp_die(esc_html__('Image file is not available on the server (CDN-only or missing file).', 'bricks-child'), '', array('response' => 404));
-        }
-
-        $branded = false;
-        if (CarsDailyDealsStickerStore::hasAnySticker() && CarsDailyDealsImageCompositor::canComposite()) {
-            $branded = CarsDailyDealsImageCompositor::compositeToTempJpeg($path);
-        }
-
-        if ($branded !== false && is_string($branded) && is_readable($branded)) {
-            header('Content-Type: image/jpeg');
-            header('Content-Disposition: attachment; filename="deal-' . $post_id . '-branded.jpg"');
-            header('Content-Length: ' . filesize($branded));
-            readfile($branded);
-            @unlink($branded);
-            exit;
-        }
-
-        $type = wp_check_filetype($path);
-        $mime = isset($type['type']) && $type['type'] ? $type['type'] : 'application/octet-stream';
-        header('Content-Type: ' . $mime);
-        header('Content-Disposition: attachment; filename="' . basename($path) . '"');
-        header('Content-Length: ' . filesize($path));
-        readfile($path);
-        exit;
-    }
-
-    public function handleZipDownload(): void
-    {
-        if (! isset($_POST['_wpnonce']) || ! wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), self::NONCE_ZIP)) {
-            wp_die(esc_html__('Security check failed.', 'bricks-child'), '', array('response' => 403));
-        }
-
-        if (! current_user_can('manage_options')) {
-            wp_die(esc_html__('You do not have permission to access this page.', 'bricks-child'), '', array('response' => 403));
-        }
-
-        if (! class_exists('ZipArchive')) {
-            wp_die(esc_html__('ZIP is not available on this server.', 'bricks-child'), '', array('response' => 500));
-        }
-
-        $raw_ids = isset($_POST['post_ids']) ? wp_unslash($_POST['post_ids']) : array();
-        $ids     = array_map('absint', is_array($raw_ids) ? $raw_ids : array());
-        $ids     = array_values(array_filter(array_unique($ids)));
-
-        if (count($ids) > 10) {
-            wp_die(esc_html__('Too many listings.', 'bricks-child'), '', array('response' => 400));
-        }
-
-        $builder = new CarsDailyDealsSnapshotBuilder();
-        $items   = $builder->fetchFirstCarsFromBrowseQuery(5);
-        $allowed = array();
-        foreach ($items as $row) {
-            $allowed[] = (int) ($row['id'] ?? 0);
-        }
-        $allowed = array_values(array_filter(array_unique($allowed)));
-
-        foreach ($ids as $id) {
-            if (! in_array($id, $allowed, true)) {
-                wp_die(esc_html__('Invalid listing selection.', 'bricks-child'), '', array('response' => 400));
-            }
-        }
-
-        $tmp = wp_tempnam('daily-deals-');
-        if (! $tmp) {
-            wp_die(esc_html__('Could not create temporary file.', 'bricks-child'), '', array('response' => 500));
-        }
-
-        $zip = new ZipArchive();
-        if ($zip->open($tmp, ZipArchive::OVERWRITE) !== true) {
-            @unlink($tmp);
-            wp_die(esc_html__('Could not create ZIP archive.', 'bricks-child'), '', array('response' => 500));
-        }
-
-        $index    = 1;
-        $cleanup  = array();
-        $do_brand = CarsDailyDealsStickerStore::hasAnySticker() && CarsDailyDealsImageCompositor::canComposite();
-
-        foreach ($ids as $post_id) {
-            foreach ($items as $row) {
-                if ((int) ($row['id'] ?? 0) !== $post_id) {
-                    continue;
-                }
-                $path = (string) ($row['image_path'] ?? '');
-                if ($path !== '' && is_readable($path)) {
-                    $file_for_zip = $path;
-                    $ext          = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-                    $safe         = $ext !== '' ? $ext : 'jpg';
-                    if ($do_brand) {
-                        $branded = CarsDailyDealsImageCompositor::compositeToTempJpeg($path);
-                        if ($branded !== false && is_string($branded) && is_readable($branded)) {
-                            $file_for_zip = $branded;
-                            $safe         = 'jpg';
-                            $cleanup[]    = $branded;
-                        }
-                    }
-                    $zip->addFile($file_for_zip, 'deal-' . $index . '.' . $safe);
-                    ++$index;
-                }
-                break;
-            }
-        }
-
-        $zip->close();
-
-        foreach ($cleanup as $tmp_branded) {
-            @unlink($tmp_branded);
-        }
-
-        if (! is_readable($tmp) || filesize($tmp) === 0) {
-            @unlink($tmp);
-            wp_die(esc_html__('No images could be added to the archive.', 'bricks-child'), '', array('response' => 400));
-        }
-
-        $filename = 'daily-deals-' . gmdate('Y-m-d') . '.zip';
-        header('Content-Type: application/zip');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Content-Length: ' . filesize($tmp));
-        readfile($tmp);
-        @unlink($tmp);
         exit;
     }
 }
