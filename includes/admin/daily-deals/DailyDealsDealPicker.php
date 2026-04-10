@@ -8,7 +8,15 @@ if (!defined('ABSPATH')) {
 
 final class DailyDealsDealPicker
 {
-    private const POOL_LIMIT = 55;
+    /**
+     * How many post IDs SQL returns (newest-first). Higher so PHP filters (price, image) still leave enough rows.
+     */
+    private const SQL_CANDIDATE_LIMIT = 100;
+
+    /**
+     * Only shuffle within this many newest eligible rows so randomness cannot surface old listings.
+     */
+    private const FRESH_SHUFFLE_WINDOW = 28;
 
     private const PICK_COUNT = 5;
 
@@ -26,11 +34,11 @@ final class DailyDealsDealPicker
     public function pickForDay(string $day_ymd): array
     {
         $bands_primary = array('great', 'good');
-        $ids_ordered = $this->fetchOrderedDealListingIds($bands_primary, self::POOL_LIMIT);
+        $ids_ordered = $this->fetchOrderedDealListingIds($bands_primary, self::SQL_CANDIDATE_LIMIT);
         $rows = $this->buildEligibleRows($ids_ordered);
 
         if (count($rows) < self::PICK_COUNT) {
-            $ids_ordered = $this->fetchOrderedDealListingIds(array('great', 'good', 'fair'), self::POOL_LIMIT);
+            $ids_ordered = $this->fetchOrderedDealListingIds(array('great', 'good', 'fair'), self::SQL_CANDIDATE_LIMIT);
             $rows = $this->buildEligibleRows($ids_ordered);
         }
 
@@ -38,7 +46,9 @@ final class DailyDealsDealPicker
             return array();
         }
 
-        $pool = array_slice($rows, 0, min(self::POOL_LIMIT, count($rows)));
+        // Rows stay in SQL order (newest first). Shuffle only inside the freshest window — not the whole pool.
+        $window = min(self::FRESH_SHUFFLE_WINDOW, count($rows));
+        $pool = array_slice($rows, 0, $window);
         $shuffled = $this->orderWithDailySeed($pool, $day_ymd);
 
         return array_slice($shuffled, 0, self::PICK_COUNT);
@@ -164,7 +174,7 @@ final class DailyDealsDealPicker
     }
 
     /**
-     * Stable pseudo-shuffle: same site + day + listing IDs → same order; pool is newest-first (cars date sort).
+     * Uniform pseudo-shuffle by day (same IDs + day → same order). Caller must pass a freshness-limited pool.
      *
      * @param list<array<string,mixed>> $rows
      * @return list<array<string,mixed>>
