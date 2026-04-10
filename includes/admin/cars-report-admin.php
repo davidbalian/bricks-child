@@ -362,6 +362,11 @@ final class CarsReportAdminPage
             <p class="description">
                 <?php esc_html_e('Use this report to detect aging inventory, monitor upload flow, and prioritize listing cleanup.', 'bricks-child'); ?>
             </p>
+            <p>
+                <a class="button button-secondary" href="<?php echo esc_url(admin_url('edit.php?post_type=car&page=cars-daily-deals')); ?>">
+                    <?php esc_html_e('Open Daily Deals', 'bricks-child'); ?>
+                </a>
+            </p>
 
             <?php $this->renderTabsNav($tab, $oldAfterDays); ?>
 
