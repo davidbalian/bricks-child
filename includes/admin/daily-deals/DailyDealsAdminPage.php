@@ -34,7 +34,6 @@ final class DailyDealsAdminPage
             wp_die(esc_html__('You do not have permission to access this page.', 'bricks-child'));
         }
 
-        $day = gmdate('Y-m-d');
         $rows = array();
         $copy = '';
 
@@ -43,7 +42,7 @@ final class DailyDealsAdminPage
                 wp_die(esc_html__('Security check failed.', 'bricks-child'), '', array('response' => 403));
             }
             $picker = new DailyDealsDealPicker();
-            $rows = $picker->pickForDay($day);
+            $rows = $picker->pickForDay();
             $builder = new DailyDealsSocialCopyBuilder();
             $copy = $builder->build($rows, home_url('/'));
         }
@@ -69,7 +68,7 @@ final class DailyDealsAdminPage
         <div class="wrap">
             <h1><?php esc_html_e('Daily Deals', 'bricks-child'); ?></h1>
             <p class="description">
-                <?php esc_html_e('Pick five active listings priced as good or great deals, ordered like /cars/ “Newest” (featured first, then newest listing date), shuffle deterministically by UTC day, then copy text and images for social posts.', 'bricks-child'); ?>
+                <?php esc_html_e('Loads the top five active “deal” listings (good/great price band) using the same freshness + listing rank order as /cars/ “Best match”, skipping cars without price or a usable image. Nothing is stored; each click runs the query again.', 'bricks-child'); ?>
             </p>
             <p>
                 <a href="<?php echo esc_url(admin_url('edit.php?post_type=car&page=cars-report')); ?>">
@@ -82,17 +81,6 @@ final class DailyDealsAdminPage
                 <button type="submit" name="bricks_child_fetch_daily_deals" value="1" class="button button-primary">
                     <?php esc_html_e('Fetch today’s deals', 'bricks-child'); ?>
                 </button>
-                <span class="description" style="margin-left:8px;">
-                    <?php
-                    echo esc_html(
-                        sprintf(
-                            /* translators: %s: UTC date Y-m-d */
-                            __('UTC day used for variety: %s', 'bricks-child'),
-                            $day
-                        )
-                    );
-                    ?>
-                </span>
             </form>
 
             <?php if (isset($_POST['bricks_child_fetch_daily_deals'])) : ?>
