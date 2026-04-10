@@ -68,7 +68,7 @@ final class DailyDealsAdminPage
         <div class="wrap">
             <h1><?php esc_html_e('Daily Deals', 'bricks-child'); ?></h1>
             <p class="description">
-                <?php esc_html_e('Loads the top five active “deal” listings (good/great price band) using the same freshness + listing rank order as /cars/ “Best match”, skipping cars without price or a usable image. Nothing is stored; each click runs the query again.', 'bricks-child'); ?>
+                <?php esc_html_e('Loads the top five active “deal” listings (good/great price band) using the same Best match sort as /cars/: live “today / 1–3 days / older” buckets from publication_date (else GMT post date), then listing_rank_score, then post date. Skips cars without price or a usable image.', 'bricks-child'); ?>
             </p>
             <p>
                 <a href="<?php echo esc_url(admin_url('edit.php?post_type=car&page=cars-report')); ?>">

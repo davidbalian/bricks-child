@@ -39,7 +39,7 @@ final class DailyDealsDealPicker
     }
 
     /**
-     * Same ORDER BY as car_listings_score_orderby_clauses() (recency → rank → post date).
+     * Same ORDER BY as /cars/ Best match (car_listings_score_orderby_clauses + car_listings_best_match_orderby_sql).
      *
      * @param list<string> $bands
      * @return list<int>
@@ -57,6 +57,10 @@ final class DailyDealsDealPicker
         $active = ListingStateManager::STATE_ACTIVE;
 
         $placeholders = implode(',', array_fill(0, count($bands), '%s'));
+        $orderby = function_exists('car_listings_best_match_orderby_sql')
+            ? car_listings_best_match_orderby_sql('p')
+            : 'p.post_date DESC';
+
         $sql = "
             SELECT p.ID
             FROM {$wpdb->posts} AS p
@@ -66,14 +70,11 @@ final class DailyDealsDealPicker
                 ON band.post_id = p.ID AND band.meta_key = 'price_insight_band' AND band.meta_value IN ($placeholders)
             LEFT JOIN {$wpdb->postmeta} AS rank_meta
                 ON rank_meta.post_id = p.ID AND rank_meta.meta_key = 'listing_rank_score'
-            LEFT JOIN {$wpdb->postmeta} AS recency_meta
-                ON recency_meta.post_id = p.ID AND recency_meta.meta_key = 'listing_rank_recency_bucket'
+            LEFT JOIN {$wpdb->postmeta} AS listing_pub_meta
+                ON listing_pub_meta.post_id = p.ID AND listing_pub_meta.meta_key = 'publication_date'
             WHERE p.post_type = 'car'
               AND p.post_status = 'publish'
-            ORDER BY
-                CAST(COALESCE(NULLIF(recency_meta.meta_value, ''), '2') AS UNSIGNED) ASC,
-                CAST(COALESCE(NULLIF(rank_meta.meta_value, ''), '0') AS DECIMAL(12,2)) DESC,
-                p.post_date DESC
+            ORDER BY {$orderby}
             LIMIT %d
         ";
 
