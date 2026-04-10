@@ -63,30 +63,49 @@ final class CarsDailyDealsAdminPage
         }
         wp_enqueue_script('jquery');
         wp_enqueue_media();
-        wp_add_inline_script(
-            'jquery',
-            "(function($){$(function(){
-                var frame;
-                $(document).on('click','.bricks-dd-sticker-pick',function(e){
-                    e.preventDefault();
-                    var btn=$(this), hid=$('#'+btn.data('hid')), prev=$('#'+btn.data('preview'));
-                    frame=wp.media({title:btn.data('title'),button:{text:btn.data('btntext')},multiple:false,library:{type:'image'}});
-                    frame.on('select',function(){
-                        var a=frame.state().get('selection').first().toJSON();
-                        hid.val(a.id);
-                        if(a.sizes&&a.sizes.thumbnail&&a.sizes.thumbnail.url){prev.html('<img src=\"'+a.sizes.thumbnail.url+'\" alt=\"\" style=\"max-width:80px;height:auto;vertical-align:middle;border-radius:2px;\" />');}
-                        else if(a.url){prev.html('<img src=\"'+a.url+'\" alt=\"\" style=\"max-width:80px;height:auto;vertical-align:middle;border-radius:2px;\" />');}
-                    });
-                    frame.open();
-                });
-                $(document).on('click','.bricks-dd-sticker-clear',function(e){
-                    e.preventDefault();
-                    var btn=$(this);
-                    $('#'+btn.data('hid')).val('0');
-                    $('#'+btn.data('preview')).empty();
-                });
-            });})(jQuery);"
-        );
+        $inline_js = <<<'JS'
+(function ($) {
+    $(function () {
+        var frame;
+        $(document).on('click', '.bricks-dd-sticker-pick', function (e) {
+            e.preventDefault();
+            var btn = $(this),
+                hid = $('#' + btn.data('hid')),
+                prev = $('#' + btn.data('preview'));
+            frame = wp.media({
+                title: btn.data('title'),
+                button: { text: btn.data('btntext') },
+                multiple: false,
+                library: { type: 'image' },
+            });
+            frame.on('select', function () {
+                var a = frame.state().get('selection').first().toJSON();
+                hid.val(a.id);
+                if (a.sizes && a.sizes.thumbnail && a.sizes.thumbnail.url) {
+                    prev.html(
+                        '<img src="' +
+                            a.sizes.thumbnail.url +
+                            '" alt="" style="max-width:80px;height:auto;vertical-align:middle;border-radius:2px;" />'
+                    );
+                } else if (a.url) {
+                    prev.html(
+                        '<img src="' + a.url + '" alt="" style="max-width:80px;height:auto;vertical-align:middle;border-radius:2px;" />'
+                    );
+                }
+            });
+            frame.open();
+        });
+        $(document).on('click', '.bricks-dd-sticker-clear', function (e) {
+            e.preventDefault();
+            var btn = $(this);
+            $('#' + btn.data('hid')).val('0');
+            $('#' + btn.data('preview')).empty();
+        });
+    });
+})(jQuery);
+JS;
+
+        wp_add_inline_script('jquery', $inline_js);
     }
 
     public function renderPage(): void
