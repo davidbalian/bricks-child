@@ -703,6 +703,11 @@ function autoagora_register_car_filter_rewrite_rules() {
         'index.php?pagename=cars&autoagora_car_filter_slug=$matches[1]',
         'top'
     );
+    add_rewrite_rule(
+        '^cars/filter/make%3A([^/]+)/?$',
+        'index.php?pagename=cars&autoagora_car_filter_slug=$matches[1]',
+        'top'
+    );
 }
 add_action('init', 'autoagora_register_car_filter_rewrite_rules');
 
@@ -766,7 +771,7 @@ function autoagora_get_active_car_filter_context() {
     if (empty($pretty_slug) && !empty($_SERVER['REQUEST_URI'])) {
         $request_path = (string) wp_parse_url(wp_unslash($_SERVER['REQUEST_URI']), PHP_URL_PATH);
         $request_path = trim($request_path, '/');
-        if (preg_match('#(?:^|/)cars/filter/make:([^/]+)/?$#', $request_path, $matches)) {
+        if (preg_match('#(?:^|/)cars/filter/make(?::|%3A)([^/]+)/?$#i', $request_path, $matches)) {
             $pretty_slug = rawurldecode((string) $matches[1]);
         }
     }

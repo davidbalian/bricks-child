@@ -211,7 +211,7 @@ function car_listings_build_query_args($atts) {
     if ($model_param === '' && $make_param === '' && !empty($_SERVER['REQUEST_URI']) && function_exists('car_filters_parse_filter_url')) {
         $request_path = (string) wp_parse_url(wp_unslash($_SERVER['REQUEST_URI']), PHP_URL_PATH);
         $request_path = trim($request_path, '/');
-        if (preg_match('#(?:^|/)cars/filter/make:([^/]+)/?$#', $request_path, $matches)) {
+        if (preg_match('#(?:^|/)cars/filter/make(?::|%3A)([^/]+)/?$#i', $request_path, $matches)) {
             $pretty_slug = sanitize_title(rawurldecode((string) $matches[1]));
             $resolved_pretty = car_filters_parse_filter_url('make:' . $pretty_slug);
             if (!empty($resolved_pretty['model'])) {

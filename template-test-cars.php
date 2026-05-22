@@ -117,6 +117,18 @@ $listing_atts = car_listings_apply_request_sort_to_atts( $listing_atts );
 $query_args = car_listings_build_query_args( $listing_atts );
 $cars_query   = car_listings_execute_query( $query_args );
 $current_page = max( 1, (int) $cars_query->get( 'paged' ) );
+$request_ctx = function_exists( 'autoagora_get_active_car_filter_context' )
+    ? autoagora_get_active_car_filter_context()
+    : array();
+$has_server_filters = !empty( $request_ctx['make_slug'] ) || !empty( $request_ctx['model_slug'] );
+if ( ! $has_server_filters ) {
+    foreach ( array( 'make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max', 'year_min', 'year_max', 'fuel_type', 'body_type', 'car_city', 'loc_lat', 'loc_lng', 'loc_radius' ) as $k ) {
+        if ( isset( $_GET[ $k ] ) && wp_unslash( $_GET[ $k ] ) !== '' ) {
+            $has_server_filters = true;
+            break;
+        }
+    }
+}
 
 // Ensure car-card assets load even when the initial query returns zero posts (AJAX may inject cards next).
 if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_card' && function_exists( 'car_card_enqueue_assets' ) ) {
@@ -222,7 +234,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
          data-atts="<?php echo esc_attr( wp_json_encode( $listing_atts ) ); ?>"
          data-page="<?php echo esc_attr( (string) $current_page ); ?>"
          data-max-pages="<?php echo esc_attr( $cars_query->max_num_pages ); ?>"
-         data-server-filtered="true">
+         data-server-filtered="<?php echo $has_server_filters ? 'true' : 'false'; ?>">
 
         <div class="car-listings-wrapper tcp-grid">
             <?php

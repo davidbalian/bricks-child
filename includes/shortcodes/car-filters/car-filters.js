@@ -286,7 +286,7 @@
         parseUrl: function() {
             var params = new URLSearchParams(window.location.search);
             var pathname = window.location.pathname.replace(/\/+$/, '');
-            var prettyMatch = pathname.match(/\/cars\/filter\/make:([^/]+)$/);
+            var prettyMatch = pathname.match(/\/cars\/filter\/make(?::|%3A)([^/]+)$/i);
 
             if (!params.toString() && !prettyMatch) return null;
 
@@ -1281,10 +1281,10 @@
                                                 }
                                             });
 
-                                            // Pretty URL bootstrap must always execute one AJAX pass.
-                                            // This guarantees the initial grid matches resolved make/model
-                                            // even if server-side route parsing or cache delivered unfiltered HTML.
-                                            CarFilters.triggerFilter(group);
+                                            // Only re-fetch listings if server didn't already filter them.
+                                            if (!isServerFiltered) {
+                                                CarFilters.triggerFilter(group);
+                                            }
                                         }, 500);
                                     }
 
@@ -1303,8 +1303,8 @@
                                         }
                                     });
 
-                                    // Pretty URL bootstrap: run once for make-only slugs too.
-                                    if (!data.model) {
+                                    // Only re-fetch listings if server didn't already filter them (and no model to wait for).
+                                    if (!data.model && !isServerFiltered) {
                                         CarFilters.triggerFilter(group);
                                     }
                                 }
