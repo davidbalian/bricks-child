@@ -18,6 +18,9 @@ final class CarsDailyDealsFacebookPublisher
     private const UPLOAD_SUBDIR = 'autoagora-daily-deals/facebook';
     private const RETENTION_DAYS = 14;
 
+    /** @var string|null */
+    private $resolved_page_access_token = null;
+
     /**
      * @return array{configured:bool,missing:array<int,string>,page_id:string,graph_version:string}
      */
@@ -281,13 +284,56 @@ final class CarsDailyDealsFacebookPublisher
      */
     private function graphPost(string $path, array $params): array
     {
-        $params['access_token'] = $this->accessToken();
+        $params['access_token'] = $this->pageAccessToken();
         $response = wp_remote_post($this->graphBaseUrl() . $path, array(
             'timeout' => 45,
             'body'    => $params,
         ));
 
         return $this->decodeGraphResponse($response);
+    }
+
+    private function pageAccessToken(): string
+    {
+        if ($this->resolved_page_access_token !== null) {
+            return $this->resolved_page_access_token;
+        }
+
+        $configured_token = $this->accessToken();
+        $resolved = $this->fetchPageAccessTokenFromAccounts($configured_token);
+
+        $this->resolved_page_access_token = $resolved !== '' ? $resolved : $configured_token;
+        return $this->resolved_page_access_token;
+    }
+
+    private function fetchPageAccessTokenFromAccounts(string $token): string
+    {
+        $url = add_query_arg(
+            array(
+                'fields'       => 'id,name,access_token',
+                'access_token' => $token,
+            ),
+            $this->graphBaseUrl() . '/me/accounts'
+        );
+
+        $response = wp_remote_get($url, array('timeout' => 30));
+        $decoded = $this->decodeGraphResponse($response);
+
+        if (empty($decoded['data']) || !is_array($decoded['data'])) {
+            return '';
+        }
+
+        $page_id = $this->pageId();
+        foreach ($decoded['data'] as $page) {
+            if (!is_array($page)) {
+                continue;
+            }
+            if ((string) ($page['id'] ?? '') === $page_id && !empty($page['access_token'])) {
+                return $this->normalizeAccessToken((string) $page['access_token']);
+            }
+        }
+
+        return '';
     }
 
     /**
@@ -414,7 +460,12 @@ final class CarsDailyDealsFacebookPublisher
 
     private function accessToken(): string
     {
-        $token = trim((string) AUTOAGORA_FACEBOOK_PAGE_ACCESS_TOKEN);
+        return $this->normalizeAccessToken((string) AUTOAGORA_FACEBOOK_PAGE_ACCESS_TOKEN);
+    }
+
+    private function normalizeAccessToken(string $token): string
+    {
+        $token = trim($token);
         $token = preg_replace('/\s+/', '', $token);
         $token = trim((string) $token, "\"'");
 
