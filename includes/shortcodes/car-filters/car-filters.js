@@ -1281,10 +1281,10 @@
                                                 }
                                             });
 
-                                            // Only re-fetch listings if server didn't already filter them
-                                            if (!isServerFiltered) {
-                                                CarFilters.triggerFilter(group);
-                                            }
+                                            // Pretty URL bootstrap must always execute one AJAX pass.
+                                            // This guarantees the initial grid matches resolved make/model
+                                            // even if server-side route parsing or cache delivered unfiltered HTML.
+                                            CarFilters.triggerFilter(group);
                                         }, 500);
                                     }
 
@@ -1303,8 +1303,8 @@
                                         }
                                     });
 
-                                    // Only re-fetch listings if server didn't already filter them (and no model to wait for)
-                                    if (!data.model && !isServerFiltered) {
+                                    // Pretty URL bootstrap: run once for make-only slugs too.
+                                    if (!data.model) {
                                         CarFilters.triggerFilter(group);
                                     }
                                 }
