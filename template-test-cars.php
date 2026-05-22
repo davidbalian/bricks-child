@@ -17,58 +17,6 @@ add_action( 'wp_head', function() {
         return;
     }
     ?>
-    <style id="autoagora-cars-critical-css">
-    body {
-        background-color: var(--bricks-color-lgsrvt);
-    }
-    .tcp-filters-bar {
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        border-bottom: 1px solid #e5e7eb;
-        background: #fff;
-    }
-    .tcp-filters-bar-inner {
-        min-height: 56px;
-    }
-    .tcp-main {
-        max-width: 2000px;
-        margin: 0 auto;
-        padding: 1.5rem 1rem 6rem;
-        background-color: var(--bricks-color-lgsrvt);
-    }
-    .tcp-heading {
-        margin: 0 0 1.25rem;
-        line-height: 1.25;
-        min-height: 1.875rem;
-    }
-    .tcp-results-count {
-        margin: -0.5rem 0 1.25rem;
-        min-height: 1.5rem;
-        line-height: 1.4;
-    }
-    .tcp-grid {
-        display: grid;
-        justify-content: start;
-        justify-items: stretch;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1.5rem;
-    }
-    .faq-answer {
-        display: none;
-    }
-    .faq-item.open .faq-answer {
-        display: block;
-    }
-    @media (min-width: 1024px) {
-        #brxe-ryrbyb {
-            min-height: 3rem;
-        }
-        #brxe-fxlzae {
-            min-height: 1.75rem;
-        }
-    }
-    </style>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
