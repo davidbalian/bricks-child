@@ -28,8 +28,11 @@ final class CarsDailyDealsInstagramCron
 
     public static function run(): void
     {
-        $publisher = new CarsDailyDealsInstagramPublisher();
-        $publisher->publishToday(false);
+        $instagram = new CarsDailyDealsInstagramPublisher();
+        $instagram->publishToday(false);
+
+        $facebook = new CarsDailyDealsFacebookPublisher();
+        $facebook->publishToday(false);
 
         wp_clear_scheduled_hook(self::HOOK);
         wp_schedule_single_event(self::nextCyprusRunTimestamp(), self::HOOK);
@@ -50,4 +53,3 @@ final class CarsDailyDealsInstagramCron
 }
 
 CarsDailyDealsInstagramCron::bootstrap();
-

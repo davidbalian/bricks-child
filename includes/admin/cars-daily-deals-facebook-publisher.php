@@ -1,6 +1,6 @@
 <?php
 /**
- * Daily Deals: Instagram carousel publishing.
+ * Daily Deals: Facebook Page publishing.
  *
  * @package bricks-child
  */
@@ -9,28 +9,27 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-final class CarsDailyDealsInstagramPublisher
+final class CarsDailyDealsFacebookPublisher
 {
-    public const OPTION_LAST_RUN = 'bricks_child_daily_deals_instagram_last_run';
-    public const OPTION_POSTED_DATES = 'bricks_child_daily_deals_instagram_posted_dates';
+    public const OPTION_LAST_RUN = 'bricks_child_daily_deals_facebook_last_run';
+    public const OPTION_POSTED_DATES = 'bricks_child_daily_deals_facebook_posted_dates';
 
-    private const MIN_CAROUSEL_ITEMS = 2;
-    private const MAX_CAROUSEL_ITEMS = 10;
-    private const UPLOAD_SUBDIR = 'autoagora-daily-deals/instagram';
+    private const MAX_PHOTOS = 10;
+    private const UPLOAD_SUBDIR = 'autoagora-daily-deals/facebook';
     private const RETENTION_DAYS = 14;
 
     /**
-     * @return array{configured:bool,missing:array<int,string>,account_id:string,graph_version:string,graph_base:string}
+     * @return array{configured:bool,missing:array<int,string>,page_id:string,graph_version:string}
      */
     public static function getConfigStatus(): array
     {
         $missing = array();
 
-        if (!defined('AUTOAGORA_INSTAGRAM_ACCOUNT_ID') || trim((string) AUTOAGORA_INSTAGRAM_ACCOUNT_ID) === '') {
-            $missing[] = 'AUTOAGORA_INSTAGRAM_ACCOUNT_ID';
+        if (!defined('AUTOAGORA_FACEBOOK_PAGE_ID') || trim((string) AUTOAGORA_FACEBOOK_PAGE_ID) === '') {
+            $missing[] = 'AUTOAGORA_FACEBOOK_PAGE_ID';
         }
-        if (!defined('AUTOAGORA_INSTAGRAM_ACCESS_TOKEN') || trim((string) AUTOAGORA_INSTAGRAM_ACCESS_TOKEN) === '') {
-            $missing[] = 'AUTOAGORA_INSTAGRAM_ACCESS_TOKEN';
+        if (!defined('AUTOAGORA_FACEBOOK_PAGE_ACCESS_TOKEN') || trim((string) AUTOAGORA_FACEBOOK_PAGE_ACCESS_TOKEN) === '') {
+            $missing[] = 'AUTOAGORA_FACEBOOK_PAGE_ACCESS_TOKEN';
         }
         if (!defined('AUTOAGORA_META_GRAPH_VERSION') || trim((string) AUTOAGORA_META_GRAPH_VERSION) === '') {
             $missing[] = 'AUTOAGORA_META_GRAPH_VERSION';
@@ -39,9 +38,8 @@ final class CarsDailyDealsInstagramPublisher
         return array(
             'configured'    => $missing === array(),
             'missing'       => $missing,
-            'account_id'    => defined('AUTOAGORA_INSTAGRAM_ACCOUNT_ID') ? trim((string) AUTOAGORA_INSTAGRAM_ACCOUNT_ID) : '',
+            'page_id'       => defined('AUTOAGORA_FACEBOOK_PAGE_ID') ? trim((string) AUTOAGORA_FACEBOOK_PAGE_ID) : '',
             'graph_version' => defined('AUTOAGORA_META_GRAPH_VERSION') ? self::normalizeGraphVersion(trim((string) AUTOAGORA_META_GRAPH_VERSION)) : '',
-            'graph_base'    => self::configuredGraphBaseUrl(),
         );
     }
 
@@ -55,7 +53,6 @@ final class CarsDailyDealsInstagramPublisher
     }
 
     /**
-     * @param bool $force Allow reposting for today's date.
      * @return array<string,mixed>
      */
     public function publishToday(bool $force = false): array
@@ -66,7 +63,7 @@ final class CarsDailyDealsInstagramPublisher
             return $this->recordRun(array(
                 'ok'      => false,
                 'status'  => 'skipped',
-                'message' => 'Daily Deals were already posted to Instagram for ' . $date . '.',
+                'message' => 'Daily Deals were already posted to Facebook for ' . $date . '.',
                 'date'    => $date,
             ));
         }
@@ -76,7 +73,7 @@ final class CarsDailyDealsInstagramPublisher
             return $this->recordRun(array(
                 'ok'      => false,
                 'status'  => 'config_error',
-                'message' => 'Missing Instagram config constants: ' . implode(', ', $config['missing']) . '.',
+                'message' => 'Missing Facebook config constants: ' . implode(', ', $config['missing']) . '.',
                 'date'    => $date,
             ));
         }
@@ -85,7 +82,7 @@ final class CarsDailyDealsInstagramPublisher
             return $this->recordRun(array(
                 'ok'      => false,
                 'status'  => 'image_error',
-                'message' => 'Instagram image generation requires GD or Imagick on the server.',
+                'message' => 'Facebook image generation requires GD or Imagick on the server.',
                 'date'    => $date,
             ));
         }
@@ -98,97 +95,69 @@ final class CarsDailyDealsInstagramPublisher
                 && is_readable((string) $item['image_path']);
         }));
 
-        if (count($items) < self::MIN_CAROUSEL_ITEMS) {
+        if ($items === array()) {
             return $this->recordRun(array(
                 'ok'      => false,
                 'status'  => 'no_items',
-                'message' => 'Instagram carousel needs at least two top deals with local readable images.',
+                'message' => 'Facebook post needs at least one top deal with a local readable image.',
                 'date'    => $date,
-                'count'   => count($items),
             ));
         }
 
-        $items = array_slice($items, 0, self::MAX_CAROUSEL_ITEMS);
+        $items = array_slice($items, 0, self::MAX_PHOTOS);
         $caption = $builder->buildSocialCaption($items);
-
-        $images = $this->createPublicInstagramImages($items, $date);
+        $images = $this->createPublicFacebookImages($items, $date);
         if ($images === array()) {
             return $this->recordRun(array(
                 'ok'      => false,
                 'status'  => 'image_error',
-                'message' => 'Could not create public Instagram images in WordPress uploads.',
+                'message' => 'Could not create public Facebook images in WordPress uploads.',
                 'date'    => $date,
             ));
         }
 
-        $image_urls = wp_list_pluck($images, 'url');
-        $child_ids = array();
-
-        foreach ($image_urls as $url) {
-            $child = $this->createMediaContainer(array(
-                'image_url'        => $url,
-                'is_carousel_item' => 'true',
-            ));
-            if (empty($child['id'])) {
+        $photo_ids = array();
+        foreach (wp_list_pluck($images, 'url') as $url) {
+            $photo = $this->createUnpublishedPhoto((string) $url);
+            if (empty($photo['id'])) {
                 return $this->recordRun(
                     $this->failedGraphRun(
-                        'child_container_error',
-                        'Instagram did not return a child media container ID for image: ' . $url . $this->graphErrorSuffix($child),
+                        'photo_upload_error',
+                        'Facebook did not return an unpublished photo ID for image: ' . $url . $this->graphErrorSuffix($photo),
                         $date,
-                        $child
+                        $photo
                     )
                 );
             }
-            $child_id = (string) $child['id'];
-            $child_ids[] = $child_id;
-            $child_status = $this->waitForContainer($child_id);
-            if (isset($child_status['status_code']) && $child_status['status_code'] === 'ERROR') {
-                return $this->recordRun(
-                    $this->failedGraphRun(
-                        'child_container_error',
-                        'Instagram child media container failed processing for image: ' . $url,
-                        $date,
-                        $child_status
-                    )
-                );
-            }
+            $photo_ids[] = (string) $photo['id'];
         }
 
-        $parent = $this->createMediaContainer(array(
-            'media_type' => 'CAROUSEL',
-            'children'   => implode(',', $child_ids),
-            'caption'    => $caption,
-        ));
-        if (empty($parent['id'])) {
-            return $this->recordRun($this->failedGraphRun('parent_container_error', 'Instagram did not return a carousel container ID.', $date, $parent));
+        $post = $this->createMultiPhotoPost($photo_ids, $caption);
+        if (empty($post['id'])) {
+            return $this->recordRun(
+                $this->failedGraphRun(
+                    'post_publish_error',
+                    'Facebook did not return a Page post ID.' . $this->graphErrorSuffix($post),
+                    $date,
+                    $post
+                )
+            );
         }
 
-        $parent_id = (string) $parent['id'];
-        $parent_status = $this->waitForContainer($parent_id);
-        if (isset($parent_status['status_code']) && $parent_status['status_code'] === 'ERROR') {
-            return $this->recordRun($this->failedGraphRun('parent_container_error', 'Instagram carousel container failed processing.', $date, $parent_status));
-        }
-
-        $published = $this->publishContainer($parent_id);
-        if (empty($published['id'])) {
-            return $this->recordRun($this->failedGraphRun('publish_error', 'Instagram did not return a published media ID.', $date, $published));
-        }
-
-        $media_id = (string) $published['id'];
-        $this->markPostedForDate($date, $media_id);
+        $post_id = (string) $post['id'];
+        $this->markPostedForDate($date, $post_id);
 
         return $this->recordRun(array(
-            'ok'                   => true,
-            'status'               => 'published',
-            'message'              => 'Daily Deals Instagram carousel published.',
-            'date'                 => $date,
-            'media_id'             => $media_id,
-            'parent_container_id'  => $parent_id,
-            'child_container_ids'  => $child_ids,
-            'listing_ids'          => array_map('intval', wp_list_pluck($items, 'id')),
-            'image_urls'           => $image_urls,
-            'published_at'         => current_time('mysql'),
-            'graph_version'        => $config['graph_version'],
+            'ok'          => true,
+            'status'      => 'published',
+            'message'     => 'Daily Deals Facebook Page post published.',
+            'date'        => $date,
+            'post_id'     => $post_id,
+            'photo_ids'   => $photo_ids,
+            'listing_ids' => array_map('intval', wp_list_pluck($items, 'id')),
+            'image_urls'  => wp_list_pluck($images, 'url'),
+            'published_at' => current_time('mysql'),
+            'post_url'    => 'https://www.facebook.com/' . rawurlencode($post_id),
         ));
     }
 
@@ -196,7 +165,7 @@ final class CarsDailyDealsInstagramPublisher
      * @param array<int,array<string,mixed>> $items
      * @return array<int,array{path:string,url:string,post_id:int}>
      */
-    private function createPublicInstagramImages(array $items, string $date): array
+    private function createPublicFacebookImages(array $items, string $date): array
     {
         $upload = wp_upload_dir();
         if (!empty($upload['error']) || empty($upload['basedir']) || empty($upload['baseurl'])) {
@@ -230,7 +199,7 @@ final class CarsDailyDealsInstagramPublisher
                 continue;
             }
 
-            $filename = 'deal-' . $index . '-' . $post_id . '-instagram-1080.jpg';
+            $filename = 'deal-' . $index . '-' . $post_id . '-facebook.jpg';
             $target = trailingslashit($target_dir) . $filename;
             if (@copy($tmp, $target)) {
                 @chmod($target, 0644);
@@ -280,44 +249,30 @@ final class CarsDailyDealsInstagramPublisher
     }
 
     /**
-     * @param array<string,string> $params
      * @return array<string,mixed>
      */
-    private function createMediaContainer(array $params): array
+    private function createUnpublishedPhoto(string $image_url): array
     {
-        return $this->graphPost('/' . $this->instagramAccountId() . '/media', $params);
-    }
-
-    /**
-     * @return array<string,mixed>
-     */
-    private function publishContainer(string $container_id): array
-    {
-        return $this->graphPost('/' . $this->instagramAccountId() . '/media_publish', array(
-            'creation_id' => $container_id,
+        return $this->graphPost('/' . rawurlencode($this->pageId()) . '/photos', array(
+            'url'       => $image_url,
+            'published' => 'false',
         ));
     }
 
     /**
+     * @param array<int,string> $photo_ids
      * @return array<string,mixed>
      */
-    private function waitForContainer(string $container_id): array
+    private function createMultiPhotoPost(array $photo_ids, string $caption): array
     {
-        $last = array();
-        for ($i = 0; $i < 6; $i++) {
-            if ($i > 0) {
-                sleep(2);
-            }
-            $last = $this->graphGet('/' . rawurlencode($container_id), array(
-                'fields' => 'status_code,status',
-            ));
-            $status_code = isset($last['status_code']) ? (string) $last['status_code'] : '';
-            if ($status_code === 'FINISHED' || $status_code === 'ERROR') {
-                break;
-            }
+        $body = array('message' => $caption);
+        $index = 0;
+        foreach ($photo_ids as $photo_id) {
+            $body['attached_media[' . $index . ']'] = wp_json_encode(array('media_fbid' => $photo_id));
+            ++$index;
         }
 
-        return $last;
+        return $this->graphPost('/' . rawurlencode($this->pageId()) . '/feed', $body);
     }
 
     /**
@@ -332,56 +287,7 @@ final class CarsDailyDealsInstagramPublisher
             'body'    => $params,
         ));
 
-        $decoded = $this->decodeGraphResponse($response);
-        if ($this->shouldRetryOnInstagramGraph($decoded)) {
-            $retry = wp_remote_post($this->instagramGraphBaseUrl() . $path, array(
-                'timeout' => 45,
-                'body'    => $params,
-            ));
-            $decoded = $this->decodeGraphResponse($retry);
-        }
-
-        return $decoded;
-    }
-
-    /**
-     * @param array<string,string> $params
-     * @return array<string,mixed>
-     */
-    private function graphGet(string $path, array $params): array
-    {
-        $params['access_token'] = $this->accessToken();
-        $url = add_query_arg($params, $this->graphBaseUrl() . $path);
-        $response = wp_remote_get($url, array('timeout' => 30));
-
-        $decoded = $this->decodeGraphResponse($response);
-        if ($this->shouldRetryOnInstagramGraph($decoded)) {
-            $retry_url = add_query_arg($params, $this->instagramGraphBaseUrl() . $path);
-            $retry = wp_remote_get($retry_url, array('timeout' => 30));
-            $decoded = $this->decodeGraphResponse($retry);
-        }
-
-        return $decoded;
-    }
-
-    /**
-     * @param array<string,mixed> $response
-     */
-    private function shouldRetryOnInstagramGraph(array $response): bool
-    {
-        if ($this->graphBaseUrl() === $this->instagramGraphBaseUrl()) {
-            return false;
-        }
-
-        if (!isset($response['error']) || !is_array($response['error'])) {
-            return false;
-        }
-
-        $error = $response['error'];
-        $code = isset($error['code']) ? (string) $error['code'] : '';
-        $message = isset($error['message']) ? strtolower((string) $error['message']) : '';
-
-        return $code === '190' && strpos($message, 'cannot parse access token') !== false;
+        return $this->decodeGraphResponse($response);
     }
 
     /**
@@ -428,22 +334,8 @@ final class CarsDailyDealsInstagramPublisher
         if (!empty($error['code'])) {
             $parts[] = 'code=' . (string) $error['code'];
         }
-        if (!empty($error['error_subcode'])) {
-            $parts[] = 'subcode=' . (string) $error['error_subcode'];
-        }
 
         return $parts === array() ? '' : ' Meta error: ' . implode(' | ', $parts);
-    }
-
-    /**
-     * @param array<string,mixed> $payload
-     * @return array<string,mixed>
-     */
-    private function recordRun(array $payload): array
-    {
-        $payload['ran_at'] = current_time('mysql');
-        update_option(self::OPTION_LAST_RUN, $payload, false);
-        return $payload;
     }
 
     /**
@@ -471,20 +363,31 @@ final class CarsDailyDealsInstagramPublisher
         return $response;
     }
 
+    /**
+     * @param array<string,mixed> $payload
+     * @return array<string,mixed>
+     */
+    private function recordRun(array $payload): array
+    {
+        $payload['ran_at'] = current_time('mysql');
+        update_option(self::OPTION_LAST_RUN, $payload, false);
+        return $payload;
+    }
+
     private function hasPostedForDate(string $date): bool
     {
         $posted = get_option(self::OPTION_POSTED_DATES, array());
         return is_array($posted) && !empty($posted[$date]);
     }
 
-    private function markPostedForDate(string $date, string $media_id): void
+    private function markPostedForDate(string $date, string $post_id): void
     {
         $posted = get_option(self::OPTION_POSTED_DATES, array());
         if (!is_array($posted)) {
             $posted = array();
         }
         $posted[$date] = array(
-            'media_id'  => $media_id,
+            'post_id'   => $post_id,
             'posted_at' => current_time('mysql'),
         );
 
@@ -501,22 +404,17 @@ final class CarsDailyDealsInstagramPublisher
 
     private function graphBaseUrl(): string
     {
-        return trailingslashit(self::configuredGraphBaseUrl()) . rawurlencode($this->graphVersion());
+        return 'https://graph.facebook.com/' . rawurlencode($this->graphVersion());
     }
 
-    private function instagramGraphBaseUrl(): string
+    private function pageId(): string
     {
-        return 'https://graph.instagram.com/' . rawurlencode($this->graphVersion());
-    }
-
-    private function instagramAccountId(): string
-    {
-        return trim((string) AUTOAGORA_INSTAGRAM_ACCOUNT_ID);
+        return trim((string) AUTOAGORA_FACEBOOK_PAGE_ID);
     }
 
     private function accessToken(): string
     {
-        $token = trim((string) AUTOAGORA_INSTAGRAM_ACCESS_TOKEN);
+        $token = trim((string) AUTOAGORA_FACEBOOK_PAGE_ACCESS_TOKEN);
         $token = preg_replace('/\s+/', '', $token);
         $token = trim((string) $token, "\"'");
 
@@ -534,18 +432,6 @@ final class CarsDailyDealsInstagramPublisher
     private function graphVersion(): string
     {
         return self::normalizeGraphVersion(trim((string) AUTOAGORA_META_GRAPH_VERSION));
-    }
-
-    private static function configuredGraphBaseUrl(): string
-    {
-        if (defined('AUTOAGORA_META_GRAPH_BASE_URL')) {
-            $base = trim((string) AUTOAGORA_META_GRAPH_BASE_URL);
-            if ($base !== '') {
-                return untrailingslashit($base);
-            }
-        }
-
-        return 'https://graph.facebook.com';
     }
 
     private static function normalizeGraphVersion(string $version): string
