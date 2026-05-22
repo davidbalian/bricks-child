@@ -133,9 +133,8 @@ final class CarsDailyDealsInstagramPublisher
                 return $this->recordRun(
                     $this->failedGraphRun(
                         'child_container_error',
-                        'Instagram did not return a child media container ID for image: ' . $url . $this->graphErrorSuffix($child),
-                        $date,
-                        $child
+                        'Instagram did not return a child media container ID for image: ' . $url,
+                        $date
                     )
                 );
             }
@@ -147,8 +146,7 @@ final class CarsDailyDealsInstagramPublisher
                     $this->failedGraphRun(
                         'child_container_error',
                         'Instagram child media container failed processing for image: ' . $url,
-                        $date,
-                        $child_status
+                        $date
                     )
                 );
             }
@@ -160,18 +158,18 @@ final class CarsDailyDealsInstagramPublisher
             'caption'    => $caption,
         ));
         if (empty($parent['id'])) {
-            return $this->recordRun($this->failedGraphRun('parent_container_error', 'Instagram did not return a carousel container ID.', $date, $parent));
+            return $this->recordRun($this->failedGraphRun('parent_container_error', 'Instagram did not return a carousel container ID.', $date));
         }
 
         $parent_id = (string) $parent['id'];
         $parent_status = $this->waitForContainer($parent_id);
         if (isset($parent_status['status_code']) && $parent_status['status_code'] === 'ERROR') {
-            return $this->recordRun($this->failedGraphRun('parent_container_error', 'Instagram carousel container failed processing.', $date, $parent_status));
+            return $this->recordRun($this->failedGraphRun('parent_container_error', 'Instagram carousel container failed processing.', $date));
         }
 
         $published = $this->publishContainer($parent_id);
         if (empty($published['id'])) {
-            return $this->recordRun($this->failedGraphRun('publish_error', 'Instagram did not return a published media ID.', $date, $published));
+            return $this->recordRun($this->failedGraphRun('publish_error', 'Instagram did not return a published media ID.', $date));
         }
 
         $media_id = (string) $published['id'];
@@ -409,33 +407,6 @@ final class CarsDailyDealsInstagramPublisher
     }
 
     /**
-     * @param array<string,mixed> $response
-     */
-    private function graphErrorSuffix(array $response): string
-    {
-        if (!isset($response['error']) || !is_array($response['error'])) {
-            return '';
-        }
-
-        $error = $response['error'];
-        $parts = array();
-        if (!empty($error['message'])) {
-            $parts[] = (string) $error['message'];
-        }
-        if (!empty($error['type'])) {
-            $parts[] = 'type=' . (string) $error['type'];
-        }
-        if (!empty($error['code'])) {
-            $parts[] = 'code=' . (string) $error['code'];
-        }
-        if (!empty($error['error_subcode'])) {
-            $parts[] = 'subcode=' . (string) $error['error_subcode'];
-        }
-
-        return $parts === array() ? '' : ' Meta error: ' . implode(' | ', $parts);
-    }
-
-    /**
      * @param array<string,mixed> $payload
      * @return array<string,mixed>
      */
@@ -447,28 +418,16 @@ final class CarsDailyDealsInstagramPublisher
     }
 
     /**
-     * @param array<string,mixed> $graph_response
      * @return array<string,mixed>
      */
-    private function failedGraphRun(string $status, string $message, string $date, array $graph_response): array
+    private function failedGraphRun(string $status, string $message, string $date): array
     {
         return array(
-            'ok'             => false,
-            'status'         => $status,
-            'message'        => $message,
-            'date'           => $date,
-            'graph_response' => $this->redactGraphResponse($graph_response),
+            'ok'      => false,
+            'status'  => $status,
+            'message' => $message,
+            'date'    => $date,
         );
-    }
-
-    /**
-     * @param array<string,mixed> $response
-     * @return array<string,mixed>
-     */
-    private function redactGraphResponse(array $response): array
-    {
-        unset($response['access_token']);
-        return $response;
     }
 
     private function hasPostedForDate(string $date): bool

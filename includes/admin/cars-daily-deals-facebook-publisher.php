@@ -125,20 +125,18 @@ final class CarsDailyDealsFacebookPublisher
             if (empty($photo['id'])) {
                 if ($this->isPageIdentityError($photo)) {
                     return $this->recordRun(array(
-                        'ok'             => false,
-                        'status'         => 'page_token_error',
-                        'message'        => 'Facebook requires a Page access token for unpublished photo posts. The configured token could not be resolved to a Page token for page ID ' . $this->pageId() . '.',
-                        'date'           => $date,
-                        'graph_response' => $this->redactGraphResponse($photo),
+                        'ok'      => false,
+                        'status'  => 'page_token_error',
+                        'message' => 'Facebook requires a Page access token for unpublished photo posts. The configured token could not be resolved to a Page token for page ID ' . $this->pageId() . '.',
+                        'date'    => $date,
                     ));
                 }
 
                 return $this->recordRun(
                     $this->failedGraphRun(
                         'photo_upload_error',
-                        'Facebook did not return an unpublished photo ID for image: ' . $url . $this->graphErrorSuffix($photo),
-                        $date,
-                        $photo
+                        'Facebook did not return an unpublished photo ID for image: ' . $url,
+                        $date
                     )
                 );
             }
@@ -150,9 +148,8 @@ final class CarsDailyDealsFacebookPublisher
             return $this->recordRun(
                 $this->failedGraphRun(
                     'post_publish_error',
-                    'Facebook did not return a Page post ID.' . $this->graphErrorSuffix($post),
-                    $date,
-                    $post
+                    'Facebook did not return a Page post ID.',
+                    $date
                 )
             );
         }
@@ -410,52 +407,16 @@ final class CarsDailyDealsFacebookPublisher
     }
 
     /**
-     * @param array<string,mixed> $response
-     */
-    private function graphErrorSuffix(array $response): string
-    {
-        if (!isset($response['error']) || !is_array($response['error'])) {
-            return '';
-        }
-
-        $error = $response['error'];
-        $parts = array();
-        if (!empty($error['message'])) {
-            $parts[] = (string) $error['message'];
-        }
-        if (!empty($error['type'])) {
-            $parts[] = 'type=' . (string) $error['type'];
-        }
-        if (!empty($error['code'])) {
-            $parts[] = 'code=' . (string) $error['code'];
-        }
-
-        return $parts === array() ? '' : ' Meta error: ' . implode(' | ', $parts);
-    }
-
-    /**
-     * @param array<string,mixed> $graph_response
      * @return array<string,mixed>
      */
-    private function failedGraphRun(string $status, string $message, string $date, array $graph_response): array
+    private function failedGraphRun(string $status, string $message, string $date): array
     {
         return array(
-            'ok'             => false,
-            'status'         => $status,
-            'message'        => $message,
-            'date'           => $date,
-            'graph_response' => $this->redactGraphResponse($graph_response),
+            'ok'      => false,
+            'status'  => $status,
+            'message' => $message,
+            'date'    => $date,
         );
-    }
-
-    /**
-     * @param array<string,mixed> $response
-     * @return array<string,mixed>
-     */
-    private function redactGraphResponse(array $response): array
-    {
-        unset($response['access_token']);
-        return $response;
     }
 
     /**

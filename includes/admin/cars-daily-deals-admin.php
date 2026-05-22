@@ -404,12 +404,6 @@ JS;
                             </td>
                         </tr>
                     <?php endif; ?>
-                    <?php if (!empty($last_run['graph_response'])) : ?>
-                        <tr>
-                            <th scope="row"><?php esc_html_e('Meta response', 'bricks-child'); ?></th>
-                            <td><code><?php echo esc_html($this->summarizeInstagramGraphResponse((array) $last_run['graph_response'])); ?></code></td>
-                        </tr>
-                    <?php endif; ?>
                 </tbody>
             </table>
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
@@ -483,12 +477,6 @@ JS;
                             </td>
                         </tr>
                     <?php endif; ?>
-                    <?php if (!empty($last_run['graph_response'])) : ?>
-                        <tr>
-                            <th scope="row"><?php esc_html_e('Meta response', 'bricks-child'); ?></th>
-                            <td><code><?php echo esc_html($this->summarizeInstagramGraphResponse((array) $last_run['graph_response'])); ?></code></td>
-                        </tr>
-                    <?php endif; ?>
                 </tbody>
             </table>
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
@@ -502,37 +490,6 @@ JS;
             </form>
         </div>
         <?php
-    }
-
-    /**
-     * @param array<string,mixed> $response
-     */
-    private function summarizeInstagramGraphResponse(array $response): string
-    {
-        if (isset($response['error']) && is_array($response['error'])) {
-            $error = $response['error'];
-            $parts = array();
-            if (!empty($error['message'])) {
-                $parts[] = (string) $error['message'];
-            }
-            if (!empty($error['type'])) {
-                $parts[] = 'type=' . (string) $error['type'];
-            }
-            if (!empty($error['code'])) {
-                $parts[] = 'code=' . (string) $error['code'];
-            }
-            return implode(' | ', $parts);
-        }
-
-        if (!empty($response['status_code'])) {
-            return 'status_code=' . (string) $response['status_code'];
-        }
-
-        if (!empty($response['http_code'])) {
-            return 'http_code=' . (string) $response['http_code'];
-        }
-
-        return (string) wp_json_encode($response);
     }
 
     public function handleSaveStickers(): void
