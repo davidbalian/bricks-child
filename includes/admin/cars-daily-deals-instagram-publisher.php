@@ -387,7 +387,17 @@ final class CarsDailyDealsInstagramPublisher
             'body'    => $params,
         ));
 
-        return $this->decodeGraphResponse($response);
+        $decoded = $this->decodeGraphResponse($response);
+        if ($this->shouldRetryOnInstagramGraph($decoded)) {
+            $retry = wp_remote_post($this->instagramGraphBaseUrl() . $path, array(
+                'timeout' => 45,
+                'body'    => $params,
+            ));
+            $decoded = $this->decodeGraphResponse($retry);
+            $decoded['retried_graph_base'] = $this->instagramGraphBaseUrl();
+        }
+
+        return $decoded;
     }
 
     /**
@@ -400,7 +410,35 @@ final class CarsDailyDealsInstagramPublisher
         $url = add_query_arg($params, $this->graphBaseUrl() . $path);
         $response = wp_remote_get($url, array('timeout' => 30));
 
-        return $this->decodeGraphResponse($response);
+        $decoded = $this->decodeGraphResponse($response);
+        if ($this->shouldRetryOnInstagramGraph($decoded)) {
+            $retry_url = add_query_arg($params, $this->instagramGraphBaseUrl() . $path);
+            $retry = wp_remote_get($retry_url, array('timeout' => 30));
+            $decoded = $this->decodeGraphResponse($retry);
+            $decoded['retried_graph_base'] = $this->instagramGraphBaseUrl();
+        }
+
+        return $decoded;
+    }
+
+    /**
+     * @param array<string,mixed> $response
+     */
+    private function shouldRetryOnInstagramGraph(array $response): bool
+    {
+        if ($this->graphBaseUrl() === $this->instagramGraphBaseUrl()) {
+            return false;
+        }
+
+        if (!isset($response['error']) || !is_array($response['error'])) {
+            return false;
+        }
+
+        $error = $response['error'];
+        $code = isset($error['code']) ? (string) $error['code'] : '';
+        $message = isset($error['message']) ? strtolower((string) $error['message']) : '';
+
+        return $code === '190' && strpos($message, 'cannot parse access token') !== false;
     }
 
     /**
@@ -527,6 +565,11 @@ final class CarsDailyDealsInstagramPublisher
     private function graphBaseUrl(): string
     {
         return trailingslashit(self::configuredGraphBaseUrl()) . rawurlencode($this->graphVersion());
+    }
+
+    private function instagramGraphBaseUrl(): string
+    {
+        return 'https://graph.instagram.com/' . rawurlencode($this->graphVersion());
     }
 
     private function instagramAccountId(): string
