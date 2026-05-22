@@ -123,6 +123,16 @@ final class CarsDailyDealsFacebookPublisher
         foreach (wp_list_pluck($images, 'url') as $url) {
             $photo = $this->createUnpublishedPhoto((string) $url);
             if (empty($photo['id'])) {
+                if ($this->isPageIdentityError($photo)) {
+                    return $this->recordRun(array(
+                        'ok'             => false,
+                        'status'         => 'page_token_error',
+                        'message'        => 'Facebook requires a Page access token for unpublished photo posts. The configured token could not be resolved to a Page token for page ID ' . $this->pageId() . '.',
+                        'date'           => $date,
+                        'graph_response' => $this->redactGraphResponse($photo),
+                    ));
+                }
+
                 return $this->recordRun(
                     $this->failedGraphRun(
                         'photo_upload_error',
@@ -301,6 +311,9 @@ final class CarsDailyDealsFacebookPublisher
 
         $configured_token = $this->accessToken();
         $resolved = $this->fetchPageAccessTokenFromAccounts($configured_token);
+        if ($resolved === '') {
+            $resolved = $this->fetchPageAccessTokenFromPage($configured_token);
+        }
 
         $this->resolved_page_access_token = $resolved !== '' ? $resolved : $configured_token;
         return $this->resolved_page_access_token;
@@ -336,6 +349,26 @@ final class CarsDailyDealsFacebookPublisher
         return '';
     }
 
+    private function fetchPageAccessTokenFromPage(string $token): string
+    {
+        $url = add_query_arg(
+            array(
+                'fields'       => 'access_token',
+                'access_token' => $token,
+            ),
+            $this->graphBaseUrl() . '/' . rawurlencode($this->pageId())
+        );
+
+        $response = wp_remote_get($url, array('timeout' => 30));
+        $decoded = $this->decodeGraphResponse($response);
+
+        if (!empty($decoded['access_token'])) {
+            return $this->normalizeAccessToken((string) $decoded['access_token']);
+        }
+
+        return '';
+    }
+
     /**
      * @param array<string,mixed>|\WP_Error $response
      * @return array<string,mixed>
@@ -358,6 +391,22 @@ final class CarsDailyDealsFacebookPublisher
         $data['http_code'] = $code;
 
         return $data;
+    }
+
+    /**
+     * @param array<string,mixed> $response
+     */
+    private function isPageIdentityError(array $response): bool
+    {
+        if (!isset($response['error']) || !is_array($response['error'])) {
+            return false;
+        }
+
+        $error = $response['error'];
+        $code = isset($error['code']) ? (string) $error['code'] : '';
+        $message = isset($error['message']) ? strtolower((string) $error['message']) : '';
+
+        return $code === '200' && strpos($message, 'as the page itself') !== false;
     }
 
     /**
