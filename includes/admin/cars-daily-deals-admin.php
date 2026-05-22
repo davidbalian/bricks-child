@@ -355,7 +355,7 @@ JS;
                             <?php if ($config['configured']) : ?>
                                 <?php esc_html_e('Ready', 'bricks-child'); ?>
                                 <span class="description">
-                                    <?php echo esc_html('Account ' . $config['account_id'] . ' via Graph ' . $config['graph_version']); ?>
+                                    <?php echo esc_html('Account ' . $config['account_id'] . ' via ' . $config['graph_base'] . '/' . $config['graph_version']); ?>
                                 </span>
                             <?php else : ?>
                                 <?php echo esc_html('Missing: ' . implode(', ', $config['missing'])); ?>
@@ -401,6 +401,12 @@ JS;
                         <tr>
                             <th scope="row"><?php esc_html_e('Meta response', 'bricks-child'); ?></th>
                             <td><code><?php echo esc_html($this->summarizeInstagramGraphResponse((array) $last_run['graph_response'])); ?></code></td>
+                        </tr>
+                    <?php endif; ?>
+                    <?php if (!empty($last_run['context']) && is_array($last_run['context'])) : ?>
+                        <tr>
+                            <th scope="row"><?php esc_html_e('Debug context', 'bricks-child'); ?></th>
+                            <td><code><?php echo esc_html((string) wp_json_encode($last_run['context'])); ?></code></td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

@@ -20,7 +20,7 @@ final class CarsDailyDealsInstagramPublisher
     private const RETENTION_DAYS = 14;
 
     /**
-     * @return array{configured:bool,missing:array<int,string>,account_id:string,graph_version:string}
+     * @return array{configured:bool,missing:array<int,string>,account_id:string,graph_version:string,graph_base:string}
      */
     public static function getConfigStatus(): array
     {
@@ -40,7 +40,8 @@ final class CarsDailyDealsInstagramPublisher
             'configured'    => $missing === array(),
             'missing'       => $missing,
             'account_id'    => defined('AUTOAGORA_INSTAGRAM_ACCOUNT_ID') ? trim((string) AUTOAGORA_INSTAGRAM_ACCOUNT_ID) : '',
-            'graph_version' => defined('AUTOAGORA_META_GRAPH_VERSION') ? trim((string) AUTOAGORA_META_GRAPH_VERSION) : '',
+            'graph_version' => defined('AUTOAGORA_META_GRAPH_VERSION') ? self::normalizeGraphVersion(trim((string) AUTOAGORA_META_GRAPH_VERSION)) : '',
+            'graph_base'    => self::configuredGraphBaseUrl(),
         );
     }
 
@@ -146,7 +147,7 @@ final class CarsDailyDealsInstagramPublisher
                 return $this->recordRun(
                     $this->failedGraphRun(
                         'child_container_error',
-                        'Instagram did not return a child media container ID for image: ' . $url,
+                        'Instagram did not return a child media container ID for image: ' . $url . $this->graphErrorSuffix($child),
                         $date,
                         $child,
                         array('image_url' => $url)
@@ -427,6 +428,33 @@ final class CarsDailyDealsInstagramPublisher
     }
 
     /**
+     * @param array<string,mixed> $response
+     */
+    private function graphErrorSuffix(array $response): string
+    {
+        if (!isset($response['error']) || !is_array($response['error'])) {
+            return '';
+        }
+
+        $error = $response['error'];
+        $parts = array();
+        if (!empty($error['message'])) {
+            $parts[] = (string) $error['message'];
+        }
+        if (!empty($error['type'])) {
+            $parts[] = 'type=' . (string) $error['type'];
+        }
+        if (!empty($error['code'])) {
+            $parts[] = 'code=' . (string) $error['code'];
+        }
+        if (!empty($error['error_subcode'])) {
+            $parts[] = 'subcode=' . (string) $error['error_subcode'];
+        }
+
+        return $parts === array() ? '' : ' Meta error: ' . implode(' | ', $parts);
+    }
+
+    /**
      * @param array<string,mixed> $payload
      * @return array<string,mixed>
      */
@@ -498,7 +526,7 @@ final class CarsDailyDealsInstagramPublisher
 
     private function graphBaseUrl(): string
     {
-        return 'https://graph.facebook.com/' . rawurlencode($this->graphVersion());
+        return trailingslashit(self::configuredGraphBaseUrl()) . rawurlencode($this->graphVersion());
     }
 
     private function instagramAccountId(): string
@@ -513,6 +541,28 @@ final class CarsDailyDealsInstagramPublisher
 
     private function graphVersion(): string
     {
-        return trim((string) AUTOAGORA_META_GRAPH_VERSION);
+        return self::normalizeGraphVersion(trim((string) AUTOAGORA_META_GRAPH_VERSION));
+    }
+
+    private static function configuredGraphBaseUrl(): string
+    {
+        if (defined('AUTOAGORA_META_GRAPH_BASE_URL')) {
+            $base = trim((string) AUTOAGORA_META_GRAPH_BASE_URL);
+            if ($base !== '') {
+                return untrailingslashit($base);
+            }
+        }
+
+        return 'https://graph.facebook.com';
+    }
+
+    private static function normalizeGraphVersion(string $version): string
+    {
+        $version = trim($version);
+        if ($version !== '' && $version[0] !== 'v') {
+            $version = 'v' . $version;
+        }
+
+        return $version;
     }
 }
