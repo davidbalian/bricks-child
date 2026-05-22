@@ -124,18 +124,48 @@ final class CarsDailyDealsInstagramPublisher
         $child_ids = array();
 
         foreach ($image_urls as $url) {
+            $preflight = $this->preflightImageUrl((string) $url);
+            if (empty($preflight['ok'])) {
+                return $this->recordRun(array(
+                    'ok'       => false,
+                    'status'   => 'image_url_error',
+                    'message'  => 'Generated Instagram image URL is not publicly fetchable: ' . $url,
+                    'date'     => $date,
+                    'context'  => array(
+                        'image_url' => $url,
+                        'preflight' => $preflight,
+                    ),
+                ));
+            }
+
             $child = $this->createMediaContainer(array(
                 'image_url'        => $url,
                 'is_carousel_item' => 'true',
             ));
             if (empty($child['id'])) {
-                return $this->recordRun($this->failedGraphRun('child_container_error', 'Instagram did not return a child media container ID.', $date, $child));
+                return $this->recordRun(
+                    $this->failedGraphRun(
+                        'child_container_error',
+                        'Instagram did not return a child media container ID for image: ' . $url,
+                        $date,
+                        $child,
+                        array('image_url' => $url)
+                    )
+                );
             }
             $child_id = (string) $child['id'];
             $child_ids[] = $child_id;
             $child_status = $this->waitForContainer($child_id);
             if (isset($child_status['status_code']) && $child_status['status_code'] === 'ERROR') {
-                return $this->recordRun($this->failedGraphRun('child_container_error', 'Instagram child media container failed processing.', $date, $child_status));
+                return $this->recordRun(
+                    $this->failedGraphRun(
+                        'child_container_error',
+                        'Instagram child media container failed processing for image: ' . $url,
+                        $date,
+                        $child_status,
+                        array('image_url' => $url)
+                    )
+                );
             }
         }
 
@@ -230,6 +260,45 @@ final class CarsDailyDealsInstagramPublisher
         }
 
         return $out;
+    }
+
+    /**
+     * @return array{ok:bool,http_code:int,content_type:string,content_length:string,error:string}
+     */
+    private function preflightImageUrl(string $url): array
+    {
+        $result = array(
+            'ok'             => false,
+            'http_code'      => 0,
+            'content_type'   => '',
+            'content_length' => '',
+            'error'          => '',
+        );
+
+        $response = wp_remote_head($url, array(
+            'redirection' => 0,
+            'timeout'     => 20,
+        ));
+
+        if (is_wp_error($response)) {
+            $result['error'] = $response->get_error_message();
+            return $result;
+        }
+
+        $result['http_code'] = (int) wp_remote_retrieve_response_code($response);
+        $result['content_type'] = (string) wp_remote_retrieve_header($response, 'content-type');
+        $result['content_length'] = (string) wp_remote_retrieve_header($response, 'content-length');
+
+        $content_type = strtolower($result['content_type']);
+        $result['ok'] = $result['http_code'] >= 200
+            && $result['http_code'] < 300
+            && strpos($content_type, 'image/jpeg') !== false;
+
+        if (!$result['ok'] && $result['error'] === '') {
+            $result['error'] = 'Expected HTTP 2xx and image/jpeg Content-Type.';
+        }
+
+        return $result;
     }
 
     private function cleanupOldUploads(string $base_dir): void
@@ -372,15 +441,21 @@ final class CarsDailyDealsInstagramPublisher
      * @param array<string,mixed> $graph_response
      * @return array<string,mixed>
      */
-    private function failedGraphRun(string $status, string $message, string $date, array $graph_response): array
+    private function failedGraphRun(string $status, string $message, string $date, array $graph_response, array $context = array()): array
     {
-        return array(
+        $payload = array(
             'ok'             => false,
             'status'         => $status,
             'message'        => $message,
             'date'           => $date,
             'graph_response' => $this->redactGraphResponse($graph_response),
         );
+
+        if ($context !== array()) {
+            $payload['context'] = $context;
+        }
+
+        return $payload;
     }
 
     /**
