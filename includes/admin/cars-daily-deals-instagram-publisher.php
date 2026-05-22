@@ -536,7 +536,19 @@ final class CarsDailyDealsInstagramPublisher
 
     private function accessToken(): string
     {
-        return trim((string) AUTOAGORA_INSTAGRAM_ACCESS_TOKEN);
+        $token = trim((string) AUTOAGORA_INSTAGRAM_ACCESS_TOKEN);
+        $token = preg_replace('/\s+/', '', $token);
+        $token = trim((string) $token, "\"'");
+
+        if (stripos($token, 'Bearer') === 0) {
+            $token = trim(substr($token, 6));
+        }
+
+        if (stripos($token, 'access_token=') === 0) {
+            $token = substr($token, strlen('access_token='));
+        }
+
+        return trim($token, "\"'");
     }
 
     private function graphVersion(): string
