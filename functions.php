@@ -1017,5 +1017,3 @@ function manual_sync_car_taxonomy() {
 
 
 
-
-
