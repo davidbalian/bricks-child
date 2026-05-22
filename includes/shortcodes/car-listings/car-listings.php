@@ -206,6 +206,22 @@ function car_listings_build_query_args($atts) {
         $make_param = sanitize_title($atts['default_make_slug']);
     }
 
+    // Fallback for pretty filter route when query vars/context are missing:
+    // /cars/filter/make:{slug}/
+    if ($model_param === '' && $make_param === '' && !empty($_SERVER['REQUEST_URI']) && function_exists('car_filters_parse_filter_url')) {
+        $request_path = (string) wp_parse_url(wp_unslash($_SERVER['REQUEST_URI']), PHP_URL_PATH);
+        $request_path = trim($request_path, '/');
+        if (preg_match('#(?:^|/)cars/filter/make:([^/]+)/?$#', $request_path, $matches)) {
+            $pretty_slug = sanitize_title(rawurldecode((string) $matches[1]));
+            $resolved_pretty = car_filters_parse_filter_url('make:' . $pretty_slug);
+            if (!empty($resolved_pretty['model'])) {
+                $model_param = sanitize_title((string) $resolved_pretty['model']);
+            } elseif (!empty($resolved_pretty['make'])) {
+                $make_param = sanitize_title((string) $resolved_pretty['make']);
+            }
+        }
+    }
+
     if (!empty($model_param)) {
         $model_term = get_term_by('slug', $model_param, 'car_make');
         if ($model_term) {

@@ -764,7 +764,7 @@ function autoagora_get_active_car_filter_context() {
 
     $pretty_slug = get_query_var('autoagora_car_filter_slug');
     if (empty($pretty_slug) && !empty($_SERVER['REQUEST_URI'])) {
-        $request_path = (string) wp_parse_url(esc_url_raw(wp_unslash($_SERVER['REQUEST_URI'])), PHP_URL_PATH);
+        $request_path = (string) wp_parse_url(wp_unslash($_SERVER['REQUEST_URI']), PHP_URL_PATH);
         $request_path = trim($request_path, '/');
         if (preg_match('#(?:^|/)cars/filter/make:([^/]+)/?$#', $request_path, $matches)) {
             $pretty_slug = rawurldecode((string) $matches[1]);
