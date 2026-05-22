@@ -11,6 +11,8 @@ if (!defined('ABSPATH')) {
 
 require_once __DIR__ . '/cars-daily-deals-snapshot.php';
 require_once __DIR__ . '/cars-daily-deals-composite.php';
+require_once __DIR__ . '/cars-daily-deals-instagram-publisher.php';
+require_once __DIR__ . '/cars-daily-deals-instagram-cron.php';
 require_once __DIR__ . '/cars-daily-deals-download-handlers.php';
 require_once __DIR__ . '/cars-daily-deals-sticker-settings-view.php';
 
@@ -20,9 +22,13 @@ final class CarsDailyDealsAdminPage
 
     private const ACTION_SAVE_STICKERS = 'bricks_child_daily_deals_save_stickers';
 
+    private const ACTION_RUN_INSTAGRAM = 'bricks_child_daily_deals_instagram_run';
+
     private const NONCE_FETCH = 'bricks_child_daily_deals_fetch';
 
     private const NONCE_STICKERS = 'bricks_child_daily_deals_stickers';
+
+    private const NONCE_RUN_INSTAGRAM = 'bricks_child_daily_deals_instagram_run';
 
     public static function bootstrap(): void
     {
@@ -31,6 +37,7 @@ final class CarsDailyDealsAdminPage
         add_action('admin_enqueue_scripts', array($page, 'enqueueAdminAssets'));
         add_action('admin_post_' . CarsDailyDealsDownloadHandlers::ACTION_ZIP, array('CarsDailyDealsDownloadHandlers', 'handleZipDownload'));
         add_action('admin_post_' . self::ACTION_SAVE_STICKERS, array($page, 'handleSaveStickers'));
+        add_action('admin_post_' . self::ACTION_RUN_INSTAGRAM, array($page, 'handleInstagramRun'));
         add_action('admin_post_' . CarsDailyDealsDownloadHandlers::ACTION_DOWNLOAD, array('CarsDailyDealsDownloadHandlers', 'handleSingleDownload'));
         add_action('admin_post_' . CarsDailyDealsDownloadHandlers::ACTION_DOWNLOAD_IG, array('CarsDailyDealsDownloadHandlers', 'handleInstagramDownload'));
     }
@@ -136,6 +143,8 @@ JS;
             <?php endif; ?>
 
             <?php CarsDailyDealsStickerSettingsView::render(self::ACTION_SAVE_STICKERS, self::NONCE_STICKERS); ?>
+
+            <?php $this->renderInstagramStatusPanel(); ?>
 
             <form method="get" action="<?php echo esc_url(admin_url('edit.php')); ?>" style="margin: 1rem 0;">
                 <input type="hidden" name="post_type" value="car" />
@@ -323,6 +332,123 @@ JS;
         <?php
     }
 
+    private function renderInstagramStatusPanel(): void
+    {
+        $config = CarsDailyDealsInstagramPublisher::getConfigStatus();
+        $last_run = CarsDailyDealsInstagramPublisher::getLastRun();
+        $next = wp_next_scheduled(CarsDailyDealsInstagramCron::HOOK);
+        $status = isset($last_run['status']) ? (string) $last_run['status'] : '';
+        $ok = !empty($last_run['ok']);
+        ?>
+        <div style="margin:1.25rem 0;padding:14px 16px;max-width:820px;border:1px solid #c3c4c7;border-radius:4px;background:#fff;">
+            <h2 style="margin:0 0 10px;font-size:15px;"><?php esc_html_e('Instagram auto-publishing', 'bricks-child'); ?></h2>
+            <?php if (isset($_GET['instagram-run']) && (string) wp_unslash($_GET['instagram-run']) === '1') : ?>
+                <div class="notice <?php echo $ok ? 'notice-success' : 'notice-error'; ?>" style="margin:10px 0;">
+                    <p><?php echo esc_html((string) ($last_run['message'] ?? 'Instagram publishing finished.')); ?></p>
+                </div>
+            <?php endif; ?>
+            <table class="widefat striped" style="max-width:760px;margin-bottom:12px;">
+                <tbody>
+                    <tr>
+                        <th scope="row" style="width:190px;"><?php esc_html_e('Configuration', 'bricks-child'); ?></th>
+                        <td>
+                            <?php if ($config['configured']) : ?>
+                                <?php esc_html_e('Ready', 'bricks-child'); ?>
+                                <span class="description">
+                                    <?php echo esc_html('Account ' . $config['account_id'] . ' via Graph ' . $config['graph_version']); ?>
+                                </span>
+                            <?php else : ?>
+                                <?php echo esc_html('Missing: ' . implode(', ', $config['missing'])); ?>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><?php esc_html_e('Next cron run', 'bricks-child'); ?></th>
+                        <td>
+                            <?php echo $next ? esc_html(date_i18n('Y-m-d H:i:s', (int) $next)) : esc_html__('Not scheduled yet', 'bricks-child'); ?>
+                            <span class="description"><?php esc_html_e('Target: daily 09:00 Asia/Nicosia.', 'bricks-child'); ?></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><?php esc_html_e('Last run', 'bricks-child'); ?></th>
+                        <td>
+                            <?php if ($last_run !== array()) : ?>
+                                <strong><?php echo esc_html($status !== '' ? $status : 'unknown'); ?></strong>
+                                <?php if (!empty($last_run['ran_at'])) : ?>
+                                    <span class="description"><?php echo esc_html(' at ' . (string) $last_run['ran_at']); ?></span>
+                                <?php endif; ?>
+                                <br />
+                                <?php echo esc_html((string) ($last_run['message'] ?? '')); ?>
+                            <?php else : ?>
+                                <?php esc_html_e('No Instagram publish run recorded yet.', 'bricks-child'); ?>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <?php if (!empty($last_run['media_id']) || !empty($last_run['parent_container_id'])) : ?>
+                        <tr>
+                            <th scope="row"><?php esc_html_e('Instagram IDs', 'bricks-child'); ?></th>
+                            <td>
+                                <?php if (!empty($last_run['media_id'])) : ?>
+                                    <?php echo esc_html('Media: ' . (string) $last_run['media_id']); ?><br />
+                                <?php endif; ?>
+                                <?php if (!empty($last_run['parent_container_id'])) : ?>
+                                    <?php echo esc_html('Container: ' . (string) $last_run['parent_container_id']); ?>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                    <?php if (!empty($last_run['graph_response'])) : ?>
+                        <tr>
+                            <th scope="row"><?php esc_html_e('Meta response', 'bricks-child'); ?></th>
+                            <td><code><?php echo esc_html($this->summarizeInstagramGraphResponse((array) $last_run['graph_response'])); ?></code></td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                <input type="hidden" name="action" value="<?php echo esc_attr(self::ACTION_RUN_INSTAGRAM); ?>" />
+                <?php wp_nonce_field(self::NONCE_RUN_INSTAGRAM); ?>
+                <label style="display:block;margin-bottom:10px;">
+                    <input type="checkbox" name="force" value="1" />
+                    <?php esc_html_e('Force repost even if today was already published', 'bricks-child'); ?>
+                </label>
+                <?php submit_button(__('Run Instagram publish now', 'bricks-child'), 'secondary', 'submit', false, $config['configured'] ? array() : array('disabled' => 'disabled')); ?>
+            </form>
+        </div>
+        <?php
+    }
+
+    /**
+     * @param array<string,mixed> $response
+     */
+    private function summarizeInstagramGraphResponse(array $response): string
+    {
+        if (isset($response['error']) && is_array($response['error'])) {
+            $error = $response['error'];
+            $parts = array();
+            if (!empty($error['message'])) {
+                $parts[] = (string) $error['message'];
+            }
+            if (!empty($error['type'])) {
+                $parts[] = 'type=' . (string) $error['type'];
+            }
+            if (!empty($error['code'])) {
+                $parts[] = 'code=' . (string) $error['code'];
+            }
+            return implode(' | ', $parts);
+        }
+
+        if (!empty($response['status_code'])) {
+            return 'status_code=' . (string) $response['status_code'];
+        }
+
+        if (!empty($response['http_code'])) {
+            return 'http_code=' . (string) $response['http_code'];
+        }
+
+        return (string) wp_json_encode($response);
+    }
+
     public function handleSaveStickers(): void
     {
         if (! isset($_POST['_wpnonce']) || ! wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), self::NONCE_STICKERS)) {
@@ -348,6 +474,33 @@ JS;
                     'post_type'     => 'car',
                     'page'          => self::SLUG,
                     'sticker-saved' => '1',
+                ),
+                admin_url('edit.php')
+            )
+        );
+        exit;
+    }
+
+    public function handleInstagramRun(): void
+    {
+        if (! isset($_POST['_wpnonce']) || ! wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), self::NONCE_RUN_INSTAGRAM)) {
+            wp_die(esc_html__('Security check failed.', 'bricks-child'), '', array('response' => 403));
+        }
+
+        if (! current_user_can('manage_options')) {
+            wp_die(esc_html__('You do not have permission to access this page.', 'bricks-child'), '', array('response' => 403));
+        }
+
+        $force = !empty($_POST['force']);
+        $publisher = new CarsDailyDealsInstagramPublisher();
+        $publisher->publishToday($force);
+
+        wp_safe_redirect(
+            add_query_arg(
+                array(
+                    'post_type'     => 'car',
+                    'page'          => self::SLUG,
+                    'instagram-run' => '1',
                 ),
                 admin_url('edit.php')
             )
