@@ -33,8 +33,8 @@ final class AutoAgoraUserListingDashboardAdminPage
     public function registerMenu(): void
     {
         add_users_page(
-            __('Listing Dashboards', 'bricks-child'),
-            __('Listing Dashboards', 'bricks-child'),
+            __('User Listing Dashboards', 'bricks-child'),
+            __('User Listing Dashboards', 'bricks-child'),
             'manage_options',
             self::SLUG,
             array($this, 'renderPage')
@@ -94,13 +94,15 @@ final class AutoAgoraUserListingDashboardAdminPage
                     __('Dealership users', 'bricks-child'),
                     $dealershipUsers,
                     $selectedUserId,
-                    $search
+                    $search,
+                    true
                 );
                 $this->renderUserGroup(
                     __('Non-dealership users', 'bricks-child'),
                     $nonDealershipUsers,
                     $selectedUserId,
-                    $search
+                    $search,
+                    false
                 );
                 ?>
             </div>
@@ -183,7 +185,7 @@ final class AutoAgoraUserListingDashboardAdminPage
     /**
      * @param array<int, WP_User> $users
      */
-    private function renderUserGroup(string $title, array $users, int $selectedUserId, string $search): void
+    private function renderUserGroup(string $title, array $users, int $selectedUserId, string $search, bool $showOutreachColumns): void
     {
         ?>
         <section class="autoagora-user-listing-dashboard__group">
@@ -199,11 +201,23 @@ final class AutoAgoraUserListingDashboardAdminPage
                         <th><?php esc_html_e('User', 'bricks-child'); ?></th>
                         <th><?php esc_html_e('Roles', 'bricks-child'); ?></th>
                         <th><?php esc_html_e('Registered', 'bricks-child'); ?></th>
-                        <th><?php esc_html_e('Action', 'bricks-child'); ?></th>
+                        <?php if ($showOutreachColumns) : ?>
+                            <th><?php esc_html_e('Outreach Status', 'bricks-child'); ?></th>
+                            <th><?php esc_html_e('Priority', 'bricks-child'); ?></th>
+                            <th><?php esc_html_e('Last Contacted', 'bricks-child'); ?></th>
+                            <th><?php esc_html_e('Contact Count', 'bricks-child'); ?></th>
+                        <?php endif; ?>
+                        <th><?php esc_html_e('Actions', 'bricks-child'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($users as $user) : ?>
+                        <?php
+                        $outreachStatus = $showOutreachColumns ? $this->getUserField((int) $user->ID, 'outreach_status') : '';
+                        $outreachPriority = $showOutreachColumns ? $this->getUserField((int) $user->ID, 'outreach_priority') : '';
+                        $lastContacted = $showOutreachColumns ? $this->getUserField((int) $user->ID, 'last_contacted') : '';
+                        $contactCount = $showOutreachColumns ? absint($this->getUserField((int) $user->ID, 'contact_count')) : 0;
+                        ?>
                         <tr<?php echo (int) $user->ID === $selectedUserId ? ' class="is-selected-user"' : ''; ?>>
                             <td>
                                 <strong><?php echo esc_html($this->formatUserName($user)); ?></strong>
@@ -213,10 +227,24 @@ final class AutoAgoraUserListingDashboardAdminPage
                             </td>
                             <td><?php echo esc_html($this->formatRoles($user)); ?></td>
                             <td><?php echo esc_html(mysql2date('Y-m-d', $user->user_registered)); ?></td>
+                            <?php if ($showOutreachColumns) : ?>
+                                <td><?php $this->renderOutreachStatusBadge($outreachStatus); ?></td>
+                                <td><?php $this->renderPriorityBadge($outreachPriority); ?></td>
+                                <td><?php echo esc_html($this->formatDateField($lastContacted)); ?></td>
+                                <td><?php echo esc_html(number_format_i18n($contactCount)); ?></td>
+                            <?php endif; ?>
                             <td>
-                                <a class="button button-small" href="<?php echo esc_url($this->dashboardUrl((int) $user->ID, $search)); ?>">
-                                    <?php esc_html_e('View dashboard', 'bricks-child'); ?>
-                                </a>
+                                <div class="autoagora-user-listing-dashboard__actions">
+                                    <a class="button button-small" href="<?php echo esc_url($this->dashboardUrl((int) $user->ID, $search)); ?>">
+                                        <?php esc_html_e('View dashboard', 'bricks-child'); ?>
+                                    </a>
+                                    <?php if ($showOutreachColumns) : ?>
+                                        <?php $this->renderWhatsAppButton($user); ?>
+                                        <a class="button button-small" href="<?php echo esc_url(get_edit_user_link((int) $user->ID)); ?>">
+                                            <?php esc_html_e('Edit Notes', 'bricks-child'); ?>
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -229,6 +257,178 @@ final class AutoAgoraUserListingDashboardAdminPage
             <?php endif; ?>
         </section>
         <?php
+    }
+
+    private function getUserField(int $userId, string $fieldName): string
+    {
+        if (function_exists('get_field')) {
+            $acfValue = get_field($fieldName, 'user_' . $userId);
+            $normalizedAcfValue = $this->normalizeFieldValue($acfValue);
+            if ($normalizedAcfValue !== '') {
+                return $normalizedAcfValue;
+            }
+        }
+
+        $metaValue = get_user_meta($userId, $fieldName, true);
+
+        return $this->normalizeFieldValue($metaValue);
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function normalizeFieldValue($value): string
+    {
+        if (is_scalar($value)) {
+            return sanitize_text_field((string) $value);
+        }
+
+        if (is_array($value)) {
+            foreach (array('value', 'label') as $key) {
+                if (isset($value[$key]) && is_scalar($value[$key])) {
+                    return sanitize_text_field((string) $value[$key]);
+                }
+            }
+        }
+
+        return '';
+    }
+
+    private function renderOutreachStatusBadge(string $status): void
+    {
+        $normalized = $this->normalizeBadgeValue($status);
+        $labels = array(
+            'contacted'      => __('Contacted', 'bricks-child'),
+            'interested'     => __('Interested', 'bricks-child'),
+            'claimed'        => __('Claimed', 'bricks-child'),
+            'not_interested' => __('Not interested', 'bricks-child'),
+            'opted_out'      => __('Opted out', 'bricks-child'),
+        );
+
+        $label = $labels[$normalized] ?? __('Not set', 'bricks-child');
+        $class = isset($labels[$normalized]) ? 'is-status-' . $normalized : 'is-empty';
+
+        $this->renderBadge($label, $class);
+    }
+
+    private function renderPriorityBadge(string $priority): void
+    {
+        $normalized = $this->normalizeBadgeValue($priority);
+        $labels = array(
+            'high'   => __('High', 'bricks-child'),
+            'medium' => __('Medium', 'bricks-child'),
+            'low'    => __('Low', 'bricks-child'),
+        );
+
+        $label = $labels[$normalized] ?? __('Not set', 'bricks-child');
+        $class = isset($labels[$normalized]) ? 'is-priority-' . $normalized : 'is-empty';
+
+        $this->renderBadge($label, $class);
+    }
+
+    private function renderBadge(string $label, string $class): void
+    {
+        ?>
+        <span class="autoagora-outreach-badge <?php echo esc_attr($class); ?>"><?php echo esc_html($label); ?></span>
+        <?php
+    }
+
+    private function renderWhatsAppButton(WP_User $user): void
+    {
+        $url = $this->buildWhatsAppUrl($user);
+        if ($url === '') {
+            ?>
+            <span class="button button-small disabled" aria-disabled="true"><?php esc_html_e('WhatsApp', 'bricks-child'); ?></span>
+            <?php
+            return;
+        }
+        ?>
+        <a class="button button-small" href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener noreferrer">
+            <?php esc_html_e('WhatsApp', 'bricks-child'); ?>
+        </a>
+        <?php
+    }
+
+    private function buildWhatsAppUrl(WP_User $user): string
+    {
+        $phone = $this->normalizeWhatsAppPhone($this->getUserPhone($user));
+        if ($phone === '') {
+            return '';
+        }
+
+        return sprintf(
+            'https://wa.me/%s?text=%s',
+            rawurlencode($phone),
+            rawurlencode($this->buildWhatsAppMessage($user))
+        );
+    }
+
+    private function buildWhatsAppMessage(WP_User $user): string
+    {
+        return sprintf(
+            __('Hi %s, this is AutoAgora. I wanted to follow up about your dealership account and listings.', 'bricks-child'),
+            $this->formatUserName($user)
+        );
+    }
+
+    private function getUserPhone(WP_User $user): string
+    {
+        $usernamePhone = sanitize_text_field((string) $user->user_login);
+        if ($usernamePhone !== '') {
+            return $usernamePhone;
+        }
+
+        $metaPhone = $this->getUserField((int) $user->ID, 'phone_number');
+        if ($metaPhone !== '') {
+            return $metaPhone;
+        }
+
+        return $this->getUserField((int) $user->ID, 'phone');
+    }
+
+    private function normalizeWhatsAppPhone(string $phone): string
+    {
+        $digits = preg_replace('/\D+/', '', $phone);
+        if (!is_string($digits) || $digits === '') {
+            return '';
+        }
+
+        if (strpos($digits, '00') === 0) {
+            $digits = substr($digits, 2);
+        }
+
+        if (strlen($digits) === 8) {
+            $digits = '357' . $digits;
+        }
+
+        return $digits;
+    }
+
+    private function normalizeBadgeValue(string $value): string
+    {
+        $value = strtolower(trim($value));
+        $value = str_replace(array('-', ' '), '_', $value);
+
+        return sanitize_key($value);
+    }
+
+    private function formatDateField(string $date): string
+    {
+        $date = trim($date);
+        if ($date === '') {
+            return __('Not set', 'bricks-child');
+        }
+
+        $timestamp = strtotime($date);
+        if (!$timestamp && preg_match('/^\d{8}$/', $date) === 1) {
+            $timestamp = strtotime(substr($date, 0, 4) . '-' . substr($date, 4, 2) . '-' . substr($date, 6, 2));
+        }
+
+        if (!$timestamp) {
+            return $date;
+        }
+
+        return date_i18n('Y-m-d', $timestamp);
     }
 
     private function renderStatCard(string $label, string $value): void
@@ -321,9 +521,60 @@ final class AutoAgoraUserListingDashboardAdminPage
             .autoagora-user-listing-dashboard__group h2 {
                 margin-top: 0;
             }
+            .autoagora-user-listing-dashboard__group {
+                overflow-x: auto;
+            }
             .autoagora-user-listing-dashboard__muted {
                 color: #646970;
                 font-size: 12px;
+            }
+            .autoagora-user-listing-dashboard__actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                align-items: center;
+            }
+            .autoagora-outreach-badge {
+                display: inline-block;
+                padding: 3px 8px;
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: 600;
+                line-height: 1.4;
+                white-space: nowrap;
+            }
+            .autoagora-outreach-badge.is-status-contacted {
+                background: #fcf3cf;
+                color: #7a5a00;
+            }
+            .autoagora-outreach-badge.is-status-interested {
+                background: #e8f2ff;
+                color: #0a4b78;
+            }
+            .autoagora-outreach-badge.is-status-claimed {
+                background: #edfaef;
+                color: #1e4620;
+            }
+            .autoagora-outreach-badge.is-status-not_interested {
+                background: #fcf0f1;
+                color: #8a2424;
+            }
+            .autoagora-outreach-badge.is-status-opted_out {
+                background: #50575e;
+                color: #fff;
+            }
+            .autoagora-outreach-badge.is-priority-high {
+                background: #fcf0f1;
+                color: #b32d2e;
+            }
+            .autoagora-outreach-badge.is-priority-medium {
+                background: #fff4e5;
+                color: #8a4b00;
+            }
+            .autoagora-outreach-badge.is-priority-low,
+            .autoagora-outreach-badge.is-empty {
+                background: #f0f0f1;
+                color: #50575e;
             }
             .autoagora-user-listing-dashboard tr.is-selected-user td {
                 background: #f0f6fc;
