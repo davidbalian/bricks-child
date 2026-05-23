@@ -27,6 +27,8 @@ class MyListingsStatsManager {
             return $this->get_empty_stats();
         }
 
+        update_meta_cache('post', $listing_ids);
+
         $stats = $this->get_empty_stats();
         $stats['total_listings'] = count($listing_ids);
 

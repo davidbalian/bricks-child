@@ -732,6 +732,7 @@ final class CarsReportAdminPage
 
         ?>
         <div class="wrap">
+            <?php $this->renderAdminCardStyles(); ?>
             <h1><?php esc_html_e('Cars report (marketplace cleanup)', 'bricks-child'); ?></h1>
             <p class="description">
                 <?php esc_html_e('Use this report to detect aging inventory, monitor upload flow, and prioritize listing cleanup.', 'bricks-child'); ?>
@@ -924,7 +925,7 @@ final class CarsReportAdminPage
     {
         $oldPercentClass = $overview['old_percent'] >= 50.0 ? 'notice-error' : ($overview['old_percent'] >= 30.0 ? 'notice-warning' : 'notice-success');
         ?>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;">
+        <div class="autoagora-admin-card-grid">
             <?php $this->renderCard(__('Total listings', 'bricks-child'), number_format_i18n($overview['total']), 'notice-info'); ?>
             <?php $this->renderCard(sprintf(__('Old listings (%d+ days)', 'bricks-child'), $oldAfterDays), number_format_i18n($overview['old_total']), $oldPercentClass); ?>
             <?php $this->renderCard(__('Old share', 'bricks-child'), sprintf('%s%%', number_format_i18n($overview['old_percent'], 2)), $oldPercentClass); ?>
@@ -937,7 +938,7 @@ final class CarsReportAdminPage
         <p class="description" style="margin-top: 0;">
             <?php esc_html_e('Counts use the same cars as “Total listings” (publish, pending, draft). Active = all of those minus sold and expired (includes cars with no listing_state set).', 'bricks-child'); ?>
         </p>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:4px;">
+        <div class="autoagora-admin-card-grid autoagora-admin-card-grid--compact">
             <?php
             $this->renderCard(
                 __('Active', 'bricks-child'),
@@ -962,10 +963,79 @@ final class CarsReportAdminPage
     private function renderCard(string $label, string $value, string $noticeClass): void
     {
         ?>
-        <div class="notice <?php echo esc_attr($noticeClass); ?>" style="margin:0;padding:12px 14px;">
-            <div style="font-size:12px;text-transform:uppercase;color:#646970;"><?php echo esc_html($label); ?></div>
-            <div style="font-size:28px;font-weight:600;line-height:1.2;"><?php echo esc_html($value); ?></div>
+        <div class="autoagora-admin-card <?php echo esc_attr($this->cardClassForNotice($noticeClass)); ?>">
+            <div class="autoagora-admin-card__label"><?php echo esc_html($label); ?></div>
+            <div class="autoagora-admin-card__value"><?php echo esc_html($value); ?></div>
         </div>
+        <?php
+    }
+
+    private function cardClassForNotice(string $noticeClass): string
+    {
+        $map = array(
+            'notice-success' => 'is-success',
+            'notice-warning' => 'is-warning',
+            'notice-error'   => 'is-error',
+            'notice-info'    => 'is-info',
+        );
+
+        return $map[$noticeClass] ?? 'is-info';
+    }
+
+    private function renderAdminCardStyles(): void
+    {
+        ?>
+        <style>
+            .autoagora-admin-card-grid {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                align-items: stretch;
+            }
+            .autoagora-admin-card-grid--compact {
+                margin-bottom: 4px;
+            }
+            .autoagora-admin-card {
+                flex: 1 1 190px;
+                min-width: 190px;
+                max-width: 280px;
+                margin: 0;
+                padding: 14px 16px;
+                background: #fff;
+                border: 1px solid #c3c4c7;
+                border-left: 4px solid #72aee6;
+                border-radius: 6px;
+                box-sizing: border-box;
+            }
+            .autoagora-admin-card.is-success {
+                border-left-color: #00a32a;
+            }
+            .autoagora-admin-card.is-warning {
+                border-left-color: #dba617;
+            }
+            .autoagora-admin-card.is-error {
+                border-left-color: #d63638;
+            }
+            .autoagora-admin-card__label {
+                margin-bottom: 6px;
+                color: #646970;
+                font-size: 12px;
+                line-height: 1.3;
+                text-transform: uppercase;
+            }
+            .autoagora-admin-card__value {
+                color: #1d2327;
+                font-size: 28px;
+                font-weight: 600;
+                line-height: 1.2;
+            }
+            @media (max-width: 782px) {
+                .autoagora-admin-card {
+                    flex-basis: 100%;
+                    max-width: none;
+                }
+            }
+        </style>
         <?php
     }
 

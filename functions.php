@@ -54,6 +54,7 @@ require_once get_stylesheet_directory() . '/includes/admin/user-favorites-column
 require_once get_stylesheet_directory() . '/includes/admin/dealership-accounts.php';
 require_once get_stylesheet_directory() . '/includes/admin/listing-click-metrics.php';
 require_once get_stylesheet_directory() . '/includes/admin/cars-report-admin.php';
+require_once get_stylesheet_directory() . '/includes/admin/user-listing-dashboard-admin.php';
 require_once get_stylesheet_directory() . '/includes/admin/cars-daily-deals-admin.php';
 
 // NEWLY ADDED FROM ASTRA CHILD (SECOND FILE)

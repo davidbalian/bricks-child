@@ -220,6 +220,7 @@ final class ListingClickMetricsPage
 
         ?>
         <div class="wrap">
+            <?php $this->renderAdminCardStyles(); ?>
             <h1><?php esc_html_e('Listing metrics (contact conversion)', 'bricks-child'); ?></h1>
             <p>
                 <a class="button button-secondary" href="<?php echo esc_url(admin_url('edit.php?post_type=car&page=cars-report')); ?>">
@@ -230,42 +231,27 @@ final class ListingClickMetricsPage
                 <?php esc_html_e('Contact click rate uses WhatsApp (whatsapp_button_clicks) plus phone (call_button_clicks), divided by listing page views (total_views_count from the car views tracker).', 'bricks-child'); ?>
             </p>
 
-            <div class="listing-metrics-wcr-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 1.25rem 0 1.5rem;">
-                <div class="notice" style="margin: 0; padding: 12px 14px;">
-                    <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; color: #646970;">
-                        <?php esc_html_e('Total listing page views', 'bricks-child'); ?>
-                    </div>
-                    <div style="font-size: 28px; font-weight: 600; line-height: 1.2;">
-                        <?php echo esc_html(number_format_i18n($siteWide['total_page_views'])); ?>
-                    </div>
-                </div>
-                <div class="notice" style="margin: 0; padding: 12px 14px;">
-                    <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; color: #646970;">
-                        <?php esc_html_e('Total WhatsApp clicks', 'bricks-child'); ?>
-                    </div>
-                    <div style="font-size: 28px; font-weight: 600; line-height: 1.2;">
-                        <?php echo esc_html(number_format_i18n($siteWide['total_whatsapp_clicks'])); ?>
-                    </div>
-                </div>
-                <div class="notice" style="margin: 0; padding: 12px 14px;">
-                    <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; color: #646970;">
-                        <?php esc_html_e('Total phone clicks', 'bricks-child'); ?>
-                    </div>
-                    <div style="font-size: 28px; font-weight: 600; line-height: 1.2;">
-                        <?php echo esc_html(number_format_i18n($siteWide['total_phone_clicks'])); ?>
-                    </div>
-                </div>
-                <div class="notice notice-<?php echo esc_attr($this->contactRateNoticeVariant($overallContactRate)); ?>" style="margin: 0; padding: 12px 14px; border-left-width: 4px;">
-                    <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; color: #646970;">
-                        <?php esc_html_e('Contact click rate', 'bricks-child'); ?>
-                    </div>
-                    <div style="font-size: 28px; font-weight: 600; line-height: 1.2;">
-                        <?php echo esc_html($this->formatContactRatePercent($overallContactRate)); ?>
-                    </div>
-                    <p style="margin: 8px 0 0; font-size: 13px;">
-                        <?php echo esc_html($this->contactRateInterpretationLabel($overallContactRate)); ?>
-                    </p>
-                </div>
+            <div class="listing-metrics-card-grid">
+                <?php
+                $this->renderSummaryCard(
+                    __('Total listing page views', 'bricks-child'),
+                    number_format_i18n($siteWide['total_page_views'])
+                );
+                $this->renderSummaryCard(
+                    __('Total WhatsApp clicks', 'bricks-child'),
+                    number_format_i18n($siteWide['total_whatsapp_clicks'])
+                );
+                $this->renderSummaryCard(
+                    __('Total phone clicks', 'bricks-child'),
+                    number_format_i18n($siteWide['total_phone_clicks'])
+                );
+                $this->renderSummaryCard(
+                    __('Contact click rate', 'bricks-child'),
+                    $this->formatContactRatePercent($overallContactRate),
+                    $this->contactRateNoticeVariant($overallContactRate),
+                    $this->contactRateInterpretationLabel($overallContactRate)
+                );
+                ?>
             </div>
 
             <p class="description" style="max-width: 720px;">
@@ -367,6 +353,79 @@ final class ListingClickMetricsPage
             selected($current, $value, false),
             esc_html($label)
         );
+    }
+
+    private function renderSummaryCard(string $label, string $value, string $variant = 'info', string $description = ''): void
+    {
+        ?>
+        <div class="listing-metrics-card is-<?php echo esc_attr($variant); ?>">
+            <div class="listing-metrics-card__label"><?php echo esc_html($label); ?></div>
+            <div class="listing-metrics-card__value"><?php echo esc_html($value); ?></div>
+            <?php if ($description !== '') : ?>
+                <p class="listing-metrics-card__description"><?php echo esc_html($description); ?></p>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+
+    private function renderAdminCardStyles(): void
+    {
+        ?>
+        <style>
+            .listing-metrics-card-grid {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                align-items: stretch;
+                margin: 1.25rem 0 1.5rem;
+            }
+            .listing-metrics-card {
+                flex: 1 1 180px;
+                min-width: 180px;
+                max-width: 280px;
+                padding: 14px 16px;
+                background: #fff;
+                border: 1px solid #c3c4c7;
+                border-left: 4px solid #72aee6;
+                border-radius: 6px;
+                box-sizing: border-box;
+            }
+            .listing-metrics-card.is-success {
+                border-left-color: #00a32a;
+            }
+            .listing-metrics-card.is-warning {
+                border-left-color: #dba617;
+            }
+            .listing-metrics-card.is-error {
+                border-left-color: #d63638;
+            }
+            .listing-metrics-card__label {
+                margin-bottom: 6px;
+                color: #646970;
+                font-size: 12px;
+                line-height: 1.3;
+                text-transform: uppercase;
+            }
+            .listing-metrics-card__value {
+                color: #1d2327;
+                font-size: 28px;
+                font-weight: 600;
+                line-height: 1.2;
+            }
+            .listing-metrics-card__description {
+                margin: 8px 0 0;
+                color: #50575e;
+                font-size: 13px;
+                line-height: 1.35;
+            }
+            @media (max-width: 782px) {
+                .listing-metrics-card {
+                    flex-basis: 100%;
+                    max-width: none;
+                }
+            }
+        </style>
+        <?php
     }
 
     /**
