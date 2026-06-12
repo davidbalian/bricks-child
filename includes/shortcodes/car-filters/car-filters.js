@@ -366,11 +366,6 @@
                 return;
             }
 
-            if ($target.data('disable-ajax') === true || $target.data('disable-ajax') === 'true') {
-                window.location.href = this.buildResultsUrl(group);
-                return;
-            }
-
             var $wrapper = $target.find('.car-listings-wrapper');
             var listingAtts = $target.data('atts') || {};
 

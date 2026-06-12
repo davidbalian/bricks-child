@@ -15,11 +15,12 @@ const AUTOAGORA_SEARCH_ALERT_STATUS_META = '_autoagora_alert_status';
 const AUTOAGORA_SEARCH_ALERT_CRITERIA_META = '_autoagora_alert_criteria';
 const AUTOAGORA_SEARCH_ALERT_SENT_META = '_autoagora_alert_sent_car_ids';
 
-add_action('init', 'autoagora_search_alerts_register_post_type');
-add_shortcode('search_alert_form', 'autoagora_search_alert_form_shortcode');
-add_action('admin_post_autoagora_save_search_alert', 'autoagora_search_alerts_handle_save');
-add_action('admin_post_autoagora_delete_search_alert', 'autoagora_search_alerts_handle_delete');
-add_action('transition_post_status', 'autoagora_search_alerts_maybe_notify_for_listing', 40, 3);
+// Search alerts rollout disabled.
+// add_action('init', 'autoagora_search_alerts_register_post_type');
+// add_shortcode('search_alert_form', 'autoagora_search_alert_form_shortcode');
+// add_action('admin_post_autoagora_save_search_alert', 'autoagora_search_alerts_handle_save');
+// add_action('admin_post_autoagora_delete_search_alert', 'autoagora_search_alerts_handle_delete');
+// add_action('transition_post_status', 'autoagora_search_alerts_maybe_notify_for_listing', 40, 3);
 
 function autoagora_search_alerts_register_post_type(): void {
     register_post_type(

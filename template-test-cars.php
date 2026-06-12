@@ -179,7 +179,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
             </button>
         </div>
         <div class="tcp-filters-modal-body">
-            <?php echo do_shortcode( '[car_filters filters="make,model,price,mileage,fuel,body,year" mode="redirect" target="test-cars-listings" layout="vertical" show_button="false"]' ); ?>
+            <?php echo do_shortcode( '[car_filters filters="make,model,price,mileage,fuel,body,year" mode="ajax" target="test-cars-listings" layout="vertical" show_button="false"]' ); ?>
         </div>
         <div class="tcp-filters-modal-footer">
             <button type="button" class="tcp-modal-apply-btn" id="tcp-modal-apply-btn">Apply Filters</button>
@@ -234,8 +234,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
          data-atts="<?php echo esc_attr( wp_json_encode( $listing_atts ) ); ?>"
          data-page="<?php echo esc_attr( (string) $current_page ); ?>"
          data-max-pages="<?php echo esc_attr( $cars_query->max_num_pages ); ?>"
-         data-server-filtered="<?php echo $has_server_filters ? 'true' : 'false'; ?>"
-         data-disable-ajax="true">
+         data-server-filtered="<?php echo $has_server_filters ? 'true' : 'false'; ?>">
 
         <div class="car-listings-wrapper tcp-grid">
             <?php
@@ -968,8 +967,8 @@ body {
    Loading state
    ============================================ */
 .car-listings-wrapper.car-listings-loading {
-    opacity: 1;
-    pointer-events: auto;
+    opacity: 0.5;
+    pointer-events: none;
     transition: opacity 0.15s;
 }
 .car-listings-wrapper.car-listings-loading-cleared {
@@ -1722,14 +1721,7 @@ body {
         // Also update the data attribute for future reads
         $container.attr('data-atts', JSON.stringify(atts));
 
-        if (window.CarFilters && CarFilters.buildResultsUrl) {
-            window.location.href = CarFilters.buildResultsUrl(group, {
-                orderby: orderby,
-                order: order
-            });
-        } else {
-            window.location.href = '/cars/?cars_orderby=' + encodeURIComponent(orderby) + '&cars_order=' + encodeURIComponent(order);
-        }
+        loadPage(1, { scroll: false });
     });
 
     /* ── AJAX pagination ── */
@@ -1853,7 +1845,10 @@ body {
             updateClearAllButton(initialCountText);
         }
         if (hasLocationFromUrl) {
-            console.info('[AutoAgora cars template] location URL present; using server-rendered listings without initial AJAX refresh');
+            var initialListingsPage = (window.CarFilters && CarFilters.resolveListingsPageFromContainerOrUrl)
+                ? CarFilters.resolveListingsPageFromContainerOrUrl($container)
+                : (parseInt($container.attr('data-page'), 10) || 1);
+            loadPage(initialListingsPage, { scroll: false });
         }
     });
 

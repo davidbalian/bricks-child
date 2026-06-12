@@ -279,9 +279,12 @@ function render_car_card($post_id, $context = array()) {
                 <span class="car-card-date"><?php echo $relative_date; ?></span>
             </div>
         </a>
-        <?php if (function_exists('autoagora_render_compare_button')) : ?>
-            <?php echo autoagora_render_compare_button((int) $post_id); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper escapes attributes. ?>
-        <?php endif; ?>
+        <?php /*
+        Buyer compare feature disabled.
+        if (function_exists('autoagora_render_compare_button')) :
+            echo autoagora_render_compare_button((int) $post_id);
+        endif;
+        */ ?>
     </article>
     <?php
 }
@@ -320,11 +323,14 @@ function car_card_render_price_insight_badge($post_id) {
         return;
     }
     $label = $labels[$band];
+    /*
+    Buyer deal-context feature disabled.
     $price = (float) str_replace(',', '', (string) car_card_get_meta_value($post_id, 'price'));
     $median = (float) str_replace(',', '', (string) car_card_get_meta_value($post_id, 'price_insight_median'));
     if ($median > 0 && $price > 0 && $price < $median && in_array($band, array('great', 'good'), true)) {
         $label .= ' - ' . (int) round((($median - $price) / $median) * 100) . '% below typical';
     }
+    */
     ?>
     <span class="car-card-price-insight car-card-price-insight--<?php echo esc_attr($band); ?>">
         <?php echo esc_html($label); ?>
