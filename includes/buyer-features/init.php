@@ -20,8 +20,8 @@ add_shortcode('price_history', 'autoagora_price_history_shortcode');
 add_shortcode('price_drop_cars', 'autoagora_price_drop_cars_shortcode');
 add_shortcode('new_listings_since_last_visit', 'autoagora_new_listings_since_last_visit_shortcode');
 add_shortcode('dealer_trust_indicators', 'autoagora_dealer_trust_indicators_shortcode');
-add_shortcode('compare_button', 'autoagora_compare_button_shortcode');
-add_shortcode('compare_cars', 'autoagora_compare_cars_shortcode');
+// add_shortcode('compare_button', 'autoagora_compare_button_shortcode');
+// add_shortcode('compare_cars', 'autoagora_compare_cars_shortcode');
 
 function autoagora_buyer_features_enqueue_assets(): void {
     $base_path = get_stylesheet_directory() . '/includes/buyer-features/';

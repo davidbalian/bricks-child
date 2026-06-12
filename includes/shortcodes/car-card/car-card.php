@@ -279,11 +279,12 @@ function render_car_card($post_id, $context = array()) {
                 <span class="car-card-date"><?php echo $relative_date; ?></span>
             </div>
         </a>
-        <?php
+        <?php /*
+        Buyer compare feature disabled.
         if (function_exists('autoagora_render_compare_button')) :
             echo autoagora_render_compare_button((int) $post_id);
         endif;
-        ?>
+        */ ?>
     </article>
     <?php
 }
