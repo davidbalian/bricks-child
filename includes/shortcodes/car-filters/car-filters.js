@@ -391,7 +391,12 @@
                         var perfRenderStart = (typeof performance !== 'undefined' && performance.now) ? performance.now() : null;
 
                         if (response.data.cards && window.carListingCardsRender) {
-                            window.carListingCardsRender.renderInto($wrapper[0], response.data.cards);
+                            try {
+                                window.carListingCardsRender.renderInto($wrapper[0], response.data.cards);
+                            } catch (renderError) {
+                                console.error('CarFilters: card render error', renderError);
+                                $wrapper.html('<p class="car-listings-no-results">Unable to render listings. Please refresh the page.</p>');
+                            }
                         } else if (response.data.html) {
                             $wrapper.html(response.data.html);
                         }

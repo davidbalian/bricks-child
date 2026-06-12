@@ -14,7 +14,11 @@
     }
 
     function writeItems(items) {
-        localStorage.setItem(KEY, JSON.stringify(items.slice(0, MAX)));
+        try {
+            localStorage.setItem(KEY, JSON.stringify(items.slice(0, MAX)));
+        } catch (e) {
+            return;
+        }
     }
 
     function itemFromButton(btn) {
@@ -34,6 +38,7 @@
     function ensureTray() {
         var tray = document.querySelector('.autoagora-compare-tray');
         if (tray) return tray;
+        if (!document.body) return null;
 
         tray = document.createElement('section');
         tray.className = 'autoagora-compare-tray';
@@ -53,6 +58,9 @@
     function renderTray() {
         var items = readItems();
         var tray = ensureTray();
+        if (!tray) {
+            return;
+        }
         if (!items.length) {
             tray.classList.remove('is-open');
             tray.innerHTML = '';
@@ -140,15 +148,17 @@
         renderTray();
     }
 
-    var mo = new MutationObserver(function (mutations) {
-        for (var i = 0; i < mutations.length; i++) {
-            if (mutations[i].addedNodes.length) {
-                updateButtons();
-                break;
+    if ('MutationObserver' in window && document.body) {
+        var mo = new MutationObserver(function (mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+                if (mutations[i].addedNodes.length) {
+                    updateButtons();
+                    break;
+                }
             }
-        }
-    });
-    mo.observe(document.body, { childList: true, subtree: true });
+        });
+        mo.observe(document.body, { childList: true, subtree: true });
+    }
 
     window.autoagoraCompareRender = renderTray;
 })();

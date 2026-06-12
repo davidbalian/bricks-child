@@ -75,3 +75,11 @@ Passed:
 - Bundled Node syntax check for `includes/shortcodes/car-filters/car-listing-cards-render.js`
 
 Manual WordPress/Bricks QA is still needed on a running site.
+
+## Loading-State Hotfix
+
+After the buyer feature rollout, `/cars/` could remain in a loading state if a frontend render error or infinite-scroll AJAX error occurred. The listing/filter scripts now:
+
+- Catch card-render errors instead of leaving the loading overlay active.
+- Hide the infinite-scroll loader on AJAX failure.
+- Guard compare storage and DOM rendering so compare failures do not block listings.

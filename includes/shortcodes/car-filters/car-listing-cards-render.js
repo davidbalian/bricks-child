@@ -233,7 +233,7 @@
             compare.className = 'car-card-compare-btn';
             compare.setAttribute('data-autoagora-compare', '1');
             Object.keys(c.cmp).forEach(function (key) {
-                compare.setAttribute('data-' + key, c.cmp[key] || '');
+                compare.setAttribute('data-' + key, String(c.cmp[key] || ''));
             });
             compare.textContent = 'Compare';
             article.appendChild(compare);
@@ -260,7 +260,13 @@
         }
         container.appendChild(frag);
         if (window.autoagoraCompareRender) {
-            window.autoagoraCompareRender();
+            try {
+                window.autoagoraCompareRender();
+            } catch (e) {
+                if (window.console && window.console.warn) {
+                    window.console.warn('Compare tray render failed', e);
+                }
+            }
         }
     }
 

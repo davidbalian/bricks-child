@@ -140,6 +140,7 @@
             console.error("Error loading more car listings");
             // Revert page on error
             currentPage--;
+            $loader.hide();
           },
           complete: function () {
             loading = false;
