@@ -190,7 +190,7 @@
             if (c.pi && PI_LABELS[c.pi]) {
                 var pi = document.createElement('span');
                 pi.className = 'car-card-price-insight car-card-price-insight--' + c.pi;
-                pi.textContent = PI_LABELS[c.pi];
+                pi.textContent = c.pi_label || PI_LABELS[c.pi];
                 signalWrap.appendChild(pi);
             }
             if (c.pop) {
@@ -227,6 +227,18 @@
         body.appendChild(foot);
         article.appendChild(body);
 
+        if (c.cmp && c.cmp['car-id']) {
+            var compare = document.createElement('button');
+            compare.type = 'button';
+            compare.className = 'car-card-compare-btn';
+            compare.setAttribute('data-autoagora-compare', '1');
+            Object.keys(c.cmp).forEach(function (key) {
+                compare.setAttribute('data-' + key, c.cmp[key] || '');
+            });
+            compare.textContent = 'Compare';
+            article.appendChild(compare);
+        }
+
         return article;
     }
 
@@ -247,6 +259,9 @@
             frag.appendChild(renderOne(cards[i]));
         }
         container.appendChild(frag);
+        if (window.autoagoraCompareRender) {
+            window.autoagoraCompareRender();
+        }
     }
 
     window.carListingCardsRender = {

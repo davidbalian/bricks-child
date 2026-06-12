@@ -1,0 +1,134 @@
+.autoagora-search-alert {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 18px;
+    background: #fff;
+}
+
+.autoagora-search-alert__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.autoagora-search-alert__title {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.3;
+}
+
+.autoagora-search-alert__hint,
+.autoagora-search-alert__message {
+    margin: 6px 0 0;
+    color: #4b5563;
+    font-size: 0.95rem;
+}
+
+.autoagora-search-alert__message {
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: #f3f4f6;
+}
+
+.autoagora-search-alert__message--success {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.autoagora-search-alert__message--error {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.autoagora-search-alert__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.autoagora-search-alert__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.autoagora-search-alert__field label {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.autoagora-search-alert__field input {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 8px 10px;
+    background: #fff;
+}
+
+.autoagora-search-alert__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.autoagora-search-alert__list {
+    display: grid;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.autoagora-search-alert__item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    border-top: 1px solid #eef0f2;
+    padding-top: 10px;
+}
+
+.autoagora-search-alert__item-title {
+    font-weight: 700;
+    color: #111827;
+}
+
+.autoagora-search-alert__item-meta {
+    margin-top: 3px;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.autoagora-search-alert__delete {
+    border: 0;
+    background: transparent;
+    color: #b91c1c;
+    cursor: pointer;
+    font-weight: 700;
+    padding: 8px;
+}
+
+@media (max-width: 640px) {
+    .autoagora-search-alert__header,
+    .autoagora-search-alert__item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .autoagora-search-alert__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .autoagora-search-alert__actions {
+        justify-content: stretch;
+    }
+
+    .autoagora-search-alert__actions .btn {
+        width: 100%;
+    }
+}

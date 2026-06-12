@@ -598,6 +598,9 @@ function car_listings_render_card($post_id) {
         </a>
 
         <?php car_listings_render_favorite_button($post_id); ?>
+        <?php if (function_exists('autoagora_render_compare_button')) : ?>
+            <?php echo autoagora_render_compare_button((int) $post_id, 'car-card-compare-btn'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Helper escapes attributes. ?>
+        <?php endif; ?>
     </article>
     <?php
 }

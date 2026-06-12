@@ -139,6 +139,21 @@ function car_card_build_listing_json_payload($post_id, $listing_index, $is_favor
     if ($band === '' || $band === null || $band === 'none') {
         $band = null;
     }
+    $price_insight_label = '';
+    if ($band !== null) {
+        $labels = array(
+            'great' => 'Great Deal',
+            'good'  => 'Good Deal',
+            'fair'  => 'Fair Deal',
+            'above' => 'Above typical',
+        );
+        $price_insight_label = isset($labels[$band]) ? $labels[$band] : '';
+        $median = (float) str_replace(',', '', (string) car_card_get_meta_value($post_id, 'price_insight_median'));
+        $price_num = (float) str_replace(',', '', (string) $price);
+        if ($price_insight_label !== '' && $median > 0 && $price_num > 0 && $price_num < $median && in_array($band, array('great', 'good'), true)) {
+            $price_insight_label .= ' - ' . (int) round((($median - $price_num) / $median) * 100) . '% below typical';
+        }
+    }
 
     $mileage_fmt = '';
     if ($mileage) {
@@ -168,6 +183,8 @@ function car_card_build_listing_json_payload($post_id, $listing_index, $is_favor
         'pop'              => ($popular_badge === '1') ? 1 : 0,
         'feat'             => !empty($is_featured) ? 1 : 0,
         'pi'               => $band,
+        'pi_label'         => $price_insight_label,
+        'cmp'              => function_exists('autoagora_get_compare_data') ? autoagora_get_compare_data((int) $post_id) : array(),
         'idx'              => (int) $listing_index,
     );
 }

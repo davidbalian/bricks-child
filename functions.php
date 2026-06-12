@@ -366,6 +366,8 @@ require_once get_stylesheet_directory() . '/includes/price-insight/init.php';
 require_once get_stylesheet_directory() . '/includes/listing-rank/ListingRankManager.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-listings/car-listings.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-filters/car-filters.php';
+require_once get_stylesheet_directory() . '/includes/search-alerts/init.php';
+require_once get_stylesheet_directory() . '/includes/buyer-features/init.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/autocy-bulk-upload/autocy-bulk-upload.php';
 
 // =========================================================================
@@ -1015,6 +1017,5 @@ function manual_sync_car_taxonomy() {
 // add_action('init', 'manual_sync_car_taxonomy');
 
 // =========================================================================
-
 
 

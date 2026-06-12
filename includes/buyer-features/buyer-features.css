@@ -1,0 +1,186 @@
+.autoagora-feature-section {
+    margin: 24px 0;
+}
+
+.autoagora-feature-title {
+    margin: 0 0 14px;
+    font-size: 1.35rem;
+    line-height: 1.25;
+    color: #111827;
+}
+
+.autoagora-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 18px;
+}
+
+.autoagora-price-history {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+}
+
+.autoagora-price-history__list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.autoagora-price-history__item {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid #f1f3f5;
+}
+
+.autoagora-price-history__item:last-child {
+    border-bottom: 0;
+}
+
+.autoagora-price-history__price {
+    font-weight: 800;
+    color: #0b72c1;
+}
+
+.autoagora-price-history__drop {
+    color: #047857;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.autoagora-trust-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.autoagora-trust-metric {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+    background: #fff;
+}
+
+.autoagora-trust-metric__label {
+    display: block;
+    color: #6b7280;
+    font-size: 0.82rem;
+}
+
+.autoagora-trust-metric__value {
+    display: block;
+    margin-top: 4px;
+    color: #111827;
+    font-size: 1.05rem;
+    font-weight: 800;
+}
+
+.autoagora-new-since {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: #eff6ff;
+    color: #1e3a8a;
+}
+
+.autoagora-new-since strong {
+    font-size: 1.15rem;
+}
+
+.autoagora-compare-btn,
+.car-card-compare-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #fff;
+    color: #1f2937;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 7px 10px;
+}
+
+.car-card-compare-btn {
+    margin: 8px 1rem 1rem;
+}
+
+.autoagora-compare-btn.is-selected,
+.car-card-compare-btn.is-selected {
+    border-color: #0b72c1;
+    background: #e0f2fe;
+    color: #075985;
+}
+
+.autoagora-compare-tray {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 9999;
+    width: min(760px, calc(100vw - 36px));
+    max-height: min(78vh, 620px);
+    overflow: auto;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    box-shadow: 0 16px 44px rgba(15, 23, 42, 0.18);
+    background: #fff;
+    padding: 14px;
+    display: none;
+}
+
+.autoagora-compare-tray.is-open {
+    display: block;
+}
+
+.autoagora-compare-tray__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.autoagora-compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+}
+
+.autoagora-compare-table th,
+.autoagora-compare-table td {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 9px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.autoagora-compare-table th {
+    color: #4b5563;
+    font-weight: 700;
+}
+
+.autoagora-empty-note {
+    color: #6b7280;
+}
+
+@media (max-width: 640px) {
+    .autoagora-trust-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .autoagora-new-since {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
