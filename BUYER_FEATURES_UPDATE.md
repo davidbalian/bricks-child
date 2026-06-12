@@ -85,3 +85,10 @@ After the buyer feature rollout, `/cars/` could remain in a loading state if a f
 - Keep the infinite-scroll sentinel hidden while idle so `/cars/` does not look like it is permanently loading.
 - Add console lifecycle logs under `[AutoAgora listings]` for infinite-scroll init/load/success/error.
 - Guard compare storage and DOM rendering so compare failures do not block listings.
+
+## Rollout Isolation Notes
+
+- Compare cars was isolated as the failing rollout slice on June 12, 2026.
+- Commit `73dec07 Enable compare cars feature` was reverted by `1f7e675 Revert "Enable compare cars feature"`.
+- Suspected cause: the compare `MutationObserver` watched the full document and called `updateButtons()`, while `updateButtons()` rewrote compare button text/classes. With compare buttons on listing cards, that could repeatedly trigger DOM mutations and keep `/cars/` in a loading/frozen state.
+- Compare remains disabled in registrations/card integrations until it is re-enabled for another controlled test.

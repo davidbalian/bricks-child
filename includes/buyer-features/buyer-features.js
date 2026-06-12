@@ -100,8 +100,13 @@
         var ids = readItems().map(function (item) { return String(item.id); });
         document.querySelectorAll('[data-autoagora-compare]').forEach(function (btn) {
             var selected = ids.indexOf(String(btn.getAttribute('data-car-id'))) !== -1;
-            btn.classList.toggle('is-selected', selected);
-            btn.textContent = selected ? 'Added to compare' : 'Compare';
+            var label = selected ? 'Added to compare' : 'Compare';
+            if (btn.classList.contains('is-selected') !== selected) {
+                btn.classList.toggle('is-selected', selected);
+            }
+            if (btn.textContent !== label) {
+                btn.textContent = label;
+            }
         });
     }
 
@@ -149,10 +154,17 @@
     }
 
     if ('MutationObserver' in window && document.body) {
+        var updateQueued = false;
         var mo = new MutationObserver(function (mutations) {
             for (var i = 0; i < mutations.length; i++) {
                 if (mutations[i].addedNodes.length) {
-                    updateButtons();
+                    if (!updateQueued) {
+                        updateQueued = true;
+                        window.requestAnimationFrame(function () {
+                            updateQueued = false;
+                            updateButtons();
+                        });
+                    }
                     break;
                 }
             }
