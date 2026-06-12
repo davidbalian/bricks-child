@@ -30,6 +30,43 @@ function car_card_best_image_size_for_attachment($attachment_id) {
 }
 
 /**
+ * Build resilient image markup for a card slide.
+ *
+ * Some imported attachments have IDs in car_images but incomplete intermediate
+ * sizes. Falling back to the raw attachment URL prevents empty gray sliders.
+ */
+function car_card_build_slide_image_html($attachment_id, $is_eager) {
+    $size = car_card_best_image_size_for_attachment($attachment_id);
+    $attrs = array(
+        'alt'           => '',
+        'decoding'      => 'async',
+        'draggable'     => 'false',
+        'sizes'         => '(max-width: 767px) 92vw, (max-width: 1200px) 48vw, 420px',
+        'class'         => 'car-card-slide-img',
+        'loading'       => $is_eager ? 'eager' : 'lazy',
+        'fetchpriority' => $is_eager ? 'high' : 'low',
+    );
+
+    $html = wp_get_attachment_image($attachment_id, $size, false, $attrs);
+    if ($html !== '') {
+        return $html;
+    }
+
+    $src = wp_get_attachment_url($attachment_id);
+    if (!$src) {
+        return '';
+    }
+
+    return sprintf(
+        '<img src="%s" alt="" decoding="async" draggable="false" sizes="%s" class="car-card-slide-img" loading="%s" fetchpriority="%s">',
+        esc_url($src),
+        esc_attr($attrs['sizes']),
+        esc_attr($attrs['loading']),
+        esc_attr($attrs['fetchpriority'])
+    );
+}
+
+/**
  * Shortcode handler
  */
 function car_card_shortcode($atts) {
@@ -126,7 +163,23 @@ function render_car_card($post_id, $context = array()) {
     $total_images = count($image_ids);
     $max_slides = 5;
     $slide_ids = array_slice($image_ids, 0, $max_slides);
-    $slide_count = count($slide_ids);
+    $slides = array();
+    foreach ($slide_ids as $index => $img_id) {
+        $slide_img_html = car_card_build_slide_image_html(
+            (int) $img_id,
+            ($is_first_grid_card && $index === 0)
+        );
+        if ($slide_img_html === '') {
+            error_log('AutoAgora car card: empty image output for attachment ' . (int) $img_id . ' on post ' . (int) $post_id);
+            continue;
+        }
+
+        $slides[] = array(
+            'html' => $slide_img_html,
+            'original_index' => $index,
+        );
+    }
+    $slide_count = count($slides);
     ?>
     <article class="car-card<?php echo $is_featured ? ' car-card-featured' : ''; ?>" data-post-id="<?php echo esc_attr($post_id); ?>">
         <!-- ROW 1: Slider -->
@@ -150,29 +203,11 @@ function render_car_card($post_id, $context = array()) {
             <!-- Slides track -->
             <?php if ($slide_count > 0) : ?>
                 <div class="car-card-slider-track">
-                    <?php foreach ($slide_ids as $index => $img_id) :
-                        $slide_size     = car_card_best_image_size_for_attachment($img_id);
-                        $slide_img_html = wp_get_attachment_image(
-                            $img_id,
-                            $slide_size,
-                            false,
-                            array(
-                                'alt'         => '',
-                                'decoding'    => 'async',
-                                'draggable'   => 'false',
-                                'sizes'       => '(max-width: 767px) 92vw, (max-width: 1200px) 48vw, 420px',
-                                'class'       => 'car-card-slide-img',
-                                'loading'     => ($is_first_grid_card && $index === 0) ? 'eager' : 'lazy',
-                                'fetchpriority' => ($is_first_grid_card && $index === 0) ? 'high' : 'low',
-                            )
-                        );
-                        if ($slide_img_html === '') {
-                            continue;
-                        }
-                        $is_last = ($index === $slide_count - 1) && ($slide_count === $max_slides);
+                    <?php foreach ($slides as $index => $slide) :
+                        $is_last = ($index === $slide_count - 1) && ($total_images > $slide_count || $slide_count === $max_slides);
                     ?>
                         <div class="car-card-slide" data-index="<?php echo $index + 1; ?>">
-                            <?php echo $slide_img_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_get_attachment_image is escaped by core. ?>
+                            <?php echo $slide['html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built by wp_get_attachment_image or escaped fallback. ?>
                             <?php if ($is_last) : ?>
                                 <div class="car-card-slide-overlay">
                                     <a href="<?php echo esc_url($permalink); ?>" class="car-card-view-all-btn">View All Images</a>

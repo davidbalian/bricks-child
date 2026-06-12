@@ -1,9 +1,16 @@
 (function () {
     'use strict';
 
+    function logCardIssue(message, data) {
+        if (window.console && window.console.warn) {
+            window.console.warn('[AutoAgora card] ' + message, data || {});
+        }
+    }
+
     function initSlider(el) {
         var track      = el.querySelector('.car-card-slider-track');
         var slides     = el.querySelectorAll('.car-card-slide');
+        var images     = el.querySelectorAll('.car-card-slide-img');
         var counter    = el.querySelector('.car-card-counter');
         var btnLeft    = el.querySelector('.car-card-arrow-left');
         var btnRight   = el.querySelector('.car-card-arrow-right');
@@ -11,6 +18,25 @@
         var total      = parseInt(el.dataset.total, 10) || slides.length;
         var slideCount = slides.length;
         var current    = 0;
+
+        if (track && slideCount > 0 && images.length === 0) {
+            var card = el.closest('.car-card');
+            logCardIssue('empty slider', {
+                postId: card ? card.getAttribute('data-post-id') : '',
+                declaredSlides: el.getAttribute('data-slides'),
+                declaredTotal: el.getAttribute('data-total')
+            });
+        }
+
+        images.forEach(function (img) {
+            img.addEventListener('error', function () {
+                var card = el.closest('.car-card');
+                logCardIssue('image failed to load', {
+                    postId: card ? card.getAttribute('data-post-id') : '',
+                    src: img.currentSrc || img.src || ''
+                });
+            }, { once: true });
+        });
 
         if (!track || slideCount === 0) return;
 

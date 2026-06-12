@@ -971,6 +971,10 @@ body {
     pointer-events: none;
     transition: opacity 0.15s;
 }
+.car-listings-wrapper.car-listings-loading-cleared {
+    opacity: 1;
+    pointer-events: auto;
+}
 
 /* ============================================
    SEO Content: Intro + FAQ
@@ -1729,11 +1733,24 @@ body {
             : {};
         var listingAtts = $container.data('atts') || {};
 
-        $wrapper.addClass('car-listings-loading');
+        $wrapper.removeClass('car-listings-loading-cleared').addClass('car-listings-loading');
+        var loadingWatchdog = window.setTimeout(function() {
+            if ($wrapper.hasClass('car-listings-loading')) {
+                console.error('[AutoAgora cars template] loading watchdog cleared stuck state', { page: page });
+                $wrapper.removeClass('car-listings-loading').addClass('car-listings-loading-cleared');
+            }
+        }, 20000);
+        console.info('[AutoAgora cars template] ajax start', {
+            page: page,
+            filters: filterData,
+            listingAtts: listingAtts,
+            locationActive: locationState.active
+        });
 
         $.ajax({
             url: carFiltersConfig.ajaxUrl,
             type: 'POST',
+            timeout: 15000,
             data: $.extend({
                 action: 'car_filters_filter_listings',
                 nonce: carFiltersConfig.nonce,
@@ -1745,11 +1762,17 @@ body {
                 location_radius_km: locationState.active ? locationState.radiusKm : ''
             }, filterData),
             success: function(response) {
+                console.info('[AutoAgora cars template] ajax response', response);
                 if (response.success) {
-                    if (response.data.cards && window.carListingCardsRender) {
-                        window.carListingCardsRender.renderInto($wrapper[0], response.data.cards);
-                    } else if (response.data.html) {
-                        $wrapper.html(response.data.html);
+                    try {
+                        if (response.data.cards && window.carListingCardsRender) {
+                            window.carListingCardsRender.renderInto($wrapper[0], response.data.cards);
+                        } else if (response.data.html) {
+                            $wrapper.html(response.data.html);
+                        }
+                    } catch (renderError) {
+                        console.error('[AutoAgora cars template] render error', renderError);
+                        $wrapper.html('<p class="car-listings-no-results">Unable to render listings. Please refresh the page.</p>');
                     }
                     $pagination.html(response.data.pagination_html || '');
                     $container.data('page', response.data.current_page);
@@ -1764,10 +1787,17 @@ body {
                 }
             },
             error: function(xhr, status, error) {
-                console.error('Pagination AJAX error:', error);
+                console.error('[AutoAgora cars template] ajax error', {
+                    status: status,
+                    error: error,
+                    responseText: xhr && xhr.responseText ? xhr.responseText.slice(0, 800) : ''
+                });
+                $wrapper.html('<p class="car-listings-no-results">Unable to load listings. Please refresh the page.</p>');
             },
             complete: function() {
+                window.clearTimeout(loadingWatchdog);
                 $wrapper.removeClass('car-listings-loading');
+                console.info('[AutoAgora cars template] ajax complete', { page: page });
             }
         });
     }

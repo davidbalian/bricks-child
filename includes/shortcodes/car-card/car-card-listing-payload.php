@@ -99,7 +99,11 @@ function car_card_build_listing_json_payload($post_id, $listing_index, $is_favor
     foreach ($slide_ids as $index => $img_id) {
         $size = car_card_best_image_size_for_attachment($img_id);
         $src = wp_get_attachment_image_url($img_id, $size);
-        if ($src === '') {
+        if (!$src) {
+            $src = wp_get_attachment_url($img_id);
+        }
+        if (!$src) {
+            error_log('AutoAgora car card JSON: empty image URL for attachment ' . (int) $img_id . ' on post ' . (int) $post_id);
             continue;
         }
         $srcset = wp_get_attachment_image_srcset($img_id, $size);

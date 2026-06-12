@@ -371,6 +371,12 @@
 
             // Show loading state
             $wrapper.addClass('car-listings-loading');
+            var loadingWatchdog = window.setTimeout(function() {
+                if ($wrapper.hasClass('car-listings-loading')) {
+                    console.error('[AutoAgora filters] loading watchdog cleared stuck state', { group: group });
+                    $wrapper.removeClass('car-listings-loading');
+                }
+            }, 20000);
             autoagoraFilterLog('ajax start', {
                 group: group,
                 target: target,
@@ -390,6 +396,7 @@
             var xhr = $.ajax({
                 url: carFiltersConfig.ajaxUrl,
                 type: 'POST',
+                timeout: 15000,
                 data: {
                     action: 'car_filters_filter_listings',
                     nonce: carFiltersConfig.nonce,
@@ -443,6 +450,7 @@
                     });
                 },
                 complete: function() {
+                    window.clearTimeout(loadingWatchdog);
                     if (currentSeq !== CarFilters.requestSeqByGroup[group]) {
                         return;
                     }
