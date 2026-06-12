@@ -180,6 +180,20 @@
     color: #6b7280;
 }
 
+.car-listings-loader.car-listings-loader-idle {
+    min-height: 1px;
+    padding: 1px 0;
+}
+
+.car-listings-loader.car-listings-loader-idle .loader-spinner,
+.car-listings-loader.car-listings-loader-idle .loader-text {
+    display: none;
+}
+
+.car-listings-loader.car-listings-loader-active .loader-spinner {
+    display: inline-block;
+}
+
 .loader-spinner {
     display: inline-block;
     width: 20px;

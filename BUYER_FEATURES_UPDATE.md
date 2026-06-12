@@ -82,4 +82,6 @@ After the buyer feature rollout, `/cars/` could remain in a loading state if a f
 
 - Catch card-render errors instead of leaving the loading overlay active.
 - Hide the infinite-scroll loader on AJAX failure.
+- Keep the infinite-scroll sentinel hidden while idle so `/cars/` does not look like it is permanently loading.
+- Add console lifecycle logs under `[AutoAgora listings]` for infinite-scroll init/load/success/error.
 - Guard compare storage and DOM rendering so compare failures do not block listings.

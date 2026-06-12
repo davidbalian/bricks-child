@@ -12,6 +12,14 @@
 (function($) {
     'use strict';
 
+    function autoagoraFilterLog() {
+        if (window.console && window.console.info) {
+            var args = Array.prototype.slice.call(arguments);
+            args.unshift('[AutoAgora filters]');
+            window.console.info.apply(window.console, args);
+        }
+    }
+
     // Global state manager
     window.CarFilters = {
         groups: {},
@@ -363,6 +371,12 @@
 
             // Show loading state
             $wrapper.addClass('car-listings-loading');
+            autoagoraFilterLog('ajax start', {
+                group: group,
+                target: target,
+                filters: this.getFilterData(group),
+                listingAtts: listingAtts
+            });
 
             // Prevent stale responses from overwriting newer filter selections.
             var currentSeq = (this.requestSeqByGroup[group] || 0) + 1;
@@ -385,8 +399,10 @@
                 },
                 success: function(response) {
                     if (currentSeq !== CarFilters.requestSeqByGroup[group]) {
+                        autoagoraFilterLog('stale response ignored', { group: group, seq: currentSeq });
                         return;
                     }
+                    autoagoraFilterLog('ajax response', response);
                     if (response.success) {
                         var perfRenderStart = (typeof performance !== 'undefined' && performance.now) ? performance.now() : null;
 
@@ -420,7 +436,11 @@
                 error: function(xhr, status, error) {
                     if (status === 'abort') return;
                     if (currentSeq !== CarFilters.requestSeqByGroup[group]) return;
-                    console.error('CarFilters: AJAX error', error);
+                    console.error('[AutoAgora filters] AJAX error', {
+                        status: status,
+                        error: error,
+                        responseText: xhr && xhr.responseText ? xhr.responseText.slice(0, 500) : ''
+                    });
                 },
                 complete: function() {
                     if (currentSeq !== CarFilters.requestSeqByGroup[group]) {
@@ -428,6 +448,7 @@
                     }
                     delete CarFilters.activeAjaxRequests[group];
                     $wrapper.removeClass('car-listings-loading');
+                    autoagoraFilterLog('ajax complete', { group: group, seq: currentSeq });
                 }
             });
             this.activeAjaxRequests[group] = xhr;
