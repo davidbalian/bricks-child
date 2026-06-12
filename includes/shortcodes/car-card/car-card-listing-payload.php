@@ -188,8 +188,7 @@ function car_card_build_listing_json_payload($post_id, $listing_index, $is_favor
         'feat'             => !empty($is_featured) ? 1 : 0,
         'pi'               => $band,
         'pi_label'         => $price_insight_label,
-        // Buyer compare feature disabled.
-        // 'cmp'              => function_exists('autoagora_get_compare_data') ? autoagora_get_compare_data((int) $post_id) : array(),
+        'cmp'              => function_exists('autoagora_get_compare_data') ? autoagora_get_compare_data((int) $post_id) : array(),
         'idx'              => (int) $listing_index,
     );
 }
