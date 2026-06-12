@@ -17,7 +17,7 @@ add_action('updated_post_meta', 'autoagora_track_price_history_from_meta_hook', 
 //
 add_shortcode('similar_cars', 'autoagora_similar_cars_shortcode');
 add_shortcode('price_history', 'autoagora_price_history_shortcode');
-// add_shortcode('price_drop_cars', 'autoagora_price_drop_cars_shortcode');
+add_shortcode('price_drop_cars', 'autoagora_price_drop_cars_shortcode');
 // add_shortcode('new_listings_since_last_visit', 'autoagora_new_listings_since_last_visit_shortcode');
 // add_shortcode('dealer_trust_indicators', 'autoagora_dealer_trust_indicators_shortcode');
 // add_shortcode('compare_button', 'autoagora_compare_button_shortcode');
