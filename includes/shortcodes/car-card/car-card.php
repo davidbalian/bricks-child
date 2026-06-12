@@ -323,14 +323,11 @@ function car_card_render_price_insight_badge($post_id) {
         return;
     }
     $label = $labels[$band];
-    /*
-    Buyer deal-context feature disabled.
     $price = (float) str_replace(',', '', (string) car_card_get_meta_value($post_id, 'price'));
     $median = (float) str_replace(',', '', (string) car_card_get_meta_value($post_id, 'price_insight_median'));
     if ($median > 0 && $price > 0 && $price < $median && in_array($band, array('great', 'good'), true)) {
         $label .= ' - ' . (int) round((($median - $price) / $median) * 100) . '% below typical';
     }
-    */
     ?>
     <span class="car-card-price-insight car-card-price-insight--<?php echo esc_attr($band); ?>">
         <?php echo esc_html($label); ?>
