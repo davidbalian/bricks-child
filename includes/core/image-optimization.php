@@ -29,8 +29,10 @@ function init_car_image_optimization() {
     // Only generate necessary image sizes for car listings
     add_filter('intermediate_image_sizes_advanced', 'optimize_car_image_sizes');
     
-    // Disable WordPress automatic image rotation (saves processing time)
-    add_filter('wp_image_maybe_exif_rotate', '__return_false');
+    // Keep WordPress EXIF orientation correction enabled. Phone camera and
+    // gallery images can store sideways pixels with an EXIF instruction that
+    // makes them look upright on the device. WordPress must apply that
+    // instruction before generating thumbnails or converting the image.
     
     // Optimize image metadata generation
     add_filter('wp_generate_attachment_metadata', 'optimize_attachment_metadata', 10, 2);
@@ -656,4 +658,4 @@ function handle_scheduled_webp_conversion($attachment_id) {
 add_action('convert_async_image_to_webp', 'handle_scheduled_webp_conversion');
 
 // Initialize optimizations when this file is loaded
-init_car_image_optimization(); 
+init_car_image_optimization();
