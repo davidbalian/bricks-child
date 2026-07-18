@@ -2,10 +2,11 @@
 /**
  * Small, private, rotating log for listing-promotion payments.
  *
- * The default directory sits one level above the WordPress document root so
- * the log cannot be downloaded over HTTP. Only explicitly allowed context
- * fields are written; secrets, signatures, payloads, email and card data are
- * never accepted by this logger.
+ * The default directory is inside wp-content so WordPress file managers can
+ * reach it. The log and its archives keep a PHP guard as their first line so
+ * direct web requests cannot reveal their contents. Only explicitly allowed
+ * context fields are written; secrets, signatures, payloads, email and card
+ * data are never accepted by this logger.
  */
 if (!defined('ABSPATH')) {
     exit;
@@ -13,7 +14,8 @@ if (!defined('ABSPATH')) {
 
 final class AutoAgora_Payment_Logger
 {
-    const FILE_NAME = 'stripe-payments.log';
+    const FILE_NAME = 'stripe-payments.php';
+    const FILE_HEADER = "<?php defined('ABSPATH') || exit; ?>";
     const DEFAULT_MAX_BYTES = 2097152; // 2 MB per file.
     const MAX_ARCHIVES = 2;
 
@@ -41,7 +43,7 @@ final class AutoAgora_Payment_Logger
             'context' => self::safe_context($context),
         );
         $line = wp_json_encode($record, JSON_UNESCAPED_SLASHES);
-        if (!is_string($line) || file_put_contents($path, $line . PHP_EOL, FILE_APPEND | LOCK_EX) === false) {
+        if (!is_string($line) || !self::append_line($path, $line)) {
             self::report_write_failure('The payment log file could not be written.');
         }
     }
@@ -51,9 +53,7 @@ final class AutoAgora_Payment_Logger
         if (defined('AUTOAGORA_PAYMENT_LOG_DIR') && trim((string) AUTOAGORA_PAYMENT_LOG_DIR) !== '') {
             $directory = rtrim(trim((string) AUTOAGORA_PAYMENT_LOG_DIR), '/\\');
         } else {
-            $document_root = isset($_SERVER['DOCUMENT_ROOT']) ? trim((string) $_SERVER['DOCUMENT_ROOT']) : '';
-            $public_root = $document_root !== '' ? untrailingslashit($document_root) : untrailingslashit(ABSPATH);
-            $directory = dirname($public_root) . DIRECTORY_SEPARATOR . 'autoagora-private-logs';
+            $directory = untrailingslashit(WP_CONTENT_DIR) . DIRECTORY_SEPARATOR . 'autoagora-payment-logs';
         }
 
         return $directory . DIRECTORY_SEPARATOR . self::FILE_NAME;
@@ -110,10 +110,17 @@ final class AutoAgora_Payment_Logger
 
     private static function ensure_directory($directory)
     {
-        if (is_dir($directory)) {
-            return is_writable($directory);
+        if (!is_dir($directory) && !wp_mkdir_p($directory)) {
+            return false;
         }
-        return wp_mkdir_p($directory) && is_writable($directory);
+        if (!is_writable($directory)) {
+            return false;
+        }
+
+        self::write_guard_file($directory . DIRECTORY_SEPARATOR . 'index.php', "<?php exit; ?>\n");
+        self::write_guard_file($directory . DIRECTORY_SEPARATOR . '.htaccess', "Require all denied\nDeny from all\n");
+        self::write_guard_file($directory . DIRECTORY_SEPARATOR . 'web.config', "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<configuration><system.webServer><authorization><deny users=\"*\" /></authorization></system.webServer></configuration>\n");
+        return true;
     }
 
     private static function rotate_if_needed($path)
@@ -123,17 +130,51 @@ final class AutoAgora_Payment_Logger
             return;
         }
 
-        $oldest = $path . '.' . self::MAX_ARCHIVES;
+        $oldest = self::archive_path($path, self::MAX_ARCHIVES);
         if (is_file($oldest)) {
             unlink($oldest);
         }
         for ($archive = self::MAX_ARCHIVES - 1; $archive >= 1; $archive--) {
-            $source = $path . '.' . $archive;
+            $source = self::archive_path($path, $archive);
             if (is_file($source)) {
-                rename($source, $path . '.' . ($archive + 1));
+                rename($source, self::archive_path($path, $archive + 1));
             }
         }
-        rename($path, $path . '.1');
+        rename($path, self::archive_path($path, 1));
+    }
+
+    private static function append_line($path, $line)
+    {
+        $handle = fopen($path, 'c+');
+        if (!$handle || !flock($handle, LOCK_EX)) {
+            if (is_resource($handle)) {
+                fclose($handle);
+            }
+            return false;
+        }
+
+        $stat = fstat($handle);
+        if (!$stat || (int) $stat['size'] === 0) {
+            fwrite($handle, self::FILE_HEADER . PHP_EOL);
+        }
+        fseek($handle, 0, SEEK_END);
+        $written = fwrite($handle, $line . PHP_EOL);
+        fflush($handle);
+        flock($handle, LOCK_UN);
+        fclose($handle);
+        return $written !== false;
+    }
+
+    private static function archive_path($path, $archive)
+    {
+        return substr($path, 0, -4) . '.' . (int) $archive . '.php';
+    }
+
+    private static function write_guard_file($path, $contents)
+    {
+        if (!is_file($path)) {
+            file_put_contents($path, $contents, LOCK_EX);
+        }
     }
 
     private static function report_write_failure($message)

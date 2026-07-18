@@ -59,18 +59,21 @@ signing secret for that exact sandbox webhook endpoint as
 ### Payment log
 
 Checkout, verified webhook, fulfillment, and refund outcomes are written as
-compact JSON lines to a dedicated payment log. By default it is outside the
-WordPress public document root:
+compact JSON lines to a dedicated payment log inside WordPress `wp-content`:
 
 ```text
-{parent of the server document root}/autoagora-private-logs/stripe-payments.log
+wp-content/autoagora-payment-logs/stripe-payments.php
 ```
 
 The exact absolute path is shown in the **AutoAgora Promotions** box when an
-administrator edits a car. The logger never records Stripe keys, webhook
-signatures, raw payloads, email addresses, or card details. It rotates each
-file at 2 MB and keeps two archives (`.1` and `.2`), limiting normal storage to
-about 6 MB.
+administrator edits a car, and the directory is visible to WordPress file
+manager plugins. The `.php` extension is intentional: every log and archive
+starts with an exit guard, and the directory also receives Apache/IIS guard
+files, so direct browser requests cannot expose payment records. The logger
+never records Stripe keys, webhook signatures, raw payloads, email addresses,
+or card details. It rotates each file at 2 MB and keeps two archives
+(`stripe-payments.1.php` and `stripe-payments.2.php`), limiting normal storage
+to about 6 MB.
 
 The directory, size limit, or logging can be changed in `wp-config.php`:
 
