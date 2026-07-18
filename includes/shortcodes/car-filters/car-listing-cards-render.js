@@ -56,7 +56,7 @@
      */
     function renderOne(c) {
         var article = document.createElement('article');
-        article.className = 'car-card' + (c.feat ? ' car-card-featured' : '');
+        article.className = 'car-card' + (c.feat ? ' car-card-featured car-card-promotion-' + (c.promo || 'priority') : '');
         article.setAttribute('data-post-id', String(c.id));
 
         var slider = document.createElement('div');
@@ -64,9 +64,15 @@
         slider.setAttribute('data-total', String(c.ti));
         slider.setAttribute('data-slides', String(c.sc));
 
-        if (c.bf || c.be) {
+        if (c.promo_label || c.bf || c.be) {
             var badges = document.createElement('div');
             badges.className = 'car-card-badges';
+            if (c.promo_label) {
+                var bp = document.createElement('span');
+                bp.className = 'car-card-badge car-card-promotion-badge car-card-promotion-badge--' + (c.promo || 'priority');
+                bp.textContent = c.promo_label;
+                badges.appendChild(bp);
+            }
             if (c.bf) {
                 var b1 = document.createElement('span');
                 b1.className = 'car-card-badge badge-full';

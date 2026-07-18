@@ -140,11 +140,13 @@ function render_car_card($post_id, $context = array()) {
         $relative_date = '<span class="post-date">' . $months . ' months ago</span>';
     }
 
-    // Badges & featured
+    // Badges and current promotion snapshot.
     $show_full_badge = car_card_get_meta_value($post_id, 'fulldetailsbadge');
     $show_extra_badge = car_card_get_meta_value($post_id, 'extradetailsbadge');
     $popular_badge = car_card_get_meta_value($post_id, 'popular_badge');
-    $is_featured = car_card_get_meta_value($post_id, 'is_featured');
+    $promotion_tier = function_exists('autoagora_get_listing_promotion_tier') ? autoagora_get_listing_promotion_tier($post_id) : 'none';
+    $promotion_label = function_exists('autoagora_listing_promotion_label') ? autoagora_listing_promotion_label($promotion_tier) : '';
+    $is_featured = $promotion_tier !== 'none';
 
     // Images — handle both ID array and associative array formats
     $raw_images = get_post_meta($post_id, 'car_images', true);
@@ -181,13 +183,16 @@ function render_car_card($post_id, $context = array()) {
     }
     $slide_count = count($slides);
     ?>
-    <article class="car-card<?php echo $is_featured ? ' car-card-featured' : ''; ?>" data-post-id="<?php echo esc_attr($post_id); ?>">
+    <article class="car-card<?php echo $is_featured ? ' car-card-featured car-card-promotion-' . esc_attr($promotion_tier) : ''; ?>" data-post-id="<?php echo esc_attr($post_id); ?>">
         <!-- ROW 1: Slider -->
         <div class="car-card-slider" data-total="<?php echo esc_attr($total_images); ?>" data-slides="<?php echo esc_attr($slide_count); ?>">
 
             <!-- Badges (top-left) -->
-            <?php if ($show_full_badge || $show_extra_badge) : ?>
+            <?php if ($promotion_label || $show_full_badge || $show_extra_badge) : ?>
                 <div class="car-card-badges">
+                    <?php if ($promotion_label) : ?>
+                        <span class="car-card-badge car-card-promotion-badge car-card-promotion-badge--<?php echo esc_attr($promotion_tier); ?>"><?php echo esc_html($promotion_label); ?></span>
+                    <?php endif; ?>
                     <?php if ($show_full_badge) : ?>
                         <span class="car-card-badge badge-full">Full Details</span>
                     <?php endif; ?>

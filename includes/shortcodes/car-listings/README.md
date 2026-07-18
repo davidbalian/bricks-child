@@ -64,7 +64,7 @@ These attributes control which listings are shown. They can be combined.
 
 | Attribute | Values | Default | Description |
 |-----------|--------|---------|-------------|
-| `featured` | `true`, `false` | `false` | Only show featured listings (ACF `is_featured` = true) |
+| `featured` | `true`, `false` | `false` | Only show currently promoted listings (Showcase or Lift) |
 | `favorites` | `true`, `false` | `false` | Only show current user's favorite listings |
 | `user_id` | User ID number | - | Only show listings by a specific user |
 | `author` | `current` | - | Only show current logged-in user's listings |
@@ -91,7 +91,7 @@ Filters can be combined for more specific results:
 
 ### Sorting
 
-**Important:** Featured listings (`is_featured` = true) always appear first, regardless of sort order. The `orderby` attribute controls the secondary sort within featured and non-featured groups.
+**Important:** Current promotions always appear first: AutoAgora Showcase, then AutoAgora Lift, then unpromoted listings. The `orderby` attribute controls the secondary sort within those groups. The legacy `is_featured` ACF value is temporarily treated as Lift for listings not yet managed by the promotion system.
 
 | Attribute | Values | Default | Description |
 |-----------|--------|---------|-------------|
@@ -307,7 +307,7 @@ This can be styled via `.car-listings-no-results`.
 ### Listings not showing
 
 1. Check that you have published cars with `post_type = 'car'`
-2. If using `featured="true"`, ensure some cars have `is_featured` ACF field checked
+2. If using `featured="true"`, ensure some cars have an active promotion in the AutoAgora Promotions box
 3. If using `favorites="true"`, ensure user is logged in and has favorites saved
 
 ### Infinite scroll not working

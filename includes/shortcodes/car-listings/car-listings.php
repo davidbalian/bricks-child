@@ -128,13 +128,9 @@ function car_listings_build_query_args($atts) {
 
     // === FILTERING BY SOURCE FLAGS ===
 
-    // Featured listings filter
+    // Promoted listings filter (new promotion snapshot with legacy is_featured fallback).
     if ($atts['featured'] === 'true') {
-        $meta_query[] = array(
-            'key'     => 'is_featured',
-            'value'   => '1',
-            'compare' => '='
-        );
+        $args['car_listings_promoted_only'] = true;
     }
 
     // Favorites filter (requires logged-in user)
@@ -767,23 +763,50 @@ add_action('wp_ajax_car_listings_load_more', 'car_listings_ajax_load_more');
 add_action('wp_ajax_nopriv_car_listings_load_more', 'car_listings_ajax_load_more');
 
 /**
- * Filter to add featured-first sorting via SQL
- * Featured posts first; then the query's order (date, price, mileage, year) applies within featured and within non-featured.
+ * Add the current promotion snapshot joins once and return its effective
+ * priority expression. Legacy is_featured listings remain Lift-equivalent
+ * until they receive their first managed promotion.
  */
-function car_listings_featured_first_orderby($clauses, $query) {
+function car_listings_promotion_priority_sql(&$clauses) {
     global $wpdb;
 
-    // Score mode is already the relevance order; do not prepend featured-first.
+    if (strpos($clauses['join'], ' AS promotion_managed_meta ') === false) {
+        $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS promotion_managed_meta ON ({$wpdb->posts}.ID = promotion_managed_meta.post_id AND promotion_managed_meta.meta_key = '_autoagora_promotion_managed')";
+        $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS promotion_status_meta ON ({$wpdb->posts}.ID = promotion_status_meta.post_id AND promotion_status_meta.meta_key = '_autoagora_promotion_status')";
+        $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS promotion_priority_meta ON ({$wpdb->posts}.ID = promotion_priority_meta.post_id AND promotion_priority_meta.meta_key = '_autoagora_promotion_priority')";
+        $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS promotion_ends_meta ON ({$wpdb->posts}.ID = promotion_ends_meta.post_id AND promotion_ends_meta.meta_key = '_autoagora_promotion_ends_at')";
+        $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS legacy_featured_meta ON ({$wpdb->posts}.ID = legacy_featured_meta.post_id AND legacy_featured_meta.meta_key = 'is_featured')";
+    }
+
+    $now_gmt = esc_sql(gmdate('Y-m-d H:i:s'));
+    return "CASE
+        WHEN promotion_managed_meta.meta_value = '1'
+         AND promotion_status_meta.meta_value = 'active'
+         AND (promotion_ends_meta.meta_value IS NULL OR promotion_ends_meta.meta_value = '' OR promotion_ends_meta.meta_value > '{$now_gmt}')
+        THEN CAST(COALESCE(NULLIF(promotion_priority_meta.meta_value, ''), '0') AS UNSIGNED)
+        WHEN (promotion_managed_meta.meta_value IS NULL OR promotion_managed_meta.meta_value <> '1')
+         AND legacy_featured_meta.meta_value = '1'
+        THEN 10
+        ELSE 0
+    END";
+}
+
+/**
+ * Promotions first; then the selected sort within each promotion tier.
+ */
+function car_listings_featured_first_orderby($clauses, $query) {
+    $priority_sql = car_listings_promotion_priority_sql($clauses);
+
+    if ($query->get('car_listings_promoted_only')) {
+        $clauses['where'] .= " AND ({$priority_sql}) > 0";
+    }
+
     $requested_orderby = (string) $query->get('_car_listings_orderby');
-    if ($requested_orderby === 'score' || (string) $query->get('meta_key') === 'listing_rank_score') {
+    if ($requested_orderby === 'score') {
         return $clauses;
     }
 
-    // Add LEFT JOIN for is_featured meta
-    $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS featured_meta ON ({$wpdb->posts}.ID = featured_meta.post_id AND featured_meta.meta_key = 'is_featured')";
-
-    // Prepend featured sorting to orderby (featured=1 first, then NULL/0)
-    $clauses['orderby'] = "CASE WHEN featured_meta.meta_value = '1' THEN 0 ELSE 1 END ASC, " . $clauses['orderby'];
+    $clauses['orderby'] = "({$priority_sql}) DESC, " . $clauses['orderby'];
 
     return $clauses;
 }
@@ -792,9 +815,9 @@ function car_listings_featured_first_orderby($clauses, $query) {
  * Score-first ordering for "Best Match".
  *
  * Priority:
- * 1) Listings posted today first
- * 2) Then listings from the last 1-3 days
- * 3) Then older listings
+ * 1) Promotion tier (Showcase, then Lift, then unpromoted)
+ * 2) Listings posted today, then 1-3 days, then older listings
+ * 3) Ranking score and post date
  * Recency bucket is precomputed by ListingRankManager:
  * - 0 = today
  * - 1 = 1-3 days
@@ -811,7 +834,8 @@ function car_listings_score_orderby_clauses($clauses, $query) {
 
     $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS rank_meta ON ({$wpdb->posts}.ID = rank_meta.post_id AND rank_meta.meta_key = 'listing_rank_score')";
     $clauses['join'] .= " LEFT JOIN {$wpdb->postmeta} AS recency_meta ON ({$wpdb->posts}.ID = recency_meta.post_id AND recency_meta.meta_key = 'listing_rank_recency_bucket')";
-    $clauses['orderby'] = "CAST(COALESCE(NULLIF(recency_meta.meta_value, ''), '2') AS UNSIGNED) ASC, CAST(COALESCE(NULLIF(rank_meta.meta_value, ''), '0') AS DECIMAL(12,2)) DESC, {$wpdb->posts}.post_date DESC";
+    $priority_sql = car_listings_promotion_priority_sql($clauses);
+    $clauses['orderby'] = "({$priority_sql}) DESC, CAST(COALESCE(NULLIF(recency_meta.meta_value, ''), '2') AS UNSIGNED) ASC, CAST(COALESCE(NULLIF(rank_meta.meta_value, ''), '0') AS DECIMAL(12,2)) DESC, {$wpdb->posts}.post_date DESC";
 
     return $clauses;
 }
