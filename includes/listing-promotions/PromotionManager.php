@@ -238,7 +238,7 @@ final class AutoAgora_Promotion_Manager
         update_post_meta($listing_id, self::META_STARTS_AT, $record->starts_at);
         update_post_meta($listing_id, self::META_ENDS_AT, $record->ends_at);
         if ((string) $before !== (string) $record->id) {
-            $this->invalidate_listing_queries();
+            $this->invalidate_listing_queries($listing_id);
         }
     }
 
@@ -253,15 +253,20 @@ final class AutoAgora_Promotion_Manager
         delete_post_meta($listing_id, self::META_STARTS_AT);
         delete_post_meta($listing_id, self::META_ENDS_AT);
         if ($was_active) {
-            $this->invalidate_listing_queries();
+            $this->invalidate_listing_queries($listing_id);
         }
     }
 
-    private function invalidate_listing_queries()
+    private function invalidate_listing_queries($listing_id)
     {
         if (function_exists('car_listings_query_cache_bump_generation')) {
             car_listings_query_cache_bump_generation();
         }
+        clean_post_cache((int) $listing_id);
+        if (!wp_next_scheduled('autoagora_purge_promotion_page_cache')) {
+            wp_schedule_single_event(time() + 5, 'autoagora_purge_promotion_page_cache');
+        }
+        do_action('autoagora_listing_promotion_snapshot_changed', (int) $listing_id);
     }
 
     private function normalize_gmt($value, $fallback)

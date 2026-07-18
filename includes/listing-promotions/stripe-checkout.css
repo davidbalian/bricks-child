@@ -1,0 +1,85 @@
+.autoagora-promotion-purchase {
+    position: relative;
+}
+
+.autoagora-promotion-purchase > summary {
+    list-style: none;
+    cursor: pointer;
+}
+
+.autoagora-promotion-purchase > summary::-webkit-details-marker {
+    display: none;
+}
+
+.autoagora-promotion-purchase-panel {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 0.5rem);
+    z-index: 30;
+    width: min(290px, 85vw);
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border: 1px solid #d7dce3;
+    border-radius: 0.75rem;
+    background: #fff;
+    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.18);
+}
+
+.autoagora-stripe-test-label {
+    color: #7c3aed;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.autoagora-buy-promotion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid #d7dce3;
+    border-radius: 0.6rem;
+    background: #fff;
+    color: #17233b;
+    cursor: pointer;
+    text-align: left;
+}
+
+.autoagora-buy-promotion:hover {
+    border-color: #0d86e3;
+    background: #f5faff;
+}
+
+.autoagora-buy-promotion:disabled {
+    cursor: wait;
+    opacity: 0.55;
+}
+
+.autoagora-buy-promotion span {
+    font-weight: 700;
+}
+
+.autoagora-buy-promotion small {
+    white-space: nowrap;
+}
+
+.autoagora-promotion-checkout-status {
+    font-size: 0.78rem;
+    color: #334155;
+}
+
+.autoagora-promotion-checkout-status.is-error {
+    color: #b32d2e;
+}
+
+@media (max-width: 599.98px) {
+    .autoagora-promotion-purchase-panel {
+        position: static;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+}
+

@@ -9,6 +9,8 @@ if (!defined('ABSPATH')) {
 require_once __DIR__ . '/PromotionSchema.php';
 require_once __DIR__ . '/PromotionRepository.php';
 require_once __DIR__ . '/PromotionManager.php';
+require_once __DIR__ . '/StripeGateway.php';
+require_once __DIR__ . '/StripeCheckoutUI.php';
 
 function autoagora_promotion_manager()
 {
@@ -38,6 +40,12 @@ add_action('init', static function () {
 add_action('autoagora_reconcile_listing_promotions', static function () {
     if (AutoAgora_Promotion_Schema::exists()) {
         autoagora_promotion_manager()->reconcile_due();
+    }
+});
+
+add_action('autoagora_purge_promotion_page_cache', static function () {
+    if (function_exists('rocket_clean_domain')) {
+        rocket_clean_domain();
     }
 });
 

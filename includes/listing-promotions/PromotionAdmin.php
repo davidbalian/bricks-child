@@ -107,6 +107,29 @@ final class AutoAgora_Promotion_Admin
         }
         echo '</p>';
 
+        if (class_exists('AutoAgora_Stripe_Gateway')) {
+            $stripe_errors = AutoAgora_Stripe_Gateway::configuration_errors();
+            echo '<div style="margin:12px 0;padding:12px;border:1px solid #dcdcde;background:#fff">';
+            echo '<p style="margin-top:0"><strong>Stripe Checkout (' . esc_html(AutoAgora_Stripe_Gateway::mode()) . ' mode):</strong> ';
+            echo $stripe_errors ? '<span style="color:#b32d2e">Not ready</span>' : '<span style="color:#008a20">Ready</span>';
+            echo '</p>';
+            echo '<p><strong>Webhook URL:</strong> <code>' . esc_html(AutoAgora_Stripe_Gateway::webhook_url()) . '</code></p>';
+            if ($stripe_errors) {
+                echo '<ul style="list-style:disc;padding-left:20px">';
+                foreach ($stripe_errors as $stripe_error) {
+                    echo '<li>' . esc_html($stripe_error) . '</li>';
+                }
+                echo '</ul>';
+            } else {
+                echo '<ul style="list-style:disc;padding-left:20px">';
+                foreach (AutoAgora_Stripe_Gateway::packages() as $package) {
+                    echo '<li>' . esc_html($package['label']) . ': EUR ' . esc_html(number_format($package['amount_minor'] / 100, 2)) . ' for ' . esc_html(AutoAgora_Stripe_Gateway::duration_label($package['duration_seconds'])) . '</li>';
+                }
+                echo '</ul>';
+            }
+            echo '</div>';
+        }
+
         wp_nonce_field('autoagora_grant_listing_promotion_' . $post->ID, 'autoagora_promotion_nonce');
         ?>
         <div style="display:grid;grid-template-columns:repeat(3,minmax(150px,1fr));gap:12px;max-width:900px;align-items:end">

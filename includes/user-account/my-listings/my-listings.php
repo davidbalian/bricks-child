@@ -79,6 +79,10 @@ function display_my_listings($atts) {
         'perPage'           => MyListingsAjaxHandler::DEFAULT_PER_PAGE,
         'isDevelopment'     => (defined('WP_DEBUG') && WP_DEBUG),
     ));
+
+    if (function_exists('autoagora_enqueue_stripe_checkout_assets')) {
+        autoagora_enqueue_stripe_checkout_assets();
+    }
     
     // Start output buffering
     ob_start();
@@ -94,6 +98,14 @@ function display_my_listings($atts) {
                 echo '<div class="notice notice-success"><p>Car listing deleted successfully.</p></div>';
             } elseif ($_GET['deleted'] === 'error') {
                 echo '<div class="notice notice-error"><p>Error deleting car listing. Please try again.</p></div>';
+            }
+        }
+        if (isset($_GET['promotion_payment'])) {
+            $promotion_payment = sanitize_key(wp_unslash($_GET['promotion_payment']));
+            if ($promotion_payment === 'success') {
+                echo '<div class="notice notice-success"><p>Payment completed. Stripe is confirming your promotion; it should appear shortly.</p></div>';
+            } elseif ($promotion_payment === 'cancelled') {
+                echo '<div class="notice notice-warning"><p>Promotion checkout was cancelled. You were not charged.</p></div>';
             }
         }
         ?>

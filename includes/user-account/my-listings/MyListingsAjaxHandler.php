@@ -376,6 +376,10 @@ class MyListingsAjaxHandler {
                         <i class="fas fa-pencil-alt"></i> Edit
                     </a>
                     <?php
+                    if ($post_status === 'publish' && ! $is_sold && ! $is_expired && function_exists('autoagora_render_promotion_purchase_controls')) {
+                        autoagora_render_promotion_purchase_controls($post_id);
+                    }
+
                     // Show refresh button for published, unsold, non-expired listings
                     if ($post_status === 'publish' && ! $is_sold && ! $is_expired) {
                         echo $refresh_ui->render_refresh_button($post_id);

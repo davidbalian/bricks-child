@@ -32,22 +32,64 @@ administrators in the car edit screen.
 
 ## Payment integration
 
-There is deliberately no public webhook before a payment provider is selected.
-After a provider-specific handler has authenticated the webhook and verified a
-successful payment, it should call:
+Stripe-hosted Checkout is implemented in `StripeGateway.php`. The first rollout
+defaults to Stripe sandbox mode and will not accept live keys. Add these secrets
+to `wp-config.php` above the "stop editing" line (never commit them):
+
+```php
+define('AUTOAGORA_STRIPE_MODE', 'test');
+define('AUTOAGORA_STRIPE_SECRET_KEY', 'sk_test_...');
+define('AUTOAGORA_STRIPE_WEBHOOK_SECRET', 'whsec_...');
+```
+
+A restricted `rk_test_...` key with permission to create Checkout Sessions can
+be used instead of `sk_test_...`. Hosted Checkout does not require a publishable
+key in this integration.
+
+Register this Stripe sandbox webhook endpoint:
+
+```text
+https://autoagora.cy/wp-json/autoagora/v1/stripe/webhook
+```
+
+Subscribe it to `checkout.session.completed` and `charge.refunded`. Use the
+signing secret for that exact sandbox webhook endpoint as
+`AUTOAGORA_STRIPE_WEBHOOK_SECRET`.
+
+The default sandbox packages are intentionally small and short:
+
+- AutoAgora Lift: EUR 1.00 for 1 hour
+- AutoAgora Showcase: EUR 2.00 for 1 hour
+
+They can be overridden without editing feature code:
+
+```php
+define('AUTOAGORA_STRIPE_LIFT_AMOUNT_CENTS', 100);
+define('AUTOAGORA_STRIPE_LIFT_DURATION_SECONDS', 3600);
+define('AUTOAGORA_STRIPE_SHOWCASE_AMOUNT_CENTS', 200);
+define('AUTOAGORA_STRIPE_SHOWCASE_DURATION_SECONDS', 3600);
+```
+
+Sellers start Checkout from `/my-listings/`. The browser supplies only listing
+ID and tier. The server controls amount/duration, validates ownership and active
+listing state, then redirects to `checkout.stripe.com`.
+
+The success redirect never grants a promotion. Only a raw-body, timestamped,
+HMAC-SHA256 verified Stripe webhook can call:
 
 ```php
 $result = autoagora_grant_paid_listing_promotion(
     $listing_id,
     'showcase',
     7 * DAY_IN_SECONDS,
-    'provider-slug',
-    $provider_event_or_payment_id,
+    'stripe',
+    $stripe_payment_intent_id,
     'Optional internal note'
 );
 ```
 
-The `(payment_provider, payment_reference)` unique index and service checks make
+The Stripe PaymentIntent ID is stored as `payment_reference`. The
+`(payment_provider, payment_reference)` unique index and service checks make
 repeat webhook delivery idempotent. A reused reference with different listing
 or tier data returns `WP_Error` rather than silently granting the wrong item.
 A short per-listing database advisory lock prevents simultaneous grants from
@@ -56,10 +98,36 @@ After an authenticated refund event, call
 `autoagora_refund_paid_listing_promotion($provider, $reference)` to remove the
 effective promotion and preserve the row with `refunded` status.
 
+Live mode is deliberately locked. Going live requires explicit production
+amounts/durations, live keys, a separate live webhook signing secret, and:
+
+```php
+define('AUTOAGORA_STRIPE_MODE', 'live');
+define('AUTOAGORA_STRIPE_LIVE_ENABLED', true);
+```
+
+Do not enable that flag until the sandbox checklist passes.
+
+### Sandbox checklist
+
+1. Add sandbox keys and register the webhook above.
+2. In wp-admin, edit a car and confirm Stripe Checkout says `Ready`.
+3. Log in as the listing owner and open `/my-listings/`.
+4. Choose Promote, then Lift or Showcase.
+5. Pay in Stripe Checkout with card `4242 4242 4242 4242`, any future
+   expiration date, and any three-digit CVC.
+6. Confirm Stripe shows a successful `checkout.session.completed` delivery.
+7. Confirm the promotion table contains an active row with source `payment`,
+   provider `stripe`, and a `pi_...` payment reference.
+8. Confirm the listing badge and marketplace ordering changed.
+9. Fully refund the test payment in Stripe and confirm `charge.refunded` changes
+   the row to `refunded` and removes the effective promotion.
+
 ## Marketplace behavior
 
 The listing query orders Showcase, Lift, then unpromoted listings before the
 existing selected sort. This also applies to Best Match. `[car_listings
 featured="true"]` now means any current promotion while retaining the legacy
 fallback. Query cache generation is bumped whenever the effective promotion
-changes.
+changes. A deferred WP Rocket domain purge also runs so cached marketplace pages
+do not keep stale badges or ordering.
