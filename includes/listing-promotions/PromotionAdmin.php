@@ -11,8 +11,36 @@ final class AutoAgora_Promotion_Admin
     public static function init()
     {
         add_action('add_meta_boxes_car', array(__CLASS__, 'add_meta_box'));
+        add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueue_assets'));
         add_action('admin_post_autoagora_grant_listing_promotion', array(__CLASS__, 'handle_grant'));
         add_action('admin_post_autoagora_cancel_listing_promotion', array(__CLASS__, 'handle_cancel'));
+        add_action('wp_ajax_autoagora_grant_listing_promotion_ajax', array(__CLASS__, 'handle_grant_ajax'));
+    }
+
+    public static function enqueue_assets($hook_suffix)
+    {
+        if (!in_array($hook_suffix, array('post.php', 'post-new.php'), true)) {
+            return;
+        }
+        $screen = get_current_screen();
+        if (!$screen || $screen->post_type !== 'car' || !current_user_can('manage_options')) {
+            return;
+        }
+
+        $path = __DIR__ . '/promotion-admin.js';
+        wp_enqueue_script(
+            'autoagora-promotion-admin',
+            get_stylesheet_directory_uri() . '/includes/listing-promotions/promotion-admin.js',
+            array(),
+            file_exists($path) ? filemtime($path) : BRICKS_CHILD_THEME_VERSION,
+            true
+        );
+        wp_localize_script('autoagora-promotion-admin', 'autoAgoraPromotionsAdmin', array(
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'workingText' => 'Granting…',
+            'buttonText' => 'Grant promotion',
+            'genericError' => 'The promotion could not be granted. Please retry.',
+        ));
     }
 
     public static function add_meta_box()
@@ -105,13 +133,11 @@ final class AutoAgora_Promotion_Admin
             </label>
         </p>
         <p>
-            <button type="submit"
+            <button type="button"
+                    id="autoagora-grant-promotion"
                     class="button button-primary"
-                    name="action"
-                    value="autoagora_grant_listing_promotion"
-                    formaction="<?php echo esc_url(admin_url('admin-post.php')); ?>"
-                    formmethod="post"
-                    formnovalidate>Grant promotion</button>
+                    data-listing-id="<?php echo esc_attr($post->ID); ?>">Grant promotion</button>
+            <span id="autoagora-promotion-action-status" role="status" aria-live="polite"></span>
             <span class="description">If another promotion is active or scheduled, this grant is queued after it so paid time is not lost.</span>
         </p>
         <?php
@@ -158,12 +184,42 @@ final class AutoAgora_Promotion_Admin
         self::authorize_listing($listing_id);
         check_admin_referer('autoagora_grant_listing_promotion_' . $listing_id, 'autoagora_promotion_nonce');
 
+        $result = self::grant_from_request($listing_id);
+        self::redirect($listing_id, is_wp_error($result) ? 'error' : 'granted', is_wp_error($result) ? $result->get_error_code() : '');
+    }
+
+    public static function handle_grant_ajax()
+    {
+        $listing_id = isset($_POST['listing_id']) ? absint($_POST['listing_id']) : 0;
+        if (!self::can_manage_listing($listing_id)) {
+            wp_send_json_error(array('message' => 'You are not allowed to manage promotions for this listing.'), 403);
+        }
+        if (!check_ajax_referer('autoagora_grant_listing_promotion_' . $listing_id, 'nonce', false)) {
+            wp_send_json_error(array('message' => 'Your session has expired. Reload the page and try again.'), 403);
+        }
+
+        $result = self::grant_from_request($listing_id);
+        if (is_wp_error($result)) {
+            wp_send_json_error(array(
+                'message' => $result->get_error_message(),
+                'code' => $result->get_error_code(),
+            ), 400);
+        }
+
+        wp_send_json_success(array(
+            'promotion_id' => (int) $result,
+            'redirect_url' => self::edit_url($listing_id, 'granted'),
+        ));
+    }
+
+    private static function grant_from_request($listing_id)
+    {
         $tier = isset($_POST['autoagora_promotion_tier']) ? sanitize_key(wp_unslash($_POST['autoagora_promotion_tier'])) : '';
         $days = isset($_POST['autoagora_promotion_days']) ? absint($_POST['autoagora_promotion_days']) : 0;
         $notes = isset($_POST['autoagora_promotion_notes']) ? sanitize_textarea_field(wp_unslash($_POST['autoagora_promotion_notes'])) : '';
         $starts_at = self::parse_local_start(isset($_POST['autoagora_promotion_starts_at']) ? wp_unslash($_POST['autoagora_promotion_starts_at']) : '');
 
-        $result = autoagora_promotion_manager()->grant_manual(
+        return autoagora_promotion_manager()->grant_manual(
             $listing_id,
             $tier,
             $days * DAY_IN_SECONDS,
@@ -171,7 +227,6 @@ final class AutoAgora_Promotion_Admin
             get_current_user_id(),
             $notes
         );
-        self::redirect($listing_id, is_wp_error($result) ? 'error' : 'granted', is_wp_error($result) ? $result->get_error_code() : '');
     }
 
     public static function handle_cancel()
@@ -191,9 +246,17 @@ final class AutoAgora_Promotion_Admin
 
     private static function authorize_listing($listing_id)
     {
-        if (!$listing_id || get_post_type($listing_id) !== 'car' || !current_user_can('manage_options') || !current_user_can('edit_post', $listing_id)) {
+        if (!self::can_manage_listing($listing_id)) {
             wp_die('You are not allowed to manage promotions for this listing.', 'Forbidden', array('response' => 403));
         }
+    }
+
+    private static function can_manage_listing($listing_id)
+    {
+        return $listing_id
+            && get_post_type($listing_id) === 'car'
+            && current_user_can('manage_options')
+            && current_user_can('edit_post', $listing_id);
     }
 
     private static function parse_local_start($value)
@@ -216,15 +279,20 @@ final class AutoAgora_Promotion_Admin
 
     private static function redirect($listing_id, $notice, $error_code = '')
     {
+        wp_safe_redirect(self::edit_url($listing_id, $notice, $error_code));
+        exit;
+    }
+
+    private static function edit_url($listing_id, $notice, $error_code = '')
+    {
         $args = array('post' => $listing_id, 'action' => 'edit', 'autoagora_promotion_notice' => $notice);
         if ($error_code !== '') {
             $args['autoagora_promotion_error'] = sanitize_key($error_code);
         }
-        wp_safe_redirect(add_query_arg(
+        return add_query_arg(
             $args,
             admin_url('post.php')
-        ));
-        exit;
+        );
     }
 }
 
