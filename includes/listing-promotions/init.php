@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 require_once __DIR__ . '/PromotionSchema.php';
 require_once __DIR__ . '/PromotionRepository.php';
 require_once __DIR__ . '/PromotionManager.php';
+require_once __DIR__ . '/PaymentLogger.php';
 require_once __DIR__ . '/StripeGateway.php';
 require_once __DIR__ . '/StripeCheckoutUI.php';
 

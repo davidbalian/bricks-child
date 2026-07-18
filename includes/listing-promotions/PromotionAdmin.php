@@ -114,6 +114,10 @@ final class AutoAgora_Promotion_Admin
             echo $stripe_errors ? '<span style="color:#b32d2e">Not ready</span>' : '<span style="color:#008a20">Ready</span>';
             echo '</p>';
             echo '<p><strong>Webhook URL:</strong> <code>' . esc_html(AutoAgora_Stripe_Gateway::webhook_url()) . '</code></p>';
+            if (class_exists('AutoAgora_Payment_Logger')) {
+                echo '<p><strong>Payment log:</strong> <code>' . esc_html(AutoAgora_Payment_Logger::path()) . '</code><br>';
+                echo '<span class="description">Created after the first payment action. Rotates at ' . esc_html(size_format(AutoAgora_Payment_Logger::max_bytes())) . ' and keeps two archives.</span></p>';
+            }
             if ($stripe_errors) {
                 echo '<ul style="list-style:disc;padding-left:20px">';
                 foreach ($stripe_errors as $stripe_error) {

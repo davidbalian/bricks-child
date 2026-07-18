@@ -56,6 +56,34 @@ Subscribe it to `checkout.session.completed` and `charge.refunded`. Use the
 signing secret for that exact sandbox webhook endpoint as
 `AUTOAGORA_STRIPE_WEBHOOK_SECRET`.
 
+### Payment log
+
+Checkout, verified webhook, fulfillment, and refund outcomes are written as
+compact JSON lines to a dedicated payment log. By default it is outside the
+WordPress public document root:
+
+```text
+{parent of the server document root}/autoagora-private-logs/stripe-payments.log
+```
+
+The exact absolute path is shown in the **AutoAgora Promotions** box when an
+administrator edits a car. The logger never records Stripe keys, webhook
+signatures, raw payloads, email addresses, or card details. It rotates each
+file at 2 MB and keeps two archives (`.1` and `.2`), limiting normal storage to
+about 6 MB.
+
+The directory, size limit, or logging can be changed in `wp-config.php`:
+
+```php
+define('AUTOAGORA_PAYMENT_LOG_DIR', '/private/server/path/autoagora-logs');
+define('AUTOAGORA_PAYMENT_LOG_MAX_BYTES', 2097152); // 64 KB to 10 MB.
+define('AUTOAGORA_PAYMENT_LOG_ENABLED', true);
+```
+
+The default directory is created after the first Checkout or webhook action.
+If WordPress cannot write there, one short fallback message is sent to the
+normal PHP/WordPress error log and payment processing continues.
+
 The default sandbox packages are intentionally small and short:
 
 - AutoAgora Lift: EUR 1.00 for 1 hour
