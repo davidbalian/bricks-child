@@ -11,6 +11,78 @@
     display: none;
 }
 
+.autoagora-promotion-trigger {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 2.55rem;
+    padding-inline: 0.75rem 0.85rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #9333ea 100%);
+    box-shadow: 0 6px 16px rgba(109, 40, 217, 0.24);
+    font-weight: 700 !important;
+    letter-spacing: -0.01em;
+    transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease, opacity 160ms ease !important;
+}
+
+.autoagora-promotion-trigger::before {
+    position: absolute;
+    z-index: -1;
+    top: -120%;
+    left: -35%;
+    width: 45%;
+    height: 340%;
+    content: '';
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+    pointer-events: none;
+    transform: rotate(20deg);
+    transition: left 450ms ease;
+}
+
+.autoagora-promotion-trigger:hover {
+    opacity: 1 !important;
+    filter: saturate(1.08) brightness(1.04);
+    transform: translateY(-1px);
+    box-shadow: 0 9px 20px rgba(109, 40, 217, 0.3);
+}
+
+.autoagora-promotion-trigger:hover::before {
+    left: 110%;
+}
+
+.autoagora-promotion-trigger:focus-visible {
+    outline: 3px solid rgba(124, 58, 237, 0.3);
+    outline-offset: 3px;
+}
+
+.autoagora-promotion-purchase[open] > .autoagora-promotion-trigger {
+    filter: saturate(1.08);
+    box-shadow: 0 4px 12px rgba(109, 40, 217, 0.22);
+}
+
+.autoagora-promotion-trigger-icon {
+    display: inline-grid;
+    width: 1.55rem;
+    height: 1.55rem;
+    place-items: center;
+    flex: 0 0 auto;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+    font-size: 0.72rem;
+}
+
+.autoagora-promotion-trigger-chevron {
+    margin-left: 0.05rem;
+    font-size: 0.62rem;
+    opacity: 0.78;
+    transition: transform 160ms ease;
+}
+
+.autoagora-promotion-purchase[open] .autoagora-promotion-trigger-chevron {
+    transform: rotate(180deg);
+}
+
 .autoagora-promotion-purchase-panel {
     position: absolute;
     left: 0;
@@ -76,10 +148,17 @@
 }
 
 @media (max-width: 599.98px) {
+    .autoagora-promotion-purchase {
+        width: 100%;
+    }
+
+    .autoagora-promotion-trigger {
+        width: 100%;
+    }
+
     .autoagora-promotion-purchase-panel {
         position: static;
         width: 100%;
         margin-top: 0.5rem;
     }
 }
-

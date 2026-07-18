@@ -46,7 +46,13 @@ function autoagora_render_promotion_purchase_controls($listing_id)
     $is_test = AutoAgora_Stripe_Gateway::mode() === 'test';
     ?>
     <details class="autoagora-promotion-purchase">
-        <summary class="btn btn-secondary"><?php echo $current_tier === 'none' ? 'Promote' : 'Add promotion'; ?></summary>
+        <summary class="btn btn-primary-gradient autoagora-promotion-trigger">
+            <span class="autoagora-promotion-trigger-icon" aria-hidden="true">
+                <i class="fas fa-bolt"></i>
+            </span>
+            <span><?php echo esc_html($current_tier === 'none' ? 'Promote listing' : 'Extend promotion'); ?></span>
+            <i class="fas fa-chevron-up autoagora-promotion-trigger-chevron" aria-hidden="true"></i>
+        </summary>
         <div class="autoagora-promotion-purchase-panel">
             <?php if ($is_test) : ?>
                 <strong class="autoagora-stripe-test-label">Stripe sandbox test</strong>
@@ -65,4 +71,3 @@ function autoagora_render_promotion_purchase_controls($listing_id)
     </details>
     <?php
 }
-

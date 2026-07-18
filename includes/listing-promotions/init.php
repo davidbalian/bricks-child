@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 require_once __DIR__ . '/PromotionSchema.php';
 require_once __DIR__ . '/PromotionRepository.php';
 require_once __DIR__ . '/PromotionManager.php';
+require_once __DIR__ . '/PaymentEventRepository.php';
 require_once __DIR__ . '/PaymentLogger.php';
 require_once __DIR__ . '/StripeGateway.php';
 require_once __DIR__ . '/StripeCheckoutUI.php';
@@ -43,6 +44,15 @@ add_action('autoagora_reconcile_listing_promotions', static function () {
         autoagora_promotion_manager()->reconcile_due();
     }
 });
+add_action('autoagora_reconcile_single_listing_promotion', static function ($listing_id) {
+    if (!AutoAgora_Promotion_Schema::exists()) {
+        return;
+    }
+    $result = autoagora_promotion_manager()->reconcile_listing((int) $listing_id);
+    if (is_wp_error($result)) {
+        error_log('AutoAgora single promotion reconciliation error for listing ' . (int) $listing_id . ': ' . $result->get_error_code());
+    }
+}, 10, 1);
 
 add_action('autoagora_purge_promotion_page_cache', static function () {
     if (function_exists('rocket_clean_domain')) {

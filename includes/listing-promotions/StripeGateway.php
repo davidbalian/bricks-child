@@ -79,6 +79,11 @@ final class AutoAgora_Stripe_Gateway
 
     public static function configuration_errors()
     {
+        static $cached_errors = null;
+        if (is_array($cached_errors)) {
+            return $cached_errors;
+        }
+
         $errors = array();
         $secret_key = self::secret_key();
         $webhook_secret = self::webhook_secret();
@@ -93,10 +98,14 @@ final class AutoAgora_Stripe_Gateway
         if (!self::packages()) {
             $errors[] = 'No valid Stripe promotion packages are configured.';
         }
+        if (!AutoAgora_Promotion_Schema::exists() || !AutoAgora_Promotion_Schema::payment_events_exists()) {
+            $errors[] = 'The promotion payment database tables are unavailable. Visit wp-admin once after deployment to run the schema update.';
+        }
         if (self::mode() === 'live' && (!defined('AUTOAGORA_STRIPE_LIVE_ENABLED') || AUTOAGORA_STRIPE_LIVE_ENABLED !== true)) {
             $errors[] = 'Stripe live mode is locked. Set AUTOAGORA_STRIPE_LIVE_ENABLED to true only after completing sandbox tests.';
         }
-        return $errors;
+        $cached_errors = $errors;
+        return $cached_errors;
     }
 
     public static function is_ready()
@@ -296,7 +305,7 @@ final class AutoAgora_Stripe_Gateway
         }
 
         $event = json_decode($payload, true);
-        if (!is_array($event) || empty($event['type']) || empty($event['data']['object'])) {
+        if (!is_array($event) || empty($event['id']) || empty($event['type']) || empty($event['data']['object'])) {
             AutoAgora_Payment_Logger::log('webhook.rejected', array(
                 'error_code' => 'stripe_payload_invalid',
             ), 'warning');
@@ -304,50 +313,131 @@ final class AutoAgora_Stripe_Gateway
         }
         $object = $event['data']['object'];
         $log_context = self::webhook_log_context($event, $object);
-        AutoAgora_Payment_Logger::log('webhook.verified', $log_context);
+        $reference = self::webhook_object_reference($event['type'], $object);
+        $events = new AutoAgora_Payment_Event_Repository();
+        $receipt = $events->receive(self::PROVIDER, $event['id'], $event['type'], $reference);
+        if (is_wp_error($receipt)) {
+            AutoAgora_Payment_Logger::log('webhook.receipt_failed', array_merge($log_context, array(
+                'error_code' => $receipt->get_error_code(),
+            )), 'error');
+            return new WP_REST_Response(array('error' => $receipt->get_error_code()), 500);
+        }
+        if ($receipt->status === AutoAgora_Payment_Event_Repository::STATUS_PROCESSED) {
+            AutoAgora_Payment_Logger::log('webhook.duplicate', $log_context);
+            return new WP_REST_Response(array('received' => true, 'duplicate' => true), 200);
+        }
 
+        AutoAgora_Payment_Logger::log('webhook.verified', array_merge($log_context, array(
+            'status' => $receipt->status,
+        )));
+        $lock_reference = $reference !== '' ? $reference : (string) $event['id'];
+        if (!self::acquire_payment_lock($lock_reference)) {
+            AutoAgora_Payment_Logger::log('webhook.busy', $log_context, 'warning');
+            return new WP_REST_Response(array('error' => 'payment_event_busy'), 503);
+        }
+
+        try {
+            $receipt = $events->find_by_id((int) $receipt->id);
+            if (!$receipt) {
+                return new WP_REST_Response(array('error' => 'payment_event_missing'), 500);
+            }
+            if ($receipt->status === AutoAgora_Payment_Event_Repository::STATUS_PROCESSED) {
+                return new WP_REST_Response(array('received' => true, 'duplicate' => true), 200);
+            }
+            if (!$events->mark_processing((int) $receipt->id)) {
+                return new WP_REST_Response(array('error' => 'payment_event_update_failed'), 500);
+            }
+
+            $result = self::process_webhook_event($event, $object, $events, $log_context);
+            if (is_wp_error($result)) {
+                $events->mark_failed((int) $receipt->id, $result->get_error_code());
+                AutoAgora_Payment_Logger::log('webhook.processing_failed', array_merge($log_context, array(
+                    'error_code' => $result->get_error_code(),
+                )), 'error');
+                return new WP_REST_Response(array('error' => $result->get_error_code()), self::webhook_error_status($result));
+            }
+
+            if (!empty($result['pending'])) {
+                if (!$events->mark_pending((int) $receipt->id, isset($result['error_code']) ? $result['error_code'] : 'pending')) {
+                    return new WP_REST_Response(array('error' => 'payment_event_update_failed'), 500);
+                }
+                return new WP_REST_Response(array('received' => true, 'pending' => true), 200);
+            }
+            if (!$events->mark_processed((int) $receipt->id)) {
+                return new WP_REST_Response(array('error' => 'payment_event_update_failed'), 500);
+            }
+            return new WP_REST_Response(array('received' => true, 'ignored' => !empty($result['ignored'])), 200);
+        } finally {
+            self::release_payment_lock($lock_reference);
+        }
+    }
+
+    private static function process_webhook_event(array $event, array $object, AutoAgora_Payment_Event_Repository $events, array $log_context)
+    {
         if ($event['type'] === 'checkout.session.completed') {
             $metadata = isset($object['metadata']) && is_array($object['metadata']) ? $object['metadata'] : array();
             if (($metadata['integration'] ?? '') !== 'autoagora_listing_promotion_v1') {
                 AutoAgora_Payment_Logger::log('webhook.ignored', array_merge($log_context, array(
                     'ignored_reason' => 'not_autoagora_promotion',
                 )));
-                return new WP_REST_Response(array('received' => true, 'ignored' => true), 200);
+                return array('ignored' => true);
             }
+
             $result = self::fulfill_checkout_session($object);
             if (is_wp_error($result)) {
-                error_log('AutoAgora Stripe fulfillment error: ' . $result->get_error_message());
-                AutoAgora_Payment_Logger::log('promotion.fulfillment_failed', array_merge($log_context, array(
-                    'error_code' => $result->get_error_code(),
-                )), 'error');
-                return new WP_REST_Response(array('error' => $result->get_error_code()), 400);
+                return $result;
             }
             AutoAgora_Payment_Logger::log('promotion.granted', array_merge($log_context, array(
                 'promotion_id' => (int) $result,
             )));
-        } elseif ($event['type'] === 'charge.refunded' && !empty($object['refunded']) && !empty($object['payment_intent'])) {
-            $result = autoagora_refund_paid_listing_promotion(self::PROVIDER, sanitize_text_field($object['payment_intent']));
-            if (is_wp_error($result)) {
-                if ($result->get_error_code() !== 'promotion_payment_not_found') {
-                    error_log('AutoAgora Stripe refund error: ' . $result->get_error_message());
-                    AutoAgora_Payment_Logger::log('promotion.refund_failed', array_merge($log_context, array(
-                        'error_code' => $result->get_error_code(),
-                    )), 'error');
-                    return new WP_REST_Response(array('error' => $result->get_error_code()), 400);
-                }
-                AutoAgora_Payment_Logger::log('promotion.refund_not_found', array_merge($log_context, array(
-                    'error_code' => $result->get_error_code(),
-                )), 'warning');
-            } else {
-                AutoAgora_Payment_Logger::log('promotion.refunded', $log_context);
+
+            $payment_intent = self::webhook_object_reference($event['type'], $object);
+            $pending_refunds = $events->pending_refunds(self::PROVIDER, $payment_intent);
+            if (is_wp_error($pending_refunds)) {
+                return $pending_refunds;
             }
-        } else {
-            AutoAgora_Payment_Logger::log('webhook.ignored', array_merge($log_context, array(
-                'ignored_reason' => 'event_not_actionable',
-            )));
+            foreach ($pending_refunds as $pending_refund) {
+                $refund = autoagora_refund_paid_listing_promotion(self::PROVIDER, $payment_intent);
+                if (is_wp_error($refund)) {
+                    $events->mark_failed((int) $pending_refund->id, $refund->get_error_code());
+                    return $refund;
+                }
+                if (!$events->mark_processed((int) $pending_refund->id)) {
+                    return new WP_Error('payment_event_update_failed', 'The pending refund receipt could not be completed.');
+                }
+                AutoAgora_Payment_Logger::log('promotion.pending_refund_applied', array_merge($log_context, array(
+                    'event_id' => $pending_refund->event_id,
+                )));
+            }
+            return array('ignored' => false);
         }
 
-        return new WP_REST_Response(array('received' => true), 200);
+        if ($event['type'] === 'charge.refunded') {
+            if (empty($object['refunded']) || empty($object['payment_intent'])) {
+                AutoAgora_Payment_Logger::log('webhook.ignored', array_merge($log_context, array(
+                    'ignored_reason' => 'partial_refund',
+                )));
+                return array('ignored' => true);
+            }
+
+            $result = autoagora_refund_paid_listing_promotion(self::PROVIDER, self::webhook_object_reference($event['type'], $object));
+            if (is_wp_error($result) && $result->get_error_code() === 'promotion_payment_not_found') {
+                AutoAgora_Payment_Logger::log('promotion.refund_pending', array_merge($log_context, array(
+                    'error_code' => $result->get_error_code(),
+                )), 'warning');
+                return array('pending' => true, 'error_code' => $result->get_error_code());
+            }
+            if (is_wp_error($result)) {
+                return $result;
+            }
+            AutoAgora_Payment_Logger::log('promotion.refunded', $log_context);
+            return array('ignored' => false);
+        }
+
+        AutoAgora_Payment_Logger::log('webhook.ignored', array_merge($log_context, array(
+            'ignored_reason' => 'event_not_actionable',
+        )));
+        return array('ignored' => true);
     }
 
     private static function fulfill_checkout_session(array $session)
@@ -370,7 +460,7 @@ final class AutoAgora_Stripe_Gateway
         $expected_amount = isset($metadata['expected_amount']) ? absint($metadata['expected_amount']) : 0;
         $amount_total = isset($session['amount_total']) ? (int) $session['amount_total'] : -1;
         $currency = isset($session['currency']) ? strtolower(sanitize_key($session['currency'])) : '';
-        $payment_intent = isset($session['payment_intent']) ? sanitize_text_field($session['payment_intent']) : '';
+        $payment_intent = self::webhook_object_reference('checkout.session.completed', $session);
 
         if (!$listing_id || !$user_id || !isset(AutoAgora_Promotion_Manager::tiers()[$tier])) {
             return new WP_Error('stripe_metadata_invalid', 'Required promotion metadata is missing.');
@@ -428,6 +518,45 @@ final class AutoAgora_Stripe_Gateway
             'currency' => isset($object['currency']) ? $object['currency'] : '',
             'status' => isset($object['payment_status']) ? $object['payment_status'] : (!empty($object['refunded']) ? 'refunded' : ''),
         );
+    }
+
+    private static function webhook_object_reference($event_type, array $object)
+    {
+        if (in_array($event_type, array('checkout.session.completed', 'charge.refunded'), true) && isset($object['payment_intent'])) {
+            if (is_array($object['payment_intent']) && isset($object['payment_intent']['id'])) {
+                return sanitize_text_field($object['payment_intent']['id']);
+            }
+            if (is_string($object['payment_intent'])) {
+                return sanitize_text_field($object['payment_intent']);
+            }
+        }
+        return '';
+    }
+
+    private static function acquire_payment_lock($reference)
+    {
+        global $wpdb;
+        $lock_name = 'autoagora_payment_' . md5((string) $reference);
+        return (int) $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 5)', $lock_name)) === 1;
+    }
+
+    private static function release_payment_lock($reference)
+    {
+        global $wpdb;
+        $lock_name = 'autoagora_payment_' . md5((string) $reference);
+        $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock_name));
+    }
+
+    private static function webhook_error_status(WP_Error $error)
+    {
+        $terminal = array(
+            'stripe_metadata_invalid',
+            'stripe_amount_invalid',
+            'stripe_payment_reference_invalid',
+            'stripe_mode_mismatch',
+            'stripe_payment_unpaid',
+        );
+        return in_array($error->get_error_code(), $terminal, true) ? 400 : 500;
     }
 
     private static function verify_webhook_signature($payload, $header, $secret)

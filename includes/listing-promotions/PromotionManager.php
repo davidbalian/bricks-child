@@ -146,7 +146,10 @@ final class AutoAgora_Promotion_Manager
                 return new WP_Error('promotion_insert_failed', 'The promotion could not be saved.');
             }
 
-            $this->reconcile_listing($listing_id);
+            $reconciled = $this->reconcile_listing($listing_id);
+            if (is_wp_error($reconciled)) {
+                return $reconciled;
+            }
             do_action('autoagora_listing_promotion_granted', $id, $listing_id, $tier, $source);
             return $id;
         } finally {
@@ -157,11 +160,23 @@ final class AutoAgora_Promotion_Manager
     public function cancel($promotion_id)
     {
         $record = $this->repository->find((int) $promotion_id);
-        if (!$record || !in_array($record->status, array(self::STATUS_ACTIVE, self::STATUS_SCHEDULED), true)) {
+        if (!$record) {
             return new WP_Error('promotion_not_cancellable', 'This promotion cannot be cancelled.');
         }
-        $this->repository->update_status((int) $record->id, self::STATUS_CANCELLED);
-        $this->reconcile_listing((int) $record->listing_id);
+        if ($record->status === self::STATUS_CANCELLED) {
+            $reconciled = $this->reconcile_listing((int) $record->listing_id);
+            return is_wp_error($reconciled) ? $reconciled : true;
+        }
+        if (!in_array($record->status, array(self::STATUS_ACTIVE, self::STATUS_SCHEDULED), true)) {
+            return new WP_Error('promotion_not_cancellable', 'This promotion cannot be cancelled.');
+        }
+        if (!$this->repository->update_status((int) $record->id, self::STATUS_CANCELLED)) {
+            return new WP_Error('promotion_status_update_failed', 'The promotion status could not be updated.');
+        }
+        $reconciled = $this->reconcile_listing((int) $record->listing_id);
+        if (is_wp_error($reconciled)) {
+            return $reconciled;
+        }
         return true;
     }
 
@@ -178,11 +193,17 @@ final class AutoAgora_Promotion_Manager
             return new WP_Error('promotion_payment_not_found', 'No paid promotion matches this payment reference.');
         }
         if ($record->status === self::STATUS_REFUNDED) {
-            return true;
+            $reconciled = $this->reconcile_listing((int) $record->listing_id);
+            return is_wp_error($reconciled) ? $reconciled : true;
         }
 
-        $this->repository->update_status((int) $record->id, self::STATUS_REFUNDED);
-        $this->reconcile_listing((int) $record->listing_id);
+        if (!$this->repository->update_status((int) $record->id, self::STATUS_REFUNDED)) {
+            return new WP_Error('promotion_status_update_failed', 'The promotion refund status could not be saved.');
+        }
+        $reconciled = $this->reconcile_listing((int) $record->listing_id);
+        if (is_wp_error($reconciled)) {
+            return $reconciled;
+        }
         do_action('autoagora_listing_promotion_refunded', (int) $record->id, (int) $record->listing_id);
         return true;
     }
@@ -191,14 +212,22 @@ final class AutoAgora_Promotion_Manager
     {
         $listing_id = (int) $listing_id;
         $now = gmdate('Y-m-d H:i:s');
-        $this->repository->expire_due_for_listing($listing_id, $now);
+        if ($this->repository->expire_due_for_listing($listing_id, $now) === false) {
+            return new WP_Error('promotion_expiry_update_failed', 'Expired promotions could not be updated.');
+        }
 
         $active = $this->repository->active_for_listing($listing_id, $now);
         if (!$active) {
             $due = $this->repository->due_scheduled_for_listing($listing_id, $now);
             if ($due) {
-                $this->repository->update_status((int) $due[0]->id, self::STATUS_ACTIVE);
-                $active = array($this->repository->find((int) $due[0]->id));
+                if (!$this->repository->update_status((int) $due[0]->id, self::STATUS_ACTIVE)) {
+                    return new WP_Error('promotion_status_update_failed', 'The scheduled promotion could not be activated.');
+                }
+                $activated = $this->repository->find((int) $due[0]->id);
+                if (!$activated) {
+                    return new WP_Error('promotion_record_missing', 'The activated promotion could not be loaded.');
+                }
+                $active = array($activated);
             }
         }
 
@@ -206,30 +235,46 @@ final class AutoAgora_Promotion_Manager
             usort($active, static function ($a, $b) {
                 return AutoAgora_Promotion_Manager::tier_priority($b->tier) <=> AutoAgora_Promotion_Manager::tier_priority($a->tier);
             });
-            $this->sync_snapshot($listing_id, $active[0]);
-        } else {
-            $this->clear_snapshot($listing_id);
+            return $this->sync_snapshot($listing_id, $active[0]);
         }
+        return $this->clear_snapshot($listing_id);
     }
 
     public function reconcile_due()
     {
         $now = gmdate('Y-m-d H:i:s');
         foreach ($this->repository->due_listing_ids($now) as $listing_id) {
-            $this->reconcile_listing($listing_id);
+            $result = $this->reconcile_listing($listing_id);
+            if (is_wp_error($result)) {
+                error_log('AutoAgora promotion reconciliation error for listing ' . (int) $listing_id . ': ' . $result->get_error_code());
+                if (!wp_next_scheduled('autoagora_reconcile_single_listing_promotion', array((int) $listing_id))) {
+                    wp_schedule_single_event(time() + MINUTE_IN_SECONDS, 'autoagora_reconcile_single_listing_promotion', array((int) $listing_id));
+                }
+            }
         }
     }
 
     public function handle_deleted_listing($listing_id)
     {
         if (AutoAgora_Promotion_Schema::exists()) {
-            $this->repository->cancel_for_deleted_listing((int) $listing_id);
+            if ($this->repository->cancel_for_deleted_listing((int) $listing_id) === false) {
+                error_log('AutoAgora promotion cancellation failed for deleted listing ' . (int) $listing_id . '.');
+            }
         }
     }
 
     private function sync_snapshot($listing_id, $record)
     {
-        $before = get_post_meta($listing_id, self::META_RECORD_ID, true);
+        $before = $this->snapshot_values($listing_id);
+        $desired = array(
+            'managed' => '1',
+            'tier' => (string) $record->tier,
+            'priority' => (string) self::tier_priority($record->tier),
+            'status' => self::STATUS_ACTIVE,
+            'record_id' => (string) (int) $record->id,
+            'starts_at' => (string) $record->starts_at,
+            'ends_at' => (string) $record->ends_at,
+        );
         update_post_meta($listing_id, self::META_MANAGED, '1');
         update_post_meta($listing_id, self::META_TIER, $record->tier);
         update_post_meta($listing_id, self::META_PRIORITY, self::tier_priority($record->tier));
@@ -237,14 +282,27 @@ final class AutoAgora_Promotion_Manager
         update_post_meta($listing_id, self::META_RECORD_ID, (int) $record->id);
         update_post_meta($listing_id, self::META_STARTS_AT, $record->starts_at);
         update_post_meta($listing_id, self::META_ENDS_AT, $record->ends_at);
-        if ((string) $before !== (string) $record->id) {
+        if ($this->snapshot_values($listing_id) !== $desired) {
+            return new WP_Error('promotion_snapshot_update_failed', 'The promotion marketplace snapshot could not be saved.');
+        }
+        if ($before !== $desired) {
             $this->invalidate_listing_queries($listing_id);
         }
+        return true;
     }
 
     private function clear_snapshot($listing_id)
     {
-        $was_active = get_post_meta($listing_id, self::META_STATUS, true) === self::STATUS_ACTIVE;
+        $before = $this->snapshot_values($listing_id);
+        $desired = array(
+            'managed' => '1',
+            'tier' => 'none',
+            'priority' => '0',
+            'status' => 'none',
+            'record_id' => '',
+            'starts_at' => '',
+            'ends_at' => '',
+        );
         update_post_meta($listing_id, self::META_MANAGED, '1');
         update_post_meta($listing_id, self::META_TIER, 'none');
         update_post_meta($listing_id, self::META_PRIORITY, 0);
@@ -252,9 +310,26 @@ final class AutoAgora_Promotion_Manager
         delete_post_meta($listing_id, self::META_RECORD_ID);
         delete_post_meta($listing_id, self::META_STARTS_AT);
         delete_post_meta($listing_id, self::META_ENDS_AT);
-        if ($was_active) {
+        if ($this->snapshot_values($listing_id) !== $desired) {
+            return new WP_Error('promotion_snapshot_update_failed', 'The promotion marketplace snapshot could not be cleared.');
+        }
+        if ($before !== $desired) {
             $this->invalidate_listing_queries($listing_id);
         }
+        return true;
+    }
+
+    private function snapshot_values($listing_id)
+    {
+        return array(
+            'managed' => (string) get_post_meta($listing_id, self::META_MANAGED, true),
+            'tier' => (string) get_post_meta($listing_id, self::META_TIER, true),
+            'priority' => (string) get_post_meta($listing_id, self::META_PRIORITY, true),
+            'status' => (string) get_post_meta($listing_id, self::META_STATUS, true),
+            'record_id' => (string) get_post_meta($listing_id, self::META_RECORD_ID, true),
+            'starts_at' => (string) get_post_meta($listing_id, self::META_STARTS_AT, true),
+            'ends_at' => (string) get_post_meta($listing_id, self::META_ENDS_AT, true),
+        );
     }
 
     private function invalidate_listing_queries($listing_id)
@@ -281,6 +356,10 @@ final class AutoAgora_Promotion_Manager
     {
         if ((int) $record->listing_id !== (int) $listing_id || (string) $record->tier !== (string) $tier) {
             return new WP_Error('promotion_payment_reference_conflict', 'This payment reference is already attached to a different promotion.');
+        }
+        $reconciled = $this->reconcile_listing((int) $record->listing_id);
+        if (is_wp_error($reconciled)) {
+            return $reconciled;
         }
         return (int) $record->id;
     }

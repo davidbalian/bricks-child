@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 
 final class AutoAgora_Promotion_Schema
 {
-    const VERSION = '1.0.0';
+    const VERSION = '1.1.0';
     const VERSION_OPTION = 'autoagora_listing_promotions_schema_version';
 
     public static function table_name()
@@ -17,9 +17,15 @@ final class AutoAgora_Promotion_Schema
         return $wpdb->prefix . 'autoagora_listing_promotions';
     }
 
+    public static function payment_events_table_name()
+    {
+        global $wpdb;
+        return $wpdb->prefix . 'autoagora_payment_events';
+    }
+
     public static function maybe_install()
     {
-        if (get_option(self::VERSION_OPTION) === self::VERSION && self::exists()) {
+        if (get_option(self::VERSION_OPTION) === self::VERSION && self::exists() && self::payment_events_exists()) {
             return;
         }
 
@@ -27,6 +33,7 @@ final class AutoAgora_Promotion_Schema
         global $wpdb;
 
         $table = self::table_name();
+        $events_table = self::payment_events_table_name();
         $charset_collate = $wpdb->get_charset_collate();
         $sql = "CREATE TABLE {$table} (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -51,9 +58,28 @@ final class AutoAgora_Promotion_Schema
             UNIQUE KEY payment_event (payment_provider,payment_reference)
         ) {$charset_collate};";
 
-        dbDelta($sql);
+        $events_sql = "CREATE TABLE {$events_table} (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            provider varchar(32) NOT NULL,
+            event_id varchar(191) NOT NULL,
+            event_type varchar(64) NOT NULL,
+            object_reference varchar(191) NULL,
+            status varchar(24) NOT NULL DEFAULT 'received',
+            error_code varchar(64) NULL,
+            attempts int(10) unsigned NOT NULL DEFAULT 0,
+            created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            processed_at datetime NULL,
+            updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY  (id),
+            UNIQUE KEY provider_event (provider,event_id),
+            KEY object_status (provider,object_reference,status),
+            KEY status_created (status,created_at)
+        ) {$charset_collate};";
 
-        if (self::exists()) {
+        dbDelta($sql);
+        dbDelta($events_sql);
+
+        if (self::exists() && self::payment_events_exists()) {
             update_option(self::VERSION_OPTION, self::VERSION, false);
         }
     }
@@ -62,6 +88,13 @@ final class AutoAgora_Promotion_Schema
     {
         global $wpdb;
         $table = self::table_name();
+        return $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like($table))) === $table;
+    }
+
+    public static function payment_events_exists()
+    {
+        global $wpdb;
+        $table = self::payment_events_table_name();
         return $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like($table))) === $table;
     }
 }

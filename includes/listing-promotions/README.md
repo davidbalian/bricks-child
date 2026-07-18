@@ -18,6 +18,14 @@ and maintains the same columns and indexes. There is intentionally no physical
 foreign key to `wp_posts`; `listing_id` is validated by the service, and rows
 are retained as audit history when a listing is deleted.
 
+Stripe webhook receipts are stored separately in
+`{$wpdb->prefix}autoagora_payment_events`. This small table records event IDs,
+types, PaymentIntent references, processing state, attempts, and error codes;
+it never stores the raw Stripe payload. The unique provider/event ID key makes
+duplicate deliveries safe. Full refunds received before their Checkout
+completion remain `pending` and are applied immediately after the matching
+promotion is recorded, because Stripe does not guarantee event delivery order.
+
 Current marketplace state is mirrored to protected postmeta keys prefixed with
 `_autoagora_promotion_`. These are a query snapshot, not the authoritative
 record. The old ACF `is_featured` value remains a Lift-equivalent fallback only
@@ -124,7 +132,9 @@ The Stripe PaymentIntent ID is stored as `payment_reference`. The
 repeat webhook delivery idempotent. A reused reference with different listing
 or tier data returns `WP_Error` rather than silently granting the wrong item.
 A short per-listing database advisory lock prevents simultaneous grants from
-being assigned overlapping time windows.
+being assigned overlapping time windows. A separate per-PaymentIntent lock
+serializes completion and refund webhooks. Existing payment rows are reconciled
+again on every retry so a prior postmeta/snapshot failure can recover.
 After an authenticated refund event, call
 `autoagora_refund_paid_listing_promotion($provider, $reference)` to remove the
 effective promotion and preserve the row with `refunded` status.
@@ -141,7 +151,8 @@ Do not enable that flag until the sandbox checklist passes.
 
 ### Sandbox checklist
 
-1. Add sandbox keys and register the webhook above.
+1. Deploy the module, visit wp-admin once so schema `1.1.0` creates the payment
+   event table, then add sandbox keys and register the webhook above.
 2. In wp-admin, edit a car and confirm Stripe Checkout says `Ready`.
 3. Log in as the listing owner and open `/my-listings/`.
 4. Choose Promote, then Lift or Showcase.
@@ -149,7 +160,8 @@ Do not enable that flag until the sandbox checklist passes.
    expiration date, and any three-digit CVC.
 6. Confirm Stripe shows a successful `checkout.session.completed` delivery.
 7. Confirm the promotion table contains an active row with source `payment`,
-   provider `stripe`, and a `pi_...` payment reference.
+   provider `stripe`, and a `pi_...` payment reference, and the payment event
+   table contains the matching `evt_...` receipt with status `processed`.
 8. Confirm the listing badge and marketplace ordering changed.
 9. Fully refund the test payment in Stripe and confirm `charge.refunded` changes
    the row to `refunded` and removes the effective promotion.
