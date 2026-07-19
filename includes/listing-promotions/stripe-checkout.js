@@ -195,6 +195,14 @@
         });
     }
 
+    function closePromotionPanels(container, exception) {
+        container.querySelectorAll('.autoagora-promotion-purchase[open]').forEach(function (purchase) {
+            if (purchase !== exception) {
+                purchase.removeAttribute('open');
+            }
+        });
+    }
+
     function init() {
         var config = window.autoAgoraStripeCheckout;
         var container = document.querySelector('.my-listings-container');
@@ -209,6 +217,28 @@
         window.setInterval(function () {
             updatePromotionCountdowns(container);
         }, 60000);
+
+        document.addEventListener('click', function (event) {
+            var purchase = event.target.closest('.autoagora-promotion-purchase');
+            closePromotionPanels(container, purchase && container.contains(purchase) ? purchase : null);
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key !== 'Escape') {
+                return;
+            }
+
+            var openPurchase = container.querySelector('.autoagora-promotion-purchase[open]');
+            if (!openPurchase) {
+                return;
+            }
+
+            closePromotionPanels(container, null);
+            var trigger = openPurchase.querySelector('.autoagora-promotion-trigger');
+            if (trigger) {
+                trigger.focus();
+            }
+        });
 
         container.addEventListener('click', function (event) {
             var tierOption = event.target.closest('.autoagora-promotion-tier-option');
