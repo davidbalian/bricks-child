@@ -224,13 +224,19 @@ final class AutoAgora_Stripe_Gateway
 
     public static function create_checkout_session($listing_id, $user_id, array $package, $attempt)
     {
-        $user = get_userdata((int) $user_id);
         $currency = strtolower(sanitize_key($package['currency']));
         $amount = (int) $package['amount_minor'];
         $duration = (int) $package['duration_seconds'];
         $days = (int) $package['days'];
         $tier = sanitize_key($package['tier']);
         $label = sanitize_text_field($package['label']);
+        $listing_title = html_entity_decode(
+            wp_strip_all_tags((string) get_the_title((int) $listing_id)),
+            ENT_QUOTES,
+            get_bloginfo('charset') ?: 'UTF-8'
+        );
+        $listing_title = sanitize_text_field($listing_title);
+        $listing_reference = ($listing_title !== '' ? $listing_title . ', ' : '') . 'listing #' . (int) $listing_id;
         $metadata = array(
             'integration' => 'autoagora_listing_promotion_v1',
             'listing_id' => (string) (int) $listing_id,
@@ -258,19 +264,16 @@ final class AutoAgora_Stripe_Gateway
                     'unit_amount' => $amount,
                     'product_data' => array(
                         'name' => $label . ' listing promotion',
-                        'description' => self::duration_label($duration) . ' promotion for listing #' . (int) $listing_id,
+                        'description' => self::duration_label($duration) . ' promotion for ' . $listing_reference,
                     ),
                 ),
             )),
             'metadata' => $metadata,
             'payment_intent_data' => array(
-                'description' => $label . ' for AutoAgora listing #' . (int) $listing_id,
+                'description' => $label . ' for ' . $listing_reference,
                 'metadata' => $metadata,
             ),
         );
-        if ($user && is_email($user->user_email)) {
-            $body['customer_email'] = $user->user_email;
-        }
 
         $response = wp_remote_post('https://api.stripe.com/v1/checkout/sessions', array(
             'timeout' => 20,
