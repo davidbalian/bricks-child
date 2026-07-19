@@ -125,6 +125,12 @@ ID, tier, and one of the allowed day values. The server controls the daily
 price and total amount, validates ownership and active listing state, then
 redirects to `checkout.stripe.com`.
 
+Each My Listings card shows the current promotion, a live remaining-time
+countdown, the exact end time in the WordPress site timezone, and the number of
+queued promotions. Opening **Manage promotion** shows every active/scheduled
+record in start order with its exact start and end. These views read the custom
+promotion table rather than the postmeta marketplace snapshot.
+
 The Stripe line item includes the listing title and ID, for example `3 days
 promotion for 2021 BMW X1, listing #23745`. AutoAgora does not prefill
 `customer_email`; Stripe asks the payer to enter the email they want associated

@@ -87,6 +87,7 @@ final class AutoAgora_Promotion_Schema
         if (self::exists() && self::payment_events_exists() && self::has_payment_snapshot_columns()) {
             update_option(self::VERSION_OPTION, self::VERSION, false);
         }
+        self::is_current(true);
     }
 
     public static function exists()
@@ -103,12 +104,17 @@ final class AutoAgora_Promotion_Schema
         return $wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like($table))) === $table;
     }
 
-    public static function is_current()
+    public static function is_current($refresh = false)
     {
-        return get_option(self::VERSION_OPTION) === self::VERSION
+        static $current = null;
+        if (!$refresh && $current !== null) {
+            return $current;
+        }
+        $current = get_option(self::VERSION_OPTION) === self::VERSION
             && self::exists()
             && self::payment_events_exists()
             && self::has_payment_snapshot_columns();
+        return $current;
     }
 
     private static function has_payment_snapshot_columns()

@@ -52,6 +52,38 @@
         updateSummary(panel, config);
     }
 
+    function remainingTime(seconds) {
+        seconds = Math.max(0, Math.floor(seconds));
+        if (seconds < 60) {
+            return 'Less than 1 minute';
+        }
+
+        var days = Math.floor(seconds / 86400);
+        var hours = Math.floor((seconds % 86400) / 3600);
+        var minutes = Math.floor((seconds % 3600) / 60);
+        var parts = [];
+        if (days > 0) {
+            parts.push(days + ' ' + (days === 1 ? 'day' : 'days'));
+        }
+        if (hours > 0 && parts.length < 2) {
+            parts.push(hours + ' ' + (hours === 1 ? 'hour' : 'hours'));
+        }
+        if (minutes > 0 && parts.length < 2) {
+            parts.push(minutes + ' ' + (minutes === 1 ? 'minute' : 'minutes'));
+        }
+        return parts.join(' ');
+    }
+
+    function updatePromotionCountdowns(container) {
+        var now = Math.floor(Date.now() / 1000);
+        container.querySelectorAll('[data-promotion-end-timestamp]').forEach(function (element) {
+            var end = Number(element.getAttribute('data-promotion-end-timestamp')) || 0;
+            if (end > 0) {
+                element.textContent = remainingTime(end - now) + ' left';
+            }
+        });
+    }
+
     function init() {
         var config = window.autoAgoraStripeCheckout;
         var container = document.querySelector('.my-listings-container');
@@ -62,6 +94,10 @@
         container.querySelectorAll('.autoagora-promotion-purchase-panel').forEach(function (panel) {
             updateSummary(panel, config);
         });
+        updatePromotionCountdowns(container);
+        window.setInterval(function () {
+            updatePromotionCountdowns(container);
+        }, 60000);
 
         container.addEventListener('click', function (event) {
             var tierOption = event.target.closest('.autoagora-promotion-tier-option');

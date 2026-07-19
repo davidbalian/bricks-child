@@ -75,6 +75,22 @@ final class AutoAgora_Promotion_Repository
         ));
     }
 
+    public function current_and_upcoming_for_listing($listing_id, $now_gmt, $limit = 20)
+    {
+        global $wpdb;
+        return $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM " . AutoAgora_Promotion_Schema::table_name() . "
+             WHERE listing_id = %d
+             AND status IN ('active','scheduled')
+             AND (ends_at IS NULL OR ends_at > %s)
+             ORDER BY starts_at ASC, id ASC
+             LIMIT %d",
+            (int) $listing_id,
+            $now_gmt,
+            max(1, (int) $limit)
+        ));
+    }
+
     public function active_for_listing($listing_id, $now_gmt)
     {
         global $wpdb;

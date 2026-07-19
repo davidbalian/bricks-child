@@ -371,6 +371,11 @@ class MyListingsAjaxHandler {
                     }
                     ?>
                 </div>
+                <?php
+                if (function_exists('autoagora_render_seller_promotion_status')) {
+                    autoagora_render_seller_promotion_status($post_id);
+                }
+                ?>
                 <div class="listing-actions">
                     <a href="<?php echo esc_url(add_query_arg('car_id', $post_id, home_url('/edit-listing/'))); ?>" class="btn btn-primary">
                         <i class="fas fa-pencil-alt"></i> Edit

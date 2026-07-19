@@ -83,6 +83,107 @@
     transform: rotate(180deg);
 }
 
+.autoagora-seller-promotion-status {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.75rem 0.85rem;
+    border: 1px solid #bae6fd;
+    border-radius: 0.8rem;
+    background: linear-gradient(135deg, #f0f9ff, #eff6ff);
+    color: #17233b;
+}
+
+.autoagora-seller-promotion-status--showcase {
+    border-color: #ddd6fe;
+    background: linear-gradient(135deg, #faf5ff, #f5f3ff);
+}
+
+.autoagora-seller-promotion-icon {
+    display: grid;
+    width: 2.15rem;
+    height: 2.15rem;
+    place-items: center;
+    border-radius: 50%;
+    background: #0d86e3;
+    color: #fff;
+    font-size: 0.82rem;
+    box-shadow: 0 4px 10px rgba(13, 134, 227, 0.2);
+}
+
+.autoagora-seller-promotion-status--showcase .autoagora-seller-promotion-icon {
+    background: #7c3aed;
+    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.2);
+}
+
+.autoagora-seller-promotion-copy,
+.autoagora-seller-promotion-timing {
+    display: grid;
+    min-width: 0;
+    gap: 0.12rem;
+}
+
+.autoagora-seller-promotion-title {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    align-items: center;
+}
+
+.autoagora-seller-promotion-title > strong {
+    font-size: 0.88rem;
+}
+
+.autoagora-seller-promotion-state {
+    padding: 0.12rem 0.38rem;
+    border-radius: 100rem;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.autoagora-seller-promotion-state.is-scheduled {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.autoagora-seller-promotion-timing {
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    gap: 0.45rem;
+    font-size: 0.74rem;
+}
+
+.autoagora-seller-promotion-timing > strong {
+    color: #0369a1;
+}
+
+.autoagora-seller-promotion-status--showcase .autoagora-seller-promotion-timing > strong {
+    color: #6d28d9;
+}
+
+.autoagora-seller-promotion-timing > span {
+    overflow: hidden;
+    color: #64748b;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.autoagora-seller-promotion-queued {
+    padding: 0.35rem 0.55rem;
+    border: 1px solid rgba(100, 116, 139, 0.18);
+    border-radius: 100rem;
+    background: rgba(255, 255, 255, 0.72);
+    color: #475569;
+    font-size: 0.68rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
 .autoagora-promotion-purchase-panel {
     position: absolute;
     left: 0;
@@ -109,6 +210,111 @@
     font-size: 0.68rem;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+}
+
+.autoagora-promotion-schedule {
+    display: grid;
+    gap: 0.55rem;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.8rem;
+    background: #f8fafc;
+    color: #17233b;
+}
+
+.autoagora-promotion-schedule-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+}
+
+.autoagora-promotion-schedule-heading > strong {
+    font-size: 0.84rem;
+}
+
+.autoagora-promotion-schedule-heading > span {
+    color: #64748b;
+    font-size: 0.66rem;
+}
+
+.autoagora-promotion-timeline {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.autoagora-promotion-timeline-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.55rem;
+    padding: 0.35rem 0;
+}
+
+.autoagora-promotion-timeline-item:not(:last-child)::before {
+    position: absolute;
+    top: 1.1rem;
+    bottom: -0.35rem;
+    left: 0.28rem;
+    width: 1px;
+    content: '';
+    background: #cbd5e1;
+}
+
+.autoagora-promotion-timeline-marker {
+    position: relative;
+    z-index: 1;
+    width: 0.58rem;
+    height: 0.58rem;
+    margin-top: 0.28rem;
+    border: 2px solid #94a3b8;
+    border-radius: 50%;
+    background: #fff;
+}
+
+.autoagora-promotion-timeline-item.is-active .autoagora-promotion-timeline-marker {
+    border-color: #22c55e;
+    background: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+}
+
+.autoagora-promotion-timeline-copy {
+    display: grid;
+    min-width: 0;
+    gap: 0.12rem;
+}
+
+.autoagora-promotion-timeline-copy > span {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.autoagora-promotion-timeline-copy strong {
+    font-size: 0.76rem;
+}
+
+.autoagora-promotion-timeline-copy small {
+    color: #64748b;
+    font-size: 0.67rem;
+    line-height: 1.4;
+}
+
+.autoagora-promotion-timeline-state {
+    color: #64748b;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.autoagora-promotion-timeline-item.is-active .autoagora-promotion-timeline-state,
+.autoagora-promotion-timeline-item.is-active small > strong {
+    color: #15803d;
 }
 
 .autoagora-promotion-panel-heading {
@@ -330,6 +536,15 @@
         width: 100%;
         max-height: none;
         margin-top: 0.5rem;
+    }
+
+    .autoagora-seller-promotion-status {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .autoagora-seller-promotion-queued {
+        grid-column: 2;
+        justify-self: start;
     }
 }
 
