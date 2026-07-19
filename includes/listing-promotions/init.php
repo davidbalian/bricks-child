@@ -54,6 +54,29 @@ add_action('autoagora_reconcile_single_listing_promotion', static function ($lis
     }
 }, 10, 1);
 
+add_action('autoagora_activate_awaiting_listing_promotions', static function ($listing_id) {
+    if (!AutoAgora_Promotion_Schema::exists()) {
+        return;
+    }
+    $result = autoagora_promotion_manager()->activate_awaiting_approval((int) $listing_id);
+    if (is_wp_error($result)) {
+        error_log('AutoAgora waiting promotion activation error for listing ' . (int) $listing_id . ': ' . $result->get_error_code());
+    }
+}, 10, 1);
+
+add_action('transition_post_status', static function ($new_status, $old_status, $post) {
+    if (!$post instanceof WP_Post || $post->post_type !== 'car' || $new_status !== 'publish' || $old_status === 'publish') {
+        return;
+    }
+    $result = autoagora_promotion_manager()->activate_awaiting_approval((int) $post->ID);
+    if (is_wp_error($result)) {
+        error_log('AutoAgora first-approval promotion activation error for listing ' . (int) $post->ID . ': ' . $result->get_error_code());
+        if (!wp_next_scheduled('autoagora_activate_awaiting_listing_promotions', array((int) $post->ID))) {
+            wp_schedule_single_event(time() + MINUTE_IN_SECONDS, 'autoagora_activate_awaiting_listing_promotions', array((int) $post->ID));
+        }
+    }
+}, 20, 3);
+
 add_action('autoagora_purge_promotion_page_cache', static function () {
     if (function_exists('rocket_clean_domain')) {
         rocket_clean_domain();
@@ -65,6 +88,12 @@ add_action('before_delete_post', static function ($post_id) {
         autoagora_promotion_manager()->handle_deleted_listing((int) $post_id);
     }
 }, 10);
+
+add_action('wp_trash_post', static function ($post_id) {
+    if (get_post_type($post_id) === 'car') {
+        autoagora_promotion_manager()->handle_trashed_listing((int) $post_id);
+    }
+}, 10, 1);
 
 add_action('deleted_user', static function ($user_id) {
     autoagora_promotion_manager()->handle_deleted_seller((int) $user_id);

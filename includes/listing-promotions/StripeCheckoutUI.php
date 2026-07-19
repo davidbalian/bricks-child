@@ -13,7 +13,7 @@ function autoagora_enqueue_stripe_checkout_assets()
     wp_enqueue_style(
         'autoagora-stripe-checkout',
         $base_url . 'stripe-checkout.css',
-        array('bricks-child-my-listings-css'),
+        array('bricks-child-theme-css'),
         file_exists($base_path . 'stripe-checkout.css') ? filemtime($base_path . 'stripe-checkout.css') : BRICKS_CHILD_THEME_VERSION
     );
     wp_enqueue_script(
@@ -107,7 +107,8 @@ function autoagora_render_seller_promotion_status($listing_id)
         }
     }
     $primary = $active ?: $schedule[0];
-    $queued_count = count($schedule) - ($active ? 1 : 0);
+    $awaiting_approval = $primary->status === AutoAgora_Promotion_Manager::STATUS_AWAITING_APPROVAL;
+    $secondary_count = max(0, count($schedule) - 1);
     $tier_label = AutoAgora_Promotion_Manager::tier_label($primary->tier) ?: ucfirst((string) $primary->tier);
     $tier_class = sanitize_html_class((string) $primary->tier);
     ?>
@@ -117,7 +118,9 @@ function autoagora_render_seller_promotion_status($listing_id)
         <span class="autoagora-seller-promotion-copy">
             <span class="autoagora-seller-promotion-title">
                 <strong><?php echo esc_html($tier_label); ?></strong>
-                <span class="autoagora-seller-promotion-state <?php echo $active ? 'is-active' : 'is-scheduled'; ?>"><?php echo $active ? 'Active' : 'Scheduled'; ?></span>
+                <span class="autoagora-seller-promotion-state <?php echo $active ? 'is-active' : ($awaiting_approval ? 'is-awaiting' : 'is-scheduled'); ?>">
+                    <?php echo $active ? 'Active' : ($awaiting_approval ? 'Waiting for approval' : 'Scheduled'); ?>
+                </span>
             </span>
             <?php if ($active) : ?>
                 <?php $end_timestamp = strtotime($active->ends_at . ' UTC'); ?>
@@ -127,6 +130,11 @@ function autoagora_render_seller_promotion_status($listing_id)
                     </strong>
                     <span>Ends <?php echo esc_html(autoagora_promotion_local_datetime($active->ends_at)); ?></span>
                 </span>
+            <?php elseif ($awaiting_approval) : ?>
+                <span class="autoagora-seller-promotion-timing">
+                    <strong>Paid and reserved</strong>
+                    <span>Full <?php echo esc_html(AutoAgora_Stripe_Gateway::duration_label($primary->duration_seconds)); ?> starts after initial approval</span>
+                </span>
             <?php else : ?>
                 <span class="autoagora-seller-promotion-timing">
                     <strong>Starts <?php echo esc_html(autoagora_promotion_local_datetime($primary->starts_at)); ?></strong>
@@ -134,9 +142,9 @@ function autoagora_render_seller_promotion_status($listing_id)
                 </span>
             <?php endif; ?>
         </span>
-        <?php if ($queued_count > 0) : ?>
+        <?php if ($secondary_count > 0) : ?>
             <span class="autoagora-seller-promotion-queued">
-                <?php echo esc_html($queued_count . ' ' . _n('promotion queued', 'promotions queued', $queued_count, 'bricks-child')); ?>
+                <?php echo esc_html($secondary_count . ' more ' . _n('promotion', 'promotions', $secondary_count, 'bricks-child')); ?>
             </span>
         <?php endif; ?>
     </section>
@@ -158,6 +166,7 @@ function autoagora_render_seller_promotion_timeline(array $schedule)
             <?php foreach ($schedule as $record) : ?>
                 <?php
                 $is_active = $record->status === AutoAgora_Promotion_Manager::STATUS_ACTIVE;
+                $is_awaiting = $record->status === AutoAgora_Promotion_Manager::STATUS_AWAITING_APPROVAL;
                 $tier_label = AutoAgora_Promotion_Manager::tier_label($record->tier) ?: ucfirst((string) $record->tier);
                 $start_local = autoagora_promotion_local_datetime($record->starts_at);
                 $end_local = autoagora_promotion_local_datetime($record->ends_at);
@@ -167,7 +176,7 @@ function autoagora_render_seller_promotion_timeline(array $schedule)
                     <span class="autoagora-promotion-timeline-copy">
                         <span>
                             <strong><?php echo esc_html($tier_label); ?></strong>
-                            <span class="autoagora-promotion-timeline-state"><?php echo $is_active ? 'Active' : 'Scheduled'; ?></span>
+                            <span class="autoagora-promotion-timeline-state"><?php echo $is_active ? 'Active' : ($is_awaiting ? 'Waiting for approval' : 'Scheduled'); ?></span>
                         </span>
                         <?php if ($is_active) : ?>
                             <?php $end_timestamp = strtotime($record->ends_at . ' UTC'); ?>
@@ -176,6 +185,11 @@ function autoagora_render_seller_promotion_timeline(array $schedule)
                                     <?php echo esc_html(autoagora_format_promotion_remaining($end_timestamp - time())); ?> left
                                 </strong>
                                 &middot; Ends <?php echo esc_html($end_local); ?>
+                            </small>
+                        <?php elseif ($is_awaiting) : ?>
+                            <small>
+                                <?php echo esc_html(AutoAgora_Stripe_Gateway::duration_label($record->duration_seconds)); ?>
+                                &middot; Starts automatically after initial approval
                             </small>
                         <?php else : ?>
                             <small>
@@ -195,6 +209,13 @@ function autoagora_render_seller_promotion_timeline(array $schedule)
 function autoagora_render_promotion_purchase_controls($listing_id)
 {
     $listing_id = (int) $listing_id;
+    $post = get_post($listing_id);
+    if (!$post || !is_user_logged_in() || ((int) $post->post_author !== get_current_user_id() && !current_user_can('manage_options'))) {
+        return;
+    }
+    if (!AutoAgora_Promotion_Manager::is_seller_purchase_eligible($listing_id)) {
+        return;
+    }
     if (!AutoAgora_Stripe_Gateway::is_ready()) {
         return;
     }
@@ -203,6 +224,7 @@ function autoagora_render_promotion_purchase_controls($listing_id)
     }
 
     $schedule = autoagora_get_seller_promotion_schedule($listing_id);
+    $initial_approval_pending = AutoAgora_Promotion_Manager::is_initial_approval_pending($listing_id);
     $current_tier = autoagora_get_listing_promotion_tier($listing_id);
     $tier_options = array();
     foreach (AutoAgora_Promotion_Manager::tiers() as $tier_key => $tier_config) {
@@ -236,7 +258,7 @@ function autoagora_render_promotion_purchase_controls($listing_id)
             <span class="autoagora-promotion-trigger-icon" aria-hidden="true">
                 <i class="fas fa-bolt"></i>
             </span>
-            <span><?php echo esc_html($schedule ? 'Manage promotion' : 'Promote listing'); ?></span>
+            <span><?php echo esc_html($schedule ? 'Manage promotion' : ($initial_approval_pending ? 'Promote after approval' : 'Promote listing')); ?></span>
             <i class="fas fa-chevron-up autoagora-promotion-trigger-chevron" aria-hidden="true"></i>
         </summary>
 
@@ -250,11 +272,13 @@ function autoagora_render_promotion_purchase_controls($listing_id)
             <?php autoagora_render_seller_promotion_timeline($schedule); ?>
 
             <div class="autoagora-promotion-panel-heading">
-                <strong><?php echo $schedule ? 'Add another promotion' : 'Choose your promotion'; ?></strong>
+                <strong><?php echo $initial_approval_pending ? ($schedule ? 'Add another launch promotion' : 'Choose your launch promotion') : ($schedule ? 'Add another promotion' : 'Choose your promotion'); ?></strong>
                 <span>
-                    <?php echo $schedule
-                        ? 'Select a visibility level and duration. New time is added after the current schedule.'
-                        : 'Select a visibility level and duration.'; ?>
+                    <?php echo $initial_approval_pending
+                        ? 'Pay now and the full duration will start automatically when this listing is first approved and published.'
+                        : ($schedule
+                            ? 'Select a visibility level and duration. New time is added after the current schedule.'
+                            : 'Select a visibility level and duration.'); ?>
                 </span>
             </div>
 
@@ -303,7 +327,7 @@ function autoagora_render_promotion_purchase_controls($listing_id)
                 </strong>
             </div>
 
-            <div class="autoagora-promotion-queue-preview<?php echo $initial_preview['queued'] ? ' is-queued' : ' is-immediate'; ?>" aria-live="polite">
+            <div class="autoagora-promotion-queue-preview<?php echo !empty($initial_preview['awaiting_approval']) ? ' is-awaiting' : ($initial_preview['queued'] ? ' is-queued' : ' is-immediate'); ?>" aria-live="polite">
                 <span class="autoagora-promotion-queue-icon" aria-hidden="true"><i class="fas fa-calendar-check"></i></span>
                 <span>
                     <strong class="autoagora-promotion-preview-headline"><?php echo esc_html($initial_preview['headline']); ?></strong>

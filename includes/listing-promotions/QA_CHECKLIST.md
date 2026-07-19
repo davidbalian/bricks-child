@@ -27,6 +27,21 @@ test below passes.
 | Attempt Checkout for another seller's listing by changing the request. | The request is rejected and no Stripe Checkout Session or promotion row is created. |
 | Attempt Checkout for a sold, expired, draft, or deleted listing. | The request is rejected before payment and no Checkout Session is created. |
 
+## Initial approval purchases
+
+| Action | Expected result |
+|---|---|
+| Submit a new car and inspect the success page. | A non-blocking promotion card offers Lift and Showcase for that exact owned listing and states that paid time begins only after approval. |
+| Complete Checkout while the new listing is still pending. | One paid row is created with status `awaiting_approval`, full `duration_seconds`, and null `starts_at`/`ends_at`; no marketplace badge appears. |
+| Purchase multiple promotions before approval. | Every payment creates one waiting row and the seller timeline shows them waiting in purchase order. |
+| Approve and publish the listing for the first time. | The first waiting promotion becomes active at approval time; additional waiting promotions become sequentially scheduled with their full durations. |
+| Move that published listing back to pending for an edit and approve it again. | Existing promotion time continues draining; no promotion restarts and no start/end dates are changed. |
+| Buy a promotion while a previously published listing is pending after an edit. | It joins the normal queue immediately rather than receiving `awaiting_approval`. |
+| Approve the listing between schedule preview and Checkout creation. | The signature changes; the seller reviews the new immediate schedule before continuing. |
+| Approve the listing after Checkout is created but before its webhook is fulfilled. | Fulfillment detects the published listing and starts/queues the promotion normally rather than leaving it waiting. |
+| Trash a never-published listing with a paid waiting promotion. | The row becomes `refund_required`, never starts, and the central manager tells the administrator to refund it through Stripe. |
+| Fully refund that flagged payment in Stripe. | The row becomes `refunded` and the refunded amount is preserved. |
+
 ## Successful Stripe payments
 
 Repeat the following for Lift and Showcase, covering 1, 3, 5, and 7 days across

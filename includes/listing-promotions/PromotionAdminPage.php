@@ -100,6 +100,8 @@ final class AutoAgora_Promotion_Admin_Page
         $errors = AutoAgora_Stripe_Gateway::configuration_errors();
         $events = new AutoAgora_Payment_Event_Repository();
         $attention = $events->admin_attention_count();
+        $promotions = new AutoAgora_Promotion_Repository();
+        $refund_required = $promotions->admin_count(array('status' => AutoAgora_Promotion_Manager::STATUS_REFUND_REQUIRED));
         $next_cron = wp_next_scheduled('autoagora_reconcile_listing_promotions');
         $lift = AutoAgora_Stripe_Gateway::package_for(AutoAgora_Promotion_Manager::TIER_PRIORITY, 1);
         $showcase = AutoAgora_Stripe_Gateway::package_for(AutoAgora_Promotion_Manager::TIER_SHOWCASE, 1);
@@ -117,6 +119,10 @@ final class AutoAgora_Promotion_Admin_Page
             <div class="autoagora-readiness-metric <?php echo $attention ? 'has-attention' : ''; ?>">
                 <strong><?php echo esc_html(number_format_i18n($attention)); ?></strong>
                 <span>payment events needing attention</span>
+            </div>
+            <div class="autoagora-readiness-metric <?php echo $refund_required ? 'has-attention' : ''; ?>">
+                <strong><?php echo esc_html(number_format_i18n($refund_required)); ?></strong>
+                <span>waiting payments require a Stripe refund</span>
             </div>
             <div class="autoagora-readiness-metric <?php echo $next_cron ? '' : 'has-attention'; ?>">
                 <strong><?php echo $next_cron ? esc_html(wp_date('j M H:i', $next_cron, wp_timezone())) : 'Missing'; ?></strong>
@@ -210,11 +216,11 @@ final class AutoAgora_Promotion_Admin_Page
         <tr id="promotion-<?php echo esc_attr($row->id); ?>">
             <td><strong><?php if ($is_live) : ?><a href="<?php echo esc_url(get_edit_post_link((int) $row->listing_id)); ?>"><?php echo esc_html($title); ?></a><?php else : ?>Deleted: <?php echo esc_html($title); ?><?php endif; ?></strong><small>#<?php echo esc_html($row->listing_id); ?> / Promotion #<?php echo esc_html($row->id); ?></small></td>
             <td><?php if (!empty($row->live_seller_id)) : ?><a href="<?php echo esc_url(get_edit_user_link((int) $row->live_seller_id)); ?>"><?php echo esc_html($row->seller_display_name ?: $row->seller_user_login); ?></a><small>User #<?php echo esc_html($row->live_seller_id); ?></small><?php elseif ($seller_id > 0) : ?><span>Deleted user</span><small>User #<?php echo esc_html($seller_id); ?></small><?php else : ?><span>Anonymized</span><?php endif; ?></td>
-            <td><strong><?php echo esc_html(AutoAgora_Promotion_Manager::tier_label($row->tier) ?: $row->tier); ?></strong><span class="autoagora-admin-status status-<?php echo esc_attr(sanitize_html_class($row->status)); ?>"><?php echo esc_html(ucfirst($row->status)); ?></span><small><?php echo esc_html(ucfirst($row->source)); ?> / <?php echo esc_html(AutoAgora_Stripe_Gateway::duration_label((int) $row->duration_seconds)); ?></small><?php if ((int) $row->granted_by > 0) : ?><small>Granted by user #<?php echo esc_html($row->granted_by); ?></small><?php endif; ?><?php if ($row->notes) : ?><small title="<?php echo esc_attr($row->notes); ?>"><?php echo esc_html(wp_html_excerpt($row->notes, 90, '...')); ?></small><?php endif; ?></td>
-            <td><span>Starts <?php echo esc_html(self::display_gmt($row->starts_at)); ?></span><small>Ends <?php echo esc_html(self::display_gmt($row->ends_at)); ?></small></td>
+            <td><strong><?php echo esc_html(AutoAgora_Promotion_Manager::tier_label($row->tier) ?: $row->tier); ?></strong><span class="autoagora-admin-status status-<?php echo esc_attr(sanitize_html_class($row->status)); ?>"><?php echo esc_html(self::status_label($row->status)); ?></span><small><?php echo esc_html(ucfirst($row->source)); ?> / <?php echo esc_html(AutoAgora_Stripe_Gateway::duration_label((int) $row->duration_seconds)); ?></small><?php if ((int) $row->granted_by > 0) : ?><small>Granted by user #<?php echo esc_html($row->granted_by); ?></small><?php endif; ?><?php if ($row->notes) : ?><small title="<?php echo esc_attr($row->notes); ?>"><?php echo esc_html(wp_html_excerpt($row->notes, 90, '...')); ?></small><?php endif; ?></td>
+            <td><?php if ($row->status === AutoAgora_Promotion_Manager::STATUS_AWAITING_APPROVAL) : ?><span>Starts after initial approval</span><small>Full duration reserved</small><?php elseif ($row->status === AutoAgora_Promotion_Manager::STATUS_REFUND_REQUIRED) : ?><span>Never started</span><small>Refund through Stripe</small><?php else : ?><span>Starts <?php echo esc_html(self::display_gmt($row->starts_at)); ?></span><small>Ends <?php echo esc_html(self::display_gmt($row->ends_at)); ?></small><?php endif; ?></td>
             <td><strong><?php echo esc_html($paid); ?></strong><?php if ((int) $row->refunded_amount_minor > 0) : ?><small>Refunded <?php echo esc_html(strtoupper((string) $row->currency) . ' ' . number_format_i18n((int) $row->refunded_amount_minor / 100, 2)); ?></small><?php endif; ?><?php if ($row->payment_reference) : ?><a href="<?php echo esc_url(self::stripe_payment_url($row->payment_reference)); ?>" target="_blank" rel="noopener noreferrer"><code><?php echo esc_html($row->payment_reference); ?></code></a><?php endif; ?><?php if ($row->stripe_checkout_session_id) : ?><code><?php echo esc_html($row->stripe_checkout_session_id); ?></code><?php endif; ?></td>
             <td><?php echo esc_html(self::display_gmt($row->created_at)); ?></td>
-            <td><?php if (in_array($row->status, array(AutoAgora_Promotion_Manager::STATUS_ACTIVE, AutoAgora_Promotion_Manager::STATUS_SCHEDULED), true)) : ?><form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" onsubmit="return confirm('Cancel this promotion? This does not issue a Stripe refund.');"><input type="hidden" name="action" value="autoagora_admin_cancel_promotion"><input type="hidden" name="promotion_id" value="<?php echo esc_attr($row->id); ?>"><?php wp_nonce_field('autoagora_admin_cancel_promotion_' . (int) $row->id); ?><button class="button button-small">Cancel</button></form><?php else : ?>&mdash;<?php endif; ?></td>
+            <td><?php if (in_array($row->status, array(AutoAgora_Promotion_Manager::STATUS_ACTIVE, AutoAgora_Promotion_Manager::STATUS_SCHEDULED, AutoAgora_Promotion_Manager::STATUS_AWAITING_APPROVAL), true)) : ?><form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" onsubmit="return confirm('Cancel this promotion? This does not issue a Stripe refund.');"><input type="hidden" name="action" value="autoagora_admin_cancel_promotion"><input type="hidden" name="promotion_id" value="<?php echo esc_attr($row->id); ?>"><?php wp_nonce_field('autoagora_admin_cancel_promotion_' . (int) $row->id); ?><button class="button button-small">Cancel</button></form><?php else : ?>&mdash;<?php endif; ?></td>
         </tr>
         <?php
     }
@@ -305,13 +311,18 @@ final class AutoAgora_Promotion_Admin_Page
     private static function status_options($selected)
     {
         foreach (self::promotion_statuses() as $status) {
-            echo '<option value="' . esc_attr($status) . '" ' . selected($selected, $status, false) . '>' . esc_html(ucfirst($status)) . '</option>';
+            echo '<option value="' . esc_attr($status) . '" ' . selected($selected, $status, false) . '>' . esc_html(self::status_label($status)) . '</option>';
         }
     }
 
     private static function promotion_statuses()
     {
-        return array('scheduled', 'active', 'expired', 'cancelled', 'refunded');
+        return array('awaiting_approval', 'scheduled', 'active', 'expired', 'cancelled', 'refund_required', 'refunded');
+    }
+
+    private static function status_label($status)
+    {
+        return ucwords(str_replace('_', ' ', (string) $status));
     }
 
     private static function event_statuses()

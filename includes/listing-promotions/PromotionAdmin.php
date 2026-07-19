@@ -189,10 +189,16 @@ final class AutoAgora_Promotion_Admin
             echo '<tr>';
             echo '<td>' . esc_html($record->id) . '</td>';
             echo '<td>' . esc_html(AutoAgora_Promotion_Manager::tier_label($record->tier) ?: $record->tier) . '</td>';
-            echo '<td>' . esc_html($record->status) . '</td>';
+            echo '<td>' . esc_html(ucwords(str_replace('_', ' ', (string) $record->status))) . '</td>';
             echo '<td>' . esc_html($record->source) . '</td>';
-            echo '<td>' . esc_html(self::display_gmt($record->starts_at)) . '</td>';
-            echo '<td>' . esc_html(self::display_gmt($record->ends_at)) . '</td>';
+            if ($record->status === AutoAgora_Promotion_Manager::STATUS_AWAITING_APPROVAL) {
+                echo '<td>After initial approval</td><td>Full duration reserved</td>';
+            } elseif ($record->status === AutoAgora_Promotion_Manager::STATUS_REFUND_REQUIRED) {
+                echo '<td>Never started</td><td>Refund through Stripe</td>';
+            } else {
+                echo '<td>' . esc_html(self::display_gmt($record->starts_at)) . '</td>';
+                echo '<td>' . esc_html(self::display_gmt($record->ends_at)) . '</td>';
+            }
             $paid = (int) $record->amount_minor > 0
                 ? strtoupper((string) $record->currency) . ' ' . number_format((int) $record->amount_minor / 100, 2)
                 : '&mdash;';
@@ -203,7 +209,7 @@ final class AutoAgora_Promotion_Admin
             }
             echo '<td>' . esc_html($payment_reference) . '</td>';
             echo '<td>';
-            if (in_array($record->status, array(AutoAgora_Promotion_Manager::STATUS_ACTIVE, AutoAgora_Promotion_Manager::STATUS_SCHEDULED), true)) {
+            if (in_array($record->status, array(AutoAgora_Promotion_Manager::STATUS_ACTIVE, AutoAgora_Promotion_Manager::STATUS_SCHEDULED, AutoAgora_Promotion_Manager::STATUS_AWAITING_APPROVAL), true)) {
                 echo '<a class="button button-small" href="' . esc_url($cancel_url) . '" onclick="return confirm(\'Cancel this promotion? This does not issue a Stripe refund.\')">Cancel</a>';
             } else {
                 echo '&mdash;';

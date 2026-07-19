@@ -120,14 +120,51 @@ final class AutoAgora_Promotion_Repository
         return $wpdb->get_results($wpdb->prepare(
             "SELECT * FROM " . AutoAgora_Promotion_Schema::table_name() . "
              WHERE listing_id = %d
-             AND status IN ('active','scheduled')
-             AND (ends_at IS NULL OR ends_at > %s)
-             ORDER BY starts_at ASC, id ASC
+             AND (
+                 (status IN ('active','scheduled') AND (ends_at IS NULL OR ends_at > %s))
+                 OR status = 'awaiting_approval'
+             )
+             ORDER BY CASE status
+                 WHEN 'active' THEN 0
+                 WHEN 'scheduled' THEN 1
+                 WHEN 'awaiting_approval' THEN 2
+                 ELSE 3
+             END, starts_at ASC, created_at ASC, id ASC
              LIMIT %d",
             (int) $listing_id,
             $now_gmt,
             max(1, (int) $limit)
         ));
+    }
+
+    public function awaiting_approval_for_listing($listing_id)
+    {
+        global $wpdb;
+        return $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM " . AutoAgora_Promotion_Schema::table_name() . "
+             WHERE listing_id = %d AND status = 'awaiting_approval'
+             ORDER BY created_at ASC, id ASC",
+            (int) $listing_id
+        ));
+    }
+
+    public function schedule_awaiting_approval($id, $status, $starts_at, $ends_at)
+    {
+        global $wpdb;
+        return false !== $wpdb->update(
+            AutoAgora_Promotion_Schema::table_name(),
+            array(
+                'status' => $status,
+                'starts_at' => $starts_at,
+                'ends_at' => $ends_at,
+            ),
+            array(
+                'id' => (int) $id,
+                'status' => AutoAgora_Promotion_Manager::STATUS_AWAITING_APPROVAL,
+            ),
+            array('%s', '%s', '%s'),
+            array('%d', '%s')
+        );
     }
 
     public function active_for_listing($listing_id, $now_gmt)
@@ -194,12 +231,41 @@ final class AutoAgora_Promotion_Repository
         )));
     }
 
+    public function published_awaiting_listing_ids($limit = 500)
+    {
+        global $wpdb;
+        return array_map('intval', $wpdb->get_col($wpdb->prepare(
+            "SELECT DISTINCT promotions.listing_id
+             FROM " . AutoAgora_Promotion_Schema::table_name() . " AS promotions
+             INNER JOIN {$wpdb->posts} AS listings ON listings.ID = promotions.listing_id
+             WHERE promotions.status = 'awaiting_approval'
+             AND listings.post_type = 'car' AND listings.post_status = 'publish'
+             LIMIT %d",
+            max(1, (int) $limit)
+        )));
+    }
+
     public function cancel_for_deleted_listing($listing_id)
     {
         global $wpdb;
         return $wpdb->query($wpdb->prepare(
-            "UPDATE " . AutoAgora_Promotion_Schema::table_name() . " SET status = 'cancelled'
-             WHERE listing_id = %d AND status IN ('active','scheduled')",
+            "UPDATE " . AutoAgora_Promotion_Schema::table_name() . "
+             SET status = CASE
+                 WHEN status = 'awaiting_approval' AND source = 'payment' THEN 'refund_required'
+                 ELSE 'cancelled'
+             END
+             WHERE listing_id = %d AND status IN ('active','scheduled','awaiting_approval')",
+            (int) $listing_id
+        ));
+    }
+
+    public function require_refund_for_waiting_listing($listing_id)
+    {
+        global $wpdb;
+        return $wpdb->query($wpdb->prepare(
+            "UPDATE " . AutoAgora_Promotion_Schema::table_name() . "
+             SET status = 'refund_required'
+             WHERE listing_id = %d AND status = 'awaiting_approval' AND source = 'payment'",
             (int) $listing_id
         ));
     }

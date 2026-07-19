@@ -13,6 +13,8 @@ final class AutoAgora_Promotion_Manager
 
     const STATUS_SCHEDULED = 'scheduled';
     const STATUS_ACTIVE = 'active';
+    const STATUS_AWAITING_APPROVAL = 'awaiting_approval';
+    const STATUS_REFUND_REQUIRED = 'refund_required';
     const STATUS_EXPIRED = 'expired';
     const STATUS_CANCELLED = 'cancelled';
     const STATUS_REFUNDED = 'refunded';
@@ -52,6 +54,34 @@ final class AutoAgora_Promotion_Manager
         return isset($tiers[$tier]) ? (int) $tiers[$tier]['priority'] : 0;
     }
 
+    public static function has_been_published($listing_id)
+    {
+        $post = get_post((int) $listing_id);
+        if (!$post || $post->post_type !== 'car') {
+            return false;
+        }
+        return $post->post_status === 'publish' || get_post_meta((int) $listing_id, 'publication_date', true) !== '';
+    }
+
+    public static function is_initial_approval_pending($listing_id)
+    {
+        $post = get_post((int) $listing_id);
+        return $post
+            && $post->post_type === 'car'
+            && $post->post_status === 'pending'
+            && !self::has_been_published((int) $listing_id);
+    }
+
+    public static function is_seller_purchase_eligible($listing_id)
+    {
+        $post = get_post((int) $listing_id);
+        if (!$post || $post->post_type !== 'car' || !in_array($post->post_status, array('publish', 'pending'), true)) {
+            return false;
+        }
+        return !class_exists('ListingStateManager')
+            || ListingStateManager::resolve_state((int) $listing_id) === ListingStateManager::STATE_ACTIVE;
+    }
+
     public function grant_manual($listing_id, $tier, $duration_seconds, $starts_at_gmt, $granted_by, $notes = '')
     {
         return $this->grant($listing_id, $tier, $duration_seconds, $starts_at_gmt, 'manual', $granted_by, '', '', $notes, array(), false);
@@ -72,6 +102,13 @@ final class AutoAgora_Promotion_Manager
 
         $existing = $this->repository->find_payment_event($provider, $reference);
         if ($existing) {
+            if ($existing->status === self::STATUS_AWAITING_APPROVAL && self::has_been_published((int) $existing->listing_id)) {
+                $activated = $this->activate_awaiting_approval((int) $existing->listing_id);
+                if (is_wp_error($activated)) {
+                    return $activated;
+                }
+                $existing = $this->repository->find((int) $existing->id);
+            }
             return $this->validate_existing_payment_event($existing, $listing_id, $tier, $duration_seconds, $payment_data);
         }
 
@@ -86,14 +123,23 @@ final class AutoAgora_Promotion_Manager
         if (!$post || $post->post_type !== 'car') {
             return new WP_Error('promotion_listing_invalid', 'The selected listing does not exist or is not a car.');
         }
-        if ($post->post_status !== 'publish' || (class_exists('ListingStateManager') && ListingStateManager::resolve_state($listing_id) !== ListingStateManager::STATE_ACTIVE)) {
-            return new WP_Error('promotion_listing_inactive', 'Only published, active listings can receive a promotion.');
+        if (!self::is_seller_purchase_eligible($listing_id)) {
+            return new WP_Error('promotion_listing_inactive', 'Only active published listings or listings awaiting review can receive a promotion.');
         }
         if ($duration_seconds < HOUR_IN_SECONDS || $duration_seconds > YEAR_IN_SECONDS) {
             return new WP_Error('promotion_duration_invalid', 'Promotion duration must be between one hour and one year.');
         }
         if (!AutoAgora_Promotion_Schema::exists()) {
             return new WP_Error('promotion_table_missing', 'The listing promotions table is unavailable.');
+        }
+
+        if (self::is_initial_approval_pending($listing_id)) {
+            return array(
+                'starts_at' => null,
+                'ends_at' => null,
+                'queued' => false,
+                'awaiting_approval' => true,
+            );
         }
 
         $now = gmdate('Y-m-d H:i:s');
@@ -121,6 +167,7 @@ final class AutoAgora_Promotion_Manager
         if (!$allow_inactive && ($post->post_status !== 'publish' || (class_exists('ListingStateManager') && ListingStateManager::resolve_state($listing_id) !== ListingStateManager::STATE_ACTIVE))) {
             return new WP_Error('promotion_listing_inactive', 'Only published, active listings can receive a promotion.');
         }
+        $awaiting_initial_approval_requested = $source === 'payment' && !empty($payment_data['awaiting_initial_approval']);
         if (!isset(self::tiers()[$tier])) {
             return new WP_Error('promotion_tier_invalid', 'The selected promotion tier is invalid.');
         }
@@ -147,6 +194,17 @@ final class AutoAgora_Promotion_Manager
         }
 
         try {
+            clean_post_cache($listing_id);
+            $post = get_post($listing_id);
+            if (!$post || $post->post_type !== 'car') {
+                return new WP_Error('promotion_listing_invalid', 'The selected listing does not exist or is not a car.');
+            }
+            $awaiting_initial_approval = $awaiting_initial_approval_requested
+                && self::is_initial_approval_pending($listing_id)
+                && self::is_seller_purchase_eligible($listing_id);
+            if ($awaiting_initial_approval_requested && !$awaiting_initial_approval && $post->post_status !== 'publish') {
+                return new WP_Error('promotion_listing_inactive', 'The pending listing can no longer wait for initial approval. Refund this payment from Stripe.');
+            }
             if ($provider && $reference) {
                 $existing = $this->repository->find_payment_event($provider, $reference);
                 if ($existing) {
@@ -155,14 +213,20 @@ final class AutoAgora_Promotion_Manager
             }
 
             $now = gmdate('Y-m-d H:i:s');
-            $requested_start = $this->normalize_gmt($starts_at_gmt, $now);
-            if ($requested_start < $now) {
-                $requested_start = $now;
+            if ($awaiting_initial_approval) {
+                $start = null;
+                $end = null;
+                $status = self::STATUS_AWAITING_APPROVAL;
+            } else {
+                $requested_start = $this->normalize_gmt($starts_at_gmt, $now);
+                if ($requested_start < $now) {
+                    $requested_start = $now;
+                }
+                $reserved_end = $this->repository->latest_reserved_end($listing_id, $requested_start);
+                $start = ($reserved_end && $reserved_end > $requested_start) ? $reserved_end : $requested_start;
+                $end = gmdate('Y-m-d H:i:s', strtotime($start . ' UTC') + $duration_seconds);
+                $status = ($start <= $now) ? self::STATUS_ACTIVE : self::STATUS_SCHEDULED;
             }
-            $reserved_end = $this->repository->latest_reserved_end($listing_id, $requested_start);
-            $start = ($reserved_end && $reserved_end > $requested_start) ? $reserved_end : $requested_start;
-            $end = gmdate('Y-m-d H:i:s', strtotime($start . ' UTC') + $duration_seconds);
-            $status = ($start <= $now) ? self::STATUS_ACTIVE : self::STATUS_SCHEDULED;
 
             $id = $this->repository->insert(array(
                 'listing_id' => $listing_id,
@@ -216,7 +280,7 @@ final class AutoAgora_Promotion_Manager
             $reconciled = $this->reconcile_listing((int) $record->listing_id);
             return is_wp_error($reconciled) ? $reconciled : true;
         }
-        if (!in_array($record->status, array(self::STATUS_ACTIVE, self::STATUS_SCHEDULED), true)) {
+        if (!in_array($record->status, array(self::STATUS_ACTIVE, self::STATUS_SCHEDULED, self::STATUS_AWAITING_APPROVAL), true)) {
             return new WP_Error('promotion_not_cancellable', 'This promotion cannot be cancelled.');
         }
         if (!$this->repository->update_status((int) $record->id, self::STATUS_CANCELLED)) {
@@ -293,9 +357,55 @@ final class AutoAgora_Promotion_Manager
         return $this->clear_snapshot($listing_id);
     }
 
+    public function activate_awaiting_approval($listing_id)
+    {
+        $listing_id = (int) $listing_id;
+        $post = get_post($listing_id);
+        if (!$post || $post->post_type !== 'car' || $post->post_status !== 'publish') {
+            return new WP_Error('promotion_listing_inactive', 'The listing is not published yet.');
+        }
+        if (class_exists('ListingStateManager') && ListingStateManager::resolve_state($listing_id) !== ListingStateManager::STATE_ACTIVE) {
+            return new WP_Error('promotion_listing_inactive', 'The listing is not active.');
+        }
+        if (!AutoAgora_Promotion_Schema::exists()) {
+            return new WP_Error('promotion_table_missing', 'The listing promotions table is unavailable.');
+        }
+        if (!$this->acquire_listing_lock($listing_id)) {
+            return new WP_Error('promotion_listing_busy', 'This listing is receiving another promotion. Please retry.');
+        }
+
+        try {
+            $waiting = $this->repository->awaiting_approval_for_listing($listing_id);
+            if (!$waiting) {
+                return true;
+            }
+            $now = gmdate('Y-m-d H:i:s');
+            $reserved_end = $this->repository->latest_reserved_end($listing_id, $now);
+            $next_start = ($reserved_end && $reserved_end > $now) ? $reserved_end : $now;
+            foreach ($waiting as $record) {
+                $end = gmdate('Y-m-d H:i:s', strtotime($next_start . ' UTC') + (int) $record->duration_seconds);
+                $status = $next_start <= $now ? self::STATUS_ACTIVE : self::STATUS_SCHEDULED;
+                if (!$this->repository->schedule_awaiting_approval((int) $record->id, $status, $next_start, $end)) {
+                    return new WP_Error('promotion_status_update_failed', 'A waiting promotion could not be scheduled.');
+                }
+                do_action('autoagora_listing_promotion_approval_activated', (int) $record->id, $listing_id);
+                $next_start = $end;
+            }
+            return $this->reconcile_listing($listing_id);
+        } finally {
+            $this->release_listing_lock($listing_id);
+        }
+    }
+
     public function reconcile_due()
     {
         $now = gmdate('Y-m-d H:i:s');
+        foreach ($this->repository->published_awaiting_listing_ids() as $listing_id) {
+            $result = $this->activate_awaiting_approval($listing_id);
+            if (is_wp_error($result)) {
+                error_log('AutoAgora waiting promotion activation error for listing ' . (int) $listing_id . ': ' . $result->get_error_code());
+            }
+        }
         foreach ($this->repository->due_listing_ids($now) as $listing_id) {
             $result = $this->reconcile_listing($listing_id);
             if (is_wp_error($result)) {
@@ -324,6 +434,16 @@ final class AutoAgora_Promotion_Manager
             if ($this->repository->cancel_for_deleted_listing((int) $listing_id) === false) {
                 error_log('AutoAgora promotion cancellation failed for deleted listing ' . (int) $listing_id . '.');
             }
+        }
+    }
+
+    public function handle_trashed_listing($listing_id)
+    {
+        if (!AutoAgora_Promotion_Schema::exists()) {
+            return;
+        }
+        if ($this->repository->require_refund_for_waiting_listing((int) $listing_id) === false) {
+            error_log('AutoAgora waiting promotion refund flag failed for trashed listing ' . (int) $listing_id . '.');
         }
     }
 

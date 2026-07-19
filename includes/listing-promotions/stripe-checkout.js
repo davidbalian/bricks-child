@@ -115,8 +115,8 @@
         }
         var headline = box.querySelector('.autoagora-promotion-preview-headline');
         var detail = box.querySelector('.autoagora-promotion-preview-detail');
-        box.classList.remove('is-error', 'is-queued', 'is-immediate');
-        box.classList.add(preview.queued ? 'is-queued' : 'is-immediate');
+        box.classList.remove('is-error', 'is-queued', 'is-immediate', 'is-awaiting');
+        box.classList.add(preview.awaiting_approval ? 'is-awaiting' : (preview.queued ? 'is-queued' : 'is-immediate'));
         if (headline) {
             headline.textContent = preview.headline;
         }
@@ -133,7 +133,7 @@
         }
         var headline = box.querySelector('.autoagora-promotion-preview-headline');
         var detail = box.querySelector('.autoagora-promotion-preview-detail');
-        box.classList.remove('is-queued', 'is-immediate');
+        box.classList.remove('is-queued', 'is-immediate', 'is-awaiting');
         box.classList.add('is-error');
         if (headline) {
             headline.textContent = 'Schedule unavailable';
@@ -205,7 +205,7 @@
 
     function init() {
         var config = window.autoAgoraStripeCheckout;
-        var container = document.querySelector('.my-listings-container');
+        var container = document.querySelector('[data-autoagora-promotion-container], .my-listings-container');
         if (!config || !container) {
             return;
         }

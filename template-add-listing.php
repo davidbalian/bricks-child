@@ -100,6 +100,20 @@ if ( $current_user->user_login === '35799372345' ) {
     );
 }
 
+$submitted_listing_id = isset($_GET['listing_id']) ? absint($_GET['listing_id']) : 0;
+$submitted_listing = $submitted_listing_id ? get_post($submitted_listing_id) : null;
+$can_promote_submitted_listing = isset($_GET['listing_submitted'])
+    && sanitize_key(wp_unslash($_GET['listing_submitted'])) === 'success'
+    && $submitted_listing instanceof WP_Post
+    && $submitted_listing->post_type === 'car'
+    && (int) $submitted_listing->post_author === get_current_user_id()
+    && function_exists('autoagora_render_promotion_purchase_controls')
+    && AutoAgora_Stripe_Gateway::is_ready()
+    && AutoAgora_Promotion_Manager::is_seller_purchase_eligible($submitted_listing_id);
+if ($can_promote_submitted_listing && function_exists('autoagora_enqueue_stripe_checkout_assets')) {
+    autoagora_enqueue_stripe_checkout_assets();
+}
+
 get_header(); ?>
 
 
@@ -115,8 +129,15 @@ get_header(); ?>
                     <h2><?php esc_html_e( 'Your listing has been submitted successfully!', 'bricks-child' ); ?></h2>
                     <p><?php esc_html_e( 'Thank you for submitting your car listing. It will be reviewed by our team and published soon.', 'bricks-child' ); ?></p>
                     <p><?php esc_html_e( 'To receive email notifications about views and clicks on your listing,', 'bricks-child' ); ?><br><?php esc_html_e( 'verify your email from your account page if you haven\'t already.', 'bricks-child' ); ?></p>
+                    <?php if ($can_promote_submitted_listing) : ?>
+                        <section class="autoagora-submission-promotion" data-autoagora-promotion-container>
+                            <h3><?php esc_html_e('Launch with more visibility', 'bricks-child'); ?></h3>
+                            <p><?php esc_html_e('Choose AutoAgora Lift or Showcase now. Your full paid duration starts only after this listing is approved and published.', 'bricks-child'); ?></p>
+                            <?php autoagora_render_promotion_purchase_controls($submitted_listing_id); ?>
+                        </section>
+                    <?php endif; ?>
                     <div class="listing-success-buttons">
-                        <a href="<?php echo esc_url( home_url( '/my-account' ) ); ?>" class="btn btn-primary"><?php esc_html_e( 'My Account', 'bricks-child' ); ?></a>
+                        <a href="<?php echo esc_url( home_url( '/my-listings/' ) ); ?>" class="btn btn-primary"><?php esc_html_e( 'My Listings', 'bricks-child' ); ?></a>
                         <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="btn btn-primary"><?php esc_html_e( 'Return to Home', 'bricks-child' ); ?></a>
                     </div>
                 </div>

@@ -85,6 +85,7 @@ final class AutoAgora_Payment_Logger
             'expected_starts_at',
             'expected_ends_at',
             'queued',
+            'awaiting_approval',
             'session_id',
             'event_id',
             'event_type',

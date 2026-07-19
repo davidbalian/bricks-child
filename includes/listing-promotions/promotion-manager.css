@@ -184,7 +184,13 @@
     color: #996800;
 }
 
+.autoagora-admin-status.status-awaiting_approval {
+    background: #fff8e5;
+    color: #996800;
+}
+
 .autoagora-admin-status.status-failed,
+.autoagora-admin-status.status-refund_required,
 .autoagora-admin-status.status-refunded,
 .autoagora-admin-status.status-cancelled {
     background: #fcf0f1;

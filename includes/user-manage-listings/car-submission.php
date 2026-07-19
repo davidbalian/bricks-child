@@ -508,7 +508,13 @@ function handle_add_car_listing() {
     car_submission_log('Car listing created successfully. Post ID: ' . $post_id . ' with ' . count($image_ids) . ' images');
     
     // Redirect to success page
-    wp_redirect(add_query_arg('listing_submitted', 'success', wp_get_referer()));
+    wp_safe_redirect(add_query_arg(
+        array(
+            'listing_submitted' => 'success',
+            'listing_id' => (int) $post_id,
+        ),
+        wp_get_referer()
+    ));
     exit;
 }
 

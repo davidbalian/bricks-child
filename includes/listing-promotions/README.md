@@ -25,7 +25,8 @@ snapshots; later pricing changes do not rewrite historical payments.
 Schema `1.3.0` adds listing-title and seller-ID audit snapshots. Existing
 rows are backfilled while their car posts still exist, and missing values are
 captured again immediately before permanent deletion. Deleting a car cancels
-only its unfinished active/scheduled promotions; all promotion and payment
+its unfinished active/scheduled promotions and flags a paid promotion that was
+still waiting for initial approval as `refund_required`; all promotion and payment
 records remain as audit history and can be identified as a deleted listing by
 the central admin manager. Permanently deleting a WordPress user anonymizes the
 seller snapshot to `0`; no seller name, email address, or phone number is stored
@@ -46,17 +47,20 @@ until a listing receives its first managed promotion.
 
 ## Lifecycle
 
-The implemented states are `scheduled`, `active`, `expired`, `cancelled`, and
-`refunded`. A five-minute WP-Cron event expires/starts due records and refreshes
+The implemented states are `awaiting_approval`, `scheduled`, `active`, `expired`,
+`cancelled`, `refund_required`, and `refunded`. A five-minute WP-Cron event expires/starts due records and refreshes
 the current snapshot. Manual grants and cancellations are available to
 administrators in the car edit screen.
 
 All tiers share one sequential queue. A new Lift or Showcase grant starts after
 the latest unfinished promotion ends, so promotions never overlap and no paid
 time is discarded. Promotions do not pause when a listing is sold or expires;
-their wall-clock schedule continues while the listing is hidden. New purchases
-are accepted only for published, active listings. Permanently deleting a car
-cancels its unfinished records but retains their audit history.
+their wall-clock schedule continues while the listing is hidden. Sellers may
+also pay while a listing is awaiting its first approval. That record has no
+start/end dates until the first publish transition, when its full duration is
+scheduled. Later edit-review cycles do not restart or pause promotion time.
+Permanently deleting a car cancels its unfinished records but retains their
+audit history; a never-started paid record is instead flagged for a Stripe refund.
 
 ## Payment integration
 
@@ -142,7 +146,9 @@ price and total amount, validates ownership and active listing state, then
 redirects to `checkout.stripe.com`.
 
 The purchase panel obtains an authoritative schedule preview from the server.
-With an empty queue it says the promotion starts after Stripe confirms payment.
+On the submission-success page and an initially pending listing, it explains
+that the full duration starts only after approval. With a published empty queue
+it says the promotion starts after Stripe confirms payment.
 With an existing queue it shows the expected site-time start and end. Checkout
 rechecks the preview immediately before redirecting; if another grant changed
 the queue, the seller must review the updated dates and click again. Checkout
@@ -150,7 +156,7 @@ metadata and the compact payment log retain the expected window for diagnosis,
 but the webhook always calculates the final window under the listing lock so an
 abandoned Checkout Session never reserves promotion time.
 
-Each My Listings card shows the current promotion, a live remaining-time
+Each My Listings card shows a waiting-for-approval promotion, or the current promotion, a live remaining-time
 countdown, the exact end time in the WordPress site timezone, and the number of
 queued promotions. Opening **Manage promotion** shows every active/scheduled
 record in start order with its exact start and end. These views read the custom
@@ -192,8 +198,12 @@ After an authenticated refund event, call
 `autoagora_refund_paid_listing_promotion($provider, $reference)` to remove the
 effective promotion and preserve the row with `refunded` status.
 
-Checkout can only be opened for a published, active listing owned by the
-seller. If that listing becomes sold, expired, or unpublished after Checkout
+Checkout can only be opened for an active-state published/pending listing owned
+by the seller. A payment made before first publication is recorded as
+`awaiting_approval` with null dates and starts on first approval. If a previously
+published listing returns to pending after an edit, new purchases join the
+normal wall-clock queue and do not wait for reapproval. If a published listing
+becomes sold, expired, or unpublished after Checkout
 opens but before the authenticated paid webhook arrives, the paid promotion is
 still recorded and its wall-clock schedule continues as agreed. A listing that
 is permanently deleted or transferred before fulfillment is rejected and the

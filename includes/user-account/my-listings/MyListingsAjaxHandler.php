@@ -381,7 +381,7 @@ class MyListingsAjaxHandler {
                         <i class="fas fa-pencil-alt"></i> Edit
                     </a>
                     <?php
-                    if ($post_status === 'publish' && ! $is_sold && ! $is_expired && function_exists('autoagora_render_promotion_purchase_controls')) {
+                    if (in_array($post_status, array('publish', 'pending'), true) && ! $is_sold && ! $is_expired && function_exists('autoagora_render_promotion_purchase_controls')) {
                         autoagora_render_promotion_purchase_controls($post_id);
                     }
 

@@ -151,6 +151,11 @@
     color: #475569;
 }
 
+.autoagora-seller-promotion-state.is-awaiting {
+    background: #fef3c7;
+    color: #92400e;
+}
+
 .autoagora-seller-promotion-timing {
     grid-template-columns: auto 1fr;
     align-items: baseline;
@@ -500,6 +505,44 @@
     border-color: #fde68a;
     background: #fffbeb;
     color: #713f12;
+}
+
+.autoagora-promotion-queue-preview.is-awaiting {
+    border-color: #fde68a;
+    background: #fffbeb;
+    color: #78350f;
+}
+
+.autoagora-submission-promotion {
+    position: relative;
+    max-width: 620px;
+    margin: 1.5rem auto 0;
+    padding: 1.1rem;
+    border: 1px solid #ddd6fe;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, #faf5ff, #f5f3ff);
+    color: #17233b;
+}
+
+.autoagora-submission-promotion > h3 {
+    margin: 0 0 0.35rem;
+    color: #5b21b6;
+}
+
+.autoagora-submission-promotion > p {
+    margin: 0 0 0.9rem;
+}
+
+.autoagora-submission-promotion .autoagora-promotion-purchase {
+    display: inline-block;
+}
+
+.autoagora-submission-promotion .autoagora-promotion-purchase-panel {
+    top: calc(100% + 0.5rem);
+    bottom: auto;
+    left: 50%;
+    text-align: left;
+    transform: translateX(-50%);
 }
 
 .autoagora-promotion-queue-preview.is-error {

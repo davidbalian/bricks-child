@@ -221,6 +221,7 @@ final class AutoAgora_Stripe_Gateway
             'expected_starts_at' => $schedule_preview['starts_at'],
             'expected_ends_at' => $schedule_preview['ends_at'],
             'queued' => !empty($schedule_preview['queued']),
+            'awaiting_approval' => !empty($schedule_preview['awaiting_approval']),
         ));
         $result = self::create_checkout_session($listing_id, get_current_user_id(), $package, $attempt, $schedule_preview);
         if (is_wp_error($result)) {
@@ -315,14 +316,21 @@ final class AutoAgora_Stripe_Gateway
             'expected_amount' => (string) $amount,
             'currency' => $currency,
             'environment' => self::mode(),
-            'expected_starts_at' => (string) $schedule_preview['starts_at'],
-            'expected_ends_at' => (string) $schedule_preview['ends_at'],
             'queued_at_checkout' => !empty($schedule_preview['queued']) ? '1' : '0',
+            'awaiting_initial_approval' => !empty($schedule_preview['awaiting_approval']) ? '1' : '0',
         );
+        if (empty($schedule_preview['awaiting_approval'])) {
+            $metadata['expected_starts_at'] = (string) $schedule_preview['starts_at'];
+            $metadata['expected_ends_at'] = (string) $schedule_preview['ends_at'];
+        }
 
-        $schedule_description = !empty($schedule_preview['queued'])
-            ? ' Expected start ' . get_date_from_gmt($schedule_preview['starts_at'], 'j M Y, H:i') . '.'
-            : ' Starts after payment confirmation.';
+        if (!empty($schedule_preview['awaiting_approval'])) {
+            $schedule_description = ' Starts automatically after the listing is approved and published.';
+        } elseif (!empty($schedule_preview['queued'])) {
+            $schedule_description = ' Expected start ' . get_date_from_gmt($schedule_preview['starts_at'], 'j M Y, H:i') . '.';
+        } else {
+            $schedule_description = ' Starts after payment confirmation.';
+        }
 
         $success_url = home_url('/my-listings/?promotion_payment=success&session_id={CHECKOUT_SESSION_ID}');
         $cancel_url = home_url('/my-listings/?promotion_payment=cancelled');
@@ -611,6 +619,7 @@ final class AutoAgora_Stripe_Gateway
                 'amount_minor' => $amount_total,
                 'currency' => $currency,
                 'stripe_checkout_session_id' => $session_id,
+                'awaiting_initial_approval' => !empty($metadata['awaiting_initial_approval']),
             )
         );
     }
@@ -624,11 +633,8 @@ final class AutoAgora_Stripe_Gateway
         if ((int) $post->post_author !== (int) $user_id && !user_can((int) $user_id, 'manage_options')) {
             return new WP_Error('stripe_listing_ownership', 'You can only promote your own listing.');
         }
-        if ($require_active && $post->post_status !== 'publish') {
-            return new WP_Error('stripe_listing_invalid', 'Only published car listings can be promoted.');
-        }
-        if ($require_active && class_exists('ListingStateManager') && ListingStateManager::resolve_state((int) $listing_id) !== ListingStateManager::STATE_ACTIVE) {
-            return new WP_Error('stripe_listing_inactive', 'Only active listings can be promoted.');
+        if ($require_active && !AutoAgora_Promotion_Manager::is_seller_purchase_eligible((int) $listing_id)) {
+            return new WP_Error('stripe_listing_inactive', 'Only active published listings or listings awaiting review can be promoted.');
         }
         return true;
     }
@@ -638,9 +644,12 @@ final class AutoAgora_Stripe_Gateway
         $starts_at = (string) $preview['starts_at'];
         $ends_at = (string) $preview['ends_at'];
         $queued = !empty($preview['queued']);
+        $awaiting_approval = !empty($preview['awaiting_approval']);
         $duration = (int) $days * DAY_IN_SECONDS;
         $signature_parts = array((int) $listing_id, sanitize_key($tier), (int) $days);
-        if ($queued) {
+        if ($awaiting_approval) {
+            $signature_parts[] = 'awaiting_initial_approval';
+        } elseif ($queued) {
             $signature_parts[] = $starts_at;
             $signature_parts[] = $ends_at;
         } else {
@@ -649,19 +658,24 @@ final class AutoAgora_Stripe_Gateway
         $signature = hash('sha256', implode('|', $signature_parts));
         return array(
             'queued' => $queued,
+            'awaiting_approval' => $awaiting_approval,
             'starts_at_gmt' => $starts_at,
             'ends_at_gmt' => $ends_at,
-            'starts_at_local' => get_date_from_gmt($starts_at, 'j M Y, H:i'),
-            'ends_at_local' => get_date_from_gmt($ends_at, 'j M Y, H:i'),
-            'start_timestamp' => strtotime($starts_at . ' UTC'),
-            'end_timestamp' => strtotime($ends_at . ' UTC'),
+            'starts_at_local' => $starts_at !== '' ? get_date_from_gmt($starts_at, 'j M Y, H:i') : '',
+            'ends_at_local' => $ends_at !== '' ? get_date_from_gmt($ends_at, 'j M Y, H:i') : '',
+            'start_timestamp' => $starts_at !== '' ? strtotime($starts_at . ' UTC') : 0,
+            'end_timestamp' => $ends_at !== '' ? strtotime($ends_at . ' UTC') : 0,
             'signature' => $signature,
-            'headline' => $queued
-                ? 'Queued: expected to start ' . get_date_from_gmt($starts_at, 'j M Y, H:i') . ' (site time)'
-                : 'Starts after Stripe confirms payment',
-            'detail' => $queued
-                ? 'Expected to end ' . get_date_from_gmt($ends_at, 'j M Y, H:i') . ' (site time) after the current promotion queue.'
-                : 'Runs for ' . self::duration_label($duration) . ' and ends exactly ' . self::duration_label($duration) . ' after activation.',
+            'headline' => $awaiting_approval
+                ? 'Starts automatically after listing approval'
+                : ($queued
+                    ? 'Queued: expected to start ' . get_date_from_gmt($starts_at, 'j M Y, H:i') . ' (site time)'
+                    : 'Starts after Stripe confirms payment'),
+            'detail' => $awaiting_approval
+                ? 'The full ' . self::duration_label($duration) . ' begins only when this listing is approved and published.'
+                : ($queued
+                    ? 'Expected to end ' . get_date_from_gmt($ends_at, 'j M Y, H:i') . ' (site time) after the current promotion queue.'
+                    : 'Runs for ' . self::duration_label($duration) . ' and ends exactly ' . self::duration_label($duration) . ' after activation.'),
         );
     }
 
@@ -679,6 +693,7 @@ final class AutoAgora_Stripe_Gateway
             'tier' => isset($metadata['tier']) ? $metadata['tier'] : '',
             'days' => isset($metadata['days']) ? absint($metadata['days']) : 0,
             'duration_seconds' => isset($metadata['duration_seconds']) ? absint($metadata['duration_seconds']) : 0,
+            'awaiting_approval' => !empty($metadata['awaiting_initial_approval']),
             'amount_minor' => isset($object['amount_total']) ? (int) $object['amount_total'] : (isset($object['amount_refunded']) ? (int) $object['amount_refunded'] : 0),
             'currency' => isset($object['currency']) ? $object['currency'] : '',
             'status' => isset($object['payment_status']) ? $object['payment_status'] : (!empty($object['refunded']) ? 'refunded' : ''),
