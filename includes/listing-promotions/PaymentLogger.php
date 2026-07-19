@@ -77,6 +77,7 @@ final class AutoAgora_Payment_Logger
             'listing_id',
             'user_id',
             'tier',
+            'days',
             'mode',
             'amount_minor',
             'currency',

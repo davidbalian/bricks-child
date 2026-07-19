@@ -54,10 +54,10 @@ final class AutoAgora_Promotion_Manager
 
     public function grant_manual($listing_id, $tier, $duration_seconds, $starts_at_gmt, $granted_by, $notes = '')
     {
-        return $this->grant($listing_id, $tier, $duration_seconds, $starts_at_gmt, 'manual', $granted_by, '', '', $notes);
+        return $this->grant($listing_id, $tier, $duration_seconds, $starts_at_gmt, 'manual', $granted_by, '', '', $notes, array());
     }
 
-    public function grant_paid($listing_id, $tier, $duration_seconds, $provider, $reference, $notes = '')
+    public function grant_paid($listing_id, $tier, $duration_seconds, $provider, $reference, $notes = '', array $payment_data = array())
     {
         if (!AutoAgora_Promotion_Schema::exists()) {
             return new WP_Error('promotion_table_missing', 'The listing promotions table is unavailable.');
@@ -72,13 +72,13 @@ final class AutoAgora_Promotion_Manager
 
         $existing = $this->repository->find_payment_event($provider, $reference);
         if ($existing) {
-            return $this->validate_existing_payment_event($existing, $listing_id, $tier);
+            return $this->validate_existing_payment_event($existing, $listing_id, $tier, $duration_seconds, $payment_data);
         }
 
-        return $this->grant($listing_id, $tier, $duration_seconds, gmdate('Y-m-d H:i:s'), 'payment', 0, $provider, $reference, $notes);
+        return $this->grant($listing_id, $tier, $duration_seconds, gmdate('Y-m-d H:i:s'), 'payment', 0, $provider, $reference, $notes, $payment_data);
     }
 
-    private function grant($listing_id, $tier, $duration_seconds, $starts_at_gmt, $source, $granted_by, $provider, $reference, $notes)
+    private function grant($listing_id, $tier, $duration_seconds, $starts_at_gmt, $source, $granted_by, $provider, $reference, $notes, array $payment_data)
     {
         $listing_id = (int) $listing_id;
         $duration_seconds = (int) $duration_seconds;
@@ -99,6 +99,17 @@ final class AutoAgora_Promotion_Manager
             return new WP_Error('promotion_table_missing', 'The listing promotions table is unavailable.');
         }
 
+        $amount_minor = $source === 'payment' && isset($payment_data['amount_minor']) ? max(0, (int) $payment_data['amount_minor']) : 0;
+        $currency = $source === 'payment' && isset($payment_data['currency']) ? strtolower(sanitize_key($payment_data['currency'])) : '';
+        $checkout_session_id = $source === 'payment' && isset($payment_data['stripe_checkout_session_id'])
+            ? sanitize_text_field($payment_data['stripe_checkout_session_id'])
+            : '';
+        $currency = substr($currency, 0, 3);
+        $checkout_session_id = function_exists('mb_substr') ? mb_substr($checkout_session_id, 0, 191) : substr($checkout_session_id, 0, 191);
+        if ($source === 'payment' && ($amount_minor < 50 || $currency !== 'eur' || strpos($checkout_session_id, 'cs_') !== 0)) {
+            return new WP_Error('promotion_payment_snapshot_invalid', 'The paid promotion details are incomplete.');
+        }
+
         if (!$this->acquire_listing_lock($listing_id)) {
             return new WP_Error('promotion_listing_busy', 'This listing is receiving another promotion. Please retry.');
         }
@@ -107,7 +118,7 @@ final class AutoAgora_Promotion_Manager
             if ($provider && $reference) {
                 $existing = $this->repository->find_payment_event($provider, $reference);
                 if ($existing) {
-                    return $this->validate_existing_payment_event($existing, $listing_id, $tier);
+                    return $this->validate_existing_payment_event($existing, $listing_id, $tier, $duration_seconds, $payment_data);
                 }
             }
 
@@ -133,6 +144,10 @@ final class AutoAgora_Promotion_Manager
                 'granted_by' => $granted_by ? (int) $granted_by : null,
                 'payment_provider' => $provider !== '' ? $provider : null,
                 'payment_reference' => $reference !== '' ? $reference : null,
+                'amount_minor' => $amount_minor,
+                'currency' => $currency !== '' ? $currency : null,
+                'refunded_amount_minor' => 0,
+                'stripe_checkout_session_id' => $checkout_session_id !== '' ? $checkout_session_id : null,
                 'notes' => $notes !== '' ? sanitize_textarea_field($notes) : null,
             ));
 
@@ -140,7 +155,7 @@ final class AutoAgora_Promotion_Manager
                 if ($provider && $reference) {
                     $existing = $this->repository->find_payment_event($provider, $reference);
                     if ($existing) {
-                        return $this->validate_existing_payment_event($existing, $listing_id, $tier);
+                        return $this->validate_existing_payment_event($existing, $listing_id, $tier, $duration_seconds, $payment_data);
                     }
                 }
                 return new WP_Error('promotion_insert_failed', 'The promotion could not be saved.');
@@ -180,7 +195,7 @@ final class AutoAgora_Promotion_Manager
         return true;
     }
 
-    public function refund_paid($provider, $reference)
+    public function refund_paid($provider, $reference, $amount_minor = 0)
     {
         if (!AutoAgora_Promotion_Schema::exists()) {
             return new WP_Error('promotion_table_missing', 'The listing promotions table is unavailable.');
@@ -197,7 +212,11 @@ final class AutoAgora_Promotion_Manager
             return is_wp_error($reconciled) ? $reconciled : true;
         }
 
-        if (!$this->repository->update_status((int) $record->id, self::STATUS_REFUNDED)) {
+        $refund_amount = (int) $amount_minor > 0 ? (int) $amount_minor : (int) $record->amount_minor;
+        if ((int) $record->amount_minor > 0) {
+            $refund_amount = min($refund_amount, (int) $record->amount_minor);
+        }
+        if (!$this->repository->mark_refunded((int) $record->id, $refund_amount)) {
             return new WP_Error('promotion_status_update_failed', 'The promotion refund status could not be saved.');
         }
         $reconciled = $this->reconcile_listing((int) $record->listing_id);
@@ -352,10 +371,22 @@ final class AutoAgora_Promotion_Manager
         return $value;
     }
 
-    private function validate_existing_payment_event($record, $listing_id, $tier)
+    private function validate_existing_payment_event($record, $listing_id, $tier, $duration_seconds = 0, array $payment_data = array())
     {
         if ((int) $record->listing_id !== (int) $listing_id || (string) $record->tier !== (string) $tier) {
             return new WP_Error('promotion_payment_reference_conflict', 'This payment reference is already attached to a different promotion.');
+        }
+        if ((int) $duration_seconds > 0 && (int) $record->duration_seconds !== (int) $duration_seconds) {
+            return new WP_Error('promotion_payment_reference_conflict', 'This payment reference has different promotion terms.');
+        }
+        if (isset($payment_data['amount_minor']) && (int) $record->amount_minor !== (int) $payment_data['amount_minor']) {
+            return new WP_Error('promotion_payment_reference_conflict', 'This payment reference has a different paid amount.');
+        }
+        if (isset($payment_data['currency']) && strtolower((string) $record->currency) !== strtolower((string) $payment_data['currency'])) {
+            return new WP_Error('promotion_payment_reference_conflict', 'This payment reference has a different currency.');
+        }
+        if (isset($payment_data['stripe_checkout_session_id']) && (string) $record->stripe_checkout_session_id !== (string) $payment_data['stripe_checkout_session_id']) {
+            return new WP_Error('promotion_payment_reference_conflict', 'This payment reference has a different Checkout Session.');
         }
         $reconciled = $this->reconcile_listing((int) $record->listing_id);
         if (is_wp_error($reconciled)) {

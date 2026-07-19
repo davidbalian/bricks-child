@@ -8,6 +8,50 @@
         return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
     }
 
+    function money(amountMinor, config) {
+        var amount = Math.max(0, Number(amountMinor) || 0) / 100;
+        if (window.Intl && typeof window.Intl.NumberFormat === 'function') {
+            return new Intl.NumberFormat(config.locale || 'en', {
+                style: 'currency',
+                currency: config.currency || 'EUR'
+            }).format(amount);
+        }
+        return '€' + amount.toFixed(2);
+    }
+
+    function selected(panel, selector) {
+        return panel.querySelector(selector + '.is-selected');
+    }
+
+    function updateSummary(panel, config) {
+        var tier = selected(panel, '.autoagora-promotion-tier-option');
+        var duration = selected(panel, '.autoagora-promotion-day-option');
+        if (!tier || !duration) {
+            return;
+        }
+
+        var days = Number(duration.getAttribute('data-days')) || 1;
+        var dailyAmount = Number(tier.getAttribute('data-daily-amount')) || 0;
+        var amount = panel.querySelector('.autoagora-promotion-total-amount');
+        var label = panel.querySelector('.autoagora-promotion-total-label');
+        if (amount) {
+            amount.textContent = money(dailyAmount * days, config);
+        }
+        if (label) {
+            label.textContent = tier.getAttribute('data-label') + ' for ' + days + ' ' + (days === 1 ? 'day' : 'days');
+        }
+    }
+
+    function selectOption(panel, option, selector, config) {
+        panel.querySelectorAll(selector).forEach(function (item) {
+            var isSelected = item === option;
+            item.classList.toggle('is-selected', isSelected);
+            item.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+        });
+        delete panel.dataset.checkoutAttempt;
+        updateSummary(panel, config);
+    }
+
     function init() {
         var config = window.autoAgoraStripeCheckout;
         var container = document.querySelector('.my-listings-container');
@@ -15,23 +59,63 @@
             return;
         }
 
+        container.querySelectorAll('.autoagora-promotion-purchase-panel').forEach(function (panel) {
+            updateSummary(panel, config);
+        });
+
         container.addEventListener('click', function (event) {
+            var tierOption = event.target.closest('.autoagora-promotion-tier-option');
+            if (tierOption && !tierOption.disabled) {
+                selectOption(
+                    tierOption.closest('.autoagora-promotion-purchase-panel'),
+                    tierOption,
+                    '.autoagora-promotion-tier-option',
+                    config
+                );
+                return;
+            }
+
+            var dayOption = event.target.closest('.autoagora-promotion-day-option');
+            if (dayOption && !dayOption.disabled) {
+                selectOption(
+                    dayOption.closest('.autoagora-promotion-purchase-panel'),
+                    dayOption,
+                    '.autoagora-promotion-day-option',
+                    config
+                );
+                return;
+            }
+
             var button = event.target.closest('.autoagora-buy-promotion');
             if (!button || button.disabled) {
                 return;
             }
+
             var panel = button.closest('.autoagora-promotion-purchase-panel');
+            var tier = panel ? selected(panel, '.autoagora-promotion-tier-option') : null;
+            var duration = panel ? selected(panel, '.autoagora-promotion-day-option') : null;
             var status = panel ? panel.querySelector('.autoagora-promotion-checkout-status') : null;
-            var buttons = panel ? panel.querySelectorAll('.autoagora-buy-promotion') : [button];
-            var originalText = status ? status.textContent : '';
+            if (!panel || !tier || !duration) {
+                if (status) {
+                    status.textContent = config.genericError;
+                    status.classList.add('is-error');
+                }
+                return;
+            }
+
+            var controls = panel.querySelectorAll('button');
             var data = new URLSearchParams();
+            if (!panel.dataset.checkoutAttempt) {
+                panel.dataset.checkoutAttempt = attemptId();
+            }
             data.set('action', config.action);
             data.set('nonce', config.nonce);
             data.set('listing_id', button.getAttribute('data-listing-id'));
-            data.set('tier', button.getAttribute('data-tier'));
-            data.set('attempt', attemptId());
+            data.set('tier', tier.getAttribute('data-tier'));
+            data.set('days', duration.getAttribute('data-days'));
+            data.set('attempt', panel.dataset.checkoutAttempt);
 
-            buttons.forEach(function (item) {
+            controls.forEach(function (item) {
                 item.disabled = true;
             });
             if (status) {
@@ -55,11 +139,11 @@
                     window.location.assign(response.data.checkout_url);
                 })
                 .catch(function (error) {
-                    buttons.forEach(function (item) {
+                    controls.forEach(function (item) {
                         item.disabled = false;
                     });
                     if (status) {
-                        status.textContent = error.message || originalText || config.genericError;
+                        status.textContent = error.message || config.genericError;
                         status.classList.add('is-error');
                     }
                 });
@@ -72,4 +156,3 @@
         init();
     }
 }());
-

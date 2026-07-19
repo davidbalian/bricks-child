@@ -14,7 +14,7 @@ final class AutoAgora_Promotion_Repository
         $ok = $wpdb->insert(
             AutoAgora_Promotion_Schema::table_name(),
             $data,
-            array('%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%s')
+            array('%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%d', '%s', '%s')
         );
         return $ok ? (int) $wpdb->insert_id : 0;
     }
@@ -46,6 +46,21 @@ final class AutoAgora_Promotion_Repository
             array('status' => $status),
             array('id' => (int) $id),
             array('%s'),
+            array('%d')
+        );
+    }
+
+    public function mark_refunded($id, $amount_minor)
+    {
+        global $wpdb;
+        return false !== $wpdb->update(
+            AutoAgora_Promotion_Schema::table_name(),
+            array(
+                'status' => AutoAgora_Promotion_Manager::STATUS_REFUNDED,
+                'refunded_amount_minor' => max(0, (int) $amount_minor),
+            ),
+            array('id' => (int) $id),
+            array('%s', '%d'),
             array('%d')
         );
     }

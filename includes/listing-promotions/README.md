@@ -18,6 +18,10 @@ and maintains the same columns and indexes. There is intentionally no physical
 foreign key to `wp_posts`; `listing_id` is validated by the service, and rows
 are retained as audit history when a listing is deleted.
 
+Schema `1.2.0` also stores the amount, currency, refunded amount, and Stripe
+Checkout Session ID on each paid promotion. These are immutable purchase
+snapshots; later pricing changes do not rewrite historical payments.
+
 Stripe webhook receipts are stored separately in
 `{$wpdb->prefix}autoagora_payment_events`. This small table records event IDs,
 types, PaymentIntent references, processing state, attempts, and error codes;
@@ -95,23 +99,31 @@ The default directory is created after the first Checkout or webhook action.
 If WordPress cannot write there, one short fallback message is sent to the
 normal PHP/WordPress error log and payment processing continues.
 
-The default sandbox packages are intentionally small and short:
+Seller Checkout offers four fixed durations for both tiers: 1, 3, 5, and 7
+days. A day is exactly 24 hours. The browser submits only tier and duration;
+the server validates the selection and calculates the final amount from the
+configured daily price.
 
-- AutoAgora Lift: EUR 1.00 for 1 hour
-- AutoAgora Showcase: EUR 2.00 for 1 hour
+The default sandbox daily prices are intentionally small:
 
-They can be overridden without editing feature code:
+- AutoAgora Lift: EUR 1.00 per day
+- AutoAgora Showcase: EUR 2.00 per day
+
+Set production daily prices without editing feature code:
 
 ```php
-define('AUTOAGORA_STRIPE_LIFT_AMOUNT_CENTS', 100);
-define('AUTOAGORA_STRIPE_LIFT_DURATION_SECONDS', 3600);
-define('AUTOAGORA_STRIPE_SHOWCASE_AMOUNT_CENTS', 200);
-define('AUTOAGORA_STRIPE_SHOWCASE_DURATION_SECONDS', 3600);
+define('AUTOAGORA_STRIPE_LIFT_DAILY_CENTS', 300);
+define('AUTOAGORA_STRIPE_SHOWCASE_DAILY_CENTS', 500);
 ```
 
+The older `AUTOAGORA_STRIPE_LIFT_AMOUNT_CENTS` and
+`AUTOAGORA_STRIPE_SHOWCASE_AMOUNT_CENTS` constants remain temporary fallbacks
+for a safe deployment. The old duration constants are no longer used.
+
 Sellers start Checkout from `/my-listings/`. The browser supplies only listing
-ID and tier. The server controls amount/duration, validates ownership and active
-listing state, then redirects to `checkout.stripe.com`.
+ID, tier, and one of the allowed day values. The server controls the daily
+price and total amount, validates ownership and active listing state, then
+redirects to `checkout.stripe.com`.
 
 The success redirect never grants a promotion. Only a raw-body, timestamped,
 HMAC-SHA256 verified Stripe webhook can call:
@@ -123,7 +135,12 @@ $result = autoagora_grant_paid_listing_promotion(
     7 * DAY_IN_SECONDS,
     'stripe',
     $stripe_payment_intent_id,
-    'Optional internal note'
+    'Optional internal note',
+    array(
+        'amount_minor' => 2500,
+        'currency' => 'eur',
+        'stripe_checkout_session_id' => $stripe_checkout_session_id,
+    )
 );
 ```
 
@@ -151,11 +168,12 @@ Do not enable that flag until the sandbox checklist passes.
 
 ### Sandbox checklist
 
-1. Deploy the module, visit wp-admin once so schema `1.1.0` creates the payment
-   event table, then add sandbox keys and register the webhook above.
+1. Deploy the module, visit wp-admin once so schema `1.2.0` creates the payment
+   event table and payment snapshot columns, then add sandbox keys and register
+   the webhook above.
 2. In wp-admin, edit a car and confirm Stripe Checkout says `Ready`.
 3. Log in as the listing owner and open `/my-listings/`.
-4. Choose Promote, then Lift or Showcase.
+4. Choose Promote, select Lift or Showcase, and select 1, 3, 5, or 7 days.
 5. Pay in Stripe Checkout with card `4242 4242 4242 4242`, any future
    expiration date, and any three-digit CVC.
 6. Confirm Stripe shows a successful `checkout.session.completed` delivery.

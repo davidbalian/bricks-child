@@ -70,7 +70,7 @@ add_action('before_delete_post', static function ($post_id) {
  * Entry point for a payment provider after its webhook signature and payment
  * status have been verified. Payment provider/reference make it idempotent.
  */
-function autoagora_grant_paid_listing_promotion($listing_id, $tier, $duration_seconds, $payment_provider, $payment_reference, $notes = '')
+function autoagora_grant_paid_listing_promotion($listing_id, $tier, $duration_seconds, $payment_provider, $payment_reference, $notes = '', array $payment_data = array())
 {
     return autoagora_promotion_manager()->grant_paid(
         (int) $listing_id,
@@ -78,16 +78,17 @@ function autoagora_grant_paid_listing_promotion($listing_id, $tier, $duration_se
         (int) $duration_seconds,
         $payment_provider,
         $payment_reference,
-        $notes
+        $notes,
+        $payment_data
     );
 }
 
 /**
  * Provider-neutral refund entry point after a refund webhook is authenticated.
  */
-function autoagora_refund_paid_listing_promotion($payment_provider, $payment_reference)
+function autoagora_refund_paid_listing_promotion($payment_provider, $payment_reference, $amount_minor = 0)
 {
-    return autoagora_promotion_manager()->refund_paid($payment_provider, $payment_reference);
+    return autoagora_promotion_manager()->refund_paid($payment_provider, $payment_reference, (int) $amount_minor);
 }
 
 function autoagora_get_listing_promotion_tier($listing_id)

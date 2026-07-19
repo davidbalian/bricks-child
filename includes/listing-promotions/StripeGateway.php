@@ -31,50 +31,69 @@ final class AutoAgora_Stripe_Gateway
 
     public static function packages()
     {
-        if (self::mode() === 'test') {
-            $packages = array(
-                AutoAgora_Promotion_Manager::TIER_PRIORITY => array(
-                    'tier' => AutoAgora_Promotion_Manager::TIER_PRIORITY,
-                    'label' => AutoAgora_Promotion_Manager::tier_label(AutoAgora_Promotion_Manager::TIER_PRIORITY),
-                    'amount_minor' => defined('AUTOAGORA_STRIPE_LIFT_AMOUNT_CENTS') ? (int) AUTOAGORA_STRIPE_LIFT_AMOUNT_CENTS : 100,
-                    'duration_seconds' => defined('AUTOAGORA_STRIPE_LIFT_DURATION_SECONDS') ? (int) AUTOAGORA_STRIPE_LIFT_DURATION_SECONDS : HOUR_IN_SECONDS,
-                ),
-                AutoAgora_Promotion_Manager::TIER_SHOWCASE => array(
-                    'tier' => AutoAgora_Promotion_Manager::TIER_SHOWCASE,
-                    'label' => AutoAgora_Promotion_Manager::tier_label(AutoAgora_Promotion_Manager::TIER_SHOWCASE),
-                    'amount_minor' => defined('AUTOAGORA_STRIPE_SHOWCASE_AMOUNT_CENTS') ? (int) AUTOAGORA_STRIPE_SHOWCASE_AMOUNT_CENTS : 200,
-                    'duration_seconds' => defined('AUTOAGORA_STRIPE_SHOWCASE_DURATION_SECONDS') ? (int) AUTOAGORA_STRIPE_SHOWCASE_DURATION_SECONDS : HOUR_IN_SECONDS,
-                ),
-            );
-        } else {
-            $packages = array(
-                AutoAgora_Promotion_Manager::TIER_PRIORITY => array(
-                    'tier' => AutoAgora_Promotion_Manager::TIER_PRIORITY,
-                    'label' => AutoAgora_Promotion_Manager::tier_label(AutoAgora_Promotion_Manager::TIER_PRIORITY),
-                    'amount_minor' => defined('AUTOAGORA_STRIPE_LIFT_AMOUNT_CENTS') ? (int) AUTOAGORA_STRIPE_LIFT_AMOUNT_CENTS : 0,
-                    'duration_seconds' => defined('AUTOAGORA_STRIPE_LIFT_DURATION_SECONDS') ? (int) AUTOAGORA_STRIPE_LIFT_DURATION_SECONDS : 0,
-                ),
-                AutoAgora_Promotion_Manager::TIER_SHOWCASE => array(
-                    'tier' => AutoAgora_Promotion_Manager::TIER_SHOWCASE,
-                    'label' => AutoAgora_Promotion_Manager::tier_label(AutoAgora_Promotion_Manager::TIER_SHOWCASE),
-                    'amount_minor' => defined('AUTOAGORA_STRIPE_SHOWCASE_AMOUNT_CENTS') ? (int) AUTOAGORA_STRIPE_SHOWCASE_AMOUNT_CENTS : 0,
-                    'duration_seconds' => defined('AUTOAGORA_STRIPE_SHOWCASE_DURATION_SECONDS') ? (int) AUTOAGORA_STRIPE_SHOWCASE_DURATION_SECONDS : 0,
-                ),
-            );
+        $default_lift = self::mode() === 'test' ? 100 : 0;
+        $default_showcase = self::mode() === 'test' ? 200 : 0;
+        $daily_prices = array(
+            AutoAgora_Promotion_Manager::TIER_PRIORITY => self::configured_daily_price(
+                'AUTOAGORA_STRIPE_LIFT_DAILY_CENTS',
+                'AUTOAGORA_STRIPE_LIFT_AMOUNT_CENTS',
+                $default_lift
+            ),
+            AutoAgora_Promotion_Manager::TIER_SHOWCASE => self::configured_daily_price(
+                'AUTOAGORA_STRIPE_SHOWCASE_DAILY_CENTS',
+                'AUTOAGORA_STRIPE_SHOWCASE_AMOUNT_CENTS',
+                $default_showcase
+            ),
+        );
+        $daily_prices = apply_filters('autoagora_stripe_promotion_daily_prices', $daily_prices, self::mode());
+
+        $packages = array();
+        foreach ($daily_prices as $tier => $daily_amount) {
+            if (!isset(AutoAgora_Promotion_Manager::tiers()[$tier]) || (int) $daily_amount < 50) {
+                continue;
+            }
+            foreach (self::allowed_days() as $days) {
+                $key = $tier . '_' . $days . 'd';
+                $packages[$key] = array(
+                    'key' => $key,
+                    'tier' => $tier,
+                    'label' => AutoAgora_Promotion_Manager::tier_label($tier),
+                    'days' => $days,
+                    'daily_amount_minor' => (int) $daily_amount,
+                    'amount_minor' => (int) $daily_amount * $days,
+                    'currency' => 'eur',
+                    'duration_seconds' => $days * DAY_IN_SECONDS,
+                );
+            }
         }
 
         $packages = apply_filters('autoagora_stripe_promotion_packages', $packages, self::mode());
-        foreach ($packages as $tier => $package) {
+        foreach ($packages as $key => $package) {
+            $days = isset($package['days']) ? (int) $package['days'] : 0;
             if (
-                !isset($package['amount_minor'], $package['duration_seconds'])
+                !isset($package['tier'], $package['amount_minor'], $package['duration_seconds'], $package['currency'])
+                || !isset(AutoAgora_Promotion_Manager::tiers()[$package['tier']])
+                || !in_array($days, self::allowed_days(), true)
                 || (int) $package['amount_minor'] < 50
-                || (int) $package['duration_seconds'] < HOUR_IN_SECONDS
-                || (int) $package['duration_seconds'] > YEAR_IN_SECONDS
+                || (int) $package['duration_seconds'] !== $days * DAY_IN_SECONDS
+                || strtolower((string) $package['currency']) !== 'eur'
             ) {
-                unset($packages[$tier]);
+                unset($packages[$key]);
             }
         }
         return $packages;
+    }
+
+    public static function allowed_days()
+    {
+        return array(1, 3, 5, 7);
+    }
+
+    public static function package_for($tier, $days)
+    {
+        $key = sanitize_key($tier) . '_' . (int) $days . 'd';
+        $packages = self::packages();
+        return isset($packages[$key]) ? $packages[$key] : null;
     }
 
     public static function configuration_errors()
@@ -95,11 +114,12 @@ final class AutoAgora_Stripe_Gateway
         if ($webhook_secret === '' || strpos($webhook_secret, 'whsec_') !== 0) {
             $errors[] = 'The Stripe webhook signing secret is missing.';
         }
-        if (!self::packages()) {
-            $errors[] = 'No valid Stripe promotion packages are configured.';
+        $expected_package_count = count(AutoAgora_Promotion_Manager::tiers()) * count(self::allowed_days());
+        if (count(self::packages()) !== $expected_package_count) {
+            $errors[] = 'Daily prices for all fixed Stripe promotion durations are not configured.';
         }
-        if (!AutoAgora_Promotion_Schema::exists() || !AutoAgora_Promotion_Schema::payment_events_exists()) {
-            $errors[] = 'The promotion payment database tables are unavailable. Visit wp-admin once after deployment to run the schema update.';
+        if (!AutoAgora_Promotion_Schema::is_current()) {
+            $errors[] = 'The promotion payment database schema is outdated. Visit wp-admin once after deployment to run the schema update.';
         }
         if (self::mode() === 'live' && (!defined('AUTOAGORA_STRIPE_LIVE_ENABLED') || AUTOAGORA_STRIPE_LIVE_ENABLED !== true)) {
             $errors[] = 'Stripe live mode is locked. Set AUTOAGORA_STRIPE_LIVE_ENABLED to true only after completing sandbox tests.';
@@ -136,6 +156,7 @@ final class AutoAgora_Stripe_Gateway
 
         $listing_id = isset($_POST['listing_id']) ? absint($_POST['listing_id']) : 0;
         $tier = isset($_POST['tier']) ? sanitize_key(wp_unslash($_POST['tier'])) : '';
+        $days = isset($_POST['days']) ? absint($_POST['days']) : 0;
         $attempt = isset($_POST['attempt']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', (string) wp_unslash($_POST['attempt'])) : '';
         $attempt = substr($attempt, 0, 80);
         if ($attempt === '') {
@@ -148,19 +169,21 @@ final class AutoAgora_Stripe_Gateway
                 'listing_id' => $listing_id,
                 'user_id' => get_current_user_id(),
                 'tier' => $tier,
+                'days' => $days,
                 'error_code' => $ownership_error->get_error_code(),
             ), 'warning');
             wp_send_json_error(array('message' => $ownership_error->get_error_message()), 403);
         }
-        $packages = self::packages();
-        if (!isset($packages[$tier])) {
+        $package = self::package_for($tier, $days);
+        if (!$package) {
             AutoAgora_Payment_Logger::log('checkout.rejected', array(
                 'listing_id' => $listing_id,
                 'user_id' => get_current_user_id(),
                 'tier' => $tier,
+                'days' => $days,
                 'error_code' => 'stripe_package_unavailable',
             ), 'warning');
-            wp_send_json_error(array('message' => 'The selected promotion package is unavailable.'), 400);
+            wp_send_json_error(array('message' => 'Choose a valid promotion and duration.'), 400);
         }
 
         AutoAgora_Payment_Logger::log('checkout.requested', array(
@@ -168,12 +191,13 @@ final class AutoAgora_Stripe_Gateway
             'listing_id' => $listing_id,
             'user_id' => get_current_user_id(),
             'tier' => $tier,
+            'days' => $days,
             'mode' => self::mode(),
-            'amount_minor' => (int) $packages[$tier]['amount_minor'],
+            'amount_minor' => (int) $package['amount_minor'],
             'currency' => 'eur',
-            'duration_seconds' => (int) $packages[$tier]['duration_seconds'],
+            'duration_seconds' => (int) $package['duration_seconds'],
         ));
-        $result = self::create_checkout_session($listing_id, get_current_user_id(), $packages[$tier], $attempt);
+        $result = self::create_checkout_session($listing_id, get_current_user_id(), $package, $attempt);
         if (is_wp_error($result)) {
             $error_data = $result->get_error_data();
             AutoAgora_Payment_Logger::log('checkout.create_failed', array(
@@ -181,6 +205,7 @@ final class AutoAgora_Stripe_Gateway
                 'listing_id' => $listing_id,
                 'user_id' => get_current_user_id(),
                 'tier' => $tier,
+                'days' => $days,
                 'error_code' => $result->get_error_code(),
                 'http_status' => is_array($error_data) && isset($error_data['http_status']) ? (int) $error_data['http_status'] : 0,
             ), 'error');
@@ -191,6 +216,7 @@ final class AutoAgora_Stripe_Gateway
             'listing_id' => $listing_id,
             'user_id' => get_current_user_id(),
             'tier' => $tier,
+            'days' => $days,
             'session_id' => $result['session_id'],
         ));
         wp_send_json_success($result);
@@ -199,9 +225,10 @@ final class AutoAgora_Stripe_Gateway
     public static function create_checkout_session($listing_id, $user_id, array $package, $attempt)
     {
         $user = get_userdata((int) $user_id);
-        $currency = 'eur';
+        $currency = strtolower(sanitize_key($package['currency']));
         $amount = (int) $package['amount_minor'];
         $duration = (int) $package['duration_seconds'];
+        $days = (int) $package['days'];
         $tier = sanitize_key($package['tier']);
         $label = sanitize_text_field($package['label']);
         $metadata = array(
@@ -209,6 +236,7 @@ final class AutoAgora_Stripe_Gateway
             'listing_id' => (string) (int) $listing_id,
             'user_id' => (string) (int) $user_id,
             'tier' => $tier,
+            'days' => (string) $days,
             'duration_seconds' => (string) $duration,
             'expected_amount' => (string) $amount,
             'currency' => $currency,
@@ -250,7 +278,7 @@ final class AutoAgora_Stripe_Gateway
             'headers' => array(
                 'Authorization' => 'Bearer ' . self::secret_key(),
                 'Content-Type' => 'application/x-www-form-urlencoded',
-                'Idempotency-Key' => 'autoagora-promotion-' . (int) $user_id . '-' . (int) $listing_id . '-' . $tier . '-' . $attempt,
+                'Idempotency-Key' => 'autoagora-promotion-' . (int) $user_id . '-' . (int) $listing_id . '-' . $tier . '-' . $days . 'd-' . $attempt,
             ),
             'body' => http_build_query($body, '', '&'),
         ));
@@ -420,7 +448,11 @@ final class AutoAgora_Stripe_Gateway
                 return array('ignored' => true);
             }
 
-            $result = autoagora_refund_paid_listing_promotion(self::PROVIDER, self::webhook_object_reference($event['type'], $object));
+            $result = autoagora_refund_paid_listing_promotion(
+                self::PROVIDER,
+                self::webhook_object_reference($event['type'], $object),
+                isset($object['amount_refunded']) ? (int) $object['amount_refunded'] : 0
+            );
             if (is_wp_error($result) && $result->get_error_code() === 'promotion_payment_not_found') {
                 AutoAgora_Payment_Logger::log('promotion.refund_pending', array_merge($log_context, array(
                     'error_code' => $result->get_error_code(),
@@ -456,16 +488,26 @@ final class AutoAgora_Stripe_Gateway
         $listing_id = isset($metadata['listing_id']) ? absint($metadata['listing_id']) : 0;
         $user_id = isset($metadata['user_id']) ? absint($metadata['user_id']) : 0;
         $tier = isset($metadata['tier']) ? sanitize_key($metadata['tier']) : '';
+        $days = isset($metadata['days']) ? absint($metadata['days']) : 0;
         $duration = isset($metadata['duration_seconds']) ? absint($metadata['duration_seconds']) : 0;
         $expected_amount = isset($metadata['expected_amount']) ? absint($metadata['expected_amount']) : 0;
         $amount_total = isset($session['amount_total']) ? (int) $session['amount_total'] : -1;
         $currency = isset($session['currency']) ? strtolower(sanitize_key($session['currency'])) : '';
         $payment_intent = self::webhook_object_reference('checkout.session.completed', $session);
 
-        if (!$listing_id || !$user_id || !isset(AutoAgora_Promotion_Manager::tiers()[$tier])) {
+        if (!$listing_id || !$user_id || !isset(AutoAgora_Promotion_Manager::tiers()[$tier]) || !in_array($days, self::allowed_days(), true)) {
             return new WP_Error('stripe_metadata_invalid', 'Required promotion metadata is missing.');
         }
-        if ($duration < HOUR_IN_SECONDS || $duration > YEAR_IN_SECONDS || $expected_amount < 50 || $amount_total !== $expected_amount || $currency !== 'eur') {
+        if (strtolower((string) ($metadata['environment'] ?? '')) !== self::mode()) {
+            return new WP_Error('stripe_mode_mismatch', 'Checkout metadata does not match the configured Stripe mode.');
+        }
+        if (
+            $duration !== $days * DAY_IN_SECONDS
+            || $expected_amount < 50
+            || $amount_total !== $expected_amount
+            || $currency !== 'eur'
+            || strtolower((string) ($metadata['currency'] ?? '')) !== 'eur'
+        ) {
             return new WP_Error('stripe_amount_invalid', 'The paid amount or promotion duration does not match Checkout metadata.');
         }
         if ($payment_intent === '' || strpos($payment_intent, 'pi_') !== 0) {
@@ -477,13 +519,21 @@ final class AutoAgora_Stripe_Gateway
         }
 
         $session_id = isset($session['id']) ? sanitize_text_field($session['id']) : '';
+        if (strpos($session_id, 'cs_') !== 0) {
+            return new WP_Error('stripe_session_invalid', 'Stripe Checkout Session reference is missing.');
+        }
         return autoagora_grant_paid_listing_promotion(
             $listing_id,
             $tier,
             $duration,
             self::PROVIDER,
             $payment_intent,
-            'Stripe Checkout ' . $session_id . '; EUR ' . number_format($amount_total / 100, 2, '.', '') . '; ' . self::mode()
+            'Stripe Checkout ' . $session_id . '; EUR ' . number_format($amount_total / 100, 2, '.', '') . '; ' . self::mode(),
+            array(
+                'amount_minor' => $amount_total,
+                'currency' => $currency,
+                'stripe_checkout_session_id' => $session_id,
+            )
         );
     }
 
@@ -514,6 +564,8 @@ final class AutoAgora_Stripe_Gateway
             'listing_id' => isset($metadata['listing_id']) ? absint($metadata['listing_id']) : 0,
             'user_id' => isset($metadata['user_id']) ? absint($metadata['user_id']) : 0,
             'tier' => isset($metadata['tier']) ? $metadata['tier'] : '',
+            'days' => isset($metadata['days']) ? absint($metadata['days']) : 0,
+            'duration_seconds' => isset($metadata['duration_seconds']) ? absint($metadata['duration_seconds']) : 0,
             'amount_minor' => isset($object['amount_total']) ? (int) $object['amount_total'] : (isset($object['amount_refunded']) ? (int) $object['amount_refunded'] : 0),
             'currency' => isset($object['currency']) ? $object['currency'] : '',
             'status' => isset($object['payment_status']) ? $object['payment_status'] : (!empty($object['refunded']) ? 'refunded' : ''),
@@ -553,6 +605,7 @@ final class AutoAgora_Stripe_Gateway
             'stripe_metadata_invalid',
             'stripe_amount_invalid',
             'stripe_payment_reference_invalid',
+            'stripe_session_invalid',
             'stripe_mode_mismatch',
             'stripe_payment_unpaid',
         );
@@ -616,6 +669,17 @@ final class AutoAgora_Stripe_Gateway
             }
         }
         return false;
+    }
+
+    private static function configured_daily_price($constant_name, $legacy_constant_name, $default)
+    {
+        if (defined($constant_name)) {
+            return (int) constant($constant_name);
+        }
+        if (defined($legacy_constant_name)) {
+            return (int) constant($legacy_constant_name);
+        }
+        return (int) $default;
     }
 
     private static function is_allowed_checkout_url($url)

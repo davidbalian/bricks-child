@@ -60,8 +60,8 @@ final class AutoAgora_Promotion_Admin
 
     public static function render_meta_box($post)
     {
-        if (!AutoAgora_Promotion_Schema::exists()) {
-            echo '<p><strong>Promotion table unavailable.</strong> Reload this admin page after the schema installer has run.</p>';
+        if (!AutoAgora_Promotion_Schema::is_current()) {
+            echo '<p><strong>Promotion database schema unavailable or outdated.</strong> Reload this admin page after the schema installer has run.</p>';
             return;
         }
 
@@ -174,7 +174,7 @@ final class AutoAgora_Promotion_Admin
             echo '<p>No promotion records yet.</p>';
             return;
         }
-        echo '<table class="widefat striped"><thead><tr><th>ID</th><th>Tier</th><th>Status</th><th>Source</th><th>Starts</th><th>Ends</th><th>Payment reference</th><th>Action</th></tr></thead><tbody>';
+        echo '<table class="widefat striped"><thead><tr><th>ID</th><th>Tier</th><th>Status</th><th>Source</th><th>Starts</th><th>Ends</th><th>Paid</th><th>Payment reference</th><th>Action</th></tr></thead><tbody>';
         foreach ($history as $record) {
             $cancel_url = wp_nonce_url(
                 add_query_arg(
@@ -193,7 +193,15 @@ final class AutoAgora_Promotion_Admin
             echo '<td>' . esc_html($record->source) . '</td>';
             echo '<td>' . esc_html(self::display_gmt($record->starts_at)) . '</td>';
             echo '<td>' . esc_html(self::display_gmt($record->ends_at)) . '</td>';
-            echo '<td>' . esc_html(trim((string) $record->payment_provider . ' ' . (string) $record->payment_reference)) . '</td>';
+            $paid = (int) $record->amount_minor > 0
+                ? strtoupper((string) $record->currency) . ' ' . number_format((int) $record->amount_minor / 100, 2)
+                : '&mdash;';
+            echo '<td>' . ($paid === '&mdash;' ? $paid : esc_html($paid)) . '</td>';
+            $payment_reference = trim((string) $record->payment_provider . ' ' . (string) $record->payment_reference);
+            if (!empty($record->stripe_checkout_session_id)) {
+                $payment_reference .= ' / ' . (string) $record->stripe_checkout_session_id;
+            }
+            echo '<td>' . esc_html($payment_reference) . '</td>';
             echo '<td>';
             if (in_array($record->status, array(AutoAgora_Promotion_Manager::STATUS_ACTIVE, AutoAgora_Promotion_Manager::STATUS_SCHEDULED), true)) {
                 echo '<a class="button button-small" href="' . esc_url($cancel_url) . '" onclick="return confirm(\'Cancel this promotion?\')">Cancel</a>';
