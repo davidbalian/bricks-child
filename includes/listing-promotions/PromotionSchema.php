@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 
 final class AutoAgora_Promotion_Schema
 {
-    const VERSION = '1.2.0';
+    const VERSION = '1.3.0';
     const VERSION_OPTION = 'autoagora_listing_promotions_schema_version';
 
     public static function table_name()
@@ -38,6 +38,8 @@ final class AutoAgora_Promotion_Schema
         $sql = "CREATE TABLE {$table} (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
             listing_id bigint(20) unsigned NOT NULL,
+            listing_title_snapshot varchar(255) NOT NULL DEFAULT '',
+            seller_id_snapshot bigint(20) unsigned NOT NULL DEFAULT 0,
             tier varchar(32) NOT NULL,
             status varchar(24) NOT NULL DEFAULT 'scheduled',
             source varchar(24) NOT NULL,
@@ -57,6 +59,7 @@ final class AutoAgora_Promotion_Schema
             updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY  (id),
             KEY listing_status (listing_id,status),
+            KEY seller_status (seller_id_snapshot,status),
             KEY status_starts (status,starts_at),
             KEY status_ends (status,ends_at),
             KEY stripe_checkout_session (stripe_checkout_session_id),
@@ -84,7 +87,11 @@ final class AutoAgora_Promotion_Schema
         dbDelta($sql);
         dbDelta($events_sql);
 
-        if (self::exists() && self::payment_events_exists() && self::has_payment_snapshot_columns()) {
+        if (self::exists() && self::has_required_promotion_columns()) {
+            self::backfill_listing_snapshots();
+        }
+
+        if (self::exists() && self::payment_events_exists() && self::has_required_promotion_columns()) {
             update_option(self::VERSION_OPTION, self::VERSION, false);
         }
         self::is_current(true);
@@ -113,18 +120,46 @@ final class AutoAgora_Promotion_Schema
         $current = get_option(self::VERSION_OPTION) === self::VERSION
             && self::exists()
             && self::payment_events_exists()
-            && self::has_payment_snapshot_columns();
+            && self::has_required_promotion_columns();
         return $current;
     }
 
-    private static function has_payment_snapshot_columns()
+    private static function has_required_promotion_columns()
     {
         if (!self::exists()) {
             return false;
         }
         global $wpdb;
         $columns = $wpdb->get_col('SHOW COLUMNS FROM ' . self::table_name(), 0);
-        $required = array('amount_minor', 'currency', 'refunded_amount_minor', 'stripe_checkout_session_id');
+        $required = array(
+            'listing_title_snapshot',
+            'seller_id_snapshot',
+            'amount_minor',
+            'currency',
+            'refunded_amount_minor',
+            'stripe_checkout_session_id',
+        );
         return !array_diff($required, array_map('strtolower', (array) $columns));
+    }
+
+    private static function backfill_listing_snapshots()
+    {
+        global $wpdb;
+        $promotions_table = self::table_name();
+        $posts_table = $wpdb->posts;
+        $wpdb->query(
+            "UPDATE {$promotions_table} AS promotions
+             INNER JOIN {$posts_table} AS listings ON listings.ID = promotions.listing_id
+             SET promotions.listing_title_snapshot = CASE
+                     WHEN promotions.listing_title_snapshot = '' THEN LEFT(listings.post_title, 255)
+                     ELSE promotions.listing_title_snapshot
+                 END,
+                 promotions.seller_id_snapshot = CASE
+                     WHEN promotions.seller_id_snapshot = 0 THEN listings.post_author
+                     ELSE promotions.seller_id_snapshot
+                 END
+             WHERE listings.post_type = 'car'
+             AND (promotions.listing_title_snapshot = '' OR promotions.seller_id_snapshot = 0)"
+        );
     }
 }

@@ -134,6 +134,8 @@ final class AutoAgora_Promotion_Manager
 
             $id = $this->repository->insert(array(
                 'listing_id' => $listing_id,
+                'listing_title_snapshot' => $this->listing_title_snapshot($post->post_title),
+                'seller_id_snapshot' => (int) $post->post_author,
                 'tier' => $tier,
                 'status' => $status,
                 'source' => $source,
@@ -276,6 +278,17 @@ final class AutoAgora_Promotion_Manager
     public function handle_deleted_listing($listing_id)
     {
         if (AutoAgora_Promotion_Schema::exists()) {
+            $post = get_post((int) $listing_id);
+            if ($post && AutoAgora_Promotion_Schema::is_current()) {
+                $snapshot_updated = $this->repository->preserve_listing_snapshot(
+                    (int) $listing_id,
+                    $this->listing_title_snapshot($post->post_title),
+                    (int) $post->post_author
+                );
+                if ($snapshot_updated === false) {
+                    error_log('AutoAgora promotion listing snapshot could not be preserved for deleted listing ' . (int) $listing_id . '.');
+                }
+            }
             if ($this->repository->cancel_for_deleted_listing((int) $listing_id) === false) {
                 error_log('AutoAgora promotion cancellation failed for deleted listing ' . (int) $listing_id . '.');
             }
@@ -369,6 +382,12 @@ final class AutoAgora_Promotion_Manager
             return $fallback;
         }
         return $value;
+    }
+
+    private function listing_title_snapshot($title)
+    {
+        $title = wp_strip_all_tags((string) $title, true);
+        return function_exists('mb_substr') ? mb_substr($title, 0, 255) : substr($title, 0, 255);
     }
 
     private function validate_existing_payment_event($record, $listing_id, $tier, $duration_seconds = 0, array $payment_data = array())

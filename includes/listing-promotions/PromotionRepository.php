@@ -14,7 +14,7 @@ final class AutoAgora_Promotion_Repository
         $ok = $wpdb->insert(
             AutoAgora_Promotion_Schema::table_name(),
             $data,
-            array('%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%d', '%s', '%s')
+            array('%d', '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%d', '%s', '%s')
         );
         return $ok ? (int) $wpdb->insert_id : 0;
     }
@@ -161,6 +161,27 @@ final class AutoAgora_Promotion_Repository
         return $wpdb->query($wpdb->prepare(
             "UPDATE " . AutoAgora_Promotion_Schema::table_name() . " SET status = 'cancelled'
              WHERE listing_id = %d AND status IN ('active','scheduled')",
+            (int) $listing_id
+        ));
+    }
+
+    public function preserve_listing_snapshot($listing_id, $listing_title, $seller_id)
+    {
+        global $wpdb;
+        return $wpdb->query($wpdb->prepare(
+            "UPDATE " . AutoAgora_Promotion_Schema::table_name() . "
+             SET listing_title_snapshot = CASE
+                     WHEN listing_title_snapshot = '' THEN %s
+                     ELSE listing_title_snapshot
+                 END,
+                 seller_id_snapshot = CASE
+                     WHEN seller_id_snapshot = 0 THEN %d
+                     ELSE seller_id_snapshot
+                 END
+             WHERE listing_id = %d
+             AND (listing_title_snapshot = '' OR seller_id_snapshot = 0)",
+            $listing_title,
+            (int) $seller_id,
             (int) $listing_id
         ));
     }

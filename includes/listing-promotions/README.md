@@ -22,6 +22,13 @@ Schema `1.2.0` also stores the amount, currency, refunded amount, and Stripe
 Checkout Session ID on each paid promotion. These are immutable purchase
 snapshots; later pricing changes do not rewrite historical payments.
 
+Schema `1.3.0` adds immutable listing-title and seller-ID snapshots. Existing
+rows are backfilled while their car posts still exist, and missing values are
+captured again immediately before permanent deletion. Deleting a car cancels
+only its unfinished active/scheduled promotions; all promotion and payment
+records remain as audit history and can be identified as a deleted listing by
+the central admin manager.
+
 Stripe webhook receipts are stored separately in
 `{$wpdb->prefix}autoagora_payment_events`. This small table records event IDs,
 types, PaymentIntent references, processing state, attempts, and error codes;
@@ -41,6 +48,13 @@ The implemented states are `scheduled`, `active`, `expired`, `cancelled`, and
 `refunded`. A five-minute WP-Cron event expires/starts due records and refreshes
 the current snapshot. Manual grants and cancellations are available to
 administrators in the car edit screen.
+
+All tiers share one sequential queue. A new Lift or Showcase grant starts after
+the latest unfinished promotion ends, so promotions never overlap and no paid
+time is discarded. Promotions do not pause when a listing is sold or expires;
+their wall-clock schedule continues while the listing is hidden. New purchases
+are accepted only for published, active listings. Permanently deleting a car
+cancels its unfinished records but retains their audit history.
 
 ## Payment integration
 
@@ -179,8 +193,8 @@ Do not enable that flag until the sandbox checklist passes.
 
 ### Sandbox checklist
 
-1. Deploy the module, visit wp-admin once so schema `1.2.0` creates the payment
-   event table and payment snapshot columns, then add sandbox keys and register
+1. Deploy the module, visit wp-admin once so schema `1.3.0` creates the payment
+   event table and promotion snapshot columns, then add sandbox keys and register
    the webhook above.
 2. In wp-admin, edit a car and confirm Stripe Checkout says `Ready`.
 3. Log in as the listing owner and open `/my-listings/`.
