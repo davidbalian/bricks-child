@@ -15,12 +15,14 @@ final class AutoAgora_Stripe_Gateway
     const WEBHOOK_NAMESPACE = 'autoagora/v1';
     const WEBHOOK_ROUTE = '/stripe/webhook';
     const CHECKOUT_AJAX_ACTION = 'autoagora_create_stripe_checkout';
+    const PREVIEW_AJAX_ACTION = 'autoagora_preview_stripe_checkout';
     const CHECKOUT_NONCE_ACTION = 'autoagora_stripe_checkout';
 
     public static function init()
     {
         add_action('rest_api_init', array(__CLASS__, 'register_webhook_route'));
         add_action('wp_ajax_' . self::CHECKOUT_AJAX_ACTION, array(__CLASS__, 'handle_checkout_ajax'));
+        add_action('wp_ajax_' . self::PREVIEW_AJAX_ACTION, array(__CLASS__, 'handle_preview_ajax'));
     }
 
     public static function mode()
@@ -124,6 +126,12 @@ final class AutoAgora_Stripe_Gateway
         if (self::mode() === 'live' && (!defined('AUTOAGORA_STRIPE_LIVE_ENABLED') || AUTOAGORA_STRIPE_LIVE_ENABLED !== true)) {
             $errors[] = 'Stripe live mode is locked. Set AUTOAGORA_STRIPE_LIVE_ENABLED to true only after completing sandbox tests.';
         }
+        if (self::mode() === 'live' && (!defined('AUTOAGORA_STRIPE_LIFT_DAILY_CENTS') || !defined('AUTOAGORA_STRIPE_SHOWCASE_DAILY_CENTS'))) {
+            $errors[] = 'Live daily prices must use the explicit Lift and Showcase daily price constants.';
+        }
+        if (self::mode() === 'live' && strtolower((string) wp_parse_url(home_url('/'), PHP_URL_SCHEME)) !== 'https') {
+            $errors[] = 'Stripe live mode requires an HTTPS WordPress site URL.';
+        }
         $cached_errors = $errors;
         return $cached_errors;
     }
@@ -185,6 +193,20 @@ final class AutoAgora_Stripe_Gateway
             ), 'warning');
             wp_send_json_error(array('message' => 'Choose a valid promotion and duration.'), 400);
         }
+        $schedule_preview = autoagora_promotion_manager()->preview_schedule($listing_id, (int) $package['duration_seconds']);
+        if (is_wp_error($schedule_preview)) {
+            wp_send_json_error(array('message' => $schedule_preview->get_error_message()), 400);
+        }
+        $formatted_preview = self::format_schedule_preview($listing_id, $tier, $days, $schedule_preview);
+        $client_preview_signature = isset($_POST['preview_signature'])
+            ? preg_replace('/[^a-f0-9]/', '', strtolower((string) wp_unslash($_POST['preview_signature'])))
+            : '';
+        if ($client_preview_signature === '' || !hash_equals($formatted_preview['signature'], $client_preview_signature)) {
+            wp_send_json_error(array(
+                'message' => 'The promotion schedule changed. Review the updated dates and continue again.',
+                'schedule_preview' => $formatted_preview,
+            ), 409);
+        }
 
         AutoAgora_Payment_Logger::log('checkout.requested', array(
             'attempt' => $attempt,
@@ -196,8 +218,11 @@ final class AutoAgora_Stripe_Gateway
             'amount_minor' => (int) $package['amount_minor'],
             'currency' => 'eur',
             'duration_seconds' => (int) $package['duration_seconds'],
+            'expected_starts_at' => $schedule_preview['starts_at'],
+            'expected_ends_at' => $schedule_preview['ends_at'],
+            'queued' => !empty($schedule_preview['queued']),
         ));
-        $result = self::create_checkout_session($listing_id, get_current_user_id(), $package, $attempt);
+        $result = self::create_checkout_session($listing_id, get_current_user_id(), $package, $attempt, $schedule_preview);
         if (is_wp_error($result)) {
             $error_data = $result->get_error_data();
             AutoAgora_Payment_Logger::log('checkout.create_failed', array(
@@ -222,7 +247,50 @@ final class AutoAgora_Stripe_Gateway
         wp_send_json_success($result);
     }
 
-    public static function create_checkout_session($listing_id, $user_id, array $package, $attempt)
+    public static function handle_preview_ajax()
+    {
+        if (!is_user_logged_in()) {
+            wp_send_json_error(array('message' => 'You must be logged in to preview a promotion.'), 401);
+        }
+        if (!check_ajax_referer(self::CHECKOUT_NONCE_ACTION, 'nonce', false)) {
+            wp_send_json_error(array('message' => 'Your session expired. Reload the page and try again.'), 403);
+        }
+        if (!self::is_ready()) {
+            wp_send_json_error(array('message' => 'Stripe Checkout is not configured yet.'), 503);
+        }
+
+        $listing_id = isset($_POST['listing_id']) ? absint($_POST['listing_id']) : 0;
+        $tier = isset($_POST['tier']) ? sanitize_key(wp_unslash($_POST['tier'])) : '';
+        $days = isset($_POST['days']) ? absint($_POST['days']) : 0;
+        $ownership_error = self::validate_seller_listing($listing_id, get_current_user_id());
+        if (is_wp_error($ownership_error)) {
+            wp_send_json_error(array('message' => $ownership_error->get_error_message()), 403);
+        }
+        $package = self::package_for($tier, $days);
+        if (!$package) {
+            wp_send_json_error(array('message' => 'Choose a valid promotion and duration.'), 400);
+        }
+        $preview = autoagora_promotion_manager()->preview_schedule($listing_id, (int) $package['duration_seconds']);
+        if (is_wp_error($preview)) {
+            wp_send_json_error(array('message' => $preview->get_error_message()), 400);
+        }
+        wp_send_json_success(self::format_schedule_preview($listing_id, $tier, $days, $preview));
+    }
+
+    public static function schedule_preview($listing_id, $tier, $days)
+    {
+        $package = self::package_for($tier, $days);
+        if (!$package) {
+            return new WP_Error('stripe_package_unavailable', 'Choose a valid promotion and duration.');
+        }
+        $preview = autoagora_promotion_manager()->preview_schedule((int) $listing_id, (int) $package['duration_seconds']);
+        if (is_wp_error($preview)) {
+            return $preview;
+        }
+        return self::format_schedule_preview((int) $listing_id, sanitize_key($tier), (int) $days, $preview);
+    }
+
+    public static function create_checkout_session($listing_id, $user_id, array $package, $attempt, array $schedule_preview)
     {
         $currency = strtolower(sanitize_key($package['currency']));
         $amount = (int) $package['amount_minor'];
@@ -247,7 +315,14 @@ final class AutoAgora_Stripe_Gateway
             'expected_amount' => (string) $amount,
             'currency' => $currency,
             'environment' => self::mode(),
+            'expected_starts_at' => (string) $schedule_preview['starts_at'],
+            'expected_ends_at' => (string) $schedule_preview['ends_at'],
+            'queued_at_checkout' => !empty($schedule_preview['queued']) ? '1' : '0',
         );
+
+        $schedule_description = !empty($schedule_preview['queued'])
+            ? ' Expected start ' . get_date_from_gmt($schedule_preview['starts_at'], 'j M Y, H:i') . '.'
+            : ' Starts after payment confirmation.';
 
         $success_url = home_url('/my-listings/?promotion_payment=success&session_id={CHECKOUT_SESSION_ID}');
         $cancel_url = home_url('/my-listings/?promotion_payment=cancelled');
@@ -264,7 +339,7 @@ final class AutoAgora_Stripe_Gateway
                     'unit_amount' => $amount,
                     'product_data' => array(
                         'name' => $label . ' listing promotion',
-                        'description' => self::duration_label($duration) . ' promotion for ' . $listing_reference,
+                        'description' => self::duration_label($duration) . ' promotion for ' . $listing_reference . '.' . $schedule_description,
                     ),
                 ),
             )),
@@ -516,7 +591,7 @@ final class AutoAgora_Stripe_Gateway
         if ($payment_intent === '' || strpos($payment_intent, 'pi_') !== 0) {
             return new WP_Error('stripe_payment_reference_invalid', 'Stripe PaymentIntent reference is missing.');
         }
-        $ownership_error = self::validate_seller_listing($listing_id, $user_id);
+        $ownership_error = self::validate_seller_listing($listing_id, $user_id, false);
         if (is_wp_error($ownership_error)) {
             return $ownership_error;
         }
@@ -540,19 +615,54 @@ final class AutoAgora_Stripe_Gateway
         );
     }
 
-    private static function validate_seller_listing($listing_id, $user_id)
+    private static function validate_seller_listing($listing_id, $user_id, $require_active = true)
     {
         $post = get_post((int) $listing_id);
-        if (!$post || $post->post_type !== 'car' || $post->post_status !== 'publish') {
-            return new WP_Error('stripe_listing_invalid', 'Only published car listings can be promoted.');
+        if (!$post || $post->post_type !== 'car') {
+            return new WP_Error('stripe_listing_invalid', 'The car listing no longer exists.');
         }
         if ((int) $post->post_author !== (int) $user_id && !user_can((int) $user_id, 'manage_options')) {
             return new WP_Error('stripe_listing_ownership', 'You can only promote your own listing.');
         }
-        if (class_exists('ListingStateManager') && ListingStateManager::resolve_state((int) $listing_id) !== ListingStateManager::STATE_ACTIVE) {
+        if ($require_active && $post->post_status !== 'publish') {
+            return new WP_Error('stripe_listing_invalid', 'Only published car listings can be promoted.');
+        }
+        if ($require_active && class_exists('ListingStateManager') && ListingStateManager::resolve_state((int) $listing_id) !== ListingStateManager::STATE_ACTIVE) {
             return new WP_Error('stripe_listing_inactive', 'Only active listings can be promoted.');
         }
         return true;
+    }
+
+    private static function format_schedule_preview($listing_id, $tier, $days, array $preview)
+    {
+        $starts_at = (string) $preview['starts_at'];
+        $ends_at = (string) $preview['ends_at'];
+        $queued = !empty($preview['queued']);
+        $duration = (int) $days * DAY_IN_SECONDS;
+        $signature_parts = array((int) $listing_id, sanitize_key($tier), (int) $days);
+        if ($queued) {
+            $signature_parts[] = $starts_at;
+            $signature_parts[] = $ends_at;
+        } else {
+            $signature_parts[] = 'immediate';
+        }
+        $signature = hash('sha256', implode('|', $signature_parts));
+        return array(
+            'queued' => $queued,
+            'starts_at_gmt' => $starts_at,
+            'ends_at_gmt' => $ends_at,
+            'starts_at_local' => get_date_from_gmt($starts_at, 'j M Y, H:i'),
+            'ends_at_local' => get_date_from_gmt($ends_at, 'j M Y, H:i'),
+            'start_timestamp' => strtotime($starts_at . ' UTC'),
+            'end_timestamp' => strtotime($ends_at . ' UTC'),
+            'signature' => $signature,
+            'headline' => $queued
+                ? 'Queued: expected to start ' . get_date_from_gmt($starts_at, 'j M Y, H:i') . ' (site time)'
+                : 'Starts after Stripe confirms payment',
+            'detail' => $queued
+                ? 'Expected to end ' . get_date_from_gmt($ends_at, 'j M Y, H:i') . ' (site time) after the current promotion queue.'
+                : 'Runs for ' . self::duration_label($duration) . ' and ends exactly ' . self::duration_label($duration) . ' after activation.',
+        );
     }
 
     private static function webhook_log_context(array $event, array $object)

@@ -54,7 +54,7 @@ final class AutoAgora_Promotion_Manager
 
     public function grant_manual($listing_id, $tier, $duration_seconds, $starts_at_gmt, $granted_by, $notes = '')
     {
-        return $this->grant($listing_id, $tier, $duration_seconds, $starts_at_gmt, 'manual', $granted_by, '', '', $notes, array());
+        return $this->grant($listing_id, $tier, $duration_seconds, $starts_at_gmt, 'manual', $granted_by, '', '', $notes, array(), false);
     }
 
     public function grant_paid($listing_id, $tier, $duration_seconds, $provider, $reference, $notes = '', array $payment_data = array())
@@ -75,10 +75,10 @@ final class AutoAgora_Promotion_Manager
             return $this->validate_existing_payment_event($existing, $listing_id, $tier, $duration_seconds, $payment_data);
         }
 
-        return $this->grant($listing_id, $tier, $duration_seconds, gmdate('Y-m-d H:i:s'), 'payment', 0, $provider, $reference, $notes, $payment_data);
+        return $this->grant($listing_id, $tier, $duration_seconds, gmdate('Y-m-d H:i:s'), 'payment', 0, $provider, $reference, $notes, $payment_data, true);
     }
 
-    private function grant($listing_id, $tier, $duration_seconds, $starts_at_gmt, $source, $granted_by, $provider, $reference, $notes, array $payment_data)
+    public function preview_schedule($listing_id, $duration_seconds, $starts_at_gmt = '')
     {
         $listing_id = (int) $listing_id;
         $duration_seconds = (int) $duration_seconds;
@@ -87,6 +87,38 @@ final class AutoAgora_Promotion_Manager
             return new WP_Error('promotion_listing_invalid', 'The selected listing does not exist or is not a car.');
         }
         if ($post->post_status !== 'publish' || (class_exists('ListingStateManager') && ListingStateManager::resolve_state($listing_id) !== ListingStateManager::STATE_ACTIVE)) {
+            return new WP_Error('promotion_listing_inactive', 'Only published, active listings can receive a promotion.');
+        }
+        if ($duration_seconds < HOUR_IN_SECONDS || $duration_seconds > YEAR_IN_SECONDS) {
+            return new WP_Error('promotion_duration_invalid', 'Promotion duration must be between one hour and one year.');
+        }
+        if (!AutoAgora_Promotion_Schema::exists()) {
+            return new WP_Error('promotion_table_missing', 'The listing promotions table is unavailable.');
+        }
+
+        $now = gmdate('Y-m-d H:i:s');
+        $requested_start = $this->normalize_gmt($starts_at_gmt, $now);
+        if ($requested_start < $now) {
+            $requested_start = $now;
+        }
+        $reserved_end = $this->repository->latest_reserved_end($listing_id, $requested_start);
+        $start = ($reserved_end && $reserved_end > $requested_start) ? $reserved_end : $requested_start;
+        return array(
+            'starts_at' => $start,
+            'ends_at' => gmdate('Y-m-d H:i:s', strtotime($start . ' UTC') + $duration_seconds),
+            'queued' => $start > $now,
+        );
+    }
+
+    private function grant($listing_id, $tier, $duration_seconds, $starts_at_gmt, $source, $granted_by, $provider, $reference, $notes, array $payment_data, $allow_inactive)
+    {
+        $listing_id = (int) $listing_id;
+        $duration_seconds = (int) $duration_seconds;
+        $post = get_post($listing_id);
+        if (!$post || $post->post_type !== 'car') {
+            return new WP_Error('promotion_listing_invalid', 'The selected listing does not exist or is not a car.');
+        }
+        if (!$allow_inactive && ($post->post_status !== 'publish' || (class_exists('ListingStateManager') && ListingStateManager::resolve_state($listing_id) !== ListingStateManager::STATE_ACTIVE))) {
             return new WP_Error('promotion_listing_inactive', 'Only published, active listings can receive a promotion.');
         }
         if (!isset(self::tiers()[$tier])) {
@@ -292,6 +324,16 @@ final class AutoAgora_Promotion_Manager
             if ($this->repository->cancel_for_deleted_listing((int) $listing_id) === false) {
                 error_log('AutoAgora promotion cancellation failed for deleted listing ' . (int) $listing_id . '.');
             }
+        }
+    }
+
+    public function handle_deleted_seller($seller_id)
+    {
+        if (!AutoAgora_Promotion_Schema::is_current()) {
+            return;
+        }
+        if ($this->repository->anonymize_deleted_seller((int) $seller_id) === false) {
+            error_log('AutoAgora promotion seller snapshot anonymization failed for deleted user ' . (int) $seller_id . '.');
         }
     }
 

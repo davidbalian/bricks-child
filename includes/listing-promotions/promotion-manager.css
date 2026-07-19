@@ -1,0 +1,219 @@
+.autoagora-promotion-manager {
+    max-width: 1500px;
+}
+
+.autoagora-promotion-manager h1 {
+    margin-bottom: 18px;
+}
+
+.autoagora-admin-card {
+    margin: 0 0 18px;
+    padding: 18px;
+    border: 1px solid #dcdcde;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.autoagora-admin-section-heading,
+.autoagora-readiness-card {
+    flex-wrap: wrap;
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: center;
+}
+
+.autoagora-admin-section-heading {
+    margin-bottom: 16px;
+}
+
+.autoagora-admin-section-heading h2 {
+    margin: 2px 0 0;
+}
+
+.autoagora-admin-section-heading p {
+    max-width: 560px;
+    margin: 0;
+    color: #646970;
+}
+
+.autoagora-admin-eyebrow {
+    display: block;
+    color: #646970;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.autoagora-readiness-card > div:first-child {
+    display: grid;
+    gap: 5px;
+}
+
+.autoagora-readiness-state {
+    font-size: 17px;
+}
+
+.autoagora-readiness-state.is-ready {
+    color: #008a20;
+}
+
+.autoagora-readiness-state.is-blocked,
+.autoagora-readiness-metric.has-attention strong {
+    color: #b32d2e;
+}
+
+.autoagora-readiness-metric {
+    display: grid;
+    min-width: 180px;
+    text-align: right;
+}
+
+.autoagora-readiness-metric strong {
+    font-size: 25px;
+}
+
+.autoagora-readiness-card > ul {
+    flex-basis: 100%;
+    margin: 0;
+    padding-left: 20px;
+    color: #b32d2e;
+    list-style: disc;
+}
+
+.autoagora-admin-grant-form,
+.autoagora-admin-filters {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(150px, 1fr));
+    gap: 12px;
+    align-items: end;
+}
+
+.autoagora-admin-grant-form label,
+.autoagora-admin-filters label {
+    display: grid;
+    gap: 5px;
+}
+
+.autoagora-admin-grant-form label > span,
+.autoagora-admin-filters label > span {
+    font-weight: 600;
+}
+
+.autoagora-admin-grant-form input,
+.autoagora-admin-grant-form select,
+.autoagora-admin-filters input,
+.autoagora-admin-filters select {
+    width: 100%;
+}
+
+.autoagora-admin-grant-form small {
+    color: #646970;
+}
+
+.autoagora-admin-notes,
+.autoagora-admin-filters .is-wide {
+    grid-column: span 2;
+}
+
+.autoagora-admin-filter-actions {
+    display: flex;
+    gap: 7px;
+}
+
+.autoagora-admin-table-wrap {
+    overflow-x: auto;
+    margin-top: 16px;
+}
+
+.autoagora-admin-table {
+    min-width: 1100px;
+}
+
+.autoagora-admin-table td {
+    vertical-align: top;
+}
+
+.autoagora-admin-table td > strong,
+.autoagora-admin-table td > span,
+.autoagora-admin-table td > small,
+.autoagora-admin-table td > code {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.autoagora-admin-table td > small {
+    color: #646970;
+}
+
+.autoagora-admin-table code {
+    max-width: 230px;
+    overflow: hidden;
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.autoagora-admin-status {
+    display: inline-block !important;
+    width: max-content;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #f0f0f1;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.autoagora-admin-status.status-active,
+.autoagora-admin-status.status-processed {
+    background: #edfaef;
+    color: #008a20;
+}
+
+.autoagora-admin-status.status-scheduled,
+.autoagora-admin-status.status-received,
+.autoagora-admin-status.status-processing {
+    background: #e9f5ff;
+    color: #0073aa;
+}
+
+.autoagora-admin-status.status-pending {
+    background: #fff8e5;
+    color: #996800;
+}
+
+.autoagora-admin-status.status-failed,
+.autoagora-admin-status.status-refunded,
+.autoagora-admin-status.status-cancelled {
+    background: #fcf0f1;
+    color: #b32d2e;
+}
+
+.autoagora-admin-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+}
+
+.autoagora-admin-pagination > div {
+    display: flex;
+    gap: 7px;
+}
+
+@media (max-width: 1100px) {
+    .autoagora-admin-grant-form,
+    .autoagora-admin-filters {
+        grid-template-columns: repeat(2, minmax(160px, 1fr));
+    }
+
+    .autoagora-readiness-card {
+        flex-wrap: wrap;
+    }
+
+    .autoagora-readiness-metric {
+        text-align: left;
+    }
+}

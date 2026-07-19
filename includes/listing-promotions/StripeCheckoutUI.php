@@ -26,10 +26,13 @@ function autoagora_enqueue_stripe_checkout_assets()
     wp_localize_script('autoagora-stripe-checkout', 'autoAgoraStripeCheckout', array(
         'ajaxUrl' => admin_url('admin-ajax.php'),
         'action' => AutoAgora_Stripe_Gateway::CHECKOUT_AJAX_ACTION,
+        'previewAction' => AutoAgora_Stripe_Gateway::PREVIEW_AJAX_ACTION,
         'nonce' => wp_create_nonce(AutoAgora_Stripe_Gateway::CHECKOUT_NONCE_ACTION),
         'currency' => 'EUR',
         'locale' => str_replace('_', '-', get_locale()),
         'workingText' => 'Opening secure checkout...',
+        'checkingScheduleText' => 'Checking the latest promotion schedule...',
+        'scheduleChangedText' => 'The schedule changed. Review the updated dates, then continue again.',
         'genericError' => 'Checkout could not be started. Please try again.',
     ));
 }
@@ -223,6 +226,10 @@ function autoagora_render_promotion_purchase_controls($listing_id)
         $default_tier = (string) array_key_first($tier_options);
     }
     $is_test = AutoAgora_Stripe_Gateway::mode() === 'test';
+    $initial_preview = AutoAgora_Stripe_Gateway::schedule_preview($listing_id, $default_tier, 1);
+    if (is_wp_error($initial_preview)) {
+        return;
+    }
     ?>
     <details class="autoagora-promotion-purchase">
         <summary class="btn btn-primary-gradient autoagora-promotion-trigger">
@@ -233,7 +240,9 @@ function autoagora_render_promotion_purchase_controls($listing_id)
             <i class="fas fa-chevron-up autoagora-promotion-trigger-chevron" aria-hidden="true"></i>
         </summary>
 
-        <div class="autoagora-promotion-purchase-panel" data-currency="EUR">
+        <div class="autoagora-promotion-purchase-panel"
+             data-currency="EUR"
+             data-preview-signature="<?php echo esc_attr($initial_preview['signature']); ?>">
             <?php if ($is_test) : ?>
                 <strong class="autoagora-stripe-test-label">Stripe sandbox test</strong>
             <?php endif; ?>
@@ -292,6 +301,14 @@ function autoagora_render_promotion_purchase_controls($listing_id)
                 <strong class="autoagora-promotion-total-amount">
                     &euro;<?php echo esc_html(number_format_i18n($tier_options[$default_tier]['daily_amount_minor'] / 100, 2)); ?>
                 </strong>
+            </div>
+
+            <div class="autoagora-promotion-queue-preview<?php echo $initial_preview['queued'] ? ' is-queued' : ' is-immediate'; ?>" aria-live="polite">
+                <span class="autoagora-promotion-queue-icon" aria-hidden="true"><i class="fas fa-calendar-check"></i></span>
+                <span>
+                    <strong class="autoagora-promotion-preview-headline"><?php echo esc_html($initial_preview['headline']); ?></strong>
+                    <small class="autoagora-promotion-preview-detail"><?php echo esc_html($initial_preview['detail']); ?></small>
+                </span>
             </div>
 
             <button type="button"

@@ -484,6 +484,55 @@
     font-size: 1.2rem;
 }
 
+.autoagora-promotion-queue-preview {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.65rem;
+    align-items: center;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid #bfdbfe;
+    border-radius: 0.75rem;
+    background: #eff6ff;
+    color: #1e3a5f;
+}
+
+.autoagora-promotion-queue-preview.is-queued {
+    border-color: #fde68a;
+    background: #fffbeb;
+    color: #713f12;
+}
+
+.autoagora-promotion-queue-preview.is-error {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.autoagora-promotion-queue-icon {
+    display: grid;
+    width: 2rem;
+    height: 2rem;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.autoagora-promotion-queue-preview > span:last-child {
+    display: grid;
+    gap: 0.12rem;
+}
+
+.autoagora-promotion-queue-preview strong {
+    font-size: 0.75rem;
+}
+
+.autoagora-promotion-queue-preview small {
+    color: inherit;
+    font-size: 0.65rem;
+    line-height: 1.4;
+    opacity: 0.82;
+}
+
 .autoagora-promotion-purchase .autoagora-buy-promotion {
     width: 100%;
     min-height: 2.8rem;

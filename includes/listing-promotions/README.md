@@ -22,12 +22,14 @@ Schema `1.2.0` also stores the amount, currency, refunded amount, and Stripe
 Checkout Session ID on each paid promotion. These are immutable purchase
 snapshots; later pricing changes do not rewrite historical payments.
 
-Schema `1.3.0` adds immutable listing-title and seller-ID snapshots. Existing
+Schema `1.3.0` adds listing-title and seller-ID audit snapshots. Existing
 rows are backfilled while their car posts still exist, and missing values are
 captured again immediately before permanent deletion. Deleting a car cancels
 only its unfinished active/scheduled promotions; all promotion and payment
 records remain as audit history and can be identified as a deleted listing by
-the central admin manager.
+the central admin manager. Permanently deleting a WordPress user anonymizes the
+seller snapshot to `0`; no seller name, email address, or phone number is stored
+in the promotion table.
 
 Stripe webhook receipts are stored separately in
 `{$wpdb->prefix}autoagora_payment_events`. This small table records event IDs,
@@ -139,6 +141,15 @@ ID, tier, and one of the allowed day values. The server controls the daily
 price and total amount, validates ownership and active listing state, then
 redirects to `checkout.stripe.com`.
 
+The purchase panel obtains an authoritative schedule preview from the server.
+With an empty queue it says the promotion starts after Stripe confirms payment.
+With an existing queue it shows the expected site-time start and end. Checkout
+rechecks the preview immediately before redirecting; if another grant changed
+the queue, the seller must review the updated dates and click again. Checkout
+metadata and the compact payment log retain the expected window for diagnosis,
+but the webhook always calculates the final window under the listing lock so an
+abandoned Checkout Session never reserves promotion time.
+
 Each My Listings card shows the current promotion, a live remaining-time
 countdown, the exact end time in the WordPress site timezone, and the number of
 queued promotions. Opening **Manage promotion** shows every active/scheduled
@@ -181,8 +192,28 @@ After an authenticated refund event, call
 `autoagora_refund_paid_listing_promotion($provider, $reference)` to remove the
 effective promotion and preserve the row with `refunded` status.
 
+Checkout can only be opened for a published, active listing owned by the
+seller. If that listing becomes sold, expired, or unpublished after Checkout
+opens but before the authenticated paid webhook arrives, the paid promotion is
+still recorded and its wall-clock schedule continues as agreed. A listing that
+is permanently deleted or transferred before fulfillment is rejected and the
+payment event remains visible to administrators for manual investigation.
+
+## Central administrator manager
+
+Administrators can open **Cars > Promotions** to search and filter every
+promotion by listing, seller, record/payment reference, tier, status, source,
+and created/start/end date. The screen supports manual grants/extensions and
+secure POST-based cancellation, displays deleted listing snapshots and
+anonymized sellers, and shows paid/refunded amounts plus Stripe references.
+The payment-event section exposes receipt status, attempts, errors, and direct
+Stripe Dashboard event links so delayed, pending, or failed webhooks are easy
+to identify. Queue-only lifecycle rules intentionally provide no pause/resume
+actions.
+
 Live mode is deliberately locked. Going live requires explicit production
-amounts/durations, live keys, a separate live webhook signing secret, and:
+daily price constants, HTTPS, live keys, a separate live webhook signing
+secret, and:
 
 ```php
 define('AUTOAGORA_STRIPE_MODE', 'live');
@@ -190,6 +221,8 @@ define('AUTOAGORA_STRIPE_LIVE_ENABLED', true);
 ```
 
 Do not enable that flag until the sandbox checklist passes.
+
+The detailed action/result QA matrix is in `QA_CHECKLIST.md` in this directory.
 
 ### Sandbox checklist
 

@@ -204,7 +204,7 @@ final class AutoAgora_Promotion_Admin
             echo '<td>' . esc_html($payment_reference) . '</td>';
             echo '<td>';
             if (in_array($record->status, array(AutoAgora_Promotion_Manager::STATUS_ACTIVE, AutoAgora_Promotion_Manager::STATUS_SCHEDULED), true)) {
-                echo '<a class="button button-small" href="' . esc_url($cancel_url) . '" onclick="return confirm(\'Cancel this promotion?\')">Cancel</a>';
+                echo '<a class="button button-small" href="' . esc_url($cancel_url) . '" onclick="return confirm(\'Cancel this promotion? This does not issue a Stripe refund.\')">Cancel</a>';
             } else {
                 echo '&mdash;';
             }

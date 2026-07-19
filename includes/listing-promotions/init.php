@@ -66,6 +66,13 @@ add_action('before_delete_post', static function ($post_id) {
     }
 }, 10);
 
+add_action('deleted_user', static function ($user_id) {
+    autoagora_promotion_manager()->handle_deleted_seller((int) $user_id);
+}, 10, 1);
+add_action('wpmu_delete_user', static function ($user_id) {
+    autoagora_promotion_manager()->handle_deleted_seller((int) $user_id);
+}, 10, 1);
+
 /**
  * Entry point for a payment provider after its webhook signature and payment
  * status have been verified. Payment provider/reference make it idempotent.
@@ -120,4 +127,5 @@ function autoagora_listing_promotion_label($tier)
 
 if (is_admin()) {
     require_once __DIR__ . '/PromotionAdmin.php';
+    require_once __DIR__ . '/PromotionAdminPage.php';
 }

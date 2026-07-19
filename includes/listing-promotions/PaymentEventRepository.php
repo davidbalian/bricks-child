@@ -85,6 +85,38 @@ final class AutoAgora_Payment_Event_Repository
         return $wpdb->last_error === '' ? $rows : new WP_Error('payment_event_query_failed', 'Pending refund receipts could not be loaded.');
     }
 
+    public function admin_search(array $filters, $limit = 25, $offset = 0)
+    {
+        global $wpdb;
+        $args = array();
+        $where = $this->admin_where($filters, $args);
+        $args[] = max(1, min(100, (int) $limit));
+        $args[] = max(0, (int) $offset);
+        $sql = "SELECT * FROM " . AutoAgora_Promotion_Schema::payment_events_table_name() . "
+                WHERE {$where}
+                ORDER BY created_at DESC, id DESC
+                LIMIT %d OFFSET %d";
+        return $wpdb->get_results($wpdb->prepare($sql, $args));
+    }
+
+    public function admin_count(array $filters)
+    {
+        global $wpdb;
+        $args = array();
+        $where = $this->admin_where($filters, $args);
+        $sql = 'SELECT COUNT(*) FROM ' . AutoAgora_Promotion_Schema::payment_events_table_name() . " WHERE {$where}";
+        return (int) $wpdb->get_var($args ? $wpdb->prepare($sql, $args) : $sql);
+    }
+
+    public function admin_attention_count()
+    {
+        global $wpdb;
+        return (int) $wpdb->get_var(
+            "SELECT COUNT(*) FROM " . AutoAgora_Promotion_Schema::payment_events_table_name() . "
+             WHERE status IN ('received','processing','pending','failed')"
+        );
+    }
+
     public function mark_processing($id)
     {
         global $wpdb;
@@ -132,5 +164,29 @@ final class AutoAgora_Payment_Event_Repository
     {
         $value = sanitize_text_field((string) $value);
         return function_exists('mb_substr') ? mb_substr($value, 0, $limit) : substr($value, 0, $limit);
+    }
+
+    private function admin_where(array $filters, array &$args)
+    {
+        global $wpdb;
+        $where = array('1=1');
+        if (!empty($filters['status'])) {
+            $where[] = 'status = %s';
+            $args[] = $filters['status'];
+        }
+        if (!empty($filters['search'])) {
+            $like = '%' . $wpdb->esc_like((string) $filters['search']) . '%';
+            $where[] = '(event_id LIKE %s OR event_type LIKE %s OR object_reference LIKE %s OR error_code LIKE %s)';
+            $args = array_merge($args, array($like, $like, $like, $like));
+        }
+        if (!empty($filters['date_from_gmt'])) {
+            $where[] = 'created_at >= %s';
+            $args[] = $filters['date_from_gmt'];
+        }
+        if (!empty($filters['date_to_gmt'])) {
+            $where[] = 'created_at < %s';
+            $args[] = $filters['date_to_gmt'];
+        }
+        return implode(' AND ', $where);
     }
 }
