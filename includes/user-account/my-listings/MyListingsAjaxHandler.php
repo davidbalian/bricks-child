@@ -377,7 +377,7 @@ class MyListingsAjaxHandler {
                 }
                 ?>
                 <div class="listing-actions">
-                    <a href="<?php echo esc_url(add_query_arg('car_id', $post_id, home_url('/edit-listing/'))); ?>" class="btn btn-primary">
+                    <a href="<?php echo esc_url(add_query_arg('car_id', $post_id, home_url('/edit-listing/'))); ?>" class="btn btn-primary my-listing-edit-button">
                         <i class="fas fa-pencil-alt"></i> Edit
                     </a>
                     <?php

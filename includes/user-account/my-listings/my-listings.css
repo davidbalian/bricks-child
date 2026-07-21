@@ -255,6 +255,20 @@
   opacity: 0.8;
 }
 
+.listing-actions .my-listing-edit-button {
+  border-color: #123d6a;
+  background: #123d6a;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(18, 61, 106, 0.18);
+}
+
+.listing-actions .my-listing-edit-button:hover,
+.listing-actions .my-listing-edit-button:focus-visible {
+  border-color: #0b2e52;
+  background: #0b2e52;
+  color: #fff;
+}
+
 .delete-button {
   margin-left: auto !important;
 }

@@ -59,6 +59,22 @@
         refreshPreview(panel, config);
     }
 
+    function scrollCheckoutIntoView(panel) {
+        if (!panel || typeof panel.scrollTo !== 'function') {
+            return;
+        }
+
+        var reduceMotion = window.matchMedia
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        window.requestAnimationFrame(function () {
+            panel.scrollTo({
+                top: panel.scrollHeight,
+                behavior: reduceMotion ? 'auto' : 'smooth'
+            });
+        });
+    }
+
     function selection(panel) {
         var tier = selected(panel, '.autoagora-promotion-tier-option');
         var duration = selected(panel, '.autoagora-promotion-day-option');
@@ -272,12 +288,14 @@
 
             var dayOption = event.target.closest('.autoagora-promotion-day-option');
             if (dayOption && !dayOption.disabled) {
+                var durationPanel = dayOption.closest('.autoagora-promotion-purchase-panel');
                 selectOption(
-                    dayOption.closest('.autoagora-promotion-purchase-panel'),
+                    durationPanel,
                     dayOption,
                     '.autoagora-promotion-day-option',
                     config
                 );
+                scrollCheckoutIntoView(durationPanel);
                 return;
             }
 

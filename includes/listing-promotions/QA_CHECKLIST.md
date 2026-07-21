@@ -23,6 +23,7 @@ test below passes.
 | Select Showcase and each duration: 1, 3, 5, 7 days. | The amount equals Showcase daily price multiplied by the selected days; no browser-supplied price is trusted by the server. |
 | Open Promote on a listing with an active or scheduled promotion. | The panel shows an expected start after the latest queued end and an expected end exactly the selected duration later. |
 | Change tier or duration. | The preview refreshes from the server and the dates/label reflect the new selection. |
+| Select a duration in a scrollable promotion panel. | The panel smoothly scrolls to reveal the total, schedule preview, and secure-checkout button without scrolling the underlying page; reduced-motion preferences are respected. |
 | Cause the queue to change in another tab, then continue. | Checkout does not immediately redirect; the UI shows the updated schedule and asks the seller to review and click again. |
 | Attempt Checkout for another seller's listing by changing the request. | The request is rejected and no Stripe Checkout Session or promotion row is created. |
 | Attempt Checkout for a sold, expired, draft, or deleted listing. | The request is rejected before payment and no Checkout Session is created. |
