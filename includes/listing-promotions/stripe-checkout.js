@@ -56,7 +56,9 @@
             status.classList.remove('is-error');
         }
         updateSummary(panel, config);
-        refreshPreview(panel, config);
+        if (selection(panel)) {
+            refreshPreview(panel, config);
+        }
     }
 
     function scrollCheckoutIntoView(panel) {
@@ -131,7 +133,7 @@
         }
         var headline = box.querySelector('.autoagora-promotion-preview-headline');
         var detail = box.querySelector('.autoagora-promotion-preview-detail');
-        box.classList.remove('is-error', 'is-queued', 'is-immediate', 'is-awaiting');
+        box.classList.remove('is-error', 'is-queued', 'is-immediate', 'is-awaiting', 'is-unselected');
         box.classList.add(preview.awaiting_approval ? 'is-awaiting' : (preview.queued ? 'is-queued' : 'is-immediate'));
         if (headline) {
             headline.textContent = preview.headline;
@@ -149,7 +151,7 @@
         }
         var headline = box.querySelector('.autoagora-promotion-preview-headline');
         var detail = box.querySelector('.autoagora-promotion-preview-detail');
-        box.classList.remove('is-queued', 'is-immediate', 'is-awaiting');
+        box.classList.remove('is-queued', 'is-immediate', 'is-awaiting', 'is-unselected');
         box.classList.add('is-error');
         if (headline) {
             headline.textContent = 'Schedule unavailable';
@@ -162,6 +164,10 @@
 
     function refreshPreview(panel, config) {
         var box = panel.querySelector('.autoagora-promotion-queue-preview');
+        var checkoutButton = panel.querySelector('.autoagora-buy-promotion');
+        if (checkoutButton) {
+            checkoutButton.disabled = true;
+        }
         if (box) {
             var headline = box.querySelector('.autoagora-promotion-preview-headline');
             if (headline) {
@@ -171,10 +177,16 @@
         previewRequest(panel, config)
             .then(function (preview) {
                 updatePreview(panel, preview);
+                if (checkoutButton) {
+                    checkoutButton.disabled = false;
+                }
             })
             .catch(function (error) {
                 if (error.message !== 'The promotion selection changed.') {
                     previewError(panel, error.message || config.genericError);
+                    if (checkoutButton) {
+                        checkoutButton.disabled = true;
+                    }
                 }
             });
     }

@@ -546,6 +546,12 @@
     color: #78350f;
 }
 
+.autoagora-promotion-queue-preview.is-unselected {
+    border-color: #dbe3ec;
+    background: #f8fafc;
+    color: #526277;
+}
+
 .autoagora-submission-promotion {
     box-sizing: border-box;
     position: relative;

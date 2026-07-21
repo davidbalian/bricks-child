@@ -266,7 +266,7 @@ function autoagora_render_promotion_purchase_controls($listing_id)
 
         <div class="autoagora-promotion-purchase-panel"
              data-currency="EUR"
-             data-preview-signature="<?php echo esc_attr($initial_preview['signature']); ?>">
+             data-preview-signature="">
             <div class="autoagora-promotion-panel-toolbar">
                 <?php if ($is_test) : ?>
                     <strong class="autoagora-stripe-test-label">Stripe sandbox test</strong>
@@ -309,15 +309,15 @@ function autoagora_render_promotion_purchase_controls($listing_id)
             </div>
 
             <div class="autoagora-promotion-duration-heading">
-                <strong>Duration</strong>
+                <strong>Select duration</strong>
                 <span>Each day is 24 hours</span>
             </div>
             <div class="autoagora-promotion-day-options" role="group" aria-label="Promotion duration">
                 <?php foreach (AutoAgora_Stripe_Gateway::allowed_days() as $days) : ?>
                     <button type="button"
-                            class="autoagora-promotion-day-option<?php echo $days === 1 ? ' is-selected' : ''; ?>"
+                            class="autoagora-promotion-day-option"
                             data-days="<?php echo esc_attr($days); ?>"
-                            aria-pressed="<?php echo $days === 1 ? 'true' : 'false'; ?>">
+                            aria-pressed="false">
                         <strong><?php echo esc_html($days); ?></strong>
                         <span><?php echo esc_html(_n('day', 'days', $days, 'bricks-child')); ?></span>
                     </button>
@@ -327,24 +327,23 @@ function autoagora_render_promotion_purchase_controls($listing_id)
             <div class="autoagora-promotion-total">
                 <span>
                     <small>Total</small>
-                    <strong class="autoagora-promotion-total-label"><?php echo esc_html($tier_options[$default_tier]['label']); ?> for 1 day</strong>
+                    <strong class="autoagora-promotion-total-label">Select a duration</strong>
                 </span>
-                <strong class="autoagora-promotion-total-amount">
-                    &euro;<?php echo esc_html(number_format_i18n($tier_options[$default_tier]['daily_amount_minor'] / 100, 2)); ?>
-                </strong>
+                <strong class="autoagora-promotion-total-amount">&mdash;</strong>
             </div>
 
-            <div class="autoagora-promotion-queue-preview<?php echo !empty($initial_preview['awaiting_approval']) ? ' is-awaiting' : ($initial_preview['queued'] ? ' is-queued' : ' is-immediate'); ?>" aria-live="polite">
+            <div class="autoagora-promotion-queue-preview is-unselected" aria-live="polite">
                 <span class="autoagora-promotion-queue-icon" aria-hidden="true"><i class="fas fa-calendar-check"></i></span>
                 <span>
-                    <strong class="autoagora-promotion-preview-headline"><?php echo esc_html($initial_preview['headline']); ?></strong>
-                    <small class="autoagora-promotion-preview-detail"><?php echo esc_html($initial_preview['detail']); ?></small>
+                    <strong class="autoagora-promotion-preview-headline">Select a duration to continue</strong>
+                    <small class="autoagora-promotion-preview-detail">Your total and expected schedule will appear here.</small>
                 </span>
             </div>
 
             <button type="button"
                     class="btn btn-primary-gradient autoagora-buy-promotion"
-                    data-listing-id="<?php echo esc_attr($listing_id); ?>">
+                    data-listing-id="<?php echo esc_attr($listing_id); ?>"
+                    disabled>
                 <i class="fas fa-lock" aria-hidden="true"></i>
                 <span>Continue to secure checkout</span>
             </button>
