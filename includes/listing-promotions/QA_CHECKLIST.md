@@ -32,6 +32,7 @@ test below passes.
 | Action | Expected result |
 |---|---|
 | Submit a new car and inspect the success page. | A non-blocking promotion card offers Lift and Showcase for that exact owned listing and states that paid time begins only after approval. |
+| Open the success-page promotion options at 320px and 390px viewport widths. | A centered bottom sheet stays fully inside the viewport and above the fixed mobile navigation; the background cannot scroll, tier choices are readable full-width rows, the sheet scrolls internally, and tapping the backdrop, close button, or Escape closes it. |
 | Complete Checkout while the new listing is still pending. | One paid row is created with status `awaiting_approval`, full `duration_seconds`, and null `starts_at`/`ends_at`; no marketplace badge appears. |
 | Purchase multiple promotions before approval. | Every payment creates one waiting row and the seller timeline shows them waiting in purchase order. |
 | Approve and publish the listing for the first time. | The first waiting promotion becomes active at approval time; additional waiting promotions become sequentially scheduled with their full durations. |

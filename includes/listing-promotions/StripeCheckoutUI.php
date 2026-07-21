@@ -258,16 +258,23 @@ function autoagora_render_promotion_purchase_controls($listing_id)
             <span class="autoagora-promotion-trigger-icon" aria-hidden="true">
                 <i class="fas fa-bolt"></i>
             </span>
-            <span><?php echo esc_html($schedule ? 'Manage promotion' : ($initial_approval_pending ? 'Promote after approval' : 'Promote listing')); ?></span>
+            <span><?php echo esc_html($schedule ? 'Manage promotion' : ($initial_approval_pending ? 'See promotion options' : 'Promote listing')); ?></span>
             <i class="fas fa-chevron-up autoagora-promotion-trigger-chevron" aria-hidden="true"></i>
         </summary>
+
+        <span class="autoagora-promotion-backdrop" aria-hidden="true"></span>
 
         <div class="autoagora-promotion-purchase-panel"
              data-currency="EUR"
              data-preview-signature="<?php echo esc_attr($initial_preview['signature']); ?>">
-            <?php if ($is_test) : ?>
-                <strong class="autoagora-stripe-test-label">Stripe sandbox test</strong>
-            <?php endif; ?>
+            <div class="autoagora-promotion-panel-toolbar">
+                <?php if ($is_test) : ?>
+                    <strong class="autoagora-stripe-test-label">Stripe sandbox test</strong>
+                <?php endif; ?>
+                <button type="button" class="autoagora-promotion-panel-close" aria-label="Close promotion options">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
 
             <?php autoagora_render_seller_promotion_timeline($schedule); ?>
 

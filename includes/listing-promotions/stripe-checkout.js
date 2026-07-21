@@ -213,6 +213,11 @@
         container.querySelectorAll('.autoagora-promotion-purchase-panel').forEach(function (panel) {
             updateSummary(panel, config);
         });
+        container.querySelectorAll('.autoagora-submission-promotion .autoagora-promotion-purchase').forEach(function (purchase) {
+            purchase.addEventListener('toggle', function () {
+                document.body.classList.toggle('autoagora-promotion-sheet-open', purchase.open);
+            });
+        });
         updatePromotionCountdowns(container);
         window.setInterval(function () {
             updatePromotionCountdowns(container);
@@ -241,6 +246,19 @@
         });
 
         container.addEventListener('click', function (event) {
+            var dismissControl = event.target.closest('.autoagora-promotion-panel-close, .autoagora-promotion-backdrop');
+            if (dismissControl) {
+                var purchase = dismissControl.closest('.autoagora-promotion-purchase');
+                if (purchase) {
+                    purchase.removeAttribute('open');
+                    var purchaseTrigger = purchase.querySelector('.autoagora-promotion-trigger');
+                    if (purchaseTrigger && dismissControl.classList.contains('autoagora-promotion-panel-close')) {
+                        purchaseTrigger.focus();
+                    }
+                }
+                return;
+            }
+
             var tierOption = event.target.closest('.autoagora-promotion-tier-option');
             if (tierOption && !tierOption.disabled) {
                 selectOption(

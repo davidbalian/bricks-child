@@ -128,14 +128,19 @@ get_header(); ?>
                 <div class="listing-success-message">
                     <h2><?php esc_html_e( 'Your listing has been submitted successfully!', 'bricks-child' ); ?></h2>
                     <p><?php esc_html_e( 'Thank you for submitting your car listing. It will be reviewed by our team and published soon.', 'bricks-child' ); ?></p>
-                    <p><?php esc_html_e( 'To receive email notifications about views and clicks on your listing,', 'bricks-child' ); ?><br><?php esc_html_e( 'verify your email from your account page if you haven\'t already.', 'bricks-child' ); ?></p>
                     <?php if ($can_promote_submitted_listing) : ?>
                         <section class="autoagora-submission-promotion" data-autoagora-promotion-container>
-                            <h3><?php esc_html_e('Launch with more visibility', 'bricks-child'); ?></h3>
-                            <p><?php esc_html_e('Choose AutoAgora Lift or Showcase now. Your full paid duration starts only after this listing is approved and published.', 'bricks-child'); ?></p>
+                            <div class="autoagora-submission-promotion-intro">
+                                <span class="autoagora-submission-promotion-icon" aria-hidden="true"><i class="fas fa-chart-line"></i></span>
+                                <span class="autoagora-submission-promotion-copy">
+                                    <h3><?php esc_html_e('Give your listing a stronger start', 'bricks-child'); ?></h3>
+                                    <p><?php esc_html_e('Choose Lift or Showcase now. It activates after approval, so none of your paid time is used while you wait.', 'bricks-child'); ?></p>
+                                </span>
+                            </div>
                             <?php autoagora_render_promotion_purchase_controls($submitted_listing_id); ?>
                         </section>
                     <?php endif; ?>
+                    <p class="listing-success-email-note"><?php esc_html_e( 'To receive email notifications about views and clicks on your listing,', 'bricks-child' ); ?><br><?php esc_html_e( 'verify your email from your account page if you haven\'t already.', 'bricks-child' ); ?></p>
                     <div class="listing-success-buttons">
                         <a href="<?php echo esc_url( home_url( '/my-listings/' ) ); ?>" class="btn btn-primary"><?php esc_html_e( 'My Listings', 'bricks-child' ); ?></a>
                         <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="btn btn-primary"><?php esc_html_e( 'Return to Home', 'bricks-child' ); ?></a>
