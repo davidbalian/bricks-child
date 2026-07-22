@@ -87,7 +87,8 @@ if (!defined('ABSPATH')) {
                                         <label><?php echo get_svg_icon('calendar'); ?> <?php esc_html_e('Year', 'bricks-child'); ?></label>
                                         <?php
                                         $year_options = array();
-                                        for ($y = 2025; $y >= 1948; $y--) {
+                                        $current_vehicle_year = (int) wp_date('Y', null, wp_timezone());
+                                        for ($y = $current_vehicle_year; $y >= 1948; $y--) {
                                             $year_options[] = array('value' => $y, 'label' => $y);
                                         }
                                         car_filter_render_dropdown(array(
@@ -580,4 +581,4 @@ if (!defined('ABSPATH')) {
             </form>
         </div>
     </div>
-</div> 
+</div>

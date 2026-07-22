@@ -228,9 +228,13 @@ function validate_numeric_range_field($field_name, $value) {
     // Validate ranges
     switch ($field_name) {
         case 'year':
-            // Year range: 1948 to 2025
-            if ($numeric_value < 1948 || $numeric_value > 2025) {
-                return sprintf(__('Year must be between 1948 and 2025. Got: %s', 'bricks-child'), esc_html($value));
+            $current_vehicle_year = (int) wp_date('Y', null, wp_timezone());
+            if ($numeric_value < 1948 || $numeric_value > $current_vehicle_year) {
+                return sprintf(
+                    __('Year must be between 1948 and %1$d. Got: %2$s', 'bricks-child'),
+                    $current_vehicle_year,
+                    esc_html($value)
+                );
             }
             break;
             

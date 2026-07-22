@@ -302,7 +302,8 @@ get_header(); ?>
                                         <label><?php echo get_svg_icon('calendar'); ?> <?php esc_html_e( 'Year', 'bricks-child' ); ?><span class="required">*</span></label>
                                         <?php
                                         $year_options = array();
-                                        for ($year = 2025; $year >= 1948; $year--) {
+                                        $current_vehicle_year = (int) wp_date('Y', null, wp_timezone());
+                                        for ($year = $current_vehicle_year; $year >= 1948; $year--) {
                                             $year_options[] = array('value' => $year, 'label' => $year);
                                         }
                                         car_filter_render_dropdown(array(

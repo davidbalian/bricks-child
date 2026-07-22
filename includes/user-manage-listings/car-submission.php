@@ -71,7 +71,8 @@ function handle_add_car_listing() {
     // Check for required fields
     $missing_fields = array();
     foreach ($required_fields as $field_key => $field_label) {
-        if (!isset($_POST[$field_key]) || empty(trim($_POST[$field_key]))) {
+        $submitted_value = isset($_POST[$field_key]) ? trim((string) wp_unslash($_POST[$field_key])) : '';
+        if ($submitted_value === '' || ($submitted_value === '0' && $field_key !== 'mileage')) {
             $missing_fields[] = $field_key;
         }
     }
@@ -196,7 +197,8 @@ function handle_add_car_listing() {
     $model = sanitize_text_field($_POST['model']);
     // variant field removed
     $year = intval($_POST['year']);
-    $mileage = intval($_POST['mileage']);
+    $mileage_input = str_replace(',', '', trim((string) wp_unslash($_POST['mileage'])));
+    $mileage = intval($mileage_input);
     $price = intval($_POST['price']);
     
     $engine_capacity = sanitize_text_field($_POST['engine_capacity']);
@@ -247,7 +249,7 @@ function handle_add_car_listing() {
         'engine_capacity' => $engine_capacity,
         'number_of_doors' => $number_of_doors,
         'number_of_seats' => $number_of_seats,
-        'mileage' => $mileage,
+        'mileage' => $mileage_input,
         'price' => $price,
         'hp' => $hp,
         'numowners' => $numowners,

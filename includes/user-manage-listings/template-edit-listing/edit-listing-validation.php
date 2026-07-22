@@ -38,7 +38,8 @@ function validate_edit_listing_form($data, $car_id) {
     // Check for required editable fields
     $missing_fields = array();
     foreach ($editable_fields as $field_key => $field_label) {
-        if (!isset($data[$field_key]) || empty(trim($data[$field_key]))) {
+        $submitted_value = isset($data[$field_key]) ? trim((string) $data[$field_key]) : '';
+        if ($submitted_value === '' || ($submitted_value === '0' && $field_key !== 'mileage')) {
             $missing_fields[] = $field_key;
         }
     }
@@ -150,4 +151,4 @@ function validate_image_requirements($existing_images, $removed_images, $new_ima
         'valid' => true,
         'message' => ''
     );
-} 
+}

@@ -69,12 +69,16 @@ function handle_add_buyer_request() {
     $price = intval(str_replace(',', '', $_POST['buyer_price']));
     $description = isset($_POST['buyer_description']) ? wp_kses_post($_POST['buyer_description']) : '';
     
-    // Validate year range (matching car-submission.php: 1948 to 2025)
-    if ($year < 1948 || $year > 2025) {
+    $current_vehicle_year = (int) wp_date('Y', null, wp_timezone());
+    if ($year < 1948 || $year > $current_vehicle_year) {
         $redirect_url = add_query_arg(
             array(
                 'error' => 'validation',
-                'message' => urlencode(sprintf(__('Year must be between 1948 and 2025. Got: %s', 'bricks-child'), $year))
+                'message' => urlencode(sprintf(
+                    __('Year must be between 1948 and %1$d. Got: %2$s', 'bricks-child'),
+                    $current_vehicle_year,
+                    $year
+                ))
             ),
             wp_get_referer()
         );
