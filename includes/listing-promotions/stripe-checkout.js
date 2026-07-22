@@ -231,6 +231,13 @@
         });
     }
 
+    function syncModalState(container) {
+        document.body.classList.toggle(
+            'autoagora-promotion-modal-open',
+            Boolean(container.querySelector('.autoagora-promotion-purchase[open]'))
+        );
+    }
+
     function init() {
         var config = window.autoAgoraStripeCheckout;
         var container = document.querySelector('[data-autoagora-promotion-container], .my-listings-container');
@@ -241,11 +248,22 @@
         container.querySelectorAll('.autoagora-promotion-purchase-panel').forEach(function (panel) {
             updateSummary(panel, config);
         });
-        container.querySelectorAll('.autoagora-submission-promotion .autoagora-promotion-purchase').forEach(function (purchase) {
-            purchase.addEventListener('toggle', function () {
-                document.body.classList.toggle('autoagora-promotion-sheet-open', purchase.open);
+        container.addEventListener('toggle', function (event) {
+            var purchase = event.target.closest('.autoagora-promotion-purchase');
+            if (!purchase || !container.contains(purchase)) {
+                return;
+            }
+
+            window.requestAnimationFrame(function () {
+                syncModalState(container);
+                if (purchase.open) {
+                    var closeButton = purchase.querySelector('.autoagora-promotion-panel-close');
+                    if (closeButton) {
+                        closeButton.focus({preventScroll: true});
+                    }
+                }
             });
-        });
+        }, true);
         updatePromotionCountdowns(container);
         window.setInterval(function () {
             updatePromotionCountdowns(container);
@@ -280,7 +298,7 @@
                 if (purchase) {
                     purchase.removeAttribute('open');
                     var purchaseTrigger = purchase.querySelector('.autoagora-promotion-trigger');
-                    if (purchaseTrigger && dismissControl.classList.contains('autoagora-promotion-panel-close')) {
+                    if (purchaseTrigger) {
                         purchaseTrigger.focus();
                     }
                 }

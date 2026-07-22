@@ -20,6 +20,7 @@ test below passes.
 |---|---|
 | Open Promote on an active listing with no queue. | The panel says the promotion starts after Stripe confirms payment. |
 | Open a promotion panel without making a duration choice. | No day is preselected; the heading says **Select duration**, the total/schedule remain placeholders, and checkout stays disabled. |
+| Open promotion options from the submission success page and My Listings on desktop. | Every entry point opens the same centered modal over a full-page backdrop; the card layout is not expanded or displaced, background scrolling is locked, and close, backdrop click, outside click, and Escape dismiss it. |
 | Select Lift and each duration: 1, 3, 5, 7 days. | The amount equals Lift daily price multiplied by the selected days; the duration label updates; the preview remains immediate. |
 | Select Showcase and each duration: 1, 3, 5, 7 days. | The amount equals Showcase daily price multiplied by the selected days; no browser-supplied price is trusted by the server. |
 | Open Promote on a listing with an active or scheduled promotion. | The panel shows an expected start after the latest queued end and an expected end exactly the selected duration later. |

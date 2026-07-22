@@ -252,6 +252,7 @@ function autoagora_render_promotion_purchase_controls($listing_id)
     if (is_wp_error($initial_preview)) {
         return;
     }
+    $dialog_title_id = 'autoagora-promotion-dialog-title-' . $listing_id;
     ?>
     <details class="autoagora-promotion-purchase">
         <summary class="btn btn-primary-gradient autoagora-promotion-trigger">
@@ -265,6 +266,9 @@ function autoagora_render_promotion_purchase_controls($listing_id)
         <span class="autoagora-promotion-backdrop" aria-hidden="true"></span>
 
         <div class="autoagora-promotion-purchase-panel"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="<?php echo esc_attr($dialog_title_id); ?>"
              data-currency="EUR"
              data-preview-signature="">
             <div class="autoagora-promotion-panel-toolbar">
@@ -279,7 +283,7 @@ function autoagora_render_promotion_purchase_controls($listing_id)
             <?php autoagora_render_seller_promotion_timeline($schedule); ?>
 
             <div class="autoagora-promotion-panel-heading">
-                <strong><?php echo $initial_approval_pending ? ($schedule ? 'Add another launch promotion' : 'Choose your launch promotion') : ($schedule ? 'Add another promotion' : 'Choose your promotion'); ?></strong>
+                <strong id="<?php echo esc_attr($dialog_title_id); ?>"><?php echo $initial_approval_pending ? ($schedule ? 'Add another launch promotion' : 'Choose your launch promotion') : ($schedule ? 'Add another promotion' : 'Choose your promotion'); ?></strong>
                 <span>
                     <?php echo $initial_approval_pending
                         ? 'Pay now and the full duration will start automatically when this listing is first approved and published.'

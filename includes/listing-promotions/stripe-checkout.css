@@ -191,12 +191,15 @@
 
 .autoagora-promotion-purchase-panel {
     box-sizing: border-box;
-    position: absolute;
-    left: 0;
-    bottom: calc(100% + 0.5rem);
-    z-index: 30;
-    width: min(410px, 92vw);
-    max-height: min(640px, calc(100vh - 2rem));
+    position: fixed;
+    z-index: 100001;
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    width: min(440px, calc(100vw - 2rem));
+    max-height: min(720px, calc(100vh - 2rem));
+    max-height: min(720px, calc(100dvh - 2rem));
     display: grid;
     gap: 0.8rem;
     overflow-y: auto;
@@ -204,11 +207,30 @@
     border: 1px solid #d7dce3;
     border-radius: 1rem;
     background: #fff;
-    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.18);
+    color: #17233b;
+    text-align: left;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.32);
 }
 
 .autoagora-promotion-backdrop {
-    display: none;
+    position: fixed;
+    z-index: 100000;
+    inset: 0;
+    display: block;
+    visibility: hidden;
+    background: rgba(15, 23, 42, 0.56);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 160ms ease, visibility 160ms ease;
+}
+
+.autoagora-promotion-purchase[open] > .autoagora-promotion-backdrop {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .autoagora-promotion-panel-toolbar {
@@ -609,14 +631,6 @@
     position: static;
 }
 
-.autoagora-submission-promotion .autoagora-promotion-purchase-panel {
-    top: calc(100% + 0.5rem);
-    bottom: auto;
-    left: 50%;
-    text-align: left;
-    transform: translateX(-50%);
-}
-
 .autoagora-promotion-queue-preview.is-error {
     border-color: #fecaca;
     background: #fef2f2;
@@ -693,6 +707,10 @@
     line-height: 1.5;
 }
 
+body.autoagora-promotion-modal-open {
+    overflow: hidden;
+}
+
 @media (max-width: 599.98px) {
     .autoagora-promotion-purchase {
         width: 100%;
@@ -703,10 +721,19 @@
     }
 
     .autoagora-promotion-purchase-panel {
-        position: static;
-        width: 100%;
-        max-height: none;
-        margin-top: 0.5rem;
+        top: auto;
+        right: auto;
+        bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px));
+        left: 50%;
+        width: calc(100vw - 1rem);
+        max-width: 430px;
+        max-height: min(68vh, 640px);
+        max-height: min(68dvh, 640px);
+        margin: 0;
+        padding: 1rem;
+        border-radius: 1rem;
+        transform: translateX(-50%);
+        box-shadow: 0 22px 60px rgba(15, 23, 42, 0.32);
     }
 
     .autoagora-submission-promotion {
@@ -725,43 +752,6 @@
         min-height: 3rem;
     }
 
-    .autoagora-submission-promotion .autoagora-promotion-backdrop {
-        position: fixed;
-        z-index: 9998;
-        inset: 0;
-        display: block;
-        visibility: hidden;
-        background: rgba(15, 23, 42, 0.52);
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 160ms ease, visibility 160ms ease;
-    }
-
-    .autoagora-submission-promotion .autoagora-promotion-purchase[open] > .autoagora-promotion-backdrop {
-        visibility: visible;
-        opacity: 1;
-        pointer-events: auto;
-    }
-
-    .autoagora-submission-promotion .autoagora-promotion-purchase-panel {
-        position: fixed;
-        z-index: 9999;
-        top: auto;
-        right: auto;
-        bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px));
-        left: 50%;
-        width: calc(100vw - 1rem);
-        max-width: 430px;
-        max-height: min(68dvh, 640px);
-        margin: 0;
-        padding: 1rem;
-        border-radius: 1rem;
-        overscroll-behavior: contain;
-        -webkit-overflow-scrolling: touch;
-        transform: translateX(-50%);
-        box-shadow: 0 22px 60px rgba(15, 23, 42, 0.32);
-    }
-
     .autoagora-seller-promotion-status {
         grid-template-columns: auto minmax(0, 1fr);
     }
@@ -771,16 +761,12 @@
         justify-self: start;
     }
 
-    .autoagora-submission-promotion .autoagora-promotion-tier-options {
+    .autoagora-promotion-tier-options {
         grid-template-columns: 1fr;
     }
 
-    .autoagora-submission-promotion .autoagora-promotion-tier-option {
+    .autoagora-promotion-tier-option {
         min-height: 6.25rem;
-    }
-
-    body.autoagora-promotion-sheet-open {
-        overflow: hidden;
     }
 }
 
