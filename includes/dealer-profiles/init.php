@@ -111,6 +111,45 @@ function autoagora_sanitize_dealer_profile_url($value): string
     return $url;
 }
 
+function autoagora_sanitize_dealer_profile_email($value): string
+{
+    $email = sanitize_email((string) $value);
+
+    return is_email($email) ? $email : '';
+}
+
+function autoagora_sanitize_dealer_profile_maps_value($value): string
+{
+    $value = trim((string) $value);
+    if ($value === '') {
+        return '';
+    }
+
+    if (stripos($value, '<iframe') !== false) {
+        return wp_kses(
+            $value,
+            array(
+                'iframe' => array(
+                    'src'             => true,
+                    'width'           => true,
+                    'height'          => true,
+                    'style'           => true,
+                    'allowfullscreen' => true,
+                    'loading'         => true,
+                    'referrerpolicy'  => true,
+                    'title'           => true,
+                    'frameborder'     => true,
+                    'class'           => true,
+                ),
+            )
+        );
+    }
+
+    $url = autoagora_sanitize_dealer_profile_url($value);
+
+    return $url !== '' ? $url : sanitize_text_field($value);
+}
+
 function autoagora_sanitize_dealer_profile_claim_status($value): string
 {
     $value = sanitize_key((string) $value);
@@ -131,11 +170,20 @@ function autoagora_register_dealer_profile_meta(): void
         'dealer_city_slug'       => array('type' => 'string', 'sanitize_callback' => 'sanitize_title'),
         'dealer_district'        => array('type' => 'string', 'sanitize_callback' => 'sanitize_text_field'),
         'dealer_address'         => array('type' => 'string', 'sanitize_callback' => 'sanitize_text_field'),
-        'dealer_maps_url'        => array('type' => 'string', 'sanitize_callback' => 'autoagora_sanitize_dealer_profile_url'),
+        'dealer_maps_address'    => array('type' => 'string', 'sanitize_callback' => 'sanitize_text_field'),
+        'dealer_maps_url'        => array('type' => 'string', 'sanitize_callback' => 'autoagora_sanitize_dealer_profile_maps_value'),
         'dealer_website'         => array('type' => 'string', 'sanitize_callback' => 'autoagora_sanitize_dealer_profile_url'),
         'dealer_instagram'       => array('type' => 'string', 'sanitize_callback' => 'autoagora_sanitize_dealer_profile_url'),
         'dealer_facebook'        => array('type' => 'string', 'sanitize_callback' => 'autoagora_sanitize_dealer_profile_url'),
         'dealer_phone'           => array('type' => 'string', 'sanitize_callback' => 'sanitize_text_field'),
+        'secondary_phone'        => array('type' => 'string', 'sanitize_callback' => 'sanitize_text_field'),
+        'dealer_whatsapp'        => array('type' => 'string', 'sanitize_callback' => 'sanitize_text_field'),
+        'dealer_email'           => array('type' => 'string', 'sanitize_callback' => 'autoagora_sanitize_dealer_profile_email'),
+        'dealer_logo_url'        => array('type' => 'string', 'sanitize_callback' => 'autoagora_sanitize_dealer_profile_url'),
+        'dealer_short_description' => array('type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field'),
+        'dealer_opening_hours'   => array('type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field'),
+        'dealer_services'        => array('type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field'),
+        'dealer_languages'       => array('type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field'),
         'dealer_source_name'     => array('type' => 'string', 'sanitize_callback' => 'sanitize_text_field'),
         'dealer_source_url'      => array('type' => 'string', 'sanitize_callback' => 'autoagora_sanitize_dealer_profile_url'),
         'dealer_import_source_id'=> array('type' => 'string', 'sanitize_callback' => 'sanitize_text_field'),
@@ -212,11 +260,15 @@ function autoagora_dealer_profile_has_public_quality(int $post_id): bool
         autoagora_dealer_profile_get_meta($post_id, 'dealer_city')
         . autoagora_dealer_profile_get_meta($post_id, 'dealer_district')
         . autoagora_dealer_profile_get_meta($post_id, 'dealer_address')
+        . autoagora_dealer_profile_get_meta($post_id, 'dealer_maps_address')
     );
     $presence = trim(
         autoagora_dealer_profile_get_meta($post_id, 'dealer_website')
         . autoagora_dealer_profile_get_meta($post_id, 'dealer_maps_url')
         . autoagora_dealer_profile_get_meta($post_id, 'dealer_phone')
+        . autoagora_dealer_profile_get_meta($post_id, 'secondary_phone')
+        . autoagora_dealer_profile_get_meta($post_id, 'dealer_whatsapp')
+        . autoagora_dealer_profile_get_meta($post_id, 'dealer_email')
         . autoagora_dealer_profile_get_meta($post_id, 'dealer_instagram')
         . autoagora_dealer_profile_get_meta($post_id, 'dealer_facebook')
     );
@@ -300,6 +352,29 @@ function autoagora_dealer_profile_active_listings_query(int $post_id, int $limit
     return new WP_Query($args);
 }
 
+function autoagora_dealer_profile_is_public_url(string $value): bool
+{
+    return autoagora_sanitize_dealer_profile_url($value) !== '';
+}
+
+function autoagora_dealer_profile_whatsapp_url(string $phone): string
+{
+    $digits = preg_replace('/\D+/', '', $phone);
+    if (!is_string($digits) || $digits === '') {
+        return '';
+    }
+
+    if (strpos($digits, '00') === 0) {
+        $digits = substr($digits, 2);
+    }
+
+    if (strlen($digits) === 8) {
+        $digits = '357' . $digits;
+    }
+
+    return 'https://wa.me/' . rawurlencode($digits);
+}
+
 function autoagora_dealer_profile_contact_links(int $post_id): array
 {
     $links = array();
@@ -312,13 +387,22 @@ function autoagora_dealer_profile_contact_links(int $post_id): array
 
     foreach ($fields as $key => $label) {
         $url = autoagora_dealer_profile_get_meta($post_id, $key);
-        if ($url !== '') {
+        if ($url !== '' && autoagora_dealer_profile_is_public_url($url)) {
             $links[] = array(
                 'label' => $label,
                 'url'   => $url,
                 'key'   => $key,
             );
         }
+    }
+
+    $email = autoagora_dealer_profile_get_meta($post_id, 'dealer_email');
+    if ($email !== '' && is_email($email)) {
+        $links[] = array(
+            'label' => __('Email', 'bricks-child'),
+            'url'   => 'mailto:' . $email,
+            'key'   => 'dealer_email',
+        );
     }
 
     $phone = autoagora_dealer_profile_get_meta($post_id, 'dealer_phone');
@@ -331,6 +415,28 @@ function autoagora_dealer_profile_contact_links(int $post_id): array
                 'key'   => 'dealer_phone',
             );
         }
+    }
+
+    $secondary_phone = autoagora_dealer_profile_get_meta($post_id, 'secondary_phone');
+    if ($secondary_phone !== '') {
+        $tel = preg_replace('/[^0-9+]/', '', $secondary_phone);
+        if (is_string($tel) && $tel !== '') {
+            $links[] = array(
+                'label' => __('Second phone', 'bricks-child'),
+                'url'   => 'tel:' . $tel,
+                'key'   => 'secondary_phone',
+            );
+        }
+    }
+
+    $whatsapp = autoagora_dealer_profile_get_meta($post_id, 'dealer_whatsapp');
+    $whatsapp_url = $whatsapp !== '' ? autoagora_dealer_profile_whatsapp_url($whatsapp) : '';
+    if ($whatsapp_url !== '') {
+        $links[] = array(
+            'label' => __('WhatsApp', 'bricks-child'),
+            'url'   => $whatsapp_url,
+            'key'   => 'dealer_whatsapp',
+        );
     }
 
     return $links;
@@ -401,18 +507,44 @@ function autoagora_render_dealer_profile_text_input(int $post_id, string $key, s
     <?php
 }
 
+function autoagora_render_dealer_profile_textarea(int $post_id, string $key, string $label, string $placeholder = ''): void
+{
+    $value = autoagora_dealer_profile_get_meta($post_id, $key);
+    ?>
+    <p class="autoagora-dealer-profile-admin-field">
+        <label for="<?php echo esc_attr($key); ?>"><strong><?php echo esc_html($label); ?></strong></label>
+        <textarea
+            id="<?php echo esc_attr($key); ?>"
+            name="autoagora_dealer_profile[<?php echo esc_attr($key); ?>]"
+            placeholder="<?php echo esc_attr($placeholder); ?>"
+            class="widefat"
+            rows="3"
+        ><?php echo esc_textarea($value); ?></textarea>
+    </p>
+    <?php
+}
+
 function autoagora_render_dealer_profile_details_meta_box(WP_Post $post): void
 {
     wp_nonce_field('autoagora_save_dealer_profile', 'autoagora_dealer_profile_nonce');
 
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_city', __('City', 'bricks-child'), 'text', 'Nicosia');
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_district', __('District', 'bricks-child'), 'text', 'Nicosia');
-    autoagora_render_dealer_profile_text_input($post->ID, 'dealer_address', __('Address', 'bricks-child'), 'text', 'Full public address');
+    autoagora_render_dealer_profile_text_input($post->ID, 'dealer_address', __('Public address', 'bricks-child'), 'text', 'Full public address');
+    autoagora_render_dealer_profile_text_input($post->ID, 'dealer_maps_address', __('Maps address', 'bricks-child'), 'text', 'Google Maps address');
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_website', __('Website URL', 'bricks-child'), 'url', 'https://example.com');
-    autoagora_render_dealer_profile_text_input($post->ID, 'dealer_maps_url', __('Google Maps URL', 'bricks-child'), 'url', 'https://maps.google.com/...');
+    autoagora_render_dealer_profile_text_input($post->ID, 'dealer_maps_url', __('Google Maps URL / embed', 'bricks-child'), 'text', 'https://maps.google.com/... or iframe embed');
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_instagram', __('Instagram URL', 'bricks-child'), 'url', 'https://instagram.com/...');
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_facebook', __('Facebook URL', 'bricks-child'), 'url', 'https://facebook.com/...');
-    autoagora_render_dealer_profile_text_input($post->ID, 'dealer_phone', __('Phone number', 'bricks-child'), 'tel', '+357...');
+    autoagora_render_dealer_profile_text_input($post->ID, 'dealer_phone', __('Primary phone number', 'bricks-child'), 'tel', '+357...');
+    autoagora_render_dealer_profile_text_input($post->ID, 'secondary_phone', __('Secondary phone number', 'bricks-child'), 'tel', '+357...');
+    autoagora_render_dealer_profile_text_input($post->ID, 'dealer_whatsapp', __('WhatsApp number', 'bricks-child'), 'tel', '+357...');
+    autoagora_render_dealer_profile_text_input($post->ID, 'dealer_email', __('Public email', 'bricks-child'), 'email', 'sales@example.com');
+    autoagora_render_dealer_profile_text_input($post->ID, 'dealer_logo_url', __('Imported logo URL', 'bricks-child'), 'url', 'https://example.com/logo.png');
+    autoagora_render_dealer_profile_textarea($post->ID, 'dealer_short_description', __('Short description', 'bricks-child'), 'Short public summary for the dealer profile.');
+    autoagora_render_dealer_profile_textarea($post->ID, 'dealer_opening_hours', __('Opening hours', 'bricks-child'), 'Monday-Friday 09:00-18:00');
+    autoagora_render_dealer_profile_textarea($post->ID, 'dealer_services', __('Services', 'bricks-child'), 'Used cars, trade-ins, finance, servicing...');
+    autoagora_render_dealer_profile_textarea($post->ID, 'dealer_languages', __('Languages', 'bricks-child'), 'Greek, English');
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_source_name', __('Source name', 'bricks-child'), 'text', 'CYTA Yellow Pages');
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_source_url', __('Source URL', 'bricks-child'), 'url', 'https://...');
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_import_source_id', __('Import source ID', 'bricks-child'), 'text', 'source-specific-id');
@@ -492,11 +624,17 @@ function autoagora_save_dealer_profile_meta(int $post_id): void
         $raw = array();
     }
 
-    $url_keys = array('dealer_maps_url', 'dealer_website', 'dealer_instagram', 'dealer_facebook', 'dealer_source_url');
-    $text_keys = array('dealer_city', 'dealer_district', 'dealer_address', 'dealer_phone', 'dealer_source_name', 'dealer_import_source_id', 'dealer_last_verified_at');
+    $url_keys = array('dealer_website', 'dealer_instagram', 'dealer_facebook', 'dealer_source_url', 'dealer_logo_url');
+    $text_keys = array('dealer_city', 'dealer_district', 'dealer_address', 'dealer_maps_address', 'dealer_phone', 'secondary_phone', 'dealer_whatsapp', 'dealer_source_name', 'dealer_import_source_id', 'dealer_last_verified_at');
+    $textarea_keys = array('dealer_short_description', 'dealer_opening_hours', 'dealer_services', 'dealer_languages');
 
     foreach ($text_keys as $key) {
         $value = isset($raw[$key]) ? sanitize_text_field((string) $raw[$key]) : '';
+        $value !== '' ? update_post_meta($post_id, $key, $value) : delete_post_meta($post_id, $key);
+    }
+
+    foreach ($textarea_keys as $key) {
+        $value = isset($raw[$key]) ? sanitize_textarea_field((string) $raw[$key]) : '';
         $value !== '' ? update_post_meta($post_id, $key, $value) : delete_post_meta($post_id, $key);
     }
 
@@ -504,6 +642,20 @@ function autoagora_save_dealer_profile_meta(int $post_id): void
         $value = isset($raw[$key]) ? autoagora_sanitize_dealer_profile_url($raw[$key]) : '';
         $value !== '' ? update_post_meta($post_id, $key, $value) : delete_post_meta($post_id, $key);
     }
+
+    $dealer_maps_url = isset($raw['dealer_maps_url'])
+        ? autoagora_sanitize_dealer_profile_maps_value($raw['dealer_maps_url'])
+        : '';
+    $dealer_maps_url !== ''
+        ? update_post_meta($post_id, 'dealer_maps_url', $dealer_maps_url)
+        : delete_post_meta($post_id, 'dealer_maps_url');
+
+    $dealer_email = isset($raw['dealer_email'])
+        ? autoagora_sanitize_dealer_profile_email($raw['dealer_email'])
+        : '';
+    $dealer_email !== ''
+        ? update_post_meta($post_id, 'dealer_email', $dealer_email)
+        : delete_post_meta($post_id, 'dealer_email');
 
     $claim_status = isset($raw['dealer_claim_status'])
         ? autoagora_sanitize_dealer_profile_claim_status($raw['dealer_claim_status'])
@@ -529,6 +681,9 @@ function autoagora_render_dealer_profile_card(int $post_id): void
 {
     $city = autoagora_dealer_profile_get_meta($post_id, 'dealer_city');
     $address = autoagora_dealer_profile_get_meta($post_id, 'dealer_address');
+    if ($address === '') {
+        $address = autoagora_dealer_profile_get_meta($post_id, 'dealer_maps_address');
+    }
     $is_claimed = autoagora_dealer_profile_is_claimed($post_id);
     $listing_count = autoagora_dealer_profile_active_listing_count($post_id);
     $links = autoagora_dealer_profile_contact_links($post_id);
@@ -560,7 +715,7 @@ function autoagora_render_dealer_profile_card(int $post_id): void
             <?php if (!empty($links)) : ?>
                 <div class="dealer-profile-card__links">
                     <?php foreach (array_slice($links, 0, 3) as $link) : ?>
-                        <a href="<?php echo esc_url($link['url']); ?>" target="<?php echo strpos($link['url'], 'tel:') === 0 ? '_self' : '_blank'; ?>" rel="noopener noreferrer">
+                        <a href="<?php echo esc_url($link['url']); ?>" target="<?php echo (strpos($link['url'], 'tel:') === 0 || strpos($link['url'], 'mailto:') === 0) ? '_self' : '_blank'; ?>" rel="noopener noreferrer">
                             <?php echo esc_html($link['label']); ?>
                         </a>
                     <?php endforeach; ?>
@@ -584,6 +739,7 @@ function autoagora_dealer_profile_get_seo_context(): array
 
         $name = get_the_title($post_id);
         $city = autoagora_dealer_profile_get_meta($post_id, 'dealer_city');
+        $short_description = autoagora_dealer_profile_get_meta($post_id, 'dealer_short_description');
         $place = $city !== '' ? $city . ', Cyprus' : 'Cyprus';
         $title = sprintf(
             /* translators: 1: dealer name, 2: place */
@@ -591,12 +747,14 @@ function autoagora_dealer_profile_get_seo_context(): array
             $name,
             $place
         );
-        $description = sprintf(
-            /* translators: 1: dealer name, 2: place */
-            __('View %1$s dealership information, contact links, location details, and active car listings in %2$s on AutoAgora.', 'bricks-child'),
-            $name,
-            $place
-        );
+        $description = $short_description !== ''
+            ? $short_description
+            : sprintf(
+                /* translators: 1: dealer name, 2: place */
+                __('View %1$s dealership information, contact links, location details, and active car listings in %2$s on AutoAgora.', 'bricks-child'),
+                $name,
+                $place
+            );
 
         return array(
             'title'       => $title,
@@ -641,8 +799,23 @@ function autoagora_dealer_profile_structured_data(int $post_id): string
 
     $city = autoagora_dealer_profile_get_meta($post_id, 'dealer_city');
     $address = autoagora_dealer_profile_get_meta($post_id, 'dealer_address');
+    if ($address === '') {
+        $address = autoagora_dealer_profile_get_meta($post_id, 'dealer_maps_address');
+    }
     $phone = autoagora_dealer_profile_get_meta($post_id, 'dealer_phone');
+    if ($phone === '') {
+        $phone = autoagora_dealer_profile_get_meta($post_id, 'secondary_phone');
+    }
+    if ($phone === '') {
+        $phone = autoagora_dealer_profile_get_meta($post_id, 'dealer_whatsapp');
+    }
+    $email = autoagora_dealer_profile_get_meta($post_id, 'dealer_email');
     $website = autoagora_dealer_profile_get_meta($post_id, 'dealer_website');
+    $short_description = autoagora_dealer_profile_get_meta($post_id, 'dealer_short_description');
+    $opening_hours = autoagora_dealer_profile_get_meta($post_id, 'dealer_opening_hours');
+    $languages = autoagora_dealer_profile_get_meta($post_id, 'dealer_languages');
+    $services = autoagora_dealer_profile_get_meta($post_id, 'dealer_services');
+    $logo_url = autoagora_dealer_profile_get_meta($post_id, 'dealer_logo_url');
     $same_as = array_filter(
         array(
             autoagora_dealer_profile_get_meta($post_id, 'dealer_instagram'),
@@ -671,6 +844,25 @@ function autoagora_dealer_profile_structured_data(int $post_id): string
         $schema['telephone'] = $phone;
     }
 
+    if ($email !== '') {
+        $schema['email'] = $email;
+    }
+
+    if ($opening_hours !== '') {
+        $opening_hours_lines = preg_split('/\r\n|\r|\n/', $opening_hours);
+        $schema['openingHours'] = is_array($opening_hours_lines)
+            ? array_values(array_filter(array_map('trim', $opening_hours_lines)))
+            : $opening_hours;
+    }
+
+    if ($languages !== '') {
+        $schema['knowsLanguage'] = array_values(array_filter(array_map('trim', explode(',', $languages))));
+    }
+
+    if ($short_description !== '' || $services !== '') {
+        $schema['description'] = trim($short_description . ($short_description !== '' && $services !== '' ? ' ' : '') . $services);
+    }
+
     if ($address !== '' || $city !== '') {
         $schema['address'] = array_filter(
             array(
@@ -682,10 +874,14 @@ function autoagora_dealer_profile_structured_data(int $post_id): string
         );
     }
 
-    if (has_post_thumbnail($post_id)) {
+    if ($logo_url !== '') {
+        $schema['logo'] = $logo_url;
+        $schema['image'] = $logo_url;
+    } elseif (has_post_thumbnail($post_id)) {
         $image = wp_get_attachment_image_url(get_post_thumbnail_id($post_id), 'full');
         if ($image) {
             $schema['image'] = $image;
+            $schema['logo'] = $image;
         }
     }
 

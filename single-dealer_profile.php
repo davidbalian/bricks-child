@@ -28,6 +28,13 @@ if (have_posts()) :
         $city = autoagora_dealer_profile_get_meta($post_id, 'dealer_city');
         $district = autoagora_dealer_profile_get_meta($post_id, 'dealer_district');
         $address = autoagora_dealer_profile_get_meta($post_id, 'dealer_address');
+        $maps_address = autoagora_dealer_profile_get_meta($post_id, 'dealer_maps_address');
+        $display_address = $address !== '' ? $address : $maps_address;
+        $short_description = autoagora_dealer_profile_get_meta($post_id, 'dealer_short_description');
+        $opening_hours = autoagora_dealer_profile_get_meta($post_id, 'dealer_opening_hours');
+        $services = autoagora_dealer_profile_get_meta($post_id, 'dealer_services');
+        $languages = autoagora_dealer_profile_get_meta($post_id, 'dealer_languages');
+        $logo_url = autoagora_dealer_profile_get_meta($post_id, 'dealer_logo_url');
         $last_verified = autoagora_dealer_profile_get_meta($post_id, 'dealer_last_verified_at');
         $is_claimed = autoagora_dealer_profile_is_claimed($post_id);
         $links = autoagora_dealer_profile_contact_links($post_id);
@@ -45,29 +52,33 @@ if (have_posts()) :
                         <?php endif; ?>
                     </div>
                     <h1><?php the_title(); ?></h1>
-                    <?php if ($address !== '' || $city !== '' || $district !== '') : ?>
+                    <?php if ($display_address !== '' || $city !== '' || $district !== '') : ?>
                         <p class="dealer-profile-hero__location">
-                            <?php echo esc_html(implode(', ', array_filter(array($address, $city, $district)))); ?>
+                            <?php echo esc_html(implode(', ', array_filter(array($display_address, $city, $district)))); ?>
                         </p>
                     <?php endif; ?>
-                    <p class="dealer-profile-hero__summary">
-                        <?php
-                        echo esc_html(
-                            sprintf(
-                                /* translators: 1: dealer name, 2: active listing count */
-                                _n('%1$s has %2$d active listing on AutoAgora.', '%1$s has %2$d active listings on AutoAgora.', $listing_count, 'bricks-child'),
-                                get_the_title(),
-                                $listing_count
-                            )
-                        );
-                        ?>
-                    </p>
+                    <?php if ($short_description !== '') : ?>
+                        <p class="dealer-profile-hero__summary"><?php echo esc_html($short_description); ?></p>
+                    <?php else : ?>
+                        <p class="dealer-profile-hero__summary">
+                            <?php
+                            echo esc_html(
+                                sprintf(
+                                    /* translators: 1: dealer name, 2: active listing count */
+                                    _n('%1$s has %2$d active listing on AutoAgora.', '%1$s has %2$d active listings on AutoAgora.', $listing_count, 'bricks-child'),
+                                    get_the_title(),
+                                    $listing_count
+                                )
+                            );
+                            ?>
+                        </p>
+                    <?php endif; ?>
                     <div class="dealer-profile-actions">
                         <?php foreach ($links as $link) : ?>
                             <a
                                 class="btn <?php echo $link['key'] === 'dealer_phone' ? 'btn-primary' : 'btn-secondary'; ?>"
                                 href="<?php echo esc_url($link['url']); ?>"
-                                target="<?php echo strpos($link['url'], 'tel:') === 0 ? '_self' : '_blank'; ?>"
+                                target="<?php echo (strpos($link['url'], 'tel:') === 0 || strpos($link['url'], 'mailto:') === 0) ? '_self' : '_blank'; ?>"
                                 rel="noopener noreferrer"
                             >
                                 <?php echo esc_html($link['label']); ?>
@@ -83,6 +94,8 @@ if (have_posts()) :
                 <div class="dealer-profile-hero__logo">
                     <?php if (has_post_thumbnail()) : ?>
                         <?php the_post_thumbnail('medium_large'); ?>
+                    <?php elseif ($logo_url !== '') : ?>
+                        <img src="<?php echo esc_url($logo_url); ?>" alt="<?php echo esc_attr(get_the_title()); ?>">
                     <?php else : ?>
                         <?php
                         $dealer_initial = function_exists('mb_substr')
@@ -113,8 +126,16 @@ if (have_posts()) :
                         <div class="dealer-profile-content">
                             <?php the_content(); ?>
                         </div>
+                    <?php elseif ($short_description !== '') : ?>
+                        <p><?php echo esc_html($short_description); ?></p>
                     <?php else : ?>
                         <p><?php esc_html_e('This dealer profile includes public business information for Cyprus car shoppers.', 'bricks-child'); ?></p>
+                    <?php endif; ?>
+                    <?php if ($services !== '') : ?>
+                        <div class="dealer-profile-text-block">
+                            <h3><?php esc_html_e('Services', 'bricks-child'); ?></h3>
+                            <p><?php echo nl2br(esc_html($services)); ?></p>
+                        </div>
                     <?php endif; ?>
                 </div>
 
@@ -125,6 +146,12 @@ if (have_posts()) :
                     <?php endif; ?>
                     <?php if ($district !== '') : ?>
                         <div><span><?php esc_html_e('District', 'bricks-child'); ?></span><strong><?php echo esc_html($district); ?></strong></div>
+                    <?php endif; ?>
+                    <?php if ($opening_hours !== '') : ?>
+                        <div><span><?php esc_html_e('Opening hours', 'bricks-child'); ?></span><strong><?php echo nl2br(esc_html($opening_hours)); ?></strong></div>
+                    <?php endif; ?>
+                    <?php if ($languages !== '') : ?>
+                        <div><span><?php esc_html_e('Languages', 'bricks-child'); ?></span><strong><?php echo esc_html($languages); ?></strong></div>
                     <?php endif; ?>
                     <div>
                         <span><?php esc_html_e('Profile', 'bricks-child'); ?></span>

@@ -303,6 +303,22 @@
     margin-bottom: 0;
 }
 
+.dealer-profile-text-block {
+    margin-top: 18px;
+}
+
+.dealer-profile-text-block h3 {
+    margin: 0 0 8px;
+    color: #111827;
+    font-size: 1rem;
+    line-height: 1.3;
+    letter-spacing: 0;
+}
+
+.dealer-profile-text-block p {
+    margin: 0;
+}
+
 .dealer-profile-facts {
     flex: 0 0 300px;
     padding: 18px;
@@ -331,6 +347,7 @@
 .dealer-profile-facts strong {
     color: #111827;
     text-align: right;
+    line-height: 1.45;
 }
 
 .dealer-profile-section-heading {
