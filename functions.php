@@ -70,6 +70,7 @@ require_once get_stylesheet_directory() . '/includes/notifications/listing-notif
 require_once get_stylesheet_directory() . '/includes/legal/legal-pages.php';
 require_once get_stylesheet_directory() . '/includes/car-make-landings.php';
 require_once get_stylesheet_directory() . '/includes/city-cars-landing/city-cars-landing-init.php';
+require_once get_stylesheet_directory() . '/includes/dealer-profiles/init.php';
 require_once get_stylesheet_directory() . '/includes/core/car-browse-assets.php';
 // Cookie consent functionality disabled
 // require_once get_stylesheet_directory() . '/includes/legal/cookie-consent.php';
