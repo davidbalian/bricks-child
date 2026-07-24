@@ -406,6 +406,7 @@ Important admin files:
 - CSV car import: `includes/admin/csv-car-import.php`
 - dealership account creation: `includes/admin/dealership-accounts.php`
 - dealership import/export: `includes/admin/dealership-import/*`, `includes/admin/dealership-export/*`
+- dealer profile XLSX import: `includes/dealer-profiles/import/*`
 - daily deals/social image export: `includes/admin/cars-daily-deals-*`
 - seller review moderation: `includes/admin/seller-reviews-admin.php`
 - favorites user column: `includes/admin/user-favorites-column.php`

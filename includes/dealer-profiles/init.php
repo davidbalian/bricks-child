@@ -1054,3 +1054,7 @@ function autoagora_enqueue_dealer_profile_assets(): void
     );
 }
 add_action('wp_enqueue_scripts', 'autoagora_enqueue_dealer_profile_assets', 25);
+
+if (is_admin()) {
+    require_once __DIR__ . '/import/DealerProfileImportAdmin.php';
+}
