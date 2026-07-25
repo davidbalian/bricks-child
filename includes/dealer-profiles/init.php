@@ -20,6 +20,12 @@ if (!defined('AUTOAGORA_DEALER_PROFILE_REWRITE_VERSION')) {
     define('AUTOAGORA_DEALER_PROFILE_REWRITE_VERSION', '2026-07-24-1');
 }
 
+function autoagora_enable_dealer_profile_logos(): void
+{
+    add_theme_support('post-thumbnails');
+}
+add_action('after_setup_theme', 'autoagora_enable_dealer_profile_logos', 20);
+
 function autoagora_dealer_profile_city_options(): array
 {
     return array(
@@ -47,6 +53,10 @@ function autoagora_register_dealer_profile_post_type(): void
                 'not_found'          => __('No dealer profiles found.', 'bricks-child'),
                 'not_found_in_trash' => __('No dealer profiles found in Trash.', 'bricks-child'),
                 'menu_name'          => __('Dealer Profiles', 'bricks-child'),
+                'featured_image'     => __('Dealer logo', 'bricks-child'),
+                'set_featured_image' => __('Set dealer logo', 'bricks-child'),
+                'remove_featured_image' => __('Remove dealer logo', 'bricks-child'),
+                'use_featured_image' => __('Use as dealer logo', 'bricks-child'),
             ),
             'public'             => true,
             'publicly_queryable' => true,
