@@ -327,7 +327,7 @@
     background: #fff;
 }
 
-.dealer-profile-facts div {
+.dealer-profile-facts > div {
     display: flex;
     gap: 12px;
     align-items: baseline;
@@ -336,18 +336,53 @@
     border-top: 1px solid #eef2f7;
 }
 
-.dealer-profile-facts div:first-of-type {
+.dealer-profile-facts > div:first-of-type {
     border-top: 0;
 }
 
-.dealer-profile-facts span {
+.dealer-profile-facts > div > span {
     color: #64748b;
 }
 
-.dealer-profile-facts strong {
+.dealer-profile-facts > div > strong {
     color: #111827;
     text-align: right;
     line-height: 1.45;
+}
+
+.dealer-profile-facts > .dealer-profile-facts__hours {
+    display: block;
+}
+
+.dealer-profile-hours {
+    display: grid;
+    gap: 7px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.dealer-profile-hours li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: baseline;
+}
+
+.dealer-profile-hours li > span {
+    color: #475569;
+    line-height: 1.4;
+}
+
+.dealer-profile-hours li > strong {
+    color: #111827;
+    text-align: right;
+    line-height: 1.4;
+}
+
+.dealer-profile-hours li > strong:only-child {
+    grid-column: 1 / -1;
+    text-align: left;
 }
 
 .dealer-profile-section-heading {

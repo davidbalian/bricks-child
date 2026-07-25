@@ -32,6 +32,7 @@ if (have_posts()) :
         $display_address = $address !== '' ? $address : $maps_address;
         $short_description = autoagora_dealer_profile_get_meta($post_id, 'dealer_short_description');
         $opening_hours = autoagora_dealer_profile_get_meta($post_id, 'dealer_opening_hours');
+        $opening_hours_rows = autoagora_dealer_profile_parse_opening_hours($opening_hours);
         $services = autoagora_dealer_profile_get_meta($post_id, 'dealer_services');
         $languages = autoagora_dealer_profile_get_meta($post_id, 'dealer_languages');
         $logo_url = autoagora_dealer_profile_get_meta($post_id, 'dealer_logo_url');
@@ -148,7 +149,19 @@ if (have_posts()) :
                         <div><span><?php esc_html_e('District', 'bricks-child'); ?></span><strong><?php echo esc_html($district); ?></strong></div>
                     <?php endif; ?>
                     <?php if ($opening_hours !== '') : ?>
-                        <div><span><?php esc_html_e('Opening hours', 'bricks-child'); ?></span><strong><?php echo nl2br(esc_html($opening_hours)); ?></strong></div>
+                        <div class="dealer-profile-facts__hours">
+                            <span><?php esc_html_e('Opening hours', 'bricks-child'); ?></span>
+                            <ul class="dealer-profile-hours">
+                                <?php foreach ($opening_hours_rows as $opening_hours_row) : ?>
+                                    <li>
+                                        <?php if ($opening_hours_row['days'] !== '') : ?>
+                                            <span><?php echo esc_html($opening_hours_row['days']); ?></span>
+                                        <?php endif; ?>
+                                        <strong><?php echo esc_html($opening_hours_row['hours']); ?></strong>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
                     <?php endif; ?>
                     <?php if ($languages !== '') : ?>
                         <div><span><?php esc_html_e('Languages', 'bricks-child'); ?></span><strong><?php echo esc_html($languages); ?></strong></div>

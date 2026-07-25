@@ -289,6 +289,154 @@ function autoagora_dealer_profile_is_indexable(int $post_id): bool
     return $explicitly_indexable && autoagora_dealer_profile_has_public_quality($post_id);
 }
 
+/**
+ * Split the current import-friendly opening-hours text into display rows.
+ *
+ * @return array<int,array{days:string,hours:string}>
+ */
+function autoagora_dealer_profile_parse_opening_hours(string $opening_hours): array
+{
+    $parts = preg_split('/\s*(?:;|\r\n|\r|\n)\s*/', trim($opening_hours));
+    if (!is_array($parts)) {
+        return array();
+    }
+
+    $rows = array();
+    foreach ($parts as $part) {
+        $part = trim($part);
+        if ($part === '') {
+            continue;
+        }
+
+        $days = '';
+        $hours = $part;
+        if (preg_match('/^(.+?)\s+((?:\d{1,2}:\d{2}.*)|(?:closed.*)|(?:open\s+24\s+hours.*)|(?:24\s+hours.*)|(?:by\s+appointment.*))$/i', $part, $matches)) {
+            $days = trim($matches[1]);
+            $hours = trim($matches[2]);
+        }
+
+        $rows[] = array(
+            'days'  => $days,
+            'hours' => $hours,
+        );
+    }
+
+    return $rows;
+}
+
+/**
+ * Summarize public SEO readiness for the dealer-profile admin table.
+ *
+ * @return array{status:string,label:string,score:int,critical_missing:array<int,string>,improvements:array<int,string>,missing:array<int,string>}
+ */
+function autoagora_dealer_profile_get_seo_audit(int $post_id): array
+{
+    $title = trim(get_the_title($post_id));
+    $city = autoagora_dealer_profile_get_meta($post_id, 'dealer_city');
+    $district = autoagora_dealer_profile_get_meta($post_id, 'dealer_district');
+    $address = autoagora_dealer_profile_get_meta($post_id, 'dealer_address');
+    $maps_address = autoagora_dealer_profile_get_meta($post_id, 'dealer_maps_address');
+    $description = autoagora_dealer_profile_get_meta($post_id, 'dealer_short_description');
+    $phone = trim(
+        autoagora_dealer_profile_get_meta($post_id, 'dealer_phone')
+        . autoagora_dealer_profile_get_meta($post_id, 'secondary_phone')
+        . autoagora_dealer_profile_get_meta($post_id, 'dealer_whatsapp')
+    );
+    $public_links = trim(
+        autoagora_dealer_profile_get_meta($post_id, 'dealer_website')
+        . autoagora_dealer_profile_get_meta($post_id, 'dealer_maps_url')
+        . autoagora_dealer_profile_get_meta($post_id, 'dealer_email')
+        . autoagora_dealer_profile_get_meta($post_id, 'dealer_instagram')
+        . autoagora_dealer_profile_get_meta($post_id, 'dealer_facebook')
+    );
+    $location = trim($city . $district . $address . $maps_address);
+    $presence = trim($phone . $public_links);
+    $has_logo = autoagora_dealer_profile_get_meta($post_id, 'dealer_logo_url') !== ''
+        || has_post_thumbnail($post_id);
+
+    $critical_missing = array();
+    if (get_post_status($post_id) !== 'publish') {
+        $critical_missing[] = __('Published status', 'bricks-child');
+    }
+    if (!autoagora_sanitize_dealer_profile_bool(get_post_meta($post_id, 'dealer_indexable', true))) {
+        $critical_missing[] = __('Indexing enabled', 'bricks-child');
+    }
+    if ($title === '') {
+        $critical_missing[] = __('Business name', 'bricks-child');
+    }
+    if ($location === '') {
+        $critical_missing[] = __('Location', 'bricks-child');
+    }
+    if ($presence === '') {
+        $critical_missing[] = __('Public contact or link', 'bricks-child');
+    }
+
+    $improvements = array();
+    if ($address === '' && $maps_address === '') {
+        $improvements[] = __('Street address', 'bricks-child');
+    }
+    if ($description === '') {
+        $improvements[] = __('Description', 'bricks-child');
+    }
+    if ($phone === '') {
+        $improvements[] = __('Phone or WhatsApp', 'bricks-child');
+    }
+    if ($public_links === '') {
+        $improvements[] = __('Website, map, email, or social link', 'bricks-child');
+    }
+    if (!$has_logo) {
+        $improvements[] = __('Logo', 'bricks-child');
+    }
+    if (autoagora_dealer_profile_get_meta($post_id, 'dealer_opening_hours') === '') {
+        $improvements[] = __('Opening hours', 'bricks-child');
+    }
+    if (autoagora_dealer_profile_get_meta($post_id, 'dealer_services') === '') {
+        $improvements[] = __('Services', 'bricks-child');
+    }
+    if (autoagora_dealer_profile_get_meta($post_id, 'dealer_languages') === '') {
+        $improvements[] = __('Languages', 'bricks-child');
+    }
+    if (autoagora_dealer_profile_get_meta($post_id, 'dealer_last_verified_at') === '') {
+        $improvements[] = __('Last checked date', 'bricks-child');
+    }
+
+    $score_fields = array(
+        $title !== '',
+        $location !== '',
+        $presence !== '',
+        $address !== '' || $maps_address !== '',
+        $description !== '',
+        $phone !== '',
+        $public_links !== '',
+        $has_logo,
+        autoagora_dealer_profile_get_meta($post_id, 'dealer_opening_hours') !== '',
+        autoagora_dealer_profile_get_meta($post_id, 'dealer_services') !== '',
+        autoagora_dealer_profile_get_meta($post_id, 'dealer_languages') !== '',
+        autoagora_dealer_profile_get_meta($post_id, 'dealer_last_verified_at') !== '',
+    );
+    $score = (int) round((count(array_filter($score_fields)) / count($score_fields)) * 100);
+
+    if (!empty($critical_missing)) {
+        $status = 'blocked';
+        $label = __('Not indexable', 'bricks-child');
+    } elseif (!empty($improvements)) {
+        $status = 'work';
+        $label = __('SEO work', 'bricks-child');
+    } else {
+        $status = 'ready';
+        $label = __('SEO ready', 'bricks-child');
+    }
+
+    return array(
+        'status'           => $status,
+        'label'            => $label,
+        'score'            => $score,
+        'critical_missing' => $critical_missing,
+        'improvements'     => $improvements,
+        'missing'          => array_merge($critical_missing, $improvements),
+    );
+}
+
 function autoagora_dealer_profile_claim_url(int $post_id): string
 {
     return add_query_arg(
@@ -677,6 +825,140 @@ function autoagora_save_dealer_profile_meta(int $post_id): void
 }
 add_action('save_post_' . AUTOAGORA_DEALER_PROFILE_POST_TYPE, 'autoagora_save_dealer_profile_meta');
 
+function autoagora_dealer_profile_admin_columns(array $columns): array
+{
+    $result = array();
+    foreach ($columns as $key => $label) {
+        $result[$key] = $label;
+        if ($key === 'title') {
+            $result['dealer_city'] = __('City', 'bricks-child');
+            $result['dealer_seo_status'] = __('SEO status', 'bricks-child');
+            $result['dealer_missing_info'] = __('Missing information', 'bricks-child');
+            $result['dealer_claim_status'] = __('Claim', 'bricks-child');
+        }
+    }
+
+    return $result;
+}
+add_filter('manage_' . AUTOAGORA_DEALER_PROFILE_POST_TYPE . '_posts_columns', 'autoagora_dealer_profile_admin_columns');
+
+function autoagora_dealer_profile_admin_column(string $column, int $post_id): void
+{
+    if ($column === 'dealer_city') {
+        $city = autoagora_dealer_profile_get_meta($post_id, 'dealer_city');
+        $district = autoagora_dealer_profile_get_meta($post_id, 'dealer_district');
+        echo esc_html($city !== '' ? $city : ($district !== '' ? $district : '-'));
+
+        return;
+    }
+
+    if ($column === 'dealer_claim_status') {
+        echo esc_html(ucfirst(autoagora_dealer_profile_get_claim_status($post_id)));
+
+        return;
+    }
+
+    if ($column !== 'dealer_seo_status' && $column !== 'dealer_missing_info') {
+        return;
+    }
+
+    $audit = autoagora_dealer_profile_get_seo_audit($post_id);
+    if ($column === 'dealer_seo_status') {
+        printf(
+            '<span class="autoagora-seo-status is-%1$s">%2$s</span><span class="autoagora-seo-score">%3$d%%</span>',
+            esc_attr($audit['status']),
+            esc_html($audit['label']),
+            (int) $audit['score']
+        );
+
+        return;
+    }
+
+    if (empty($audit['missing'])) {
+        echo '<span class="autoagora-seo-complete">' . esc_html__('Complete', 'bricks-child') . '</span>';
+
+        return;
+    }
+
+    if (!empty($audit['critical_missing'])) {
+        echo '<strong class="autoagora-seo-critical">' . esc_html__('Blocks indexing:', 'bricks-child') . '</strong> ';
+        echo esc_html(implode(', ', $audit['critical_missing']));
+    }
+    if (!empty($audit['critical_missing']) && !empty($audit['improvements'])) {
+        echo '<br>';
+    }
+    if (!empty($audit['improvements'])) {
+        echo '<span class="autoagora-seo-improvements">';
+        echo esc_html(
+            sprintf(
+                /* translators: %s: comma-separated profile fields */
+                __('Improve: %s', 'bricks-child'),
+                implode(', ', $audit['improvements'])
+            )
+        );
+        echo '</span>';
+    }
+}
+add_action('manage_' . AUTOAGORA_DEALER_PROFILE_POST_TYPE . '_posts_custom_column', 'autoagora_dealer_profile_admin_column', 10, 2);
+
+function autoagora_dealer_profile_admin_list_styles(): void
+{
+    $screen = get_current_screen();
+    if (!$screen || $screen->base !== 'edit' || $screen->post_type !== AUTOAGORA_DEALER_PROFILE_POST_TYPE) {
+        return;
+    }
+    ?>
+    <style>
+        .column-dealer_city,
+        .column-dealer_claim_status {
+            width: 9%;
+        }
+        .column-dealer_seo_status {
+            width: 11%;
+        }
+        .column-dealer_missing_info {
+            width: 30%;
+        }
+        .autoagora-seo-status {
+            display: inline-block;
+            padding: 3px 7px;
+            border-radius: 4px;
+            font-weight: 600;
+            line-height: 1.35;
+        }
+        .autoagora-seo-status.is-ready {
+            color: #166534;
+            background: #dcfce7;
+        }
+        .autoagora-seo-status.is-work {
+            color: #854d0e;
+            background: #fef9c3;
+        }
+        .autoagora-seo-status.is-blocked {
+            color: #991b1b;
+            background: #fee2e2;
+        }
+        .autoagora-seo-score {
+            display: block;
+            margin-top: 4px;
+            color: #646970;
+            font-size: 12px;
+        }
+        .autoagora-seo-critical {
+            color: #b32d2e;
+        }
+        .autoagora-seo-improvements {
+            color: #50575e;
+        }
+        .autoagora-seo-complete {
+            color: #166534;
+            font-weight: 600;
+        }
+    </style>
+    <?php
+}
+add_action('admin_head-edit.php', 'autoagora_dealer_profile_admin_list_styles');
+
 function autoagora_render_dealer_profile_card(int $post_id): void
 {
     $city = autoagora_dealer_profile_get_meta($post_id, 'dealer_city');
@@ -849,10 +1131,17 @@ function autoagora_dealer_profile_structured_data(int $post_id): string
     }
 
     if ($opening_hours !== '') {
-        $opening_hours_lines = preg_split('/\r\n|\r|\n/', $opening_hours);
-        $schema['openingHours'] = is_array($opening_hours_lines)
-            ? array_values(array_filter(array_map('trim', $opening_hours_lines)))
-            : $opening_hours;
+        $opening_hours_rows = autoagora_dealer_profile_parse_opening_hours($opening_hours);
+        $schema['openingHours'] = array_values(
+            array_filter(
+                array_map(
+                    static function (array $row): string {
+                        return trim($row['days'] . ($row['days'] !== '' ? ' ' : '') . $row['hours']);
+                    },
+                    $opening_hours_rows
+                )
+            )
+        );
     }
 
     if ($languages !== '') {
