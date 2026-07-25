@@ -4,6 +4,10 @@ WordPress admin path:
 
 `Dealer Profiles > Import profiles`
 
+Rollback path:
+
+`Dealer Profiles > Delete imported profiles`
+
 The importer accepts the research workbook's `All Research` or `Migration Ready`
 worksheet. It validates and previews the file before changing data, then imports
 20 rows per confirmed request.
@@ -35,3 +39,13 @@ worksheet. It validates and previews the file before changing data, then imports
 - Rejects external worksheet relationships.
 - Stores only validated JSON rows in a random, access-blocked temporary folder.
 - Deletes completed sessions and removes abandoned session files after one day.
+
+## Rollback
+
+- Permanently deletes only profiles carrying a non-empty `dealer_import_source_id`.
+- Runs in small automatic batches so the full research import can be removed.
+- Protects claimed and pending-claim profiles.
+- Requires `manage_options`, a WordPress nonce, a checkbox, and typed `DELETE`
+  confirmation.
+- Uses permanent deletion because trashed profiles are intentionally still found
+  by the importer and would block a clean re-import.

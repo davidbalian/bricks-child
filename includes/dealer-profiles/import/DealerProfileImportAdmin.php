@@ -15,14 +15,17 @@ require_once __DIR__ . '/DealerProfileImportRunner.php';
 final class AutoAgoraDealerProfileImportAdmin
 {
     private const PAGE_SLUG = 'dealer-profile-import';
+    private const DELETE_PAGE_SLUG = 'dealer-profile-import-delete';
     private const NONCE_UPLOAD = 'dealer_profile_import_upload';
     private const NONCE_CONFIRM = 'dealer_profile_import_confirm';
     private const NONCE_PROCESS = 'dealer_profile_import_process';
+    private const NONCE_DELETE = 'dealer_profile_import_delete';
     private const TRANSIENT_PREFIX = 'aag_dp_import_';
     private const RESULT_PREFIX = 'aag_dp_import_result_';
     private const SESSION_TTL = 7200;
     private const MAX_UPLOAD_BYTES = 10485760;
     private const BATCH_SIZE = 20;
+    private const DELETE_BATCH_SIZE = 40;
     private const MAX_PREVIEW_ROWS = 100;
 
     public static function init(): void
@@ -39,6 +42,15 @@ final class AutoAgoraDealerProfileImportAdmin
             'manage_options',
             self::PAGE_SLUG,
             array(__CLASS__, 'renderPage')
+        );
+
+        add_submenu_page(
+            'edit.php?post_type=' . AUTOAGORA_DEALER_PROFILE_POST_TYPE,
+            __('Delete imported dealer profiles', 'bricks-child'),
+            __('Delete imported profiles', 'bricks-child'),
+            'manage_options',
+            self::DELETE_PAGE_SLUG,
+            array(__CLASS__, 'renderDeletePage')
         );
     }
 
@@ -86,6 +98,232 @@ final class AutoAgoraDealerProfileImportAdmin
         }
 
         self::renderUploadForm();
+    }
+
+    public static function renderDeletePage(): void
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('You do not have permission to delete imported dealer profiles.', 'bricks-child'));
+        }
+
+        $method = isset($_SERVER['REQUEST_METHOD'])
+            ? strtoupper(sanitize_text_field(wp_unslash($_SERVER['REQUEST_METHOD'])))
+            : 'GET';
+        if ($method === 'POST') {
+            check_admin_referer(self::NONCE_DELETE);
+
+            $step = isset($_POST['dealer_profile_delete_step'])
+                ? sanitize_key(wp_unslash($_POST['dealer_profile_delete_step']))
+                : '';
+            if ($step === 'start') {
+                $confirmation = isset($_POST['dealer_profile_delete_confirmation'])
+                    ? strtoupper(trim(sanitize_text_field(wp_unslash($_POST['dealer_profile_delete_confirmation']))))
+                    : '';
+                if ($confirmation !== 'DELETE' || empty($_POST['dealer_profile_delete_acknowledgement'])) {
+                    self::renderDeleteOverview(
+                        __('Enter DELETE and confirm the acknowledgement before continuing.', 'bricks-child'),
+                        true
+                    );
+
+                    return;
+                }
+
+                self::processDeleteBatch(0, 0);
+
+                return;
+            }
+
+            if ($step === 'process') {
+                $deleted = isset($_POST['dealer_profile_deleted_count'])
+                    ? absint($_POST['dealer_profile_deleted_count'])
+                    : 0;
+                $failed = isset($_POST['dealer_profile_failed_count'])
+                    ? absint($_POST['dealer_profile_failed_count'])
+                    : 0;
+                self::processDeleteBatch($deleted, $failed);
+
+                return;
+            }
+        }
+
+        $deleted = isset($_GET['deleted']) ? absint($_GET['deleted']) : 0;
+        $failed = isset($_GET['failed']) ? absint($_GET['failed']) : 0;
+        self::renderDeleteOverview('', false, $deleted, $failed);
+    }
+
+    private static function processDeleteBatch(int $deleted, int $failed): void
+    {
+        $ids = self::importedProfileIds(self::DELETE_BATCH_SIZE, true);
+        foreach ($ids as $post_id) {
+            $result = wp_delete_post($post_id, true);
+            if ($result instanceof WP_Post) {
+                ++$deleted;
+            } else {
+                ++$failed;
+                update_post_meta($post_id, '_autoagora_import_delete_failed', '1');
+            }
+        }
+
+        $remaining = self::countImportedProfiles(true);
+        if ($remaining <= 0) {
+            wp_safe_redirect(
+                add_query_arg(
+                    array(
+                        'post_type' => AUTOAGORA_DEALER_PROFILE_POST_TYPE,
+                        'page'      => self::DELETE_PAGE_SLUG,
+                        'deleted'   => $deleted,
+                        'failed'    => $failed,
+                    ),
+                    admin_url('edit.php')
+                )
+            );
+            exit;
+        }
+
+        echo '<div class="wrap">';
+        echo '<h1>' . esc_html__('Deleting imported dealer profiles', 'bricks-child') . '</h1>';
+        echo '<p>' . esc_html(
+            sprintf(
+                /* translators: 1: deleted profiles, 2: remaining profiles */
+                __('Deleted %1$d profiles. %2$d remain.', 'bricks-child'),
+                $deleted,
+                $remaining
+            )
+        ) . '</p>';
+        echo '<p class="description">'
+            . esc_html__('Keep this page open. The next deletion batch will start automatically.', 'bricks-child')
+            . '</p>';
+        echo '<form method="post" id="dealer-profile-delete-continue">';
+        wp_nonce_field(self::NONCE_DELETE);
+        echo '<input type="hidden" name="dealer_profile_delete_step" value="process">';
+        echo '<input type="hidden" name="dealer_profile_deleted_count" value="' . esc_attr((string) $deleted) . '">';
+        echo '<input type="hidden" name="dealer_profile_failed_count" value="' . esc_attr((string) $failed) . '">';
+        submit_button(__('Continue deletion', 'bricks-child'), 'primary', 'submit', false);
+        echo '</form>';
+        echo '<script>window.setTimeout(function(){var f=document.getElementById("dealer-profile-delete-continue");'
+            . 'if(f){f.submit();}},500);</script>';
+        echo '</div>';
+    }
+
+    private static function renderDeleteOverview(
+        string $error = '',
+        bool $preserve_input = false,
+        int $deleted = 0,
+        int $failed = 0
+    ): void {
+        $deletable = self::countImportedProfiles(true);
+        $all_imported = self::countImportedProfiles(false);
+        $protected = max(0, $all_imported - $deletable);
+
+        echo '<div class="wrap">';
+        echo '<h1>' . esc_html__('Delete imported dealer profiles', 'bricks-child') . '</h1>';
+
+        if ($deleted > 0 || $failed > 0) {
+            $notice_class = $failed > 0 ? 'notice-warning' : 'notice-success';
+            echo '<div class="notice ' . esc_attr($notice_class) . ' is-dismissible"><p>';
+            echo esc_html(
+                sprintf(
+                    /* translators: 1: deleted profiles, 2: failed profiles */
+                    __('Deletion finished. Deleted: %1$d. Failed: %2$d.', 'bricks-child'),
+                    $deleted,
+                    $failed
+                )
+            );
+            echo '</p></div>';
+        }
+
+        if ($error !== '') {
+            echo '<div class="notice notice-error inline"><p>' . esc_html($error) . '</p></div>';
+        }
+
+        echo '<p>' . esc_html__(
+            'This permanently deletes dealer profiles created by the XLSX importer. It cannot be undone.',
+            'bricks-child'
+        ) . '</p>';
+        echo '<div style="display:flex;gap:12px;flex-wrap:wrap;margin:16px 0;">';
+        self::summaryBox(__('Will be deleted', 'bricks-child'), $deletable);
+        self::summaryBox(__('Claimed or pending - protected', 'bricks-child'), $protected);
+        echo '</div>';
+
+        if ($deletable <= 0) {
+            echo '<p><strong>' . esc_html__('There are no unclaimed imported profiles to delete.', 'bricks-child') . '</strong></p>';
+            echo '</div>';
+
+            return;
+        }
+
+        echo '<form method="post">';
+        wp_nonce_field(self::NONCE_DELETE);
+        echo '<input type="hidden" name="dealer_profile_delete_step" value="start">';
+        echo '<table class="form-table" role="presentation"><tr>';
+        echo '<th scope="row"><label for="dealer_profile_delete_confirmation">'
+            . esc_html__('Confirmation', 'bricks-child') . '</label></th><td>';
+        echo '<input type="text" class="regular-text" id="dealer_profile_delete_confirmation" '
+            . 'name="dealer_profile_delete_confirmation" value="'
+            . esc_attr($preserve_input ? 'DELETE' : '') . '" autocomplete="off" required>';
+        echo '<p class="description">' . esc_html__('Enter DELETE to confirm.', 'bricks-child') . '</p>';
+        echo '</td></tr></table>';
+        echo '<p><label><input type="checkbox" name="dealer_profile_delete_acknowledgement" value="1" required> '
+            . esc_html__('I understand these imported profiles will be permanently deleted.', 'bricks-child')
+            . '</label></p>';
+        submit_button(__('Permanently delete imported profiles', 'delete', 'submit', false));
+        echo '</form></div>';
+    }
+
+    /**
+     * @return list<int>
+     */
+    private static function importedProfileIds(int $limit, bool $deletable_only): array
+    {
+        $meta_query = array(
+            'relation' => 'AND',
+            array(
+                'key'     => 'dealer_import_source_id',
+                'value'   => '',
+                'compare' => '!=',
+            ),
+            array(
+                'key'     => '_autoagora_import_delete_failed',
+                'compare' => 'NOT EXISTS',
+            ),
+        );
+
+        if ($deletable_only) {
+            $meta_query[] = array(
+                'relation' => 'OR',
+                array(
+                    'key'     => 'dealer_claim_status',
+                    'compare' => 'NOT EXISTS',
+                ),
+                array(
+                    'key'     => 'dealer_claim_status',
+                    'value'   => array('claimed', 'pending'),
+                    'compare' => 'NOT IN',
+                ),
+            );
+        }
+
+        $ids = get_posts(
+            array(
+                'post_type'              => AUTOAGORA_DEALER_PROFILE_POST_TYPE,
+                'post_status'            => array('publish', 'draft', 'pending', 'private', 'future', 'trash'),
+                'posts_per_page'         => $limit,
+                'fields'                 => 'ids',
+                'orderby'                => 'ID',
+                'order'                  => 'ASC',
+                'no_found_rows'          => true,
+                'update_post_meta_cache' => true,
+                'update_post_term_cache' => false,
+                'meta_query'             => $meta_query,
+            )
+        );
+
+        return is_array($ids) ? array_map('intval', $ids) : array();
+    }
+
+    private static function countImportedProfiles(bool $deletable_only): int
+    {
+        return count(self::importedProfileIds(-1, $deletable_only));
     }
 
     private static function handleUpload(): void
