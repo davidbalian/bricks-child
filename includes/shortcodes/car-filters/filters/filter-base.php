@@ -251,6 +251,7 @@ function car_filter_render_range($args) {
         'max_value'       => '',
         'abs_min'         => 0,
         'abs_max'         => 0,
+        'inputmode'       => 'numeric',
         'data_attrs'      => array(),
     );
     $args = wp_parse_args($args, $defaults);
@@ -277,7 +278,7 @@ function car_filter_render_range($args) {
                        value="<?php echo esc_attr($args['min_value']); ?>"
                        data-abs-min="<?php echo esc_attr($args['abs_min']); ?>"
                        data-abs-max="<?php echo esc_attr($args['abs_max']); ?>"
-                       inputmode="numeric">
+                       inputmode="<?php echo esc_attr($args['inputmode']); ?>">
             </div>
             <div class="car-filter-input-wrapper">
                 <label for="<?php echo esc_attr($args['id']); ?>-max" class="car-filter-input-label">
@@ -291,7 +292,7 @@ function car_filter_render_range($args) {
                        value="<?php echo esc_attr($args['max_value']); ?>"
                        data-abs-min="<?php echo esc_attr($args['abs_min']); ?>"
                        data-abs-max="<?php echo esc_attr($args['abs_max']); ?>"
-                       inputmode="numeric">
+                       inputmode="<?php echo esc_attr($args['inputmode']); ?>">
             </div>
         </div>
     </div>
@@ -498,6 +499,10 @@ function car_filter_build_constrained_post_ids($filters, $exclude_keys = array()
                 );
             }
         }
+    }
+
+    if (function_exists('car_listings_append_extended_meta_filters')) {
+        $meta_query = car_listings_append_extended_meta_filters($meta_query, $filters, $exclude_keys);
     }
 
     $meta_query[] = ListingStateManager::meta_query_active_clause();

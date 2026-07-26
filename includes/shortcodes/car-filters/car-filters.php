@@ -23,6 +23,7 @@ require_once __DIR__ . '/filters/filter-mileage.php';
 require_once __DIR__ . '/filters/filter-year.php';
 require_once __DIR__ . '/filters/filter-fuel.php';
 require_once __DIR__ . '/filters/filter-body.php';
+require_once __DIR__ . '/filters/filter-extended.php';
 
 /**
  * Register the combined [car_filters] shortcode
@@ -66,6 +67,19 @@ function car_filters_shortcode($atts) {
         'year'    => 'car_filter_year_shortcode',
         'fuel'    => 'car_filter_fuel_shortcode',
         'body'    => 'car_filter_body_shortcode',
+        'engine'  => 'car_filter_engine_shortcode',
+        'hp'      => 'car_filter_hp_shortcode',
+        'owners'  => 'car_filter_owners_shortcode',
+        'transmission' => 'car_filter_transmission_shortcode',
+        'drive'   => 'car_filter_drive_shortcode',
+        'exterior' => 'car_filter_exterior_shortcode',
+        'interior' => 'car_filter_interior_shortcode',
+        'doors'   => 'car_filter_doors_shortcode',
+        'seats'   => 'car_filter_seats_shortcode',
+        'availability' => 'car_filter_availability_shortcode',
+        'antique' => 'car_filter_antique_shortcode',
+        'extras'  => 'car_filter_extras_shortcode',
+        'history' => 'car_filter_history_shortcode',
     );
 
     // Shared attributes to pass to each filter
@@ -394,6 +408,10 @@ function car_filters_ajax_filter_listings() {
     }
 
     // ACF car_city (from listing_atts — city landings and /cars/?car_city=).
+    if (function_exists('car_listings_append_extended_meta_filters')) {
+        $meta_query = car_listings_append_extended_meta_filters($meta_query, $_POST);
+    }
+
     if (!empty($atts['default_car_city'])) {
         $city_meta = sanitize_text_field($atts['default_car_city']);
         if ($city_meta !== '') {
@@ -608,6 +626,31 @@ function car_filters_ajax_get_available_options() {
         'fuel_types'  => !empty($_POST['fuel_type']) ? array_map('trim', explode(',', sanitize_text_field($_POST['fuel_type']))) : array(),
         'body_types'  => !empty($_POST['body_type']) ? array_map('trim', explode(',', sanitize_text_field($_POST['body_type']))) : array(),
     );
+
+    foreach (
+        array(
+            'engine_capacity_min',
+            'engine_capacity_max',
+            'hp_min',
+            'hp_max',
+            'numowners_min',
+            'numowners_max',
+            'transmission',
+            'drive_type',
+            'exterior_color',
+            'interior_color',
+            'number_of_doors',
+            'number_of_seats',
+            'availability',
+            'isantique',
+            'extras',
+            'vehiclehistory',
+        ) as $filter_key
+    ) {
+        $filters[$filter_key] = isset($_POST[$filter_key])
+            ? sanitize_text_field(wp_unslash($_POST[$filter_key]))
+            : '';
+    }
 
     $data = car_filter_get_available_options_data($filters);
 

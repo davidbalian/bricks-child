@@ -20,6 +20,23 @@
         }
     }
 
+    var CAR_FILTER_RANGES = ['price', 'mileage', 'year', 'engine_capacity', 'hp', 'numowners'];
+    var CAR_FILTER_MULTI = ['fuel_type', 'body_type', 'drive_type', 'exterior_color', 'interior_color', 'extras', 'vehiclehistory'];
+    var CAR_FILTER_SINGLE = ['transmission', 'number_of_doors', 'number_of_seats', 'availability', 'isantique'];
+    var CAR_FILTER_CLASSES = {
+        fuel_type: 'fuel',
+        body_type: 'body',
+        engine_capacity: 'engine',
+        drive_type: 'drive',
+        exterior_color: 'exterior',
+        interior_color: 'interior',
+        number_of_doors: 'doors',
+        number_of_seats: 'seats',
+        numowners: 'owners',
+        vehiclehistory: 'history',
+        isantique: 'antique'
+    };
+
     // Global state manager
     window.CarFilters = {
         groups: {},
@@ -44,6 +61,22 @@
                     year_max: '',
                     fuel_type: '',
                     body_type: '',
+                    engine_capacity_min: '',
+                    engine_capacity_max: '',
+                    hp_min: '',
+                    hp_max: '',
+                    numowners_min: '',
+                    numowners_max: '',
+                    transmission: '',
+                    drive_type: '',
+                    exterior_color: '',
+                    interior_color: '',
+                    number_of_doors: '',
+                    number_of_seats: '',
+                    availability: '',
+                    isantique: '',
+                    extras: '',
+                    vehiclehistory: '',
                     target: '',
                     mode: 'ajax',
                     redirectUrl: '/cars/',
@@ -104,18 +137,23 @@
          */
         getFilterData: function(group) {
             var state = this.getState(group);
-            return {
+            var data = {
                 make: state.make.value,
                 model: state.model.value,
-                price_min: this.parseNumber(state.price_min),
-                price_max: this.parseNumber(state.price_max),
-                mileage_min: this.parseNumber(state.mileage_min),
-                mileage_max: this.parseNumber(state.mileage_max),
-                year_min: this.parseNumber(state.year_min),
-                year_max: this.parseNumber(state.year_max),
-                fuel_type: state.fuel_type,
-                body_type: state.body_type
+                fuel_type: state.fuel_type || '',
+                body_type: state.body_type || ''
             };
+
+            var self = this;
+            CAR_FILTER_RANGES.forEach(function(key) {
+                data[key + '_min'] = self.parseFilterNumber(state[key + '_min'], key);
+                data[key + '_max'] = self.parseFilterNumber(state[key + '_max'], key);
+            });
+            CAR_FILTER_MULTI.concat(CAR_FILTER_SINGLE).forEach(function(key) {
+                data[key] = state[key] || '';
+            });
+
+            return data;
         },
 
         /**
@@ -139,23 +177,16 @@
         },
 
         appendNonMakeParams: function(params, state) {
-            var priceMin = this.parseNumber(state.price_min);
-            var priceMax = this.parseNumber(state.price_max);
-            if (priceMin) params.set('price_min', priceMin);
-            if (priceMax) params.set('price_max', priceMax);
-
-            var mileageMin = this.parseNumber(state.mileage_min);
-            var mileageMax = this.parseNumber(state.mileage_max);
-            if (mileageMin) params.set('mileage_min', mileageMin);
-            if (mileageMax) params.set('mileage_max', mileageMax);
-
-            var yearMin = this.parseNumber(state.year_min);
-            var yearMax = this.parseNumber(state.year_max);
-            if (yearMin) params.set('year_min', yearMin);
-            if (yearMax) params.set('year_max', yearMax);
-
-            if (state.fuel_type) params.set('fuel_type', state.fuel_type);
-            if (state.body_type) params.set('body_type', state.body_type);
+            var self = this;
+            CAR_FILTER_RANGES.forEach(function(key) {
+                var min = self.parseFilterNumber(state[key + '_min'], key);
+                var max = self.parseFilterNumber(state[key + '_max'], key);
+                if (min !== '') params.set(key + '_min', min);
+                if (max !== '') params.set(key + '_max', max);
+            });
+            CAR_FILTER_MULTI.concat(CAR_FILTER_SINGLE).forEach(function(key) {
+                if (state[key]) params.set(key, state[key]);
+            });
         },
 
         /**
@@ -300,15 +331,21 @@
 
             var result = {
                 makeSlug: prettyMatch ? decodeURIComponent(prettyMatch[1]) : (params.get('model') || params.get('make') || null),
-                price_min: params.get('price_min') ? parseInt(params.get('price_min'), 10) : null,
-                price_max: params.get('price_max') ? parseInt(params.get('price_max'), 10) : null,
-                mileage_min: params.get('mileage_min') ? parseInt(params.get('mileage_min'), 10) : null,
-                mileage_max: params.get('mileage_max') ? parseInt(params.get('mileage_max'), 10) : null,
-                year_min: params.get('year_min') ? parseInt(params.get('year_min'), 10) : null,
-                year_max: params.get('year_max') ? parseInt(params.get('year_max'), 10) : null,
                 fuel_type: params.get('fuel_type') || null,
                 body_type: params.get('body_type') || null
             };
+            var self = this;
+            CAR_FILTER_RANGES.forEach(function(key) {
+                result[key + '_min'] = params.get(key + '_min') !== null
+                    ? self.parseFilterNumber(params.get(key + '_min'), key)
+                    : null;
+                result[key + '_max'] = params.get(key + '_max') !== null
+                    ? self.parseFilterNumber(params.get(key + '_max'), key)
+                    : null;
+            });
+            CAR_FILTER_MULTI.concat(CAR_FILTER_SINGLE).forEach(function(key) {
+                result[key] = params.get(key) || null;
+            });
 
             // Return null if nothing was actually set
             var hasAny = Object.keys(result).some(function(k) { return result[k] !== null; });
@@ -470,6 +507,15 @@
             return parseInt(String(value).replace(/,/g, ''), 10) || '';
         },
 
+        parseFilterNumber: function(value, filterType) {
+            if (filterType !== 'engine_capacity') {
+                return this.parseNumber(value);
+            }
+            if (value === '' || value === null || value === undefined) return '';
+            var parsed = parseFloat(String(value).replace(/,/g, ''));
+            return isNaN(parsed) ? '' : parsed;
+        },
+
         /**
          * Format number with commas
          */
@@ -477,6 +523,18 @@
             if (!value) return '';
             var num = this.parseNumber(value);
             return num ? num.toLocaleString() : '';
+        },
+
+        formatFilterNumber: function(value, filterType) {
+            if (filterType !== 'engine_capacity') {
+                return this.formatNumber(value);
+            }
+            var parsed = this.parseFilterNumber(value, filterType);
+            return parsed === '' ? '' : String(parsed);
+        },
+
+        getFilterClass: function(filterType) {
+            return CAR_FILTER_CLASSES[filterType] || filterType;
         }
     };
 
@@ -548,6 +606,9 @@
 
         selectOption: function($dropdown, $option) {
             var value = $option.data('value');
+            if (value !== undefined && value !== null) {
+                value = String(value);
+            }
             var slug = $option.data('slug') || '';
             var label = $option.clone().children('.car-filter-count').remove().end().text().trim();
             var filterType = $dropdown.data('filter-type');
@@ -743,6 +804,16 @@
                 $input.val(cleaned);
                 return;
             }
+            if (filterType === 'engine_capacity') {
+                var decimal = value.replace(/[^0-9.]/g, '');
+                var firstDot = decimal.indexOf('.');
+                if (firstDot !== -1) {
+                    decimal = decimal.substring(0, firstDot + 1) +
+                        decimal.substring(firstDot + 1).replace(/\./g, '').substring(0, 1);
+                }
+                $input.val(decimal);
+                return;
+            }
 
             // Remove non-numeric characters except for the cursor position
             var cursorPos = $input[0].selectionStart;
@@ -770,16 +841,16 @@
             var $minInput = $wrapper.find('.car-filter-input-min');
             var $maxInput = $wrapper.find('.car-filter-input-max');
 
-            var minVal = CarFilters.parseNumber($minInput.val());
-            var maxVal = CarFilters.parseNumber($maxInput.val());
+            var minVal = CarFilters.parseFilterNumber($minInput.val(), filterType);
+            var maxVal = CarFilters.parseFilterNumber($maxInput.val(), filterType);
 
             // Validate min <= max
             if (minVal && maxVal && minVal > maxVal) {
                 if ($input.hasClass('car-filter-input-min')) {
-                    $minInput.val(CarFilters.formatNumber(maxVal));
+                    $minInput.val(CarFilters.formatFilterNumber(maxVal, filterType));
                     minVal = maxVal;
                 } else {
-                    $maxInput.val(CarFilters.formatNumber(minVal));
+                    $maxInput.val(CarFilters.formatFilterNumber(minVal, filterType));
                     maxVal = minVal;
                 }
             }
@@ -892,20 +963,10 @@
                 self._currentXhr = $.ajax({
                     url: carFiltersConfig.ajaxUrl,
                     type: 'POST',
-                    data: {
+                    data: $.extend({
                         action: 'car_filters_get_available_options',
-                        nonce: carFiltersConfig.nonce,
-                        make: filterData.make,
-                        model: filterData.model,
-                        price_min: filterData.price_min,
-                        price_max: filterData.price_max,
-                        mileage_min: filterData.mileage_min,
-                        mileage_max: filterData.mileage_max,
-                        year_min: filterData.year_min,
-                        year_max: filterData.year_max,
-                        fuel_type: filterData.fuel_type,
-                        body_type: filterData.body_type
-                    },
+                        nonce: carFiltersConfig.nonce
+                    }, filterData),
                     success: function(response) {
                         if (response.success && response.data) {
                             self.updateDropdowns(group, response.data);
@@ -1143,7 +1204,7 @@
                     return;
                 }
 
-                if (filterType === 'fuel_type' || filterType === 'body_type') {
+                if (CAR_FILTER_MULTI.indexOf(filterType) !== -1) {
                     var values = [];
                     $filter.find('.car-filter-dropdown-option.selected').each(function() {
                         var value = $(this).data('value');
@@ -1155,9 +1216,14 @@
                     return;
                 }
 
-                if (filterType === 'price' || filterType === 'mileage' || filterType === 'year') {
+                if (CAR_FILTER_RANGES.indexOf(filterType) !== -1) {
                     state[filterType + '_min'] = $filter.find('.car-filter-input-min').val() || '';
                     state[filterType + '_max'] = $filter.find('.car-filter-input-max').val() || '';
+                    return;
+                }
+
+                if (CAR_FILTER_SINGLE.indexOf(filterType) !== -1) {
+                    state[filterType] = $filter.find('select').val() || '';
                 }
             });
         }
@@ -1169,18 +1235,10 @@
             return false;
         }
 
-        return !!(
-            (state.make && state.make.value) ||
-            (state.model && state.model.value) ||
-            state.price_min ||
-            state.price_max ||
-            state.mileage_min ||
-            state.mileage_max ||
-            state.year_min ||
-            state.year_max ||
-            state.fuel_type ||
-            state.body_type
-        );
+        var data = CarFilters.getFilterData(group);
+        return Object.keys(data).some(function(key) {
+            return data[key] !== '' && data[key] !== null && data[key] !== undefined;
+        });
     }
 
     /**
@@ -1259,21 +1317,20 @@
                 }
 
                 // Set meta filter values
-                ['price', 'mileage', 'year'].forEach(function(key) {
-                    if (parsedUrl[key + '_min']) {
+                CAR_FILTER_RANGES.forEach(function(key) {
+                    if (parsedUrl[key + '_min'] !== null && parsedUrl[key + '_min'] !== '') {
                         CarFilters.setState(group, key + '_min', String(parsedUrl[key + '_min']));
                     }
-                    if (parsedUrl[key + '_max']) {
+                    if (parsedUrl[key + '_max'] !== null && parsedUrl[key + '_max'] !== '') {
                         CarFilters.setState(group, key + '_max', String(parsedUrl[key + '_max']));
                     }
                 });
 
-                if (parsedUrl.fuel_type) {
-                    CarFilters.setState(group, 'fuel_type', parsedUrl.fuel_type);
-                }
-                if (parsedUrl.body_type) {
-                    CarFilters.setState(group, 'body_type', parsedUrl.body_type);
-                }
+                CAR_FILTER_MULTI.concat(CAR_FILTER_SINGLE).forEach(function(key) {
+                    if (parsedUrl[key]) {
+                        CarFilters.setState(group, key, parsedUrl[key]);
+                    }
+                });
 
                 // Resolve make/model slug via AJAX
                 if (parsedUrl.makeSlug) {
@@ -1348,21 +1405,22 @@
                 }
 
                 // Update range input UIs
-                ['price', 'mileage', 'year'].forEach(function(key) {
-                    if (parsedUrl[key + '_min']) {
-                        var $minInputs = $('.car-filter-' + key + '[data-group="' + group + '"] .car-filter-input-min');
-                        $minInputs.val(CarFilters.formatNumber(parsedUrl[key + '_min']));
+                CAR_FILTER_RANGES.forEach(function(key) {
+                    var filterClass = CarFilters.getFilterClass(key);
+                    if (parsedUrl[key + '_min'] !== null && parsedUrl[key + '_min'] !== '') {
+                        var $minInputs = $('.car-filter-' + filterClass + '[data-group="' + group + '"] .car-filter-input-min');
+                        $minInputs.val(CarFilters.formatFilterNumber(parsedUrl[key + '_min'], key));
                     }
-                    if (parsedUrl[key + '_max']) {
-                        var $maxInputs = $('.car-filter-' + key + '[data-group="' + group + '"] .car-filter-input-max');
-                        $maxInputs.val(CarFilters.formatNumber(parsedUrl[key + '_max']));
+                    if (parsedUrl[key + '_max'] !== null && parsedUrl[key + '_max'] !== '') {
+                        var $maxInputs = $('.car-filter-' + filterClass + '[data-group="' + group + '"] .car-filter-input-max');
+                        $maxInputs.val(CarFilters.formatFilterNumber(parsedUrl[key + '_max'], key));
                     }
                 });
 
-                // Update multi-select filter dropdown UIs (fuel_type, body_type)
-                ['fuel_type', 'body_type'].forEach(function(key) {
+                // Update dropdown UIs for restored multi- and single-select filters.
+                CAR_FILTER_MULTI.concat(CAR_FILTER_SINGLE).forEach(function(key) {
                     if (parsedUrl[key]) {
-                        var filterClass = key === 'fuel_type' ? 'fuel' : 'body';
+                        var filterClass = CarFilters.getFilterClass(key);
                         var values = parsedUrl[key].split(',');
                         var $dropdowns = $('.car-filter-' + filterClass + '[data-group="' + group + '"] .car-filter-dropdown');
                         $dropdowns.each(function() {
@@ -1389,6 +1447,7 @@
                             } else if (matchCount > 1) {
                                 $text.removeClass('placeholder').text(matchCount + ' selected');
                             }
+                            $dropdown.find('select').val(values[0]);
                         });
                     }
                 });

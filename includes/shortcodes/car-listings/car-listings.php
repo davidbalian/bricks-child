@@ -109,6 +109,136 @@ function car_listings_apply_request_sort_to_atts(array $atts) {
 }
 
 /**
+ * Append the extended car-detail filters shared by page-load and AJAX queries.
+ *
+ * @param array $meta_query Existing WP meta query.
+ * @param array $source Request-like filter values.
+ * @param array $exclude_keys Filter names to ignore when calculating cascading options.
+ * @return array
+ */
+function car_listings_append_extended_meta_filters(array $meta_query, array $source, array $exclude_keys = array()) {
+    $range_filters = array(
+        'engine_capacity' => 'engine_capacity',
+        'hp'              => 'hp',
+        'numowners'       => 'numowners',
+    );
+
+    foreach ($range_filters as $filter_key => $meta_key) {
+        if (in_array($filter_key, $exclude_keys, true)) {
+            continue;
+        }
+
+        foreach (array('min' => '>=', 'max' => '<=') as $bound => $compare) {
+            $request_key = $filter_key . '_' . $bound;
+            if (!isset($source[$request_key]) || $source[$request_key] === '') {
+                continue;
+            }
+
+            $raw_value = str_replace(',', '', sanitize_text_field(wp_unslash($source[$request_key])));
+            if (!is_numeric($raw_value)) {
+                continue;
+            }
+
+            $meta_query[] = array(
+                'key'     => $meta_key,
+                'value'   => $filter_key === 'engine_capacity' ? (float) $raw_value : (int) $raw_value,
+                'compare' => $compare,
+                'type'    => 'NUMERIC',
+            );
+        }
+    }
+
+    $single_filters = array(
+        'transmission'    => 'transmission',
+        'number_of_doors' => 'number_of_doors',
+        'number_of_seats' => 'number_of_seats',
+        'availability'    => 'availability',
+        'isantique'       => 'isantique',
+    );
+
+    foreach ($single_filters as $filter_key => $meta_key) {
+        if (
+            in_array($filter_key, $exclude_keys, true)
+            || !isset($source[$filter_key])
+            || $source[$filter_key] === ''
+        ) {
+            continue;
+        }
+
+        $value = sanitize_text_field(wp_unslash($source[$filter_key]));
+        if ($filter_key === 'isantique') {
+            $value = $value === '1' ? '1' : '';
+        }
+        if ($value === '') {
+            continue;
+        }
+
+        $meta_query[] = array(
+            'key'     => $meta_key,
+            'value'   => $value,
+            'compare' => '=',
+        );
+    }
+
+    $multi_value_filters = array(
+        'drive_type'     => 'drive_type',
+        'exterior_color' => 'exterior_color',
+        'interior_color' => 'interior_color',
+    );
+
+    foreach ($multi_value_filters as $filter_key => $meta_key) {
+        if (in_array($filter_key, $exclude_keys, true) || empty($source[$filter_key])) {
+            continue;
+        }
+
+        $raw_values = is_array($source[$filter_key])
+            ? wp_unslash($source[$filter_key])
+            : explode(',', sanitize_text_field(wp_unslash($source[$filter_key])));
+        $values = array_values(array_filter(array_map('sanitize_text_field', $raw_values), 'strlen'));
+        if (empty($values)) {
+            continue;
+        }
+
+        $meta_query[] = array(
+            'key'     => $meta_key,
+            'value'   => count($values) === 1 ? $values[0] : $values,
+            'compare' => count($values) === 1 ? '=' : 'IN',
+        );
+    }
+
+    $serialized_filters = array(
+        'extras'         => 'extras',
+        'vehiclehistory' => 'vehiclehistory',
+    );
+
+    foreach ($serialized_filters as $filter_key => $meta_key) {
+        if (in_array($filter_key, $exclude_keys, true) || empty($source[$filter_key])) {
+            continue;
+        }
+
+        $raw_values = is_array($source[$filter_key])
+            ? wp_unslash($source[$filter_key])
+            : explode(',', sanitize_text_field(wp_unslash($source[$filter_key])));
+        $values = array_values(array_filter(array_map('sanitize_key', $raw_values), 'strlen'));
+        if (empty($values)) {
+            continue;
+        }
+
+        $required_values = array('relation' => 'AND');
+        foreach ($values as $value) {
+            $required_values[] = array(
+                'key'     => $meta_key,
+                'value'   => '"' . $value . '"',
+                'compare' => 'LIKE',
+            );
+        }
+        $meta_query[] = $required_values;
+    }
+
+    return $meta_query;
+}
+
+/**
  * Build WP_Query arguments based on shortcode attributes
  */
 function car_listings_build_query_args($atts) {
@@ -338,6 +468,8 @@ function car_listings_build_query_args($atts) {
             ? array('key' => 'body_type', 'value' => $body_types[0], 'compare' => '=')
             : array('key' => 'body_type', 'value' => $body_types, 'compare' => 'IN');
     }
+
+    $meta_query = car_listings_append_extended_meta_filters($meta_query, $_GET);
 
     // City (ACF car_city): URL wins over shortcode default (city landings / browse after redirect).
     $car_city_filter = '';

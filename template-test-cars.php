@@ -122,7 +122,7 @@ $request_ctx = function_exists( 'autoagora_get_active_car_filter_context' )
     : array();
 $has_server_filters = !empty( $request_ctx['make_slug'] ) || !empty( $request_ctx['model_slug'] );
 if ( ! $has_server_filters ) {
-    foreach ( array( 'make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max', 'year_min', 'year_max', 'fuel_type', 'body_type', 'car_city', 'loc_lat', 'loc_lng', 'loc_radius' ) as $k ) {
+    foreach ( array( 'make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max', 'year_min', 'year_max', 'fuel_type', 'body_type', 'engine_capacity_min', 'engine_capacity_max', 'hp_min', 'hp_max', 'numowners_min', 'numowners_max', 'transmission', 'drive_type', 'exterior_color', 'interior_color', 'number_of_doors', 'number_of_seats', 'availability', 'isantique', 'extras', 'vehiclehistory', 'car_city', 'loc_lat', 'loc_lng', 'loc_radius' ) as $k ) {
         if ( isset( $_GET[ $k ] ) && wp_unslash( $_GET[ $k ] ) !== '' ) {
             $has_server_filters = true;
             break;
@@ -139,33 +139,43 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 <!-- Filters bar -->
 <div class="tcp-filters-bar">
     <div class="tcp-filters-bar-inner">
-        <button type="button" class="tcp-filters-btn" id="tcp-filters-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="1" fill="currentColor" stroke="none"/></svg>
-            Filters
-        </button>
-        <button type="button" class="tcp-filters-btn" id="tcp-location-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.373 7-11a7 7 0 1 0-14 0c0 5.627 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-            Location
-        </button>
-        <div class="tcp-active-filters" id="tcp-active-filters"></div>
-
-        <div class="tcp-sort" id="tcp-sort">
-            <button type="button" class="tcp-sort-btn" id="tcp-sort-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
-                <span id="tcp-sort-label">Best Match</span>
+        <div class="tcp-quick-filters" aria-label="Quick car filters">
+            <button type="button" class="tcp-quick-filter" data-filter-target="make">Make &amp; model</button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="price">Price</button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="year">Year</button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="mileage">Mileage</button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="transmission">Transmission</button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="body">Body type</button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="fuel">Fuel type</button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="engine">Engine size</button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="location">Location</button>
+        </div>
+        <div class="tcp-toolbar-actions">
+            <button type="button" class="tcp-filters-btn" id="tcp-filters-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="1" fill="currentColor" stroke="none"/></svg>
+                All filters
             </button>
-            <div class="tcp-sort-menu" id="tcp-sort-menu">
-                <button type="button" class="tcp-sort-option selected" data-orderby="score" data-order="DESC">Best Match</button>
-                <button type="button" class="tcp-sort-option" data-orderby="date" data-order="DESC">Newest</button>
-                <button type="button" class="tcp-sort-option" data-orderby="date" data-order="ASC">Oldest</button>
-                <button type="button" class="tcp-sort-option" data-orderby="price" data-order="ASC">Price: Low to High</button>
-                <button type="button" class="tcp-sort-option" data-orderby="price" data-order="DESC">Price: High to Low</button>
-                <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="ASC">Mileage: Low to High</button>
-                <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="DESC">Mileage: High to Low</button>
-                <button type="button" class="tcp-sort-option" data-orderby="year" data-order="DESC">Year: Newest</button>
-                <button type="button" class="tcp-sort-option" data-orderby="year" data-order="ASC">Year: Oldest</button>
+            <div class="tcp-sort" id="tcp-sort">
+                <button type="button" class="tcp-sort-btn" id="tcp-sort-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
+                    <span id="tcp-sort-label">Best Match</span>
+                </button>
+                <div class="tcp-sort-menu" id="tcp-sort-menu">
+                    <button type="button" class="tcp-sort-option selected" data-orderby="score" data-order="DESC">Best Match</button>
+                    <button type="button" class="tcp-sort-option" data-orderby="date" data-order="DESC">Newest</button>
+                    <button type="button" class="tcp-sort-option" data-orderby="date" data-order="ASC">Oldest</button>
+                    <button type="button" class="tcp-sort-option" data-orderby="price" data-order="ASC">Price: Low to High</button>
+                    <button type="button" class="tcp-sort-option" data-orderby="price" data-order="DESC">Price: High to Low</button>
+                    <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="ASC">Mileage: Low to High</button>
+                    <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="DESC">Mileage: High to Low</button>
+                    <button type="button" class="tcp-sort-option" data-orderby="year" data-order="DESC">Year: Newest</button>
+                    <button type="button" class="tcp-sort-option" data-orderby="year" data-order="ASC">Year: Oldest</button>
+                </div>
             </div>
         </div>
+    </div>
+    <div class="tcp-active-filters-row">
+        <div class="tcp-active-filters" id="tcp-active-filters"></div>
     </div>
 </div>
 
@@ -179,7 +189,62 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
             </button>
         </div>
         <div class="tcp-filters-modal-body">
-            <?php echo do_shortcode( '[car_filters filters="make,model,price,mileage,fuel,body,year" mode="ajax" target="test-cars-listings" layout="vertical" show_button="false"]' ); ?>
+            <?php
+            $tcp_modal_filter_sections = array(
+                'Search essentials' => array(
+                    'make' => 'car_filter_make',
+                    'model' => 'car_filter_model',
+                    'price' => 'car_filter_price',
+                    'year' => 'car_filter_year',
+                    'mileage' => 'car_filter_mileage',
+                ),
+                'Vehicle details' => array(
+                    'transmission' => 'car_filter_transmission',
+                    'body' => 'car_filter_body',
+                    'fuel' => 'car_filter_fuel',
+                    'engine' => 'car_filter_engine',
+                    'hp' => 'car_filter_hp',
+                    'drive' => 'car_filter_drive',
+                    'exterior' => 'car_filter_exterior',
+                    'interior' => 'car_filter_interior',
+                    'doors' => 'car_filter_doors',
+                    'seats' => 'car_filter_seats',
+                ),
+                'More options' => array(
+                    'availability' => 'car_filter_availability',
+                    'owners' => 'car_filter_owners',
+                    'antique' => 'car_filter_antique',
+                    'extras' => 'car_filter_extras',
+                    'history' => 'car_filter_history',
+                ),
+            );
+            ?>
+            <div class="car-filters-container car-filters-vertical"
+                 data-group="default"
+                 data-mode="ajax"
+                 data-target="test-cars-listings"
+                 data-redirect-url="/cars/"
+                 data-results-base-url="/cars/">
+                <?php foreach ( $tcp_modal_filter_sections as $section_title => $section_filters ) : ?>
+                    <section class="tcp-filter-section">
+                        <h3><?php echo esc_html( $section_title ); ?></h3>
+                        <div class="car-filters-wrapper">
+                            <?php foreach ( $section_filters as $filter_name => $filter_shortcode ) : ?>
+                                <div class="car-filters-item car-filters-item-<?php echo esc_attr( $filter_name ); ?>">
+                                    <?php
+                                    echo do_shortcode(
+                                        sprintf(
+                                            '[%s group="default" mode="ajax" target="test-cars-listings"]',
+                                            $filter_shortcode
+                                        )
+                                    );
+                                    ?>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </section>
+                <?php endforeach; ?>
+            </div>
         </div>
         <div class="tcp-filters-modal-footer">
             <button type="button" class="tcp-modal-apply-btn" id="tcp-modal-apply-btn">Apply Filters</button>
@@ -388,6 +453,45 @@ body {
     align-items: center;
     gap: 0.75rem;
 }
+.tcp-quick-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    overflow-x: auto;
+    flex: 1 1 auto;
+    scrollbar-width: none;
+}
+.tcp-quick-filters::-webkit-scrollbar {
+    display: none;
+}
+.tcp-quick-filter {
+    flex: 0 0 auto;
+    min-height: 38px;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid #0d86e3;
+    border-radius: 999px;
+    background: #fff;
+    color: #075f9f;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.tcp-quick-filter:hover,
+.tcp-quick-filter.is-active {
+    border-color: #0d86e3;
+    background: #eaf5fd;
+    color: #064d82;
+}
+.tcp-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex: 0 0 auto;
+}
 .tcp-filters-btn {
     display: inline-flex;
     align-items: center;
@@ -413,7 +517,6 @@ body {
 .tcp-sort {
     position: relative;
     flex-shrink: 0;
-    margin-left: auto;
 }
 .tcp-sort-btn {
     display: inline-flex;
@@ -479,6 +582,15 @@ body {
     flex: 1;
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+.tcp-active-filters-row {
+    display: none;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 1rem 0.7rem;
+}
+.tcp-active-filters-row.has-active {
+    display: block;
 }
 .tcp-active-filters::-webkit-scrollbar {
     display: none;
@@ -555,7 +667,7 @@ body {
     background: #fff;
     border-radius: 1rem;
     width: 100%;
-    max-width: 600px;
+    max-width: 760px;
     max-height: 90vh;
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(0,0,0,0.2);
@@ -609,6 +721,22 @@ body {
 }
 .tcp-filters-modal-body .car-filters-container {
     width: 100%;
+}
+.tcp-filter-section + .tcp-filter-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+.tcp-filter-section h3 {
+    margin: 0 0 1rem;
+    color: #172033;
+    font-size: 1rem;
+    line-height: 1.35;
+    font-weight: 700;
+}
+.tcp-filters-modal-body .car-filters-item.is-quick-target {
+    border-radius: 0.5rem;
+    box-shadow: 0 0 0 3px rgba(13, 134, 227, 0.18);
 }
 .tcp-filters-modal-footer {
     padding: 1rem 1.25rem;
@@ -670,7 +798,17 @@ body {
 .tcp-filters-modal-body .car-filters-item-make,
 .tcp-filters-modal-body .car-filters-item-model,
 .tcp-filters-modal-body .car-filters-item-fuel,
-.tcp-filters-modal-body .car-filters-item-body {
+.tcp-filters-modal-body .car-filters-item-body,
+.tcp-filters-modal-body .car-filters-item-transmission,
+.tcp-filters-modal-body .car-filters-item-drive,
+.tcp-filters-modal-body .car-filters-item-exterior,
+.tcp-filters-modal-body .car-filters-item-interior,
+.tcp-filters-modal-body .car-filters-item-doors,
+.tcp-filters-modal-body .car-filters-item-seats,
+.tcp-filters-modal-body .car-filters-item-availability,
+.tcp-filters-modal-body .car-filters-item-antique,
+.tcp-filters-modal-body .car-filters-item-extras,
+.tcp-filters-modal-body .car-filters-item-history {
     flex: 0 0 calc(50% - 0.5rem);
 }
 .tcp-location-modal {
@@ -787,17 +925,28 @@ body {
         display: none;
     }
     .tcp-filters-bar-inner {
-        flex-wrap: wrap;
-        row-gap: 0;
+        align-items: stretch;
+        flex-direction: column;
+        gap: 0.65rem;
+        padding-right: 0;
+    }
+    .tcp-quick-filters {
+        width: 100%;
+        padding-right: 1rem;
+    }
+    .tcp-toolbar-actions {
+        padding-right: 1rem;
+    }
+    .tcp-filters-btn {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+    .tcp-sort {
+        flex: 0 0 auto;
     }
     .tcp-active-filters {
-        order: 10;
-        flex-basis: 100%;
         width: 100%;
-        padding-top: 1rem;
-        padding-bottom: 0.5rem;
-        border-top: 1px solid #e5e7eb;
-        margin-top: 1rem;
+        padding: 0.65rem 0 0.1rem;
     }
     .tcp-active-filters:empty {
         display: none;
@@ -810,6 +959,22 @@ body {
     }
     .tcp-filters-modal-overlay {
         padding: 0;
+    }
+    .tcp-filters-modal-body .car-filters-item-make,
+    .tcp-filters-modal-body .car-filters-item-model,
+    .tcp-filters-modal-body .car-filters-item-fuel,
+    .tcp-filters-modal-body .car-filters-item-body,
+    .tcp-filters-modal-body .car-filters-item-transmission,
+    .tcp-filters-modal-body .car-filters-item-drive,
+    .tcp-filters-modal-body .car-filters-item-exterior,
+    .tcp-filters-modal-body .car-filters-item-interior,
+    .tcp-filters-modal-body .car-filters-item-doors,
+    .tcp-filters-modal-body .car-filters-item-seats,
+    .tcp-filters-modal-body .car-filters-item-availability,
+    .tcp-filters-modal-body .car-filters-item-antique,
+    .tcp-filters-modal-body .car-filters-item-extras,
+    .tcp-filters-modal-body .car-filters-item-history {
+        flex-basis: 100%;
     }
     .tcp-location-map {
         height: 100%;
@@ -1113,6 +1278,26 @@ body {
     var locationAutocomplete = null;
     var locationGeocoder = null;
     var reverseGeocodeTimer = null;
+    var rangeFilterKeys = ['price', 'mileage', 'year', 'engine_capacity', 'hp', 'numowners'];
+    var selectFilterKeys = ['fuel_type', 'body_type', 'transmission', 'drive_type', 'exterior_color', 'interior_color', 'number_of_doors', 'number_of_seats', 'availability', 'isantique', 'extras', 'vehiclehistory'];
+    var allFilterKeys = ['make', 'model'];
+    rangeFilterKeys.forEach(function(key) {
+        allFilterKeys.push(key + '_min', key + '_max');
+    });
+    allFilterKeys = allFilterKeys.concat(selectFilterKeys);
+    var filterClassMap = {
+        fuel_type: 'fuel',
+        body_type: 'body',
+        engine_capacity: 'engine',
+        drive_type: 'drive',
+        exterior_color: 'exterior',
+        interior_color: 'interior',
+        number_of_doors: 'doors',
+        number_of_seats: 'seats',
+        numowners: 'owners',
+        vehiclehistory: 'history',
+        isantique: 'antique'
+    };
 
     /**
      * Calculate posts_per_page as a multiple of current column count
@@ -1174,13 +1359,66 @@ body {
         year_max: 'Year max',
         fuel_type: 'Fuel',
         body_type: 'Body',
+        engine_capacity_min: 'Engine min',
+        engine_capacity_max: 'Engine max',
+        hp_min: 'Power min',
+        hp_max: 'Power max',
+        numowners_min: 'Owners min',
+        numowners_max: 'Owners max',
+        transmission: 'Transmission',
+        drive_type: 'Drive',
+        exterior_color: 'Exterior',
+        interior_color: 'Interior',
+        number_of_doors: 'Doors',
+        number_of_seats: 'Seats',
+        availability: 'Availability',
+        isantique: 'Registration',
+        extras: 'Features',
+        vehiclehistory: 'History',
         location_radius: 'Location'
     };
 
     /* ── Modal open/close ── */
-    $('#tcp-filters-btn').on('click', function() {
+    function openFilterModal(filterTarget) {
         $overlay.addClass('open');
         $('body').css('overflow', 'hidden');
+        if (!filterTarget) return;
+
+        window.setTimeout(function() {
+            var $item = $overlay.find('.car-filters-item-' + filterTarget).first();
+            if (!$item.length) return;
+
+            var body = $overlay.find('.tcp-filters-modal-body')[0];
+            if (body) {
+                var bodyRect = body.getBoundingClientRect();
+                var itemRect = $item[0].getBoundingClientRect();
+                body.scrollTo({
+                    top: Math.max(0, body.scrollTop + itemRect.top - bodyRect.top - 16),
+                    behavior: 'smooth'
+                });
+            }
+
+            $overlay.find('.car-filters-item').removeClass('is-quick-target');
+            $item.addClass('is-quick-target');
+            window.setTimeout(function() {
+                $item.removeClass('is-quick-target');
+            }, 1800);
+
+            var $dropdown = $item.find('.car-filter-dropdown').first();
+            if ($dropdown.length && !$dropdown.hasClass('car-filter-dropdown-disabled')) {
+                $('.car-filter-dropdown.open').removeClass('open')
+                    .find('.car-filter-dropdown-button').attr('aria-expanded', 'false');
+                $dropdown.addClass('open');
+                $dropdown.find('.car-filter-dropdown-button').attr('aria-expanded', 'true');
+                var $search = $dropdown.find('.car-filter-dropdown-search:not(:disabled)');
+                ($search.length ? $search : $dropdown.find('.car-filter-dropdown-button')).first().focus();
+            } else {
+                $item.find('.car-filter-input').first().focus();
+            }
+        }, 80);
+    }
+    $('#tcp-filters-btn').on('click', function() {
+        openFilterModal('');
     });
     function closeModal() {
         $overlay.removeClass('open');
@@ -1219,6 +1457,14 @@ body {
     }
 
     $('#tcp-location-btn').on('click', openLocationModal);
+    $('.tcp-quick-filter').on('click', function() {
+        var target = String($(this).data('filter-target') || '');
+        if (target === 'location') {
+            openLocationModal();
+            return;
+        }
+        openFilterModal(target);
+    });
     $('#tcp-location-modal-close').on('click', closeLocationModal);
     $locationOverlay.on('click', function(e) {
         if (e.target === this) closeLocationModal();
@@ -1249,23 +1495,24 @@ body {
             hasAny = true;
         }
         // Range filters
-        ['price', 'mileage', 'year'].forEach(function(key) {
+        rangeFilterKeys.forEach(function(key) {
             var min = state[key + '_min'];
             var max = state[key + '_max'];
-            var noComma = (key === 'year');
+            var noComma = (key === 'year' || key === 'engine_capacity');
+            var suffix = key === 'engine_capacity' ? 'L' : (key === 'hp' ? ' hp' : '');
             if (min) {
-                html += chip(key + '_min', filterLabels[key + '_min'] + ': ' + formatNum(min, noComma));
+                html += chip(key + '_min', filterLabels[key + '_min'] + ': ' + formatNum(min, noComma) + suffix);
                 hasAny = true;
             }
             if (max) {
-                html += chip(key + '_max', filterLabels[key + '_max'] + ': ' + formatNum(max, noComma));
+                html += chip(key + '_max', filterLabels[key + '_max'] + ': ' + formatNum(max, noComma) + suffix);
                 hasAny = true;
             }
         });
         // Simple selects
-        ['fuel_type', 'body_type'].forEach(function(key) {
+        selectFilterKeys.forEach(function(key) {
             if (state[key]) {
-                html += chip(key, filterLabels[key] + ': ' + state[key]);
+                html += chip(key, filterLabels[key] + ': ' + getFilterValueLabel(key, state[key]));
                 hasAny = true;
             }
         });
@@ -1280,19 +1527,55 @@ body {
         }
 
         $chips.html(html);
+        $chips.closest('.tcp-active-filters-row').toggleClass('has-active', hasAny);
+        updateQuickFilterStates(state);
     }
 
     function chip(key, label) {
         return '<span class="tcp-chip" data-filter="' + key + '">' +
-               label +
+               escapeHtml(label) +
                '<button type="button" class="tcp-chip-remove" data-filter="' + key + '" aria-label="Remove">&times;</button>' +
                '</span>';
     }
 
+    function escapeHtml(value) {
+        return $('<div>').text(String(value)).html();
+    }
+
     function formatNum(val, raw) {
-        var n = parseInt(String(val).replace(/,/g, ''), 10);
+        var n = raw ? parseFloat(String(val).replace(/,/g, '')) : parseInt(String(val).replace(/,/g, ''), 10);
         if (!n) return val;
         return raw ? String(n) : n.toLocaleString();
+    }
+
+    function getFilterValueLabel(key, value) {
+        var filterClass = filterClassMap[key] || key;
+        return String(value).split(',').map(function(item) {
+            var $option = $('.car-filter-' + filterClass + ' .car-filter-dropdown-option').filter(function() {
+                return String($(this).data('value')) === item;
+            }).first();
+            return $option.length
+                ? $option.clone().children('.car-filter-count').remove().end().text().trim()
+                : item.replace(/_/g, ' ');
+        }).join(', ');
+    }
+
+    function updateQuickFilterStates(state) {
+        $('.tcp-quick-filter').each(function() {
+            var target = String($(this).data('filter-target') || '');
+            var active = false;
+            if (target === 'make') {
+                active = !!((state.make && state.make.value) || (state.model && state.model.value));
+            } else if (target === 'location') {
+                active = locationState.active;
+            } else {
+                var stateKey = Object.keys(filterClassMap).find(function(key) {
+                    return filterClassMap[key] === target;
+                }) || target;
+                active = !!(state[stateKey] || state[stateKey + '_min'] || state[stateKey + '_max']);
+            }
+            $(this).toggleClass('is-active', active);
+        });
     }
 
     function getMakeLabel(termId) {
@@ -1558,8 +1841,7 @@ body {
 
     // Clear all
     $chips.on('click', '#tcp-clear-all', function() {
-        ['make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max',
-         'year_min', 'year_max', 'fuel_type', 'body_type', 'location_radius'].forEach(function(key) {
+        allFilterKeys.concat(['location_radius']).forEach(function(key) {
             clearFilter(key);
         });
         resetSort();
@@ -1584,7 +1866,7 @@ body {
             var parts = key.split('_');
             var bound = parts.pop(); // min or max
             var field = parts.join('_');
-            var filterCls = field === 'fuel_type' ? 'fuel' : (field === 'body_type' ? 'body' : field);
+            var filterCls = filterClassMap[field] || field;
             $('.car-filter-' + filterCls + ' .car-filter-input-' + bound).val('');
         } else if (key === 'location_radius') {
             locationState.active = false;
@@ -1597,7 +1879,7 @@ body {
             syncLocationParamsToUrl();
         } else {
             CarFilters.setState(group, key, '');
-            var filterCls = key === 'fuel_type' ? 'fuel' : (key === 'body_type' ? 'body' : key);
+            var filterCls = filterClassMap[key] || key;
             var $dd = $('.car-filter-' + filterCls + ' .car-filter-dropdown');
             $dd.find('.car-filter-dropdown-option').removeClass('selected');
             $dd.find('.car-filter-dropdown-option[data-value=""]').addClass('selected');
@@ -1608,8 +1890,7 @@ body {
 
     /* ── No-results clear all button ── */
     $wrapper.on('click', '#tcp-no-results-clear-btn', function() {
-        ['make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max',
-         'year_min', 'year_max', 'fuel_type', 'body_type', 'location_radius'].forEach(function(key) {
+        allFilterKeys.concat(['location_radius']).forEach(function(key) {
             clearFilter(key);
         });
         resetSort();
@@ -1621,8 +1902,7 @@ body {
         CarFilters.triggerFilter(group);
     });
     $('#tcp-modal-clear-btn').on('click', function() {
-        ['make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max',
-         'year_min', 'year_max', 'fuel_type', 'body_type'].forEach(function(key) {
+        allFilterKeys.forEach(function(key) {
             clearFilter(key);
         });
         resetSort();
@@ -1850,15 +2130,6 @@ body {
                 : (parseInt($container.attr('data-page'), 10) || 1);
             loadPage(initialListingsPage, { scroll: false });
         }
-    });
-
-    // Scroll modal body to bottom when fuel/body dropdowns are opened
-    $(document).on('click', '.tcp-filters-modal-body .car-filters-item-fuel .car-filter-dropdown-button, .tcp-filters-modal-body .car-filters-item-body .car-filter-dropdown-button', function() {
-        var modalBody = document.querySelector('.tcp-filters-modal-body');
-        if (!modalBody) return;
-        setTimeout(function() {
-            modalBody.scrollTo({ top: modalBody.scrollHeight, behavior: 'smooth' });
-        }, 50);
     });
 
 })(jQuery);
