@@ -500,6 +500,37 @@ function autoagora_dealer_profile_active_listings_query(int $post_id, int $limit
     return new WP_Query($args);
 }
 
+function autoagora_dealer_profile_recommended_listings_query(int $limit = 8): WP_Query
+{
+    $args = array(
+        'post_type'                     => 'car',
+        'post_status'                   => 'publish',
+        'posts_per_page'                => max(1, min(12, $limit)),
+        'ignore_sticky_posts'           => true,
+        'orderby'                       => 'date',
+        'order'                         => 'DESC',
+        '_car_listings_orderby'         => 'score',
+        '_car_listings_order'           => 'DESC',
+        'car_listing_state_active_only' => true,
+    );
+
+    if (function_exists('car_listings_execute_query') && class_exists('ListingStateManager')) {
+        return car_listings_execute_query($args);
+    }
+
+    unset(
+        $args['_car_listings_orderby'],
+        $args['_car_listings_order'],
+        $args['car_listing_state_active_only']
+    );
+
+    if (class_exists('ListingStateManager')) {
+        $args['meta_query'] = array(ListingStateManager::meta_query_active_clause());
+    }
+
+    return new WP_Query($args);
+}
+
 function autoagora_dealer_profile_is_public_url(string $value): bool
 {
     return autoagora_sanitize_dealer_profile_url($value) !== '';

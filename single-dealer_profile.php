@@ -10,9 +10,18 @@ if (!defined('ABSPATH')) {
 }
 
 $post_id = get_queried_object_id();
-$listings_query = function_exists('autoagora_dealer_profile_active_listings_query')
+$dealer_listings_query = function_exists('autoagora_dealer_profile_active_listings_query')
     ? autoagora_dealer_profile_active_listings_query((int) $post_id, 12)
     : null;
+$has_dealer_listings = $dealer_listings_query instanceof WP_Query
+    && $dealer_listings_query->have_posts();
+$listings_query = $has_dealer_listings
+    ? $dealer_listings_query
+    : (
+        function_exists('autoagora_dealer_profile_recommended_listings_query')
+            ? autoagora_dealer_profile_recommended_listings_query(8)
+            : null
+    );
 
 if ($listings_query instanceof WP_Query && $listings_query->have_posts() && function_exists('car_card_enqueue_assets')) {
     car_card_enqueue_assets();
@@ -179,10 +188,22 @@ if (have_posts()) :
 
             <section class="dealer-profile-listings">
                 <div class="dealer-profile-section-heading">
-                    <h2><?php esc_html_e('Active listings', 'bricks-child'); ?></h2>
-                    <?php if ($is_claimed && $listing_count > 0) : ?>
+                    <h2>
+                        <?php
+                        echo esc_html(
+                            $has_dealer_listings
+                                ? __('Active listings', 'bricks-child')
+                                : __('Cars you might like', 'bricks-child')
+                        );
+                        ?>
+                    </h2>
+                    <?php if ($has_dealer_listings && $is_claimed && $listing_count > 0) : ?>
                         <a href="<?php echo esc_url(add_query_arg('user_id', autoagora_dealer_profile_get_claimed_user_id($post_id), home_url('/cars/'))); ?>">
                             <?php esc_html_e('View all', 'bricks-child'); ?>
+                        </a>
+                    <?php elseif (!$has_dealer_listings) : ?>
+                        <a href="<?php echo esc_url(home_url('/cars/')); ?>">
+                            <?php esc_html_e('Browse all cars', 'bricks-child'); ?>
                         </a>
                     <?php endif; ?>
                 </div>
@@ -190,6 +211,9 @@ if (have_posts()) :
                 <?php if ($listings_query instanceof WP_Query && $listings_query->have_posts()) : ?>
                     <div class="car-listings-wrapper dealer-profile-listings__grid">
                         <?php
+                        $listing_post_ids = wp_list_pluck($listings_query->posts, 'ID');
+                        update_postmeta_cache($listing_post_ids);
+                        update_post_thumbnail_cache($listings_query);
                         $listing_index = 0;
                         while ($listings_query->have_posts()) :
                             $listings_query->the_post();
@@ -201,10 +225,10 @@ if (have_posts()) :
                     </div>
                 <?php else : ?>
                     <div class="dealer-profile-empty">
-                        <h3><?php esc_html_e('No active listings yet', 'bricks-child'); ?></h3>
-                        <p><?php esc_html_e('Check back later for cars from this dealer, or browse all used cars in Cyprus.', 'bricks-child'); ?></p>
+                        <h3><?php esc_html_e('No cars available right now', 'bricks-child'); ?></h3>
+                        <p><?php esc_html_e('Browse all used cars in Cyprus to continue your search.', 'bricks-child'); ?></p>
                         <a class="btn btn-secondary" href="<?php echo esc_url(home_url('/cars/')); ?>">
-                            <?php esc_html_e('Browse cars', 'bricks-child'); ?>
+                            <?php esc_html_e('Browse all cars', 'bricks-child'); ?>
                         </a>
                     </div>
                 <?php endif; ?>
