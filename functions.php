@@ -378,6 +378,23 @@ require_once get_stylesheet_directory() . '/includes/shortcodes/autocy-bulk-uplo
 // =========================================================================
 
 /**
+ * Remove the retired buyer-request announcement from the global header.
+ *
+ * The header contains separate desktop and mobile Bricks sections.
+ */
+add_filter( 'bricks/element/render', function( $render, $element ) {
+    if ( function_exists( 'bricks_is_frontend' ) && ! bricks_is_frontend() ) {
+        return $render;
+    }
+
+    if ( isset( $element->id ) && in_array( $element->id, array( 'gzgxcj', 'esfxlz' ), true ) ) {
+        return false;
+    }
+
+    return $render;
+}, 10, 2 );
+
+/**
  * Add text strings to builder.
  * FROM: Bricks (Main File)
  */
