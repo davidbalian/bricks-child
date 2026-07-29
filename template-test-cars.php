@@ -93,7 +93,7 @@ $listing_atts = array(
     'favorites'          => 'false',
     'user_id'            => '',
     'author'             => '',
-    'orderby'            => 'score',
+    'orderby'            => 'date',
     'order'              => 'DESC',
     'show_sold'          => 'false',
     'id'                 => 'test-cars-listings',
@@ -158,11 +158,11 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
             <div class="tcp-sort" id="tcp-sort">
                 <button type="button" class="tcp-sort-btn" id="tcp-sort-btn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
-                    <span id="tcp-sort-label">Best Match</span>
+                    <span id="tcp-sort-label">Newest</span>
                 </button>
                 <div class="tcp-sort-menu" id="tcp-sort-menu">
-                    <button type="button" class="tcp-sort-option selected" data-orderby="score" data-order="DESC">Best Match</button>
-                    <button type="button" class="tcp-sort-option" data-orderby="date" data-order="DESC">Newest</button>
+                    <button type="button" class="tcp-sort-option selected" data-orderby="date" data-order="DESC">Newest</button>
+                    <button type="button" class="tcp-sort-option" data-orderby="score" data-order="DESC">Best Match</button>
                     <button type="button" class="tcp-sort-option" data-orderby="date" data-order="ASC">Oldest</button>
                     <button type="button" class="tcp-sort-option" data-orderby="price" data-order="ASC">Price: Low to High</button>
                     <button type="button" class="tcp-sort-option" data-orderby="price" data-order="DESC">Price: High to Low</button>
@@ -349,7 +349,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
                 Browse <strong>600+ used cars for sale in Cyprus</strong> from trusted dealerships and private sellers across Nicosia, Limassol, Larnaca, and Paphos. Whether you're looking for a fuel-efficient hatchback for city driving, a family SUV, or a luxury sedan, AutoAgora makes it easy to compare prices, specs, and photos - all in one place.
             </p>
             <p>
-                Use the filters above to narrow your search by make, model, price range, fuel type, mileage, and more. Every listing includes full vehicle details, high-quality photos, and direct contact with the seller. Can't find what you're looking for? <a href="/buyer-requests/">Post a buyer request</a> and let dealers across Cyprus come to you.
+                Use the filters above to narrow your search by make, model, price range, fuel type, mileage, and more. Every listing includes full vehicle details, high-quality photos, and direct contact with the seller.
             </p>
         </section>
 
@@ -1339,9 +1339,9 @@ body {
     function resetSort() {
         $sort.find('.tcp-sort-option').removeClass('selected');
         $sort.find('.tcp-sort-option').first().addClass('selected');
-        $sortLabel.text('Best Match');
+        $sortLabel.text('Newest');
         var atts = $container.data('atts') || {};
-        atts.orderby = 'score';
+        atts.orderby = 'date';
         atts.order = 'DESC';
         $container.data('atts', atts);
         $container.attr('data-atts', JSON.stringify(atts));
