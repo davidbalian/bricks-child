@@ -10,6 +10,13 @@
   width: 100%;
 }
 
+.page-id-68 > .bricks-container,
+.page-id-29644 > .bricks-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
 .login-required-message {
   padding: 2rem;
   background: var(--white);
