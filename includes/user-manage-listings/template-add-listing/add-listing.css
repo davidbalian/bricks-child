@@ -822,6 +822,14 @@ label svg path,
   justify-content: center;
 }
 
+#add-car-listing-form .choose-location-btn svg,
+#add-car-listing-form #json-import-btn svg {
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+
 /* Clear location button */
 .clear-location-btn {
   position: absolute;
