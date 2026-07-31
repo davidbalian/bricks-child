@@ -1,10 +1,10 @@
-.page-id-68 #content .ast-container {
+.page-template-template-add-listing #content .ast-container {
   max-width: 1000px !important;
   padding-top: 2rem;
   padding-bottom: 2rem;
 }
 
-.page-id-68 .bricks-container {
+.page-template-template-add-listing .bricks-container {
   width: 100%;
 }
 
@@ -624,16 +624,16 @@
 } */
 
 /* SVG Icon Styles */
-.page-id-68 #add-car-listing-form h2 svg,
-.page-id-68 #add-car-listing-form label svg {
+#add-car-listing-form h2 svg,
+#add-car-listing-form label svg {
   width: auto;
   height: 1em;
   vertical-align: -0.125em;
   overflow: visible !important;
 }
 
-.page-id-68 #add-car-listing-form h2,
-.page-id-68 #add-car-listing-form label {
+#add-car-listing-form h2,
+#add-car-listing-form label {
   display: flex;
   align-items: center;
   gap: 0.6rem;
