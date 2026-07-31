@@ -13,7 +13,9 @@ if (!defined('ABSPATH')) {
  * Enqueue Google Maps API and location picker scripts
  */
 function autoagora_enqueue_google_maps_assets() {
-    if (is_page('add-listing') || is_page('edit-listing')) {
+    $is_listing_form = is_page_template('template-add-listing.php') || is_page_template('template-edit-listing.php');
+
+    if ($is_listing_form) {
 
         // ✅ Google Maps with Places Library
         $google_maps_url = 'https://maps.googleapis.com/maps/api/js?key=' . urlencode(GOOGLE_MAPS_API_KEY) . '&libraries=places&language=en';
@@ -41,7 +43,17 @@ function autoagora_enqueue_google_maps_assets() {
             'defaultLat' => 35.1856,
             'defaultLng' => 33.3823,
             'zoom' => 8,
-            'debug' => (strpos($_SERVER['HTTP_HOST'], 'staging') !== false || strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
+			'language' => function_exists('autoagora_current_language') ? autoagora_current_language() : 'en',
+			'i18n' => [
+				'findCurrentLocation' => __('Find my current location', 'bricks-child'),
+				'geolocationUnsupported' => __('Geolocation is not supported by your browser.', 'bricks-child'),
+				'geolocationError' => __('Error getting location: {message}', 'bricks-child'),
+				'chooseLocation' => __('Choose Location', 'bricks-child'),
+				'continue' => __('Continue', 'bricks-child'),
+				'searchLocation' => __('Search for a location in Cyprus...', 'bricks-child'),
+				'close' => __('Close', 'bricks-child'),
+			],
+			'debug' => (strpos($_SERVER['HTTP_HOST'], 'staging') !== false || strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
         ]);
     }
 }

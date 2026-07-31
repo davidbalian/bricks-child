@@ -10,6 +10,8 @@
 // Define theme version constant
 define('BRICKS_CHILD_THEME_VERSION', '1.0.0');
 
+require_once get_stylesheet_directory() . '/includes/i18n/init.php';
+
 // =========================================================================
 // Custom Functionality Includes
 // FROM: Astra Child (Second File)

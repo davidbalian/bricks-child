@@ -1,4 +1,15 @@
 jQuery(document).ready(function ($) {
+  const i18n = (window.addListingData && addListingData.i18n) || {};
+  const t = function (key, fallback, replacements) {
+    let value = i18n[key] || fallback;
+
+    Object.entries(replacements || {}).forEach(function ([name, replacement]) {
+      value = value.split("{" + name + "}").join(String(replacement));
+    });
+
+    return value;
+  };
+
   // PRODUCTION SAFETY: Only log in development environments
 window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' ||
                                                window.location.hostname.includes('staging') ||
@@ -10,17 +21,17 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
   // FORM VALIDATION CONFIGURATION
   // =====================================================
   const requiredFields = {
-    'add-listing-make': { type: 'dropdown', label: 'Make' },
-    'add-listing-model': { type: 'dropdown', label: 'Model' },
-    'add-listing-year': { type: 'dropdown', label: 'Year' },
-    'add-listing-availability': { type: 'dropdown', label: 'Availability' },
-    'add-listing-engine-capacity': { type: 'dropdown', label: 'Engine Capacity' },
-    'add-listing-fuel-type': { type: 'dropdown', label: 'Fuel Type' },
-    'add-listing-transmission': { type: 'dropdown', label: 'Transmission' },
-    'add-listing-body-type': { type: 'dropdown', label: 'Body Type' },
-    'add-listing-exterior-color': { type: 'dropdown', label: 'Exterior Color' },
-    'mileage': { type: 'text', label: 'Mileage' },
-    'price': { type: 'text', label: 'Price' }
+    'add-listing-make': { type: 'dropdown', label: t('make', 'Make') },
+    'add-listing-model': { type: 'dropdown', label: t('model', 'Model') },
+    'add-listing-year': { type: 'dropdown', label: t('year', 'Year') },
+    'add-listing-availability': { type: 'dropdown', label: t('availability', 'Availability') },
+    'add-listing-engine-capacity': { type: 'dropdown', label: t('engineCapacity', 'Engine Capacity') },
+    'add-listing-fuel-type': { type: 'dropdown', label: t('fuelType', 'Fuel Type') },
+    'add-listing-transmission': { type: 'dropdown', label: t('transmission', 'Transmission') },
+    'add-listing-body-type': { type: 'dropdown', label: t('bodyType', 'Body Type') },
+    'add-listing-exterior-color': { type: 'dropdown', label: t('exteriorColor', 'Exterior Color') },
+    'mileage': { type: 'text', label: t('mileage', 'Mileage') },
+    'price': { type: 'text', label: t('price', 'Price') }
   };
 
   // Collapsible sections functionality
@@ -103,7 +114,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     // Check images first (minimum 2) - they're at the top of the page
     const imageCount = getImageCount();
     if (imageCount < 2) {
-      errors.push({ fieldId: 'image-preview', label: 'Images (minimum 2)', type: 'images' });
+      errors.push({ fieldId: 'image-preview', label: t('imagesMinimum', 'Images (minimum 2)'), type: 'images' });
     }
 
     // Check all required fields
@@ -116,7 +127,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     // Check location
     const locationValue = $('#location').val();
     if (!locationValue || locationValue.trim() === '') {
-      errors.push({ fieldId: 'location-row', label: 'Location', type: 'location' });
+      errors.push({ fieldId: 'location-row', label: t('location', 'Location'), type: 'location' });
     }
 
     return {
@@ -149,7 +160,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       const $imagesSection = $('.add-listing-images-section');
       $imagesSection.addClass('images-section-has-error');
       if (!$imagesSection.find('.images-section-error').length) {
-        $imagesSection.append('<p class="images-section-error">Please upload at least 2 images</p>');
+        $('<p class="images-section-error"></p>')
+          .text(t('uploadAtLeastTwo', 'Please upload at least 2 images'))
+          .appendTo($imagesSection);
       }
       return;
     } else {
@@ -162,7 +175,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
       // Add error message if not already present
       if (!$container.find('.field-error-message').length) {
-        $container.append('<span class="field-error-message">This field is required</span>');
+        $('<span class="field-error-message"></span>')
+          .text(t('fieldRequired', 'This field is required'))
+          .appendTo($container);
       }
     }
   }
@@ -513,7 +528,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         selectHtml += '<option value="' + opt.value + '">' + opt.label + '</option>';
       });
 
-      html += '<div class="car-filter-no-results hidden">No matching results</div>';
+      html += '<div class="car-filter-no-results hidden">' + t('noResults', 'No matching results') + '</div>';
 
       $options.html(html);
       $select.html(selectHtml);
@@ -542,7 +557,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
       if (isLoading) {
         $button.prop('disabled', true);
-        $options.html('<div class="car-filter-loading" style="padding: 0.75rem; color: #6b7280; text-align: center;">Loading...</div>');
+        $options.html('<div class="car-filter-loading" style="padding: 0.75rem; color: #6b7280; text-align: center;">' + t('loading', 'Loading') + '...</div>');
       }
     },
 
@@ -560,7 +575,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       $button.find('.car-filter-dropdown-text').addClass('placeholder').text(placeholder);
 
       var html = '<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="">' + placeholder + '</button>';
-      html += '<div class="car-filter-no-results hidden">No matching results</div>';
+      html += '<div class="car-filter-no-results hidden">' + t('noResults', 'No matching results') + '</div>';
       $options.html(html);
       $select.html('<option value="">' + placeholder + '</option>');
     }
@@ -587,7 +602,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
     if (!makeName) {
       // No make selected - disable model dropdown
-      AddListingDropdown.disable($modelDropdown, 'Select Model');
+      AddListingDropdown.disable($modelDropdown, t('selectModel', 'Select Model'));
       return;
     }
 
@@ -597,8 +612,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     var $buttonText = $button.find('.car-filter-dropdown-text');
 
     $button.prop('disabled', true);
-    $options.html('<div class="car-filter-loading" style="padding: 0.75rem; color: #6b7280; text-align: center;">Loading.</div>');
-    $buttonText.text('Loading.');
+    $options.html('<div class="car-filter-loading" style="padding: 0.75rem; color: #6b7280; text-align: center;">' + t('loading', 'Loading') + '.</div>');
+    $buttonText.text(t('loading', 'Loading') + '.');
 
     // Start loading animation
     isLoadingModels = true;
@@ -609,7 +624,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         return;
       }
       loadingDots = (loadingDots % 3) + 1;
-      var loadingText = 'Loading' + '.'.repeat(loadingDots);
+      var loadingText = t('loading', 'Loading') + '.'.repeat(loadingDots);
       $options.find('.car-filter-loading').text(loadingText);
       $buttonText.text(loadingText);
     }, 400);
@@ -622,6 +637,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         action: "get_models_for_make",
         make: makeName,
         nonce: addListingData.nonce,
+        lang: addListingData.lang || '',
       },
       success: function(response) {
         // Stop loading state and clear animation BEFORE updating DOM
@@ -640,12 +656,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             };
           });
 
-          AddListingDropdown.updateOptions($modelDropdown, options, 'Select Model');
+          AddListingDropdown.updateOptions($modelDropdown, options, t('selectModel', 'Select Model'));
 
           if (isDevelopment) console.log("[Add Listing] Loaded", options.length, "models");
         } else {
           if (isDevelopment) console.error("[Add Listing] Error loading models:", response);
-          AddListingDropdown.disable($modelDropdown, 'Error loading models');
+          AddListingDropdown.disable($modelDropdown, t('modelLoadError', 'Error loading models'));
         }
       },
       error: function(xhr, status, error) {
@@ -657,7 +673,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         }
 
         if (isDevelopment) console.error("[Add Listing] AJAX error:", error);
-        AddListingDropdown.disable($modelDropdown, 'Error loading models');
+        AddListingDropdown.disable($modelDropdown, t('modelLoadError', 'Error loading models'));
       }
     });
   });
@@ -704,7 +720,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       // Remove the 0.0 option and reset selection if it was 0.0
       if ($engineCapacitySelect.val() === "0.0") {
         $engineCapacitySelect.val("");
-        $engineCapacityButton.find(".car-filter-dropdown-text").addClass("placeholder").text("Select Engine Capacity");
+        $engineCapacityButton.find(".car-filter-dropdown-text").addClass("placeholder").text(t('selectEngineCapacity', 'Select Engine Capacity'));
         $engineCapacityDropdown.find(".car-filter-dropdown-option").removeClass("selected");
         $engineCapacityDropdown.find('.car-filter-dropdown-option[data-value=""]').addClass("selected");
       }
@@ -751,7 +767,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     const handle = $("<button>")
       .attr({
         type: "button",
-        "aria-label": "Swap image position",
+        "aria-label": t('swapImage', 'Swap image position'),
       })
       .addClass("image-swap-handle")
       .html("&larr;&rarr;")
@@ -1009,7 +1025,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     const locationField = $("#location");
     if (!locationField.val().trim()) {
       e.preventDefault();
-      showAllValidationErrors([{ fieldId: 'location-row', label: 'Location', type: 'location' }]);
+      showAllValidationErrors([{ fieldId: 'location-row', label: t('location', 'Location'), type: 'location' }]);
       return false;
     }
 
@@ -1027,12 +1043,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
     if (totalImages < 2) {
       e.preventDefault();
-      alert("Please upload at least 2 images before submitting the form");
+      alert(t('uploadBeforeSubmit', 'Please upload at least 2 images before submitting the form'));
       return;
     }
     if (totalImages > 25) {
       e.preventDefault();
-      alert("Maximum 25 images allowed");
+      alert(t('maximumImages', 'Maximum 25 images allowed'));
       return;
     }
 
@@ -1045,9 +1061,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
       if (pendingUploads > 0) {
         e.preventDefault();
-        alert(
-          `Please wait for ${pendingUploads} image(s) to finish uploading before submitting.`
-        );
+        alert(t('waitForUploads', 'Please wait for {count} image(s) to finish uploading before submitting.', { count: pendingUploads }));
         return false;
       }
 
@@ -1218,9 +1232,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       for (const file of candidateFiles) {
         // Check if adding this file would exceed the maximum
         if (accumulatedFilesList.length >= maxFiles) {
-          alert(
-            "Maximum " + maxFiles + " files allowed. Some files were not added."
-          );
+          alert(t('maximumFiles', 'Maximum {count} files allowed. Some files were not added.', { count: maxFiles }));
           break;
         }
 
@@ -1250,32 +1262,25 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         }
 
         if (!allowedTypes.includes(file.type)) {
-          alert(
-            'File type "' +
-              file.type +
-              '" not allowed for "' +
-              file.name +
-              '". Only JPG, PNG, GIF, and WebP are permitted.'
-          );
+          alert(t('fileTypeNotAllowed', 'File type "{type}" not allowed for "{name}". Only JPG, PNG, GIF, and WebP are permitted.', {
+            type: file.type,
+            name: file.name,
+          }));
           continue;
         }
 
         if (file.size > maxFileSize) {
-          alert(
-            'File "' +
-              file.name +
-              '" is too large (' +
-              (file.size / (1024 * 1024)).toFixed(2) +
-              "MB). Maximum allowed is " +
-              maxFileSize / (1024 * 1024) +
-              "MB."
-          );
+          alert(t('fileTooLarge', 'File "{name}" is too large ({size}MB). Maximum allowed is {max}MB.', {
+            name: file.name,
+            size: (file.size / (1024 * 1024)).toFixed(2),
+            max: maxFileSize / (1024 * 1024),
+          }));
           continue;
         }
 
         try {
           // Update processing status
-          updateProcessingStatus("Optimizing " + file.name + "...");
+          updateProcessingStatus(t('optimizingFile', 'Optimizing {name}...', { name: file.name }));
 
           const originalSize = file.size;
           totalOriginalSize += originalSize;
@@ -1302,7 +1307,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
           // Start async upload immediately after optimization
           if (asyncUploadManager) {
             try {
-              updateProcessingStatus("Uploading " + file.name + "...");
+              updateProcessingStatus(t('uploadingFile', 'Uploading {name}...', { name: file.name }));
               const fileKey = await asyncUploadManager.addFileToQueue(
                 optimizedFile,
                 file
@@ -1411,7 +1416,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         const indicator = $(`
                     <div id="image-processing-indicator" class="image-processing-indicator">
                         <div class="processing-spinner"></div>
-                        <div class="processing-text">Optimizing images...</div>
+                        <div class="processing-text">${t('optimizingImages', 'Optimizing images...')}</div>
                         <div class="processing-status"></div>
                     </div>
                 `);
@@ -1433,11 +1438,11 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     optimizationErrors
   ) {
     if (totalSavings > 0) {
-      const summaryMessage = `✅ Optimized ${filesCount} image${
-        filesCount > 1 ? "s" : ""
-      }: Saved ${totalSavings.toFixed(
-        1
-      )} KB (${compressionPercent}% reduction)`;
+      const summaryMessage = t('optimizedSummary', 'Optimized {count} image(s): Saved {saved} KB ({percent}% reduction)', {
+        count: filesCount,
+        saved: totalSavings.toFixed(1),
+        percent: compressionPercent,
+      });
 
       const summaryEl = $(
         `<div class="optimization-summary">${summaryMessage}</div>`
@@ -1452,9 +1457,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
   }
 
   function showErrorSummary(optimizationErrors, filesAddedThisBatchCount) {
-    const errorMessage = `❌ ${optimizationErrors} image${
-      optimizationErrors > 1 ? "s" : ""
-    } were not optimized. Please check the images and try again.`;
+    const errorMessage = t('optimizationErrorSummary', '{count} image(s) were not optimized. Please check the images and try again.', {
+      count: optimizationErrors,
+    });
 
     const errorEl = $(`<div class="error-summary">${errorMessage}</div>`);
     imagePreview.before(errorEl);
@@ -1509,7 +1514,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       // Add initial upload status if async upload is starting
       if (file.asyncFileKey) {
         previewItem.append(
-          '<div class="upload-status upload-pending">⏳ Uploading...</div>'
+          '<div class="upload-status upload-pending">' + t('uploading', 'Uploading...') + '</div>'
         );
       }
 
@@ -1550,7 +1555,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
       // Add compression stats tooltip
       const statsTooltip = $(`
-                <div class="compression-stats" title="Original: ${stats.originalSize}KB | Optimized: ${stats.optimizedSize}KB | Saved: ${stats.savings}KB (${stats.compressionRatio}%)">
+                <div class="compression-stats" title="${t('original', 'Original')}: ${stats.originalSize}KB | ${t('optimized', 'Optimized')}: ${stats.optimizedSize}KB | ${t('saved', 'Saved')}: ${stats.savings}KB (${stats.compressionRatio}%)">
                     <span class="stats-icon">📊</span>
                     <span class="stats-text">-${stats.compressionRatio}%</span>
                 </div>
@@ -1696,7 +1701,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       const $preview = $(`.image-preview[data-async-key="${fileKey}"]`);
       $preview.find(".upload-status").remove();
       $preview.append(
-        '<div class="upload-status upload-success">✓ Uploaded</div>'
+        '<div class="upload-status upload-success">' + t('uploaded', 'Uploaded') + '</div>'
       );
 
       setTimeout(() => {
@@ -1729,7 +1734,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       const $preview = $(`.image-preview[data-async-key="${fileKey}"]`);
       $preview.find(".upload-status").remove();
       $preview.append(
-        '<div class="upload-status upload-error">✗ Upload failed</div>'
+        '<div class="upload-status upload-error">' + t('uploadFailed', 'Upload failed') + '</div>'
       );
 
       // Show fallback message below upload area
@@ -1749,7 +1754,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       const message = $(`
                 <div class="async-upload-fallback-message">
                     <i class="fas fa-info-circle fallback-icon"></i>
-                    <span>Background upload failed but images will submit normally when you press submit. You may continue filling the form.</span>
+                    <span>${t('uploadFallback', 'Background upload failed but images will submit normally when you press submit. You may continue filling the form.')}</span>
                 </div>
             `);
 
@@ -1808,6 +1813,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       data: {
         action: "get_user_saved_locations",
         nonce: addListingData.nonce,
+        lang: addListingData.lang || '',
       },
       success: function (response) {
         if (response.success && response.data && response.data.length > 0) {
@@ -1857,7 +1863,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     const $button = $dropdownWrapper.find(".car-filter-dropdown-button");
     const $search = $dropdownWrapper.find(".car-filter-dropdown-search");
 
-    const placeholder = "Recently used locations";
+    const placeholder = t('recentLocations', 'Recently used locations');
 
     // Build options HTML
     let html = '<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="">' + placeholder + "</button>";
@@ -1869,7 +1875,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       selectHtml += '<option value="' + opt.value + '" data-location=\'' + opt.locationData + '\'>' + opt.label + "</option>";
     });
 
-    html += '<div class="car-filter-no-results hidden">No matching results</div>';
+    html += '<div class="car-filter-no-results hidden">' + t('noResults', 'No matching results') + '</div>';
 
     $options.html(html);
     $select.html(selectHtml);
@@ -2022,7 +2028,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     $button.find(".car-filter-dropdown-text")
       .addClass("placeholder")
       .removeClass("location-selected")
-      .text("Select location");
+      .text(t('selectLocation', 'Select location'));
 
     // Reset selection
     $options.find(".car-filter-dropdown-option").removeClass("selected");

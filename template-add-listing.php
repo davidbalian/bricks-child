@@ -85,7 +85,51 @@ wp_enqueue_script(
 // Localize the script with necessary data
 wp_localize_script('astra-child-add-listing-js', 'addListingData', array(
     'ajaxurl' => admin_url('admin-ajax.php'),
-    'nonce' => wp_create_nonce('add_car_listing_nonce')
+    'nonce' => wp_create_nonce('add_car_listing_nonce'),
+    'lang' => function_exists('autoagora_current_language') ? autoagora_current_language() : 'en',
+    'i18n' => array(
+        'make' => __('Make', 'bricks-child'),
+        'model' => __('Model', 'bricks-child'),
+        'year' => __('Year', 'bricks-child'),
+        'availability' => __('Availability', 'bricks-child'),
+        'engineCapacity' => __('Engine Capacity', 'bricks-child'),
+        'fuelType' => __('Fuel Type', 'bricks-child'),
+        'transmission' => __('Transmission', 'bricks-child'),
+        'bodyType' => __('Body Type', 'bricks-child'),
+        'exteriorColor' => __('Exterior Color', 'bricks-child'),
+        'mileage' => __('Mileage', 'bricks-child'),
+        'price' => __('Price', 'bricks-child'),
+        'location' => __('Location', 'bricks-child'),
+        'imagesMinimum' => __('Images (minimum 2)', 'bricks-child'),
+        'uploadAtLeastTwo' => __('Please upload at least 2 images', 'bricks-child'),
+        'fieldRequired' => __('This field is required', 'bricks-child'),
+        'noResults' => __('No matching results', 'bricks-child'),
+        'loading' => __('Loading', 'bricks-child'),
+        'selectModel' => __('Select Model', 'bricks-child'),
+        'modelLoadError' => __('Error loading models', 'bricks-child'),
+        'selectEngineCapacity' => __('Select Engine Capacity', 'bricks-child'),
+        'swapImage' => __('Swap image position', 'bricks-child'),
+        'uploadBeforeSubmit' => __('Please upload at least 2 images before submitting the form', 'bricks-child'),
+        'maximumImages' => __('Maximum 25 images allowed', 'bricks-child'),
+        'waitForUploads' => __('Please wait for {count} image(s) to finish uploading before submitting.', 'bricks-child'),
+        'maximumFiles' => __('Maximum {count} files allowed. Some files were not added.', 'bricks-child'),
+        'fileTypeNotAllowed' => __('File type "{type}" not allowed for "{name}". Only JPG, PNG, GIF, and WebP are permitted.', 'bricks-child'),
+        'fileTooLarge' => __('File "{name}" is too large ({size}MB). Maximum allowed is {max}MB.', 'bricks-child'),
+        'optimizingFile' => __('Optimizing {name}...', 'bricks-child'),
+        'uploadingFile' => __('Uploading {name}...', 'bricks-child'),
+        'optimizingImages' => __('Optimizing images...', 'bricks-child'),
+        'uploading' => __('Uploading...', 'bricks-child'),
+        'uploaded' => __('Uploaded', 'bricks-child'),
+        'uploadFailed' => __('Upload failed', 'bricks-child'),
+        'uploadFallback' => __('Background upload failed but images will submit normally when you press submit. You may continue filling the form.', 'bricks-child'),
+        'recentLocations' => __('Recently used locations', 'bricks-child'),
+        'selectLocation' => __('Select location', 'bricks-child'),
+		'optimizedSummary' => __('Optimized {count} image(s): Saved {saved} KB ({percent}% reduction)', 'bricks-child'),
+		'optimizationErrorSummary' => __('{count} image(s) were not optimized. Please check the images and try again.', 'bricks-child'),
+		'original' => __('Original', 'bricks-child'),
+		'optimized' => __('Optimized', 'bricks-child'),
+		'saved' => __('Saved', 'bricks-child'),
+    )
 ));
 
 // Enqueue JSON import handler - Specific User Only (Server-side check)
@@ -142,8 +186,8 @@ get_header(); ?>
                     <?php endif; ?>
                     <p class="listing-success-email-note"><?php esc_html_e( 'To receive email notifications about views and clicks on your listing,', 'bricks-child' ); ?><br><?php esc_html_e( 'verify your email from your account page if you haven\'t already.', 'bricks-child' ); ?></p>
                     <div class="listing-success-buttons">
-                        <a href="<?php echo esc_url( home_url( '/my-listings/' ) ); ?>" class="btn btn-primary"><?php esc_html_e( 'My Listings', 'bricks-child' ); ?></a>
-                        <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="btn btn-primary"><?php esc_html_e( 'Return to Home', 'bricks-child' ); ?></a>
+                        <a href="<?php echo esc_url( autoagora_localized_page_url( 'my-listings' ) ); ?>" class="btn btn-primary"><?php esc_html_e( 'My Listings', 'bricks-child' ); ?></a>
+                        <a href="<?php echo esc_url( autoagora_localized_page_url() ); ?>" class="btn btn-primary"><?php esc_html_e( 'Return to Home', 'bricks-child' ); ?></a>
                     </div>
                 </div>
                 <?php
@@ -181,11 +225,26 @@ get_header(); ?>
                         // Check for specific validation errors
                         if (isset($_GET['fields']) && !empty($_GET['fields'])) {
                             $missing_fields = explode(',', sanitize_text_field($_GET['fields']));
+							$missing_field_labels = array(
+								'make' => __( 'Make', 'bricks-child' ),
+								'model' => __( 'Model', 'bricks-child' ),
+								'year' => __( 'Year', 'bricks-child' ),
+								'mileage' => __( 'Mileage', 'bricks-child' ),
+								'price' => __( 'Price', 'bricks-child' ),
+								'engine_capacity' => __( 'Engine Capacity', 'bricks-child' ),
+								'fuel_type' => __( 'Fuel Type', 'bricks-child' ),
+								'transmission' => __( 'Transmission', 'bricks-child' ),
+								'body_type' => __( 'Body Type', 'bricks-child' ),
+								'exterior_color' => __( 'Exterior Color', 'bricks-child' ),
+								'availability' => __( 'Availability', 'bricks-child' ),
+							);
                             echo '<div class="form-error-message">';
                             echo '<p>' . esc_html__('The following fields are required:', 'bricks-child') . '</p>';
                             echo '<ul>';
                             foreach ($missing_fields as $field) {
-                                echo '<li>' . esc_html(ucfirst(str_replace('_', ' ', $field))) . '</li>';
+								$field = sanitize_key( $field );
+								$field_label = isset( $missing_field_labels[ $field ] ) ? $missing_field_labels[ $field ] : ucfirst( str_replace( '_', ' ', $field ) );
+                                echo '<li>' . esc_html( $field_label ) . '</li>';
                             }
                             echo '</ul>';
                             echo '</div>';
@@ -215,6 +274,7 @@ get_header(); ?>
                     <?php wp_nonce_field( 'add_car_listing_nonce', 'add_car_listing_nonce' ); ?>
                     <input type="hidden" name="action" value="add_new_car_listing">
                     <input type="hidden" name="post_type" value="car">
+					<input type="hidden" name="autoagora_lang" value="<?php echo esc_attr( autoagora_current_language() ); ?>">
                     <input type="hidden" id="async_session_id" name="async_session_id" value="">
 
                     <?php
@@ -323,13 +383,13 @@ get_header(); ?>
                                     <div class="form-third">
                                         <label for="mileage"><?php echo get_svg_icon('road'); ?> <?php esc_html_e( 'Mileage', 'bricks-child' ); ?><span class="required">*</span></label>
                                         <div class="input-with-suffix">
-                                            <input type="text" id="mileage" name="mileage" class="form-control" placeholder="E.g '180,000'">
+                                            <input type="text" id="mileage" name="mileage" class="form-control" placeholder="<?php echo esc_attr__( "E.g '180,000'", 'bricks-child' ); ?>">
                                             <span class="input-suffix">km</span>
                                         </div>
                                     </div>
                                     <div class="form-third">
                                         <label for="price"><?php echo get_svg_icon('euro-sign'); ?> <?php esc_html_e( 'Price', 'bricks-child' ); ?><span class="required">*</span></label>
-                                        <input type="text" id="price" name="price" class="form-control" placeholder="E.g '10,000'">
+                                        <input type="text" id="price" name="price" class="form-control" placeholder="<?php echo esc_attr__( "E.g '10,000'", 'bricks-child' ); ?>">
                                     </div>
                                     <div class="form-third">
                                         <label><?php echo get_svg_icon('circle-check'); ?> <?php esc_html_e( 'Availability', 'bricks-child' ); ?><span class="required">*</span></label>
@@ -370,14 +430,14 @@ get_header(); ?>
                                                 ),
                                             ));
                                             ?>
-                                            <button type="button" class="clear-location-btn" id="clear-location-btn" style="display: none;" title="Clear location">
+                                            <button type="button" class="clear-location-btn" id="clear-location-btn" style="display: none;" title="<?php echo esc_attr__( 'Clear location', 'bricks-child' ); ?>">
                                                 <?php echo get_svg_icon('xmark'); ?>
                                             </button>
                                         </div>
 
-                                        <span class="location-or-separator">OR</span>
+                                        <span class="location-or-separator"><?php esc_html_e( 'OR', 'bricks-child' ); ?></span>
 
-                                        <button type="button" class="btn btn-secondary choose-location-btn">Choose Location <?php echo get_svg_icon('map-location-dot'); ?></button>
+                                        <button type="button" class="btn btn-secondary choose-location-btn"><?php esc_html_e( 'Choose Location', 'bricks-child' ); ?> <?php echo get_svg_icon('map-location-dot'); ?></button>
                                     </div>
 
                                     <!-- Hidden field to store location for form submission -->
@@ -546,7 +606,7 @@ get_header(); ?>
                                     <div class="form-half">
                                         <label for="hp"><?php echo get_svg_icon('gauge-high'); ?> <?php esc_html_e( 'Horsepower', 'bricks-child' ); ?></label>
                                         <div class="input-with-suffix">
-                                            <input type="text" id="hp" name="hp" class="form-control" min="0" step="1" placeholder="E.g '100'">
+                                            <input type="text" id="hp" name="hp" class="form-control" min="0" step="1" placeholder="<?php echo esc_attr__( "E.g '100'", 'bricks-child' ); ?>">
                                             <span class="input-suffix">hp</span>
                                         </div>
                                     </div>
@@ -645,7 +705,7 @@ get_header(); ?>
                                         while ($current_date <= $end_date) {
                                             $mot_options[] = array(
                                                 'value' => $current_date->format('Y-m'),
-                                                'label' => $current_date->format('F Y')
+												'label' => wp_date( 'F Y', $current_date->getTimestamp(), wp_timezone() )
                                             );
                                             $current_date->modify('+1 month');
                                         }
@@ -663,7 +723,7 @@ get_header(); ?>
                                     </div>
                                     <div class="form-half">
                                         <label for="numowners"><?php echo get_svg_icon('users'); ?> <?php esc_html_e( 'Number of Owners', 'bricks-child' ); ?></label>
-                                        <input type="number" id="numowners" name="numowners" class="form-control" min="1" max="99" placeholder="E.g '2'">
+                                        <input type="number" id="numowners" name="numowners" class="form-control" min="1" max="99" placeholder="<?php echo esc_attr__( "E.g '2'", 'bricks-child' ); ?>">
                                     </div>
                                 </div>
 
@@ -679,24 +739,24 @@ get_header(); ?>
                                     <div class="vehicle-history-grid">
                                         <?php
                                         $vehicle_history_options = array(
-                                            'no_accidents' => 'No Accidents',
-                                            'minor_accidents' => 'Minor Accidents',
-                                            'major_accidents' => 'Major Accidents',
-                                            'regular_maintenance' => 'Regular Maintenance',
-                                            'engine_overhaul' => 'Engine Overhaul',
-                                            'transmission_replacement' => 'Transmission Replacement',
-                                            'repainted' => 'Repainted',
-                                            'bodywork_repair' => 'Bodywork Repair',
-                                            'rust_treatment' => 'Rust Treatment',
-                                            'no_modifications' => 'No Modifications',
-                                            'performance_upgrades' => 'Performance Upgrades',
-                                            'cosmetic_modifications' => 'Cosmetic Modifications',
-                                            'flood_damage' => 'Flood Damage',
-                                            'fire_damage' => 'Fire Damage',
-                                            'hail_damage' => 'Hail Damage',
-                                            'clear_title' => 'Clear Title',
-                                            'no_known_issues' => 'No Known Issues',
-                                            'odometer_replacement' => 'Odometer Replacement'
+                                            'no_accidents' => __('No Accidents', 'bricks-child'),
+                                            'minor_accidents' => __('Minor Accidents', 'bricks-child'),
+                                            'major_accidents' => __('Major Accidents', 'bricks-child'),
+                                            'regular_maintenance' => __('Regular Maintenance', 'bricks-child'),
+                                            'engine_overhaul' => __('Engine Overhaul', 'bricks-child'),
+                                            'transmission_replacement' => __('Transmission Replacement', 'bricks-child'),
+                                            'repainted' => __('Repainted', 'bricks-child'),
+                                            'bodywork_repair' => __('Bodywork Repair', 'bricks-child'),
+                                            'rust_treatment' => __('Rust Treatment', 'bricks-child'),
+                                            'no_modifications' => __('No Modifications', 'bricks-child'),
+                                            'performance_upgrades' => __('Performance Upgrades', 'bricks-child'),
+                                            'cosmetic_modifications' => __('Cosmetic Modifications', 'bricks-child'),
+                                            'flood_damage' => __('Flood Damage', 'bricks-child'),
+                                            'fire_damage' => __('Fire Damage', 'bricks-child'),
+                                            'hail_damage' => __('Hail Damage', 'bricks-child'),
+                                            'clear_title' => __('Clear Title', 'bricks-child'),
+                                            'no_known_issues' => __('No Known Issues', 'bricks-child'),
+                                            'odometer_replacement' => __('Odometer Replacement', 'bricks-child')
                                         );
                                         foreach ($vehicle_history_options as $value => $label) {
                                             echo '<div class="vehicle-history-option">';
@@ -713,25 +773,25 @@ get_header(); ?>
                                     <div class="extras-grid">
                                         <?php
                                         $extras_options = array(
-                                            'alloy_wheels' => 'Alloy Wheels',
-                                            'cruise_control' => 'Cruise Control',
-                                            'disabled_accessible' => 'Disabled Accessible',
-                                            'keyless_start' => 'Keyless Start',
-                                            'rear_view_camera' => 'Rear View Camera',
-                                            'start_stop' => 'Start/Stop',
-                                            'sunroof' => 'Sunroof',
-                                            'heated_seats' => 'Heated Seats',
-                                            'android_auto' => 'Android Auto',
-                                            'apple_carplay' => 'Apple CarPlay',
-                                            'folding_mirrors' => 'Folding Mirrors',
-                                            'leather_seats' => 'Leather Seats',
-                                            'panoramic_roof' => 'Panoramic Roof',
-                                            'parking_sensors' => 'Parking Sensors',
-                                            'camera_360' => '360° Camera',
-                                            'adaptive_cruise_control' => 'Adaptive Cruise Control',
-                                            'blind_spot_mirror' => 'Blind Spot Mirror',
-                                            'lane_assist' => 'Lane Assist',
-                                            'power_tailgate' => 'Power Tailgate'
+                                            'alloy_wheels' => __('Alloy Wheels', 'bricks-child'),
+                                            'cruise_control' => __('Cruise Control', 'bricks-child'),
+                                            'disabled_accessible' => __('Disabled Accessible', 'bricks-child'),
+                                            'keyless_start' => __('Keyless Start', 'bricks-child'),
+                                            'rear_view_camera' => __('Rear View Camera', 'bricks-child'),
+                                            'start_stop' => __('Start/Stop', 'bricks-child'),
+                                            'sunroof' => __('Sunroof', 'bricks-child'),
+                                            'heated_seats' => __('Heated Seats', 'bricks-child'),
+                                            'android_auto' => __('Android Auto', 'bricks-child'),
+                                            'apple_carplay' => __('Apple CarPlay', 'bricks-child'),
+                                            'folding_mirrors' => __('Folding Mirrors', 'bricks-child'),
+                                            'leather_seats' => __('Leather Seats', 'bricks-child'),
+                                            'panoramic_roof' => __('Panoramic Roof', 'bricks-child'),
+                                            'parking_sensors' => __('Parking Sensors', 'bricks-child'),
+                                            'camera_360' => __('360° Camera', 'bricks-child'),
+                                            'adaptive_cruise_control' => __('Adaptive Cruise Control', 'bricks-child'),
+                                            'blind_spot_mirror' => __('Blind Spot Mirror', 'bricks-child'),
+                                            'lane_assist' => __('Lane Assist', 'bricks-child'),
+                                            'power_tailgate' => __('Power Tailgate', 'bricks-child')
                                         );
                                         foreach ($extras_options as $value => $label) {
                                             echo '<div class="extra-option">';
@@ -759,7 +819,7 @@ get_header(); ?>
                         <p class="description-guidelines-green"><?php esc_html_e( 'Focus on condition, upgrades, or unique features.', 'bricks-child' ); ?></p>
 
                         <div class="form-row">
-                            <textarea id="description" name="description" class="form-control" rows="5" placeholder="Enter your description here..."></textarea>
+                            <textarea id="description" name="description" class="form-control" rows="5" placeholder="<?php echo esc_attr__( 'Enter your description here...', 'bricks-child' ); ?>"></textarea>
                         </div>
                         </div><!-- .section-content -->
                         </div><!-- .section-content-wrapper -->
@@ -773,15 +833,15 @@ get_header(); ?>
             }
         } else {
             $login_url = wp_login_url( get_permalink() );
-            $register_page = get_page_by_path( 'register' ); // Assuming you have a 'register' page
+			$register_url = autoagora_localized_page_url( 'register' );
 
             echo '<div class="login-required-message">';
             echo '<h1>' . esc_html__( 'Please Log in to Submit a Car Listing', 'bricks-child' ) . '</h1>';
             echo '<p>';
             echo '<a href="' . esc_url( $login_url ) . '">' . esc_html__( 'Log In', 'bricks-child' ) . '</a>';
 
-            if ( $register_page ) {
-                echo ' | <a href="' . esc_url( get_permalink( $register_page->ID ) ) . '">' . esc_html__( 'Register', 'bricks-child' ) . '</a>';
+			if ( $register_url ) {
+				echo ' | <a href="' . esc_url( $register_url ) . '">' . esc_html__( 'Register', 'bricks-child' ) . '</a>';
             }
             echo '</p>';
             echo '</div>';

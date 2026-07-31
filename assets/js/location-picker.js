@@ -1,4 +1,15 @@
 document.addEventListener('DOMContentLoaded', function () {
+    const i18n = (window.mapConfig && mapConfig.i18n) || {};
+    const t = function (key, fallback, replacements) {
+        let value = i18n[key] || fallback;
+
+        Object.entries(replacements || {}).forEach(function ([name, replacement]) {
+            value = value.split('{' + name + '}').join(String(replacement));
+        });
+
+        return value;
+    };
+
     let map = null;
     // let marker = null;
     let selectedCoordinates = null;
@@ -63,13 +74,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const button = document.createElement('button');
             button.className = 'mapboxgl-ctrl-text mapboxgl-ctrl-locate-me';
             button.type = 'button';
-            button.title = 'Find my current location';
-            button.setAttribute('aria-label', 'Find my current location');
-            button.textContent = 'Find my current location';
+            button.title = t('findCurrentLocation', 'Find my current location');
+            button.setAttribute('aria-label', t('findCurrentLocation', 'Find my current location'));
+            button.textContent = t('findCurrentLocation', 'Find my current location');
 
             button.onclick = () => {
                 if (!navigator.geolocation) {
-                    alert('Geolocation is not supported by your browser.');
+                    alert(t('geolocationUnsupported', 'Geolocation is not supported by your browser.'));
                     return;
                 }
 
@@ -105,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     (error) => {
                         navigator.geolocation.clearWatch(watchId);
-                        alert(`Error getting location: ${error.message}`);
+                        alert(t('geolocationError', 'Error getting location: {message}', { message: error.message }));
                         if (isDevelopment)
                             console.error('Geolocation error:', error);
                         button.classList.remove('mapboxgl-ctrl-geolocate-active');
@@ -177,15 +188,15 @@ document.addEventListener('DOMContentLoaded', function () {
         locationModal.innerHTML = `
             <div class="location-picker-content">
                 <div class="location-picker-header">
-                    <h2>Choose Location</h2>
-                    <button class="close-modal">&times;</button>
+                    <h2>${t('chooseLocation', 'Choose Location')}</h2>
+                    <button class="close-modal" type="button" title="${t('close', 'Close')}" aria-label="${t('close', 'Close')}">&times;</button>
                 </div>
                 <div class="location-picker-body">
                     <div class="search-container" id="geocoder"></div>
                     <div class="location-map"></div>
                 </div>
                 <div class="location-picker-footer">
-                    <button class="choose-location-btn" disabled>Continue</button>
+                    <button class="choose-location-btn" type="button" disabled>${t('continue', 'Continue')}</button>
                 </div>
             </div>
         `;
@@ -244,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function () {
             wrapper.className = 'mapboxgl-ctrl-geocoder';
             const input = document.createElement('input');
             input.type = 'text';
-            input.placeholder = 'Search for a location in Cyprus...';
+            input.placeholder = t('searchLocation', 'Search for a location in Cyprus...');
             input.autocomplete = 'off';
             wrapper.appendChild(input);
             geocoderContainer.appendChild(wrapper);

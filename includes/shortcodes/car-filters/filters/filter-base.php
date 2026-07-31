@@ -52,7 +52,7 @@ function car_filter_render_dropdown($args) {
     $defaults = array(
         'id'          => '',
         'name'        => '',
-        'placeholder' => 'Select...',
+        'placeholder' => __( 'Select...', 'bricks-child' ),
         'options'     => array(),
         'popular'     => array(),
         'selected'    => '',
@@ -111,7 +111,7 @@ function car_filter_render_dropdown($args) {
                 }
             }
         } else {
-            $selected_label = count($selected_values) . ' selected';
+			$selected_label = sprintf( __( '%d selected', 'bricks-child' ), count( $selected_values ) );
             $has_selection = true;
         }
     }
@@ -138,7 +138,7 @@ function car_filter_render_dropdown($args) {
             <?php if ($args['searchable']) : ?>
                 <input type="text"
                        class="car-filter-dropdown-search"
-                       placeholder="Search..."
+                       placeholder="<?php echo esc_attr__( 'Search...', 'bricks-child' ); ?>"
                        id="<?php echo esc_attr($args['id']); ?>-search"
                        <?php echo $disabled_attr; ?>>
             <?php endif; ?>
@@ -161,7 +161,7 @@ function car_filter_render_dropdown($args) {
                         $popular_values[] = (string)$pop['value'];
                     }
                 ?>
-                    <div class="car-filter-section-header">Most Popular</div>
+					<div class="car-filter-section-header"><?php esc_html_e( 'Most Popular', 'bricks-child' ); ?></div>
                     <?php foreach ($args['popular'] as $option) :
                         $is_selected = in_array((string)$option['value'], $selected_values, true);
                     ?>
@@ -198,7 +198,7 @@ function car_filter_render_dropdown($args) {
                     </button>
                 <?php endforeach; ?>
 
-                <div class="car-filter-no-results hidden">No matching results</div>
+				<div class="car-filter-no-results hidden"><?php esc_html_e( 'No matching results', 'bricks-child' ); ?></div>
             </div>
         </div>
 
