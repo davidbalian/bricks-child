@@ -223,6 +223,17 @@ function autoagora_dequeue_cars_page_web_fonts() {
 add_action( 'wp_enqueue_scripts', 'autoagora_dequeue_cars_page_web_fonts', 100 );
 
 /**
+ * Keep the critical cars-page stylesheet out of WP Rocket's persistent minify
+ * cache. The source is already small and versioned with filemtime; serving it
+ * directly prevents a deploy from reusing an older /cache/min/ copy.
+ */
+function autoagora_exclude_cars_page_css_from_rocket_minify( $excluded_files ) {
+    $excluded_files[] = '/wp-content/themes/bricks-child/assets/css/cars-page.css';
+    return $excluded_files;
+}
+add_filter( 'rocket_exclude_css', 'autoagora_exclude_cars_page_css_from_rocket_minify' );
+
+/**
  * Dashicons are only needed for the admin bar. Dropping them for visitors cuts unused CSS on listings and elsewhere.
  */
 function bricks_child_dequeue_dashicons_when_admin_bar_hidden() {
