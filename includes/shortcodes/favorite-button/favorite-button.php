@@ -79,7 +79,7 @@ function enqueue_favorite_button_assets() {
             'favorite-button-js',
             get_stylesheet_directory_uri() . '/includes/shortcodes/favorite-button/favorite-button.js',
             array('jquery'),
-            filemtime( get_stylesheet_directory() . '/includes/shortcodes/favorite-button/favorite-button.js' ),
+            '1.0.0',
             true
         );
         

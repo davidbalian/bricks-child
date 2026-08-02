@@ -44,17 +44,9 @@
         btn.className = 'favorite-btn favorite-btn-listing favorite-btn-small' + (isFav ? ' active' : '');
         btn.setAttribute('data-car-id', String(postId));
         btn.setAttribute('title', isFav ? 'Remove from favorites' : 'Add to favorites');
-        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('class', 'favorite-heart-icon');
-        svg.setAttribute('width', '15');
-        svg.setAttribute('height', '15');
-        svg.setAttribute('viewBox', '0 0 24 24');
-        svg.setAttribute('aria-hidden', 'true');
-        svg.setAttribute('focusable', 'false');
-        var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', 'M12 21s-7.5-4.35-9.5-8.65C.82 8.74 2.73 4.5 6.78 4.5c2.14 0 3.52 1.23 4.22 2.25.7-1.02 2.08-2.25 4.22-2.25 4.05 0 5.96 4.24 4.28 7.85C19.5 16.65 12 21 12 21Z');
-        svg.appendChild(path);
-        btn.appendChild(svg);
+        var i = document.createElement('i');
+        i.className = isFav ? 'fas fa-heart' : 'far fa-heart';
+        btn.appendChild(i);
         return btn;
     }
 

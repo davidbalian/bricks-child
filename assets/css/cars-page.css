@@ -605,22 +605,13 @@ body {
    Main Content
    ============================================ */
 .tcp-main {
+    width: 100%;
     max-width: 2000px;
     margin: 0 auto;
     padding: 1.5rem 1rem 6rem;
     background-color: var(--bricks-color-lgsrvt);
-}
-
-/*
- * CLS guard: do not allow Inter/Outfit to swap into the repeated listings UI
- * after first paint. Descendant specificity intentionally overrides the Outfit
- * declarations used by card titles and prices in car-card.css.
- */
-.tcp-filters-bar,
-.tcp-filters-bar *,
-.tcp-main,
-.tcp-main * {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
 }
 .tcp-heading {
     font-size: 1.5rem;
