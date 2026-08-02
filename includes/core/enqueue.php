@@ -36,6 +36,33 @@ function bricks_child_enqueue_styles() {
 
     // Enqueue car listings styles
 
+    // Enqueue cars browse page styles. Must load from <head>: this CSS defines the
+    // .tcp-filters-bar / .tcp-main / grid / card layout and was previously printed
+    // inline after .tcp-main, causing a large CLS shift on first paint.
+    if (is_page_template('template-test-cars.php')) {
+        wp_enqueue_style( 'bricks-child-cars-page-css', get_stylesheet_directory_uri() . '/assets/css/cars-page.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/assets/css/cars-page.css' ), 'all' );
+
+        // car-card.css and car-listings.css are normally enqueued from inside the shortcode
+        // render, which runs after wp_head and lands them in the footer. Registering the same
+        // handles here resolves them in <head>, and the later shortcode calls become no-ops.
+        $card_css = get_stylesheet_directory() . '/includes/shortcodes/car-card/car-card.css';
+        if ( file_exists( $card_css ) ) {
+            wp_enqueue_style( 'car-card', get_stylesheet_directory_uri() . '/includes/shortcodes/car-card/car-card.css', array(), filemtime( $card_css ), 'all' );
+        }
+
+        $listings_css = get_stylesheet_directory() . '/includes/shortcodes/car-listings/car-listings.css';
+        if ( file_exists( $listings_css ) ) {
+            wp_enqueue_style( 'car-listings-shortcode', get_stylesheet_directory_uri() . '/includes/shortcodes/car-listings/car-listings.css', array(), filemtime( $listings_css ), 'all' );
+        }
+
+        // The template renders .car-filters-* markup inside the filters bar above .tcp-main,
+        // so this stylesheet also has to resolve before first paint.
+        $filters_css = get_stylesheet_directory() . '/includes/shortcodes/car-filters/car-filters.css';
+        if ( file_exists( $filters_css ) ) {
+            wp_enqueue_style( 'car-filters-css', get_stylesheet_directory_uri() . '/includes/shortcodes/car-filters/car-filters.css', array(), filemtime( $filters_css ), 'all' );
+        }
+    }
+
     // Enqueue add listing page styles
     if (is_page_template('template-add-listing.php')) {
         wp_enqueue_style( 'bricks-child-add-listing-css', get_stylesheet_directory_uri() . '/includes/user-manage-listings/template-add-listing/add-listing.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/includes/user-manage-listings/template-add-listing/add-listing.css' ), 'all' );
