@@ -12,6 +12,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Google Maps: loaded on first Location modal open via autoagora-car-browse-maps-loader (see includes/core/car-browse-assets.php).
 
+/**
+ * Critical CLS guard, printed inline at the very top of <head>.
+ *
+ * Both modal overlays are markup siblings that sit directly above .tcp-main in the
+ * document flow. They are only taken out of flow by cars-page.css, so until that
+ * stylesheet applies they render in flow at roughly 2500px tall and push .tcp-main
+ * down the page. Any paint that happens before the stylesheet lands therefore costs
+ * a full-viewport layout shift.
+ *
+ * Inlining the one rule that matters removes the network dependency entirely. The
+ * .open state in cars-page.css uses a two-class selector, so it still wins on
+ * specificity and the modals continue to open normally.
+ */
+add_action( 'wp_head', function() {
+    if ( ! is_page_template( 'template-test-cars.php' ) ) {
+        return;
+    }
+    echo "<style id=\"tcp-critical-cls-guard\">.tcp-filters-modal-overlay{display:none}.tcp-filters-bar{position:sticky;top:0}</style>\n";
+}, 1 );
+
 add_action( 'wp_head', function() {
     if ( ! is_page_template( 'template-test-cars.php' ) ) {
         return;
