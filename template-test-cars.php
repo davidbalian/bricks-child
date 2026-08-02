@@ -13,6 +13,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Google Maps: loaded on first Location modal open via autoagora-car-browse-maps-loader (see includes/core/car-browse-assets.php).
 
 /**
+ * Temporary production-safe CLS attribution for the /cars/ investigation.
+ * Remove after the remaining layout-shift source has been identified.
+ */
+add_action( 'wp_head', function() {
+    if ( ! is_page_template( 'template-test-cars.php' ) ) {
+        return;
+    }
+    ?>
+    <script id="autoagora-cls-diagnostic">
+    (function () {
+        if (!('PerformanceObserver' in window)) return;
+        new PerformanceObserver(function (list) {
+            list.getEntries().forEach(function (entry) {
+                if (entry.hadRecentInput) return;
+                var sources = (entry.sources || []).map(function (source) {
+                    var node = source.node;
+                    return {
+                        node: node ? node.tagName.toLowerCase() + (node.id ? '#' + node.id : '') + (node.classList && node.classList.length ? '.' + Array.from(node.classList).slice(0, 3).join('.') : '') : null,
+                        previousRect: source.previousRect,
+                        currentRect: source.currentRect
+                    };
+                });
+                console.info('[AutoAgora CLS]', JSON.stringify({ value: entry.value, startTime: entry.startTime, sources: sources }));
+            });
+        }).observe({ type: 'layout-shift', buffered: true });
+    }());
+    </script>
+    <?php
+}, 0 );
+
+/**
  * Critical CLS guard, printed inline at the very top of <head>.
  *
  * Both modal overlays are markup siblings that sit directly above .tcp-main in the
