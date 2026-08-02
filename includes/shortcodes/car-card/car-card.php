@@ -354,11 +354,12 @@ function car_card_render_favorite_button($post_id) {
     }
 
     $is_favorite = $user_id && in_array($post_id, $favorite_cars);
-    $heart_class = $is_favorite ? 'fas fa-heart' : 'far fa-heart';
     $button_class = 'favorite-btn favorite-btn-listing favorite-btn-small' . ($is_favorite ? ' active' : '');
     ?>
     <button class="<?php echo esc_attr($button_class); ?>" data-car-id="<?php echo esc_attr($post_id); ?>" title="<?php echo $is_favorite ? 'Remove from favorites' : 'Add to favorites'; ?>">
-        <i class="<?php echo esc_attr($heart_class); ?>"></i>
+        <svg class="favorite-heart-icon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 21s-7.5-4.35-9.5-8.65C.82 8.74 2.73 4.5 6.78 4.5c2.14 0 3.52 1.23 4.22 2.25.7-1.02 2.08-2.25 4.22-2.25 4.05 0 5.96 4.24 4.28 7.85C19.5 16.65 12 21 12 21Z" />
+        </svg>
     </button>
     <?php
 }

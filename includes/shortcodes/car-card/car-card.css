@@ -169,6 +169,21 @@
     cursor: pointer;
 }
 
+.car-card-slider .favorite-heart-icon {
+    display: block;
+    width: 15px;
+    height: 15px;
+    fill: transparent;
+    stroke: #ef4444;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.car-card-slider .favorite-btn.active .favorite-heart-icon {
+    fill: #ef4444;
+}
+
 /* ── Arrows ── */
 .car-card-arrow {
     position: absolute;

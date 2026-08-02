@@ -207,6 +207,22 @@ function bricks_child_enqueue_styles() {
 add_action( 'wp_enqueue_scripts', 'bricks_child_enqueue_styles', 15 );
 
 /**
+ * Keep the New Cars Page Template free of late web-font swaps.
+ *
+ * The template renders a large grid of repeated text. Even small metric changes
+ * between the fallback face and Inter/Outfit are amplified across the grid and
+ * have been measured as a full .tcp-main layout shift in Lighthouse.
+ */
+function autoagora_dequeue_cars_page_web_fonts() {
+    if ( ! is_page_template( 'template-test-cars.php' ) ) {
+        return;
+    }
+
+    wp_dequeue_style( 'bricks-google-fonts' );
+}
+add_action( 'wp_enqueue_scripts', 'autoagora_dequeue_cars_page_web_fonts', 100 );
+
+/**
  * Dashicons are only needed for the admin bar. Dropping them for visitors cuts unused CSS on listings and elsewhere.
  */
 function bricks_child_dequeue_dashicons_when_admin_bar_hidden() {
@@ -282,4 +298,4 @@ function enqueue_theme_scripts() {
 
     // Theme scripts can be added here if needed
 }
-add_action('wp_enqueue_scripts', 'enqueue_theme_scripts'); 
+add_action('wp_enqueue_scripts', 'enqueue_theme_scripts');

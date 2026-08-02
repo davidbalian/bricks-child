@@ -41,14 +41,16 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
         // Optimistically update UI
         favoriteBtn.classList.toggle('active');
-        if (isActive) {
+        if (isActive && heartIcon) {
             heartIcon.classList.remove('fas');
             heartIcon.classList.add('far');
             favoriteBtn.title = 'Add to favorites';
-        } else {
+        } else if (!isActive && heartIcon) {
             heartIcon.classList.remove('far');
             heartIcon.classList.add('fas');
             favoriteBtn.title = 'Remove from favorites';
+        } else {
+            favoriteBtn.title = isActive ? 'Add to favorites' : 'Remove from favorites';
         }
 
         // Prepare AJAX data
@@ -92,14 +94,16 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     
     function revertFavoriteUI(favoriteBtn, wasActive, heartIcon) {
         favoriteBtn.classList.toggle('active');
-        if (wasActive) {
+        if (wasActive && heartIcon) {
             heartIcon.classList.remove('far');
             heartIcon.classList.add('fas');
             favoriteBtn.title = 'Remove from favorites';
-        } else {
+        } else if (!wasActive && heartIcon) {
             heartIcon.classList.remove('fas');
             heartIcon.classList.add('far');
             favoriteBtn.title = 'Add to favorites';
+        } else {
+            favoriteBtn.title = wasActive ? 'Remove from favorites' : 'Add to favorites';
         }
     }
-}); 
+});
