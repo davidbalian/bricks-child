@@ -269,18 +269,34 @@
     }
 
     .custom-homepage-hero {
+        position: relative;
         padding: 0;
     }
 
+    .custom-homepage-hero::before {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        height: 180px;
+        background-image:
+            linear-gradient(rgba(18, 24, 38, 0.16), rgba(18, 24, 38, 0.16)),
+            var(--custom-homepage-hero-image);
+        background-position: 50% 80%;
+        background-size: cover;
+        background-repeat: no-repeat;
+        content: '';
+    }
+
     .custom-homepage-hero-inner {
+        position: relative;
+        z-index: 1;
         width: 100%;
         min-height: 690px;
         padding: 6.25rem 0.625rem 1rem;
         align-items: flex-start;
         border-radius: 0;
-        background-position: center;
-        background-size: cover;
-        background-repeat: no-repeat;
+        background-image: none;
     }
 
     .custom-homepage-search-card {
