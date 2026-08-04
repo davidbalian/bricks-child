@@ -175,7 +175,7 @@ get_header();
     <section
         class="custom-homepage-hero"
         aria-labelledby="custom-homepage-title"
-        style="--custom-homepage-hero-image: url('<?php echo esc_url(content_url('/uploads/2025/04/hero-bg-1024x683.webp')); ?>');"
+        style="--custom-homepage-hero-image: url('https://autoagora.cy/wp-content/uploads/2025/04/hero-bg-1024x683.webp');"
     >
         <div class="custom-homepage-container custom-homepage-hero-inner">
             <div class="custom-homepage-search-card">
