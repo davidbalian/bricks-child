@@ -172,11 +172,46 @@
 /* Search Input */
 .car-filter-dropdown-search {
     display: none; /* Hidden by default; enabled when dropdown is open */
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0.5rem 0.75rem !important;
+    border: none !important;
+    border-bottom: 1px solid #dfe2e6 !important;
+    border-radius: 0 !important;
+    outline: none;
+    background-color: #f5f5f5 !important;
+    color: #2a3546 !important;
+    font-size: 16px !important;
+    font-weight: 500;
+    line-height: 1.5;
+    box-shadow: none !important;
+    appearance: none;
 }
 
 /* Show search only while the dropdown menu is open */
 .car-filter-dropdown.open .car-filter-dropdown-search {
     display: block !important;
+}
+
+.car-filter-dropdown-search:focus {
+    border-bottom-color: #dfe2e6 !important;
+    outline: none !important;
+    background-color: #eef2f7 !important;
+    box-shadow: none !important;
+}
+
+.car-filter-dropdown-search::placeholder {
+    color: #6b7280 !important;
+    font-weight: 400;
+    opacity: 1;
+}
+
+.car-filter-dropdown-search:disabled {
+    background-color: #f5f5f5 !important;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* Options Container */
