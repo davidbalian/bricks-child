@@ -21,6 +21,7 @@ This is the dense technical map for future agents. It favors pointers, contracts
 - `style.css`: theme header, CSS variables, shared button system, global styling.
 - `template-add-listing.php`: add car listing page.
 - `template-edit-listing.php`: edit existing car listing page.
+- `template-custom-homepage.php`: repository-owned homepage recreation with dynamic car collections and `[homepage_filters]` in the hero.
 - `template-buyer-requests.php`: buyer request index.
 - `template-create-buyer-request.php`: buyer request form.
 - `single-buyer_request.php`: single buyer request display.
@@ -476,4 +477,3 @@ No automated suite exists. Useful checks after edits:
 - For SEO: view source for title/meta/canonical/robots/schema
 - For filters: test initial URL params, AJAX change, pagination, sort, and clear
 - For add/edit: test nonce, unauthorized access, owner access, image upload path, taxonomy assignment
-

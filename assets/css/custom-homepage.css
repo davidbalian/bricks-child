@@ -1,0 +1,287 @@
+.page-template-template-custom-homepage {
+    background: var(--light-bg, #f9f9f9);
+}
+
+.custom-homepage-main {
+    overflow: hidden;
+    background: var(--light-bg, #f9f9f9);
+    color: var(--text-color, #242424);
+}
+
+.custom-homepage-container {
+    width: min(100% - 2rem, 1440px);
+    margin-inline: auto;
+}
+
+.custom-homepage-section {
+    padding: 2rem 0;
+}
+
+.custom-homepage-hero {
+    padding: 1rem 0 2rem;
+}
+
+.custom-homepage-hero-inner {
+    display: flex;
+    align-items: center;
+    min-height: 650px;
+    padding: 2rem;
+    border-radius: 3rem;
+    background-image:
+        linear-gradient(rgba(18, 24, 38, 0.16), rgba(18, 24, 38, 0.16)),
+        var(--custom-homepage-hero-image);
+    background-position: center;
+    background-size: cover;
+}
+
+.custom-homepage-search-card {
+    width: min(760px, 100%);
+    padding: clamp(1.5rem, 4vw, 3rem);
+    border-radius: 2rem;
+    background: #fff;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+}
+
+.custom-homepage-search-card h1 {
+    margin: 0 0 2rem;
+    color: var(--text-color, #242424);
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    line-height: 1.12;
+}
+
+.custom-homepage-search-card .car-filters-container {
+    width: 100%;
+}
+
+.custom-homepage-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.custom-homepage-section-heading h2 {
+    margin: 0;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1.2;
+}
+
+.custom-homepage-scroll-buttons {
+    display: flex;
+    flex: none;
+    gap: 0.5rem;
+}
+
+.custom-homepage-scroll-button {
+    display: inline-grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    place-items: center;
+    border: 1px solid #dce1e8;
+    border-radius: 50%;
+    background: #fff;
+    color: #22304e;
+    font: inherit;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.custom-homepage-scroll-button:hover {
+    border-color: var(--light-blue, #0d86e3);
+    color: var(--light-blue, #0d86e3);
+    transform: translateY(-1px);
+}
+
+.custom-homepage-car-row {
+    display: grid;
+    grid-auto-columns: minmax(280px, calc((100% - 4.5rem) / 4));
+    grid-auto-flow: column;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding: 0.2rem 0.1rem 1rem;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+.custom-homepage-car-row > .car-card {
+    min-width: 0;
+    scroll-snap-align: start;
+}
+
+.custom-homepage-car-row .car-card-body {
+    background: #fff;
+}
+
+.custom-homepage-empty {
+    padding: 2rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 1rem;
+    background: #fff;
+    text-align: center;
+}
+
+.custom-homepage-view-all {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.custom-homepage-view-all .btn-secondary {
+    border: 1px solid var(--light-blue, #0d86e3);
+    color: var(--dark-blue, #0b72c1);
+    background: #fff;
+}
+
+.custom-homepage-view-all .btn-secondary:hover {
+    color: #fff;
+    background: var(--light-blue, #0d86e3);
+}
+
+.custom-homepage-cta-section {
+    padding-block: 2rem;
+}
+
+.custom-homepage-cta {
+    display: flex;
+    min-height: 330px;
+    padding: clamp(2rem, 6vw, 5rem) clamp(1.5rem, 6vw, 6rem);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2rem;
+    color: #fff;
+    text-align: center;
+}
+
+.custom-homepage-cta--one {
+    background: linear-gradient(20deg, #22304e, #0b72c1);
+}
+
+.custom-homepage-cta--two {
+    background: linear-gradient(170deg, #22304e, #0b72c1);
+}
+
+.custom-homepage-cta--three {
+    background: linear-gradient(70deg, #22304e, #0b72c1);
+}
+
+.custom-homepage-cta h2 {
+    max-width: 900px;
+    margin: 0 0 1rem;
+    color: inherit;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+}
+
+.custom-homepage-cta-copy {
+    max-width: 850px;
+}
+
+.custom-homepage-cta-copy p {
+    margin: 0.35rem 0;
+    color: inherit;
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+}
+
+.custom-homepage-cta-button {
+    margin-top: 1.5rem;
+    border: 1px solid #fff;
+    color: #22304e;
+    background: #fff;
+}
+
+.custom-homepage-cta-button:hover {
+    color: #fff;
+    background: transparent;
+}
+
+@media (max-width: 991px) {
+    .custom-homepage-hero-inner {
+        min-height: 590px;
+        border-radius: 2rem;
+    }
+
+    .custom-homepage-car-row {
+        grid-auto-columns: minmax(280px, calc((100% - 1.5rem) / 2));
+    }
+}
+
+@media (max-width: 767px) {
+    .custom-homepage-container {
+        width: min(100% - 1.25rem, 1440px);
+    }
+
+    .custom-homepage-section {
+        padding: 1.5rem 0;
+    }
+
+    .custom-homepage-hero {
+        padding: 0;
+    }
+
+    .custom-homepage-hero-inner {
+        width: 100%;
+        min-height: 690px;
+        padding: 6.25rem 0.625rem 1rem;
+        align-items: flex-start;
+        border-radius: 0;
+        background-position: center top;
+        background-size: auto 215px;
+        background-repeat: no-repeat;
+    }
+
+    .custom-homepage-search-card {
+        padding: 2rem 1.5rem;
+        border-radius: 1.5rem;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+    }
+
+    .custom-homepage-search-card h1 {
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+    }
+
+    .custom-homepage-section-heading {
+        align-items: flex-end;
+    }
+
+    .custom-homepage-section-heading h2 {
+        font-size: 1.65rem;
+    }
+
+    .custom-homepage-scroll-button {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .custom-homepage-car-row {
+        width: calc(100% + 0.625rem);
+        grid-auto-columns: minmax(280px, 88%);
+        gap: 1rem;
+    }
+
+    .custom-homepage-cta {
+        min-height: 360px;
+        padding: 2.5rem 1.25rem;
+        border-radius: 1.5rem;
+    }
+
+    .custom-homepage-cta h2 {
+        font-size: 2rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .custom-homepage-car-row {
+        scroll-behavior: auto;
+    }
+
+    .custom-homepage-scroll-button {
+        transition: none;
+    }
+}
