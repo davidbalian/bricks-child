@@ -103,11 +103,11 @@
 }
 
 .custom-homepage-scroll-button[data-scroll-direction="previous"] svg {
-    transform: translateX(-2px);
+    transform: translateX(-1px);
 }
 
 .custom-homepage-scroll-button[data-scroll-direction="next"] svg {
-    transform: translateX(2px);
+    transform: translateX(1px);
 }
 
 .custom-homepage-car-row-shell {
