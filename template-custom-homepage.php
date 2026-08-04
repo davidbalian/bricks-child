@@ -53,6 +53,7 @@ if (!function_exists('autoagora_custom_homepage_query')) {
             'posts_per_page'                => 8,
             'orderby'                       => 'date',
             'order'                         => 'DESC',
+            '_car_listings_orderby'         => 'date',
             'ignore_sticky_posts'           => true,
             'no_found_rows'                 => true,
             'car_listing_state_active_only' => true,
@@ -62,15 +63,11 @@ if (!function_exists('autoagora_custom_homepage_query')) {
             $args['meta_query'] = array_merge(array('relation' => 'AND'), $meta_clauses);
         }
 
-        if (function_exists('car_listings_active_listing_state_clauses')) {
-            add_filter('posts_clauses', 'car_listings_active_listing_state_clauses', 12, 2);
-        }
-
-        $query = new WP_Query($args);
-
-        if (function_exists('car_listings_active_listing_state_clauses')) {
-            remove_filter('posts_clauses', 'car_listings_active_listing_state_clauses', 12);
-        }
+        // Use the marketplace query pipeline so active paid promotions are ordered
+        // first using the same tier/status/expiry rules as the /cars page.
+        $query = function_exists('car_listings_execute_query')
+            ? car_listings_execute_query($args)
+            : new WP_Query($args);
 
         if (!empty($query->posts)) {
             update_postmeta_cache(wp_list_pluck($query->posts, 'ID'));
