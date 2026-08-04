@@ -278,8 +278,8 @@
         padding: 6.25rem 0.625rem 1rem;
         align-items: flex-start;
         border-radius: 0;
-        background-position: center top;
-        background-size: auto 215px;
+        background-position: center;
+        background-size: cover;
         background-repeat: no-repeat;
     }
 
