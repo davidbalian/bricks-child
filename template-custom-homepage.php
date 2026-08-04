@@ -101,31 +101,39 @@ if (!function_exists('autoagora_custom_homepage_collection')) {
             <div class="custom-homepage-container">
                 <div class="custom-homepage-section-heading">
                     <h2 id="<?php echo esc_attr($section_id); ?>-title"><?php echo esc_html($title); ?></h2>
-                    <div class="custom-homepage-scroll-buttons" aria-label="<?php echo esc_attr($title); ?> carousel controls">
-                        <button type="button" class="custom-homepage-scroll-button" data-scroll-direction="previous" data-scroll-target="<?php echo esc_attr($section_id); ?>" aria-label="Previous cars">&#8249;</button>
-                        <button type="button" class="custom-homepage-scroll-button" data-scroll-direction="next" data-scroll-target="<?php echo esc_attr($section_id); ?>" aria-label="Next cars">&#8250;</button>
-                    </div>
+                    <?php if (!$is_latest) : ?>
+                        <div class="custom-homepage-scroll-buttons" aria-label="<?php echo esc_attr($title); ?> carousel controls">
+                            <button type="button" class="custom-homepage-scroll-button" data-scroll-direction="previous" data-scroll-target="<?php echo esc_attr($section_id); ?>" aria-label="Previous cars">
+                                <svg viewBox="0 0 12 12" aria-hidden="true"><polyline points="8,2 4,6 8,10"/></svg>
+                            </button>
+                            <button type="button" class="custom-homepage-scroll-button" data-scroll-direction="next" data-scroll-target="<?php echo esc_attr($section_id); ?>" aria-label="Next cars">
+                                <svg viewBox="0 0 12 12" aria-hidden="true"><polyline points="4,2 8,6 4,10"/></svg>
+                            </button>
+                        </div>
+                    <?php endif; ?>
                 </div>
 
                 <?php if ($query->have_posts()) : ?>
-                    <div id="<?php echo esc_attr($section_id); ?>" class="custom-homepage-car-row">
-                        <?php
-                        $listing_index = 0;
-                        while ($query->have_posts()) :
-                            $query->the_post();
-                            if (function_exists('render_car_card')) {
-                                render_car_card(get_the_ID(), array('listing_index' => $listing_index));
-                            }
-                            $listing_index++;
-                        endwhile;
-                        ?>
+                    <div class="custom-homepage-car-row-shell">
+                        <div id="<?php echo esc_attr($section_id); ?>" class="custom-homepage-car-row">
+                            <?php
+                            $listing_index = 0;
+                            while ($query->have_posts()) :
+                                $query->the_post();
+                                if (function_exists('render_car_card')) {
+                                    render_car_card(get_the_ID(), array('listing_index' => $listing_index));
+                                }
+                                $listing_index++;
+                            endwhile;
+                            ?>
+                        </div>
                     </div>
                 <?php else : ?>
                     <p class="custom-homepage-empty"><?php esc_html_e('No cars are available in this collection right now.', 'bricks-child'); ?></p>
                 <?php endif; ?>
 
                 <div class="custom-homepage-view-all">
-                    <a class="btn btn-secondary" href="<?php echo esc_url($view_all_url); ?>"><?php echo esc_html($view_all); ?></a>
+                    <a class="brxe-button main-cta-button bricks-button bricks-background-primary" href="<?php echo esc_url($view_all_url); ?>"><?php echo esc_html($view_all); ?></a>
                 </div>
             </div>
         </section>
@@ -156,7 +164,7 @@ if (!function_exists('autoagora_custom_homepage_cta')) {
                         <p><?php echo esc_html($paragraph); ?></p>
                     <?php endforeach; ?>
                 </div>
-                <a class="btn btn-secondary custom-homepage-cta-button" href="<?php echo esc_url($url); ?>"><?php echo esc_html($button); ?></a>
+                <a class="brxe-button main-cta-button white-cta-button bricks-button bricks-background-primary" href="<?php echo esc_url($url); ?>"><?php echo esc_html($button); ?></a>
             </div>
         </section>
         <?php

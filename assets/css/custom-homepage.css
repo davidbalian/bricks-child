@@ -35,7 +35,7 @@
 }
 
 .custom-homepage-search-card {
-    width: min(760px, 100%);
+    width: 40%;
     padding: clamp(1.5rem, 4vw, 3rem);
     border-radius: 2rem;
     background: #fff;
@@ -45,7 +45,7 @@
 .custom-homepage-search-card h1 {
     margin: 0 0 2rem;
     color: var(--text-color, #242424);
-    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-size: 1.5rem;
     line-height: 1.12;
 }
 
@@ -63,7 +63,7 @@
 
 .custom-homepage-section-heading h2 {
     margin: 0;
-    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-size: 1.8rem;
     line-height: 1.2;
 }
 
@@ -83,17 +83,55 @@
     border-radius: 50%;
     background: #fff;
     color: #22304e;
-    font: inherit;
-    font-size: 2rem;
-    line-height: 1;
     cursor: pointer;
-    transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    transition: border-color 0.2s ease, color 0.2s ease;
 }
 
 .custom-homepage-scroll-button:hover {
     border-color: var(--light-blue, #0d86e3);
     color: var(--light-blue, #0d86e3);
-    transform: translateY(-1px);
+}
+
+.custom-homepage-scroll-button svg {
+    width: 1.4rem;
+    height: 1.4rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.custom-homepage-car-row-shell {
+    position: relative;
+}
+
+.custom-homepage-car-row-shell::before,
+.custom-homepage-car-row-shell::after {
+    position: absolute;
+    top: 0;
+    bottom: 1rem;
+    z-index: 5;
+    width: clamp(3rem, 8vw, 8rem);
+    opacity: 0;
+    pointer-events: none;
+    content: '';
+    transition: opacity 0.2s ease;
+}
+
+.custom-homepage-car-row-shell::before {
+    left: 0;
+    background: linear-gradient(to right, #f9f9f9 0%, rgba(249, 249, 249, 0.7) 30%, rgba(249, 249, 249, 0.3) 60%, rgba(249, 249, 249, 0) 100%);
+}
+
+.custom-homepage-car-row-shell::after {
+    right: 0;
+    background: linear-gradient(to left, #f9f9f9 0%, rgba(249, 249, 249, 0.7) 30%, rgba(249, 249, 249, 0.3) 60%, rgba(249, 249, 249, 0) 100%);
+}
+
+.custom-homepage-car-row-shell.can-scroll-left::before,
+.custom-homepage-car-row-shell.can-scroll-right::after {
+    opacity: 1;
 }
 
 .custom-homepage-car-row {
@@ -118,6 +156,19 @@
     background: #fff;
 }
 
+.custom-homepage-cars-section.is-latest .custom-homepage-car-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-columns: auto;
+    grid-auto-flow: row;
+    overflow: visible;
+    scroll-snap-type: none;
+}
+
+.custom-homepage-cars-section.is-latest .custom-homepage-car-row-shell::before,
+.custom-homepage-cars-section.is-latest .custom-homepage-car-row-shell::after {
+    display: none;
+}
+
 .custom-homepage-empty {
     padding: 2rem;
     border: 1px solid #e5e7eb;
@@ -130,17 +181,6 @@
     display: flex;
     justify-content: center;
     margin-top: 1rem;
-}
-
-.custom-homepage-view-all .btn-secondary {
-    border: 1px solid var(--light-blue, #0d86e3);
-    color: var(--dark-blue, #0b72c1);
-    background: #fff;
-}
-
-.custom-homepage-view-all .btn-secondary:hover {
-    color: #fff;
-    background: var(--light-blue, #0d86e3);
 }
 
 .custom-homepage-cta-section {
@@ -175,7 +215,7 @@
     max-width: 900px;
     margin: 0 0 1rem;
     color: inherit;
-    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-size: 1.8rem;
 }
 
 .custom-homepage-cta-copy {
@@ -188,16 +228,8 @@
     font-size: clamp(1rem, 1.6vw, 1.2rem);
 }
 
-.custom-homepage-cta-button {
+.custom-homepage-cta .white-cta-button {
     margin-top: 1.5rem;
-    border: 1px solid #fff;
-    color: #22304e;
-    background: #fff;
-}
-
-.custom-homepage-cta-button:hover {
-    color: #fff;
-    background: transparent;
 }
 
 @media (max-width: 991px) {
@@ -206,8 +238,16 @@
         border-radius: 2rem;
     }
 
+    .custom-homepage-search-card {
+        width: 50%;
+    }
+
     .custom-homepage-car-row {
         grid-auto-columns: minmax(280px, calc((100% - 1.5rem) / 2));
+    }
+
+    .custom-homepage-cars-section.is-latest .custom-homepage-car-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
@@ -236,6 +276,7 @@
     }
 
     .custom-homepage-search-card {
+        width: 100%;
         padding: 2rem 1.5rem;
         border-radius: 1.5rem;
         box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
@@ -251,7 +292,7 @@
     }
 
     .custom-homepage-section-heading h2 {
-        font-size: 1.65rem;
+        font-size: 1.8rem;
     }
 
     .custom-homepage-scroll-button {
@@ -265,15 +306,17 @@
         gap: 1rem;
     }
 
+    .custom-homepage-cars-section.is-latest .custom-homepage-car-row {
+        width: 100%;
+        grid-template-columns: 1fr;
+    }
+
     .custom-homepage-cta {
         min-height: 360px;
         padding: 2.5rem 1.25rem;
         border-radius: 1.5rem;
     }
 
-    .custom-homepage-cta h2 {
-        font-size: 2rem;
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {
