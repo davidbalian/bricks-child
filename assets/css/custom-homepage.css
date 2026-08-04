@@ -102,6 +102,14 @@
     stroke-linejoin: round;
 }
 
+.custom-homepage-scroll-button[data-scroll-direction="previous"] svg {
+    transform: translateX(-2px);
+}
+
+.custom-homepage-scroll-button[data-scroll-direction="next"] svg {
+    transform: translateX(2px);
+}
+
 .custom-homepage-car-row-shell {
     position: relative;
 }
