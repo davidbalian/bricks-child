@@ -111,6 +111,17 @@ $related_query    = autoagora_single_car_related_query($post_id, 8);
 $author_id        = (int) get_post_field('post_author', $post_id);
 $author           = get_userdata($author_id);
 $author_name      = $author ? $author->display_name : '';
+if ($author && !in_array('dealership', (array) $author->roles, true)) {
+    $private_seller_name = trim(
+        (string) get_user_meta($author_id, 'first_name', true)
+        . ' '
+        . (string) get_user_meta($author_id, 'last_name', true)
+    );
+
+    if ($private_seller_name !== '') {
+        $author_name = $private_seller_name;
+    }
+}
 $author_url       = $author_id ? get_author_posts_url($author_id) : '';
 $city_url         = autoagora_single_car_city_url((string) $city);
 $posted_label     = autoagora_single_car_relative_date($post_id);
