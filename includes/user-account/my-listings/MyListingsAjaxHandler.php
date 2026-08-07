@@ -406,6 +406,10 @@ class MyListingsAjaxHandler {
                         </button>
                         <?php
                     }
+
+                    if ($post_status === 'publish' && ! $is_sold && ! $is_expired) {
+                        echo autoagora_facebook_group_share_button($post_id, 'my_listings'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                    }
                     ?>
                     <a
                         href="<?php echo esc_url($delete_url); ?>"

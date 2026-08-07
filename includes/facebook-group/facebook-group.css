@@ -1,0 +1,118 @@
+.autoagora-facebook-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(24, 119, 242, 0.25);
+  border-radius: var(--border-radius-large);
+  background: linear-gradient(135deg, #f7faff 0%, #eef5ff 100%);
+  color: #1c2b3a;
+  text-align: left;
+}
+
+.autoagora-facebook-card-icon {
+  display: inline-flex;
+  flex: 0 0 3.25rem;
+  width: 3.25rem;
+  height: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #1877f2;
+  color: #fff;
+  font-size: 1.45rem;
+}
+
+.autoagora-facebook-card-copy {
+  flex: 1 1 auto;
+}
+
+.autoagora-facebook-card h3 {
+  margin: 0 0 0.35rem;
+  color: var(--dark-blue);
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+}
+
+.autoagora-facebook-card p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.autoagora-facebook-card-action {
+  flex: 0 0 auto;
+}
+
+.autoagora-facebook-card-action .btn {
+  white-space: nowrap;
+}
+
+.autoagora-facebook-admin-note {
+  display: block;
+  margin-top: 0.65rem;
+  color: #6b4f00;
+}
+
+.autoagora-facebook-admin-note a {
+  font-weight: 700;
+}
+
+.autoagora-facebook-homepage-section {
+  padding-block: clamp(1.5rem, 4vw, 3rem);
+}
+
+.listing-success-message .autoagora-facebook-card {
+  margin-top: 1.25rem;
+}
+
+.autoagora-facebook-single-wrapper {
+  width: min(100% - 2rem, 1200px);
+  margin: clamp(2rem, 5vw, 4rem) auto;
+}
+
+.autoagora-facebook-share-control {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.listing-actions:has(.autoagora-facebook-share-control) {
+  flex-wrap: wrap;
+}
+
+.autoagora-facebook-share-feedback {
+  max-width: 18rem;
+  color: var(--dark-blue);
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
+.autoagora-facebook-share-button.is-copied {
+  border-color: var(--success-green);
+  color: #126b31;
+}
+
+@media (max-width: 700px) {
+  .autoagora-facebook-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 1.25rem;
+  }
+
+  .autoagora-facebook-card-copy {
+    min-width: calc(100% - 4.75rem);
+  }
+
+  .autoagora-facebook-card-action {
+    width: 100%;
+  }
+
+  .autoagora-facebook-card-action .btn {
+    width: 100%;
+    white-space: normal;
+  }
+
+  .listing-actions .autoagora-facebook-share-control,
+  .listing-actions .autoagora-facebook-share-button {
+    width: 100%;
+  }
+}

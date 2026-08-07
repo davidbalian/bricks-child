@@ -169,16 +169,33 @@ final class ListingNotificationMessageFactory
         $subject = 'Your listing is now live';
         $body = sprintf('%s is published and visible to buyers.', $listing_title);
         $support = 'Keep it fresh: verify photos, price, and details to stay competitive.';
+        $group_url = function_exists('autoagora_facebook_group_url') ? autoagora_facebook_group_url() : '';
+        $buttons = sprintf(
+            '<a href="%s" style="display:inline-block;background:#0073aa;color:#fff;padding:10px 16px;margin:0 8px 8px 0;border-radius:4px;text-decoration:none;font-weight:600;">View Listing</a><a href="%s" style="display:inline-block;background:#eef1f4;color:#253746;padding:10px 16px;margin:0 8px 8px 0;border-radius:4px;text-decoration:none;font-weight:600;">My Listings</a>',
+            esc_url($listing_url),
+            esc_url($this->getListingsUrl())
+        );
+        $facebook_html = '';
+        $facebook_text = '';
+
+        if ($group_url !== '') {
+            $facebook_html = sprintf(
+                '<p><strong>Want more reach?</strong> Copy your live listing link and post it in the AutoAgora Facebook group.</p><p><a href="%s" style="display:inline-block;background:#1877f2;color:#fff;padding:10px 16px;border-radius:4px;text-decoration:none;font-weight:600;">Open Facebook Group</a></p>',
+                esc_url($group_url)
+            );
+            $facebook_text = "\n\nWant more reach? Copy your live listing link and post it in the AutoAgora Facebook group:\n" . $group_url;
+        }
 
         $html = sprintf(
-            '<p>%s</p><p>%s</p><p><a href="%s" style="background:#0073aa;color:#fff;padding:10px 16px;border-radius:4px;text-decoration:none;font-weight:600;">My Listings</a></p><p><small>%s</small></p>',
+            '<p>%s</p><p>%s</p><p>%s</p>%s<p><small>%s</small></p>',
             esc_html($body),
             esc_html($support),
-            esc_url($this->getListingsUrl()),
+            $buttons,
+            $facebook_html,
             esc_html($this->getGlobalFooter())
         );
 
-        $text = $body . "\n\n" . $support . "\n\nVisit: " . $listing_url . "\n" . $this->getGlobalFooter();
+        $text = $body . "\n\n" . $support . "\n\nView listing: " . $listing_url . $facebook_text . "\n\n" . $this->getGlobalFooter();
 
         return [
             'subject' => $subject,

@@ -19,6 +19,7 @@ require_once get_stylesheet_directory() . '/includes/i18n/init.php';
 // IMPORTANT: Ensure these files and the '/vendor' directory exist in your Bricks child theme folder.
 require_once get_stylesheet_directory() . '/vendor/autoload.php';
 require_once get_stylesheet_directory() . '/includes/listing-state/init.php';
+require_once get_stylesheet_directory() . '/includes/facebook-group/init.php';
 require_once get_stylesheet_directory() . '/includes/listing-promotions/init.php';
 require_once get_stylesheet_directory() . '/includes/core/google-maps-assets.php';
 require_once get_stylesheet_directory() . '/includes/core/car-listing-redirects.php';

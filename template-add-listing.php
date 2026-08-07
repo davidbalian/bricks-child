@@ -184,6 +184,7 @@ get_header(); ?>
                             <?php autoagora_render_promotion_purchase_controls($submitted_listing_id); ?>
                         </section>
                     <?php endif; ?>
+                    <?php echo autoagora_facebook_group_join_card('submission_success', 'submission'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                     <p class="listing-success-email-note"><?php esc_html_e( 'To receive email notifications about views and clicks on your listing,', 'bricks-child' ); ?><br><?php esc_html_e( 'verify your email from your account page if you haven\'t already.', 'bricks-child' ); ?></p>
                     <div class="listing-success-buttons">
                         <a href="<?php echo esc_url( autoagora_localized_page_url( 'my-listings' ) ); ?>" class="btn btn-primary"><?php esc_html_e( 'My Listings', 'bricks-child' ); ?></a>
