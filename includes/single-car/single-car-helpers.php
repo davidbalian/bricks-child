@@ -267,58 +267,139 @@ function autoagora_single_car_city_url($city) {
 }
 
 /**
- * Query eight active cars with the same model as the current listing.
+ * Query up to eight related active cars in descending relevance tiers.
  *
- * Uses the marketplace query executor so paid promotion priority, Best Match
- * rank, recency buckets, and the shared result cache remain consistent with
- * homepage/browse listing collections.
+ * Tier order is exact model, same make/body, same body across all makes, then
+ * the full marketplace. Each tier uses the marketplace's promotion and Best
+ * Match ordering before its results are appended to the final list.
  *
  * @param int $post_id Car post ID.
  * @param int $limit   Maximum related cars.
  * @return WP_Query
  */
 function autoagora_single_car_related_query($post_id, $limit = 8) {
+    $limit = max(1, (int) $limit);
     $terms = autoagora_single_car_terms($post_id);
-    $args = array(
-        'post_type'                     => 'car',
-        'post_status'                   => 'publish',
-        'posts_per_page'                => max(1, (int) $limit),
-        'post__not_in'                  => array((int) $post_id),
-        'ignore_sticky_posts'           => true,
-        'car_listing_state_active_only' => true,
-        '_car_listings_orderby'         => 'score',
-        '_car_listings_order'           => 'DESC',
-        'orderby'                       => 'date',
-        'order'                         => 'DESC',
-    );
+    $make = trim((string) autoagora_single_car_field($post_id, 'make'));
+    $model = trim((string) autoagora_single_car_field($post_id, 'model'));
+    $body_type = trim((string) autoagora_single_car_field($post_id, 'body_type'));
+    $selected_ids = array((int) $post_id);
+    $related_ids = array();
 
-    if ($terms['model'] instanceof WP_Term) {
-        $args['tax_query'] = array(
+    $run_tier = static function (array $tier_args) use (&$selected_ids, &$related_ids, $limit) {
+        $remaining = $limit - count($related_ids);
+        if ($remaining <= 0) {
+            return;
+        }
+
+        $args = array_merge(
             array(
-                'taxonomy' => 'car_make',
-                'field'    => 'term_id',
-                'terms'    => array((int) $terms['model']->term_id),
+                'post_type'                     => 'car',
+                'post_status'                   => 'publish',
+                'posts_per_page'                => $remaining,
+                'post__not_in'                  => $selected_ids,
+                'ignore_sticky_posts'           => true,
+                'no_found_rows'                 => true,
+                'car_listing_state_active_only' => true,
+                '_car_listings_orderby'         => 'score',
+                '_car_listings_order'           => 'DESC',
+                'orderby'                       => 'date',
+                'order'                         => 'DESC',
             ),
+            $tier_args
         );
-    } else {
-        $make = trim((string) autoagora_single_car_field($post_id, 'make'));
-        $model = trim((string) autoagora_single_car_field($post_id, 'model'));
-        $args['meta_query'] = array('relation' => 'AND');
-        if ($make !== '') {
-            $args['meta_query'][] = array('key' => 'make', 'value' => $make, 'compare' => '=');
+
+        if (function_exists('car_listings_query_cache_run_wp_query')) {
+            $query = car_listings_query_cache_run_wp_query($args);
+        } elseif (function_exists('car_listings_execute_query')) {
+            $query = car_listings_execute_query($args);
+        } else {
+            $query = new WP_Query($args);
         }
-        if ($model !== '') {
-            $args['meta_query'][] = array('key' => 'model', 'value' => $model, 'compare' => '=');
+
+        foreach ($query->posts as $post) {
+            $candidate_id = $post instanceof WP_Post ? (int) $post->ID : (int) $post;
+            if ($candidate_id <= 0 || in_array($candidate_id, $selected_ids, true)) {
+                continue;
+            }
+            $related_ids[] = $candidate_id;
+            $selected_ids[] = $candidate_id;
+            if (count($related_ids) >= $limit) {
+                break;
+            }
         }
-        if (count($args['meta_query']) === 1) {
-            $args['post__in'] = array(0);
-            unset($args['meta_query']);
-        }
+    };
+
+    // Tier 1: exact make and model.
+    if ($terms['model'] instanceof WP_Term) {
+        $run_tier(array(
+            'tax_query' => array(
+                array(
+                    'taxonomy'         => 'car_make',
+                    'field'            => 'term_id',
+                    'terms'            => array((int) $terms['model']->term_id),
+                    'include_children' => false,
+                ),
+            ),
+        ));
+    } elseif ($make !== '' && $model !== '') {
+        $run_tier(array(
+            'meta_query' => array(
+                'relation' => 'AND',
+                array('key' => 'make', 'value' => $make, 'compare' => '='),
+                array('key' => 'model', 'value' => $model, 'compare' => '='),
+            ),
+        ));
     }
 
-    if (function_exists('car_listings_execute_query')) {
-        return car_listings_execute_query($args);
+    // Tier 2: same make and body type.
+    if ($body_type !== '' && $terms['make'] instanceof WP_Term) {
+        $run_tier(array(
+            'tax_query' => array(
+                array(
+                    'taxonomy'         => 'car_make',
+                    'field'            => 'term_id',
+                    'terms'            => array((int) $terms['make']->term_id),
+                    'include_children' => true,
+                ),
+            ),
+            'meta_query' => array(
+                array('key' => 'body_type', 'value' => $body_type, 'compare' => '='),
+            ),
+        ));
+    } elseif ($body_type !== '' && $make !== '') {
+        $run_tier(array(
+            'meta_query' => array(
+                'relation' => 'AND',
+                array('key' => 'make', 'value' => $make, 'compare' => '='),
+                array('key' => 'body_type', 'value' => $body_type, 'compare' => '='),
+            ),
+        ));
     }
 
-    return new WP_Query($args);
+    // Tier 3: same body type across all makes.
+    if ($body_type !== '') {
+        $run_tier(array(
+            'meta_query' => array(
+                array('key' => 'body_type', 'value' => $body_type, 'compare' => '='),
+            ),
+        ));
+    }
+
+    // Tier 4: any active marketplace listing.
+    $run_tier(array());
+
+    if (empty($related_ids)) {
+        $related_ids = array(0);
+    }
+
+    return new WP_Query(array(
+        'post_type'           => 'car',
+        'post_status'         => 'publish',
+        'post__in'            => $related_ids,
+        'orderby'             => 'post__in',
+        'posts_per_page'      => $limit,
+        'ignore_sticky_posts' => true,
+        'no_found_rows'       => true,
+    ));
 }
