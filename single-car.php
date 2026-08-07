@@ -125,6 +125,7 @@ if ($author && !in_array('dealership', (array) $author->roles, true)) {
 $author_url       = $author_id ? get_author_posts_url($author_id) : '';
 $city_url         = autoagora_single_car_city_url((string) $city);
 $posted_label     = autoagora_single_car_relative_date($post_id);
+$is_posted_today  = $posted_label === __('Posted today', 'bricks-child');
 $formatted_price  = autoagora_single_car_number($price);
 $formatted_miles  = autoagora_single_car_number($mileage);
 $transmission_display = autoagora_single_car_translated_value($transmission);
@@ -227,7 +228,7 @@ get_header();
                 <?php endif; ?>
 
                 <?php if ($posted_label !== '') : ?>
-                    <p class="autoagora-single-car__posted"><span aria-hidden="true"></span><?php echo esc_html($posted_label); ?></p>
+                    <p class="autoagora-single-car__posted"><?php if ($is_posted_today) : ?><span aria-hidden="true"></span><?php endif; ?><?php echo esc_html($posted_label); ?></p>
                 <?php endif; ?>
 
                 <div class="autoagora-single-car__seller">
