@@ -46,6 +46,15 @@
     min-width: 0;
 }
 
+.autoagora-single-car__summary {
+    position: sticky;
+    top: 1.5rem;
+}
+
+body.admin-bar .autoagora-single-car__summary {
+    top: calc(32px + 1.5rem);
+}
+
 .autoagora-single-car__card {
     background: var(--single-car-surface);
     border: 1px solid var(--single-car-border);
@@ -531,6 +540,11 @@
     .autoagora-single-car__hero {
         grid-template-columns: 1fr;
         gap: 1.5rem;
+    }
+
+    .autoagora-single-car__summary,
+    body.admin-bar .autoagora-single-car__summary {
+        position: static;
     }
 
     .autoagora-single-car__spec-tables {
