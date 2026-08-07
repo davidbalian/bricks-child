@@ -124,6 +124,8 @@ return array(
 	'Number of Owners' => 'Αριθμός ιδιοκτητών',
 	"E.g '2'" => "π.χ. '2'",
 	'Registered as an Antique' => 'Εγγεγραμμένο ως κλασικό όχημα',
+	'MOT Until' => 'MOT έως',
+	'Yes' => 'Ναι',
 	'Vehicle History' => 'Ιστορικό οχήματος',
 	'No Accidents' => 'Χωρίς ατυχήματα',
 	'Minor Accidents' => 'Μικρά ατυχήματα',

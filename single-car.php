@@ -144,7 +144,17 @@ $design_specs = array_filter(
     }
 );
 
-$has_background = autoagora_single_car_has_value($owners) || autoagora_single_car_has_value($mot_until) || !empty($is_antique);
+$background_specs = array_filter(
+    array(
+        array('label' => __('Number of Owners', 'bricks-child'), 'value' => autoagora_single_car_has_value($owners) ? $owners : ''),
+        array('label' => __('MOT Until', 'bricks-child'), 'value' => autoagora_single_car_has_value($mot_until) ? autoagora_single_car_mot_label($mot_until) : ''),
+        array('label' => __('Registered as an Antique', 'bricks-child'), 'value' => !empty($is_antique) ? __('Yes', 'bricks-child') : ''),
+    ),
+    static function ($spec) {
+        return autoagora_single_car_has_value($spec['value']);
+    }
+);
+$has_background = !empty($background_specs);
 
 get_header();
 ?>
@@ -296,10 +306,17 @@ get_header();
                     <hr>
                     <div class="autoagora-single-car__detail-section">
                         <h2><?php esc_html_e('Registration & Background Info', 'bricks-child'); ?></h2>
-                        <div class="autoagora-single-car__background-grid">
-                            <?php if (autoagora_single_car_has_value($owners)) : ?><span><i class="fa-solid fa-users" aria-hidden="true"></i><?php echo esc_html(sprintf(_n('%s owner', '%s owners', (int) $owners, 'bricks-child'), $owners)); ?></span><?php endif; ?>
-                            <?php if (autoagora_single_car_has_value($mot_until)) : ?><span><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i><?php echo esc_html(sprintf(__('MOT Until: %s', 'bricks-child'), autoagora_single_car_mot_label($mot_until))); ?></span><?php endif; ?>
-                            <?php if (!empty($is_antique)) : ?><span><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i><?php esc_html_e('Registered as antique', 'bricks-child'); ?></span><?php endif; ?>
+                        <div class="autoagora-single-car__table-wrap">
+                            <table class="autoagora-single-car__spec-table">
+                                <tbody>
+                                    <?php foreach ($background_specs as $spec) : ?>
+                                        <tr>
+                                            <th scope="row"><?php echo esc_html($spec['label']); ?></th>
+                                            <td><?php echo esc_html($spec['value']); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 <?php endif; ?>
