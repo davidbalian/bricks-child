@@ -25,6 +25,7 @@ This is the dense technical map for future agents. It favors pointers, contracts
 - `template-buyer-requests.php`: buyer request index.
 - `template-create-buyer-request.php`: buyer request form.
 - `single-buyer_request.php`: single buyer request display.
+- `single-car.php`: repository-owned single car display; reuses the gallery/contact/review/action shortcodes and ranks exact-model related cars through the shared marketplace query executor.
 - `taxonomy-car_make-landing.php`: managed make/model SEO landing template.
 - `template-cars-city-{nicosia,limassol,larnaca,paphos}.php`: city landing templates.
 - `template-test-cars.php`: large browse/test template; inspect only when debugging that exact route.
