@@ -148,6 +148,11 @@
 }
 
 .autoagora-single-car__seller .seller-verification-badge {
+    align-self: flex-start;
+    width: fit-content;
+    max-width: max-content;
+    margin-left: 0;
+    margin-right: 0;
     color: #29313a;
     font-size: .9rem;
 }
@@ -349,13 +354,55 @@
     border-top: 1px solid var(--single-car-border);
 }
 
-.autoagora-single-car__spec-grid {
+.autoagora-single-car__spec-tables {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem;
 }
 
-.autoagora-single-car__spec-grid span,
+.autoagora-single-car__table-wrap {
+    overflow: hidden;
+    border: 1px solid var(--single-car-border);
+    border-radius: .65rem;
+}
+
+.autoagora-single-car__spec-table {
+    width: 100%;
+    margin: 0;
+    border: 0;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: .94rem;
+}
+
+.autoagora-single-car__spec-table tr:not(:last-child) {
+    border-bottom: 1px solid var(--single-car-border);
+}
+
+.autoagora-single-car__spec-table tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+.autoagora-single-car__spec-table th,
+.autoagora-single-car__spec-table td {
+    padding: .9rem 1rem;
+    border: 0;
+    line-height: 1.35;
+}
+
+.autoagora-single-car__spec-table th {
+    width: 56%;
+    color: #52606d;
+    font-weight: 500;
+    text-align: left;
+}
+
+.autoagora-single-car__spec-table td {
+    color: #202833;
+    font-weight: 600;
+    text-align: right;
+}
+
 .autoagora-single-car__background-grid span {
     display: flex;
     align-items: center;
@@ -365,7 +412,6 @@
     font-size: .93rem;
 }
 
-.autoagora-single-car__spec-grid i,
 .autoagora-single-car__background-grid i {
     width: 1.25rem;
     color: #30567e;
@@ -468,10 +514,6 @@
         padding: 2rem;
     }
 
-    .autoagora-single-car__spec-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
     .autoagora-single-car__related-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -491,8 +533,9 @@
         gap: 1.5rem;
     }
 
-    .autoagora-single-car__spec-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .autoagora-single-car__spec-tables {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
 
     .autoagora-single-car__related-grid {
@@ -543,7 +586,6 @@
         align-items: flex-start;
     }
 
-    .autoagora-single-car__spec-grid,
     .autoagora-single-car__related-grid {
         grid-template-columns: 1fr;
     }

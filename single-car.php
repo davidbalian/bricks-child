@@ -105,11 +105,11 @@ $summary_specs = array_filter(
 
 $performance_specs = array_filter(
     array(
-        array('icon' => 'fa-solid fa-gauge-high', 'value' => autoagora_single_car_has_value($engine_capacity) ? $engine_capacity . 'L' : ''),
-        array('icon' => 'fa-solid fa-gas-pump', 'value' => $fuel_type),
-        array('icon' => 'fa-solid fa-gears', 'value' => $transmission),
-        array('icon' => 'fa-solid fa-road', 'value' => $drive_type),
-        array('icon' => 'fa-solid fa-bolt', 'value' => autoagora_single_car_has_value($horsepower) ? $horsepower . 'hp' : ''),
+        array('label' => __('Engine Capacity', 'bricks-child'), 'value' => autoagora_single_car_has_value($engine_capacity) ? $engine_capacity . 'L' : ''),
+        array('label' => __('Fuel Type', 'bricks-child'), 'value' => $fuel_type),
+        array('label' => __('Transmission', 'bricks-child'), 'value' => $transmission),
+        array('label' => __('Drive Type', 'bricks-child'), 'value' => $drive_type),
+        array('label' => __('Horsepower', 'bricks-child'), 'value' => autoagora_single_car_has_value($horsepower) ? $horsepower . 'hp' : ''),
     ),
     static function ($spec) {
         return autoagora_single_car_has_value($spec['value']);
@@ -118,11 +118,11 @@ $performance_specs = array_filter(
 
 $design_specs = array_filter(
     array(
-        array('icon' => 'fa-solid fa-car-side', 'value' => $body_type),
-        array('icon' => 'fa-solid fa-door-open', 'value' => autoagora_single_car_has_value($doors) ? sprintf(_n('%s door', '%s doors', (int) $doors, 'bricks-child'), $doors) : ''),
-        array('icon' => 'fa-solid fa-chair', 'value' => autoagora_single_car_has_value($seats) ? sprintf(_n('%s seat', '%s seats', (int) $seats, 'bricks-child'), $seats) : ''),
-        array('icon' => 'fa-solid fa-paint-roller', 'value' => $exterior_color ? $exterior_color . ' ' . __('Exterior', 'bricks-child') : ''),
-        array('icon' => 'fa-solid fa-paintbrush', 'value' => $interior_color ? $interior_color . ' ' . __('Interior', 'bricks-child') : ''),
+        array('label' => __('Body Type', 'bricks-child'), 'value' => $body_type),
+        array('label' => __('Doors', 'bricks-child'), 'value' => autoagora_single_car_has_value($doors) ? $doors : ''),
+        array('label' => __('Seats', 'bricks-child'), 'value' => autoagora_single_car_has_value($seats) ? $seats : ''),
+        array('label' => __('Exterior Color', 'bricks-child'), 'value' => $exterior_color),
+        array('label' => __('Interior Color', 'bricks-child'), 'value' => $interior_color),
     ),
     static function ($spec) {
         return autoagora_single_car_has_value($spec['value']);
@@ -208,29 +208,43 @@ get_header();
         </section>
 
         <section class="autoagora-single-car__card autoagora-single-car__specification-card" aria-label="<?php esc_attr_e('Car specifications', 'bricks-child'); ?>">
-            <?php if ($performance_specs) : ?>
-                <div class="autoagora-single-car__spec-section">
-                    <h2><?php esc_html_e('Engine & Performance', 'bricks-child'); ?></h2>
-                    <div class="autoagora-single-car__spec-grid">
-                        <?php foreach ($performance_specs as $spec) : ?>
-                            <span><i class="<?php echo esc_attr($spec['icon']); ?>" aria-hidden="true"></i><?php echo esc_html($spec['value']); ?></span>
-                        <?php endforeach; ?>
+            <div class="autoagora-single-car__spec-tables">
+                <?php if ($performance_specs) : ?>
+                    <div class="autoagora-single-car__spec-section">
+                        <h2><?php esc_html_e('Engine & Performance', 'bricks-child'); ?></h2>
+                        <div class="autoagora-single-car__table-wrap">
+                            <table class="autoagora-single-car__spec-table">
+                                <tbody>
+                                    <?php foreach ($performance_specs as $spec) : ?>
+                                        <tr>
+                                            <th scope="row"><?php echo esc_html($spec['label']); ?></th>
+                                            <td><?php echo esc_html($spec['value']); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-            <?php endif; ?>
+                <?php endif; ?>
 
-            <?php if ($performance_specs && $design_specs) : ?><hr><?php endif; ?>
-
-            <?php if ($design_specs) : ?>
-                <div class="autoagora-single-car__spec-section">
-                    <h2><?php esc_html_e('Body & Design', 'bricks-child'); ?></h2>
-                    <div class="autoagora-single-car__spec-grid">
-                        <?php foreach ($design_specs as $spec) : ?>
-                            <span><i class="<?php echo esc_attr($spec['icon']); ?>" aria-hidden="true"></i><?php echo esc_html($spec['value']); ?></span>
-                        <?php endforeach; ?>
+                <?php if ($design_specs) : ?>
+                    <div class="autoagora-single-car__spec-section">
+                        <h2><?php esc_html_e('Body & Design', 'bricks-child'); ?></h2>
+                        <div class="autoagora-single-car__table-wrap">
+                            <table class="autoagora-single-car__spec-table">
+                                <tbody>
+                                    <?php foreach ($design_specs as $spec) : ?>
+                                        <tr>
+                                            <th scope="row"><?php echo esc_html($spec['label']); ?></th>
+                                            <td><?php echo esc_html($spec['value']); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
 
             <?php if (($terms['model'] instanceof WP_Term) || ($city && $city_url)) : ?>
                 <hr>
