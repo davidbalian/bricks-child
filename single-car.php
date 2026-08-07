@@ -194,13 +194,13 @@ get_header();
 
                 <div class="autoagora-single-car__seller">
                     <?php if ($author_id) : ?>
+                        <?php $logo = do_shortcode('[dealership_logo user_id="' . $author_id . '" size="medium" class="autoagora-single-car__seller-logo-image"]'); ?>
                         <a class="autoagora-single-car__seller-profile" href="<?php echo esc_url($author_url); ?>">
-                            <span class="autoagora-single-car__seller-logo">
-                                <?php
-                                $logo = do_shortcode('[dealership_logo user_id="' . $author_id . '" size="medium" class="autoagora-single-car__seller-logo-image"]');
-                                echo $logo !== '' ? $logo : '<i class="fa-solid fa-user" aria-hidden="true"></i>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                                ?>
-                            </span>
+                            <?php if ($logo !== '') : ?>
+                                <span class="autoagora-single-car__seller-logo">
+                                    <?php echo $logo; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Shortcode output. ?>
+                                </span>
+                            <?php endif; ?>
                             <span class="autoagora-single-car__seller-copy">
                                 <span class="autoagora-single-car__seller-name"><i class="fa-solid fa-user" aria-hidden="true"></i><?php echo esc_html($author_name); ?></span>
                                 <?php echo do_shortcode('[dealership_verified user_id="' . $author_id . '"]'); ?>
