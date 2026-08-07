@@ -4,11 +4,12 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    const shareStrings = window.shareButtonData || {};
     // PRODUCTION SAFETY: Only log in development environments
-window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' || 
+window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' ||
                                                window.location.hostname.includes('staging') ||
                                                window.location.search.includes('debug=true'));
-    
+
     // === SHARE BUTTON FUNCTIONALITY ===
     // Handle clicks on any share button (supports multiple buttons on page)
     document.addEventListener('click', function(e) {
@@ -18,14 +19,14 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             handleShareClick(shareBtn, e);
         }
     });
-    
+
     function handleShareClick(shareBtn, e) {
         e.preventDefault();
         e.stopPropagation();
-        
+
         // Get current page URL
         const currentUrl = window.location.href;
-        
+
         // Check if Web Share API is available
         if (navigator.share) {
             navigator.share({
@@ -46,7 +47,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     function copyToClipboard(text) {
         if (navigator.clipboard) {
             navigator.clipboard.writeText(text).then(() => {
-                alert('Link copied to clipboard!');
+                alert(shareStrings.linkCopied || 'Link copied to clipboard!');
             }).catch(err => {
                 if (isDevelopment) console.error('Failed to copy: ', err);
                 fallbackCopyTextToClipboard(text);
@@ -69,14 +70,14 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         try {
             const successful = document.execCommand('copy');
             if (successful) {
-                alert('Link copied to clipboard!');
+                alert(shareStrings.linkCopied || 'Link copied to clipboard!');
             } else {
-                alert('Unable to copy link. Please copy manually: ' + text);
+                alert((shareStrings.copyFailed || 'Unable to copy link. Please copy manually:') + ' ' + text);
             }
         } catch (err) {
             if (isDevelopment) console.error('Fallback: Oops, unable to copy', err);
-            alert('Unable to copy link. Please copy manually: ' + text);
+            alert((shareStrings.copyFailed || 'Unable to copy link. Please copy manually:') + ' ' + text);
         }
         document.body.removeChild(textArea);
     }
-}); 
+});

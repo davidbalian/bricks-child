@@ -62,6 +62,17 @@ function autoagora_translate_child_theme_string( $translation, $text, $domain ) 
 add_filter( 'gettext_bricks-child', 'autoagora_translate_child_theme_string', 10, 3 );
 
 /**
+ * Translate singular/plural strings in the child theme.
+ */
+function autoagora_translate_child_theme_plural( $translation, $single, $plural, $number ) {
+	$catalog = autoagora_translation_catalog();
+	$key     = (int) $number === 1 ? $single : $plural;
+
+	return isset( $catalog[ $key ] ) ? $catalog[ $key ] : $translation;
+}
+add_filter( 'ngettext_bricks-child', 'autoagora_translate_child_theme_plural', 10, 4 );
+
+/**
  * Resolve a translated page URL while retaining an English fallback.
  */
 function autoagora_localized_page_url( $english_slug = '' ) {

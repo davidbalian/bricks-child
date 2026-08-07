@@ -26,12 +26,12 @@ function share_button_shortcode( $atts ) {
     $base_class = 'share-btn';
     $design_class = 'share-btn-' . esc_attr($atts['design']);
     $size_class = 'share-btn-' . esc_attr($atts['size']);
-    
+
     $button_class = trim($base_class . ' ' . $design_class . ' ' . $size_class);
 
     ob_start();
     ?>
-    <button class="<?php echo esc_attr($button_class); ?>" title="Share this listing">
+    <button class="<?php echo esc_attr($button_class); ?>" title="<?php esc_attr_e('Share this listing', 'bricks-child'); ?>">
         <i class="fas fa-share-alt"></i>
         <?php if (!empty($atts['text'])): ?>
             <span class="share-btn-text"><?php echo esc_html($atts['text']); ?></span>
@@ -47,7 +47,7 @@ function share_button_shortcode( $atts ) {
 function enqueue_share_button_assets() {
     // Load on pages where share buttons are likely to be used (Bricks compatible)
     if (is_singular('car') || is_page()) {
-        
+
         // Enqueue the JavaScript
         wp_enqueue_script(
             'share-button-js',
@@ -56,8 +56,12 @@ function enqueue_share_button_assets() {
             '1.0.0',
             true
         );
-        
+        wp_localize_script('share-button-js', 'shareButtonData', array(
+            'linkCopied' => __('Link copied to clipboard!', 'bricks-child'),
+            'copyFailed' => __('Unable to copy link. Please copy manually:', 'bricks-child'),
+        ));
+
         // Note: No CSS file exists for share button
     }
 }
-add_action('wp_enqueue_scripts', 'enqueue_share_button_assets'); 
+add_action('wp_enqueue_scripts', 'enqueue_share_button_assets');

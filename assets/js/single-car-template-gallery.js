@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function initGallery(container) {
+    var galleryStrings = window.singleCarGalleryData || {};
     var track      = container.querySelector('.scg-track');
     var slides     = container.querySelectorAll('.scg-slide');
     var total      = slides.length;
@@ -216,15 +217,15 @@ function initGallery(container) {
                             '<span class="lightbox-current">' + (lbCurrent + 1) + '</span> / ' +
                             '<span class="lightbox-total">' + lbTotal + '</span>' +
                         '</div>' +
-                        '<button class="lightbox-close" type="button" aria-label="Close gallery"><i class="fas fa-times"></i></button>' +
+                        '<button class="lightbox-close" type="button" aria-label="' + (galleryStrings.closeGallery || 'Close gallery') + '"><i class="fas fa-times"></i></button>' +
                     '</div>' +
                     '<div class="lightbox-main-slider-wrapper">' +
                         '<div class="lb-track-wrap">' +
                             '<div class="lb-track">' + slidesHTML + '</div>' +
                         '</div>' +
                         '<div class="lightbox-arrows">' +
-                            '<button type="button" class="lightbox-prev-btn" aria-label="Previous image"><i class="fas fa-chevron-left"></i></button>' +
-                            '<button type="button" class="lightbox-next-btn" aria-label="Next image"><i class="fas fa-chevron-right"></i></button>' +
+                            '<button type="button" class="lightbox-prev-btn" aria-label="' + (galleryStrings.previousImage || 'Previous image') + '"><i class="fas fa-chevron-left"></i></button>' +
+                            '<button type="button" class="lightbox-next-btn" aria-label="' + (galleryStrings.nextImage || 'Next image') + '"><i class="fas fa-chevron-right"></i></button>' +
                         '</div>' +
                     '</div>' +
                     '<div class="lightbox-thumbnail-wrapper">' +

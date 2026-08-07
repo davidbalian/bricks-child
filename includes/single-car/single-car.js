@@ -2,6 +2,7 @@
     'use strict';
 
     function initDescriptionToggle() {
+        var strings = window.autoagoraSingleCar || {};
         var description = document.querySelector('[data-single-car-description]');
         var button = document.querySelector('[data-single-car-read-more]');
 
@@ -19,7 +20,7 @@
         button.addEventListener('click', function () {
             var expanded = description.classList.toggle('is-expanded');
             button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-            button.textContent = expanded ? 'Read Less' : 'Read More';
+            button.textContent = expanded ? (strings.readLess || 'Read Less') : (strings.readMore || 'Read More');
         });
     }
 

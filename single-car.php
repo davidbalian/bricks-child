@@ -33,6 +33,14 @@ wp_enqueue_script(
     filemtime($asset_path . 'single-car.js'),
     true
 );
+wp_localize_script(
+    'autoagora-single-car',
+    'autoagoraSingleCar',
+    array(
+        'readMore' => __('Read More', 'bricks-child'),
+        'readLess' => __('Read Less', 'bricks-child'),
+    )
+);
 
 $verification_css = get_stylesheet_directory() . '/includes/shortcodes/seller-verification/seller-verification.css';
 if (file_exists($verification_css)) {
@@ -81,6 +89,13 @@ $city_url         = autoagora_single_car_city_url((string) $city);
 $posted_label     = autoagora_single_car_relative_date($post_id);
 $formatted_price  = autoagora_single_car_number($price);
 $formatted_miles  = autoagora_single_car_number($mileage);
+$transmission_display = autoagora_single_car_translated_value($transmission);
+$fuel_type_display = autoagora_single_car_translated_value($fuel_type);
+$drive_type_display = autoagora_single_car_translated_value($drive_type);
+$body_type_display = autoagora_single_car_translated_value($body_type);
+$exterior_color_display = autoagora_single_car_translated_value($exterior_color);
+$interior_color_display = autoagora_single_car_translated_value($interior_color);
+$city_display      = autoagora_single_car_translated_value($city);
 $page_title       = get_the_title($post_id);
 $gallery_html     = do_shortcode('[single_car_template_gallery post_id="' . (int) $post_id . '"]');
 $seller_reviews_html = $author_id
@@ -95,8 +110,8 @@ $summary_specs = array_filter(
     array(
         $year,
         $formatted_miles !== '' ? $formatted_miles . 'km' : '',
-        $transmission,
-        $fuel_type,
+        $transmission_display,
+        $fuel_type_display,
     ),
     static function ($value) {
         return autoagora_single_car_has_value($value);
@@ -106,9 +121,9 @@ $summary_specs = array_filter(
 $performance_specs = array_filter(
     array(
         array('label' => __('Engine Capacity', 'bricks-child'), 'value' => autoagora_single_car_has_value($engine_capacity) ? $engine_capacity . 'L' : ''),
-        array('label' => __('Fuel Type', 'bricks-child'), 'value' => $fuel_type),
-        array('label' => __('Transmission', 'bricks-child'), 'value' => $transmission),
-        array('label' => __('Drive Type', 'bricks-child'), 'value' => $drive_type),
+        array('label' => __('Fuel Type', 'bricks-child'), 'value' => $fuel_type_display),
+        array('label' => __('Transmission', 'bricks-child'), 'value' => $transmission_display),
+        array('label' => __('Drive Type', 'bricks-child'), 'value' => $drive_type_display),
         array('label' => __('Horsepower', 'bricks-child'), 'value' => autoagora_single_car_has_value($horsepower) ? $horsepower . 'hp' : ''),
     ),
     static function ($spec) {
@@ -118,11 +133,11 @@ $performance_specs = array_filter(
 
 $design_specs = array_filter(
     array(
-        array('label' => __('Body Type', 'bricks-child'), 'value' => $body_type),
+        array('label' => __('Body Type', 'bricks-child'), 'value' => $body_type_display),
         array('label' => __('Doors', 'bricks-child'), 'value' => autoagora_single_car_has_value($doors) ? $doors : ''),
         array('label' => __('Seats', 'bricks-child'), 'value' => autoagora_single_car_has_value($seats) ? $seats : ''),
-        array('label' => __('Exterior Color', 'bricks-child'), 'value' => $exterior_color),
-        array('label' => __('Interior Color', 'bricks-child'), 'value' => $interior_color),
+        array('label' => __('Exterior Color', 'bricks-child'), 'value' => $exterior_color_display),
+        array('label' => __('Interior Color', 'bricks-child'), 'value' => $interior_color_display),
     ),
     static function ($spec) {
         return autoagora_single_car_has_value($spec['value']);
@@ -136,9 +151,9 @@ get_header();
 <main id="primary" class="autoagora-single-car">
     <div class="autoagora-single-car__container">
         <nav class="autoagora-single-car__breadcrumbs" aria-label="<?php esc_attr_e('Breadcrumb', 'bricks-child'); ?>">
-            <a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Home', 'bricks-child'); ?></a>
+            <a href="<?php echo esc_url(autoagora_localized_page_url()); ?>"><?php esc_html_e('Home', 'bricks-child'); ?></a>
             <span aria-hidden="true">/</span>
-            <a href="<?php echo esc_url(home_url('/cars/')); ?>"><?php esc_html_e('Cars', 'bricks-child'); ?></a>
+            <a href="<?php echo esc_url(autoagora_localized_page_url('cars')); ?>"><?php esc_html_e('Cars', 'bricks-child'); ?></a>
             <span aria-hidden="true">/</span>
             <span aria-current="page"><?php echo esc_html($page_title); ?></span>
         </nav>
@@ -256,8 +271,8 @@ get_header();
                         <?php endif; ?>
                     <?php endif; ?>
                     <?php if ($city && $city_url) : ?>
-                        <span><?php echo esc_html(sprintf(__('This car is in %s.', 'bricks-child'), $city)); ?></span>
-                        <a href="<?php echo esc_url($city_url); ?>"><?php echo esc_html(sprintf(__('View all cars in %s', 'bricks-child'), $city)); ?></a>
+                        <span><?php echo esc_html(sprintf(__('This car is in %s.', 'bricks-child'), $city_display)); ?></span>
+                        <a href="<?php echo esc_url($city_url); ?>"><?php echo esc_html(sprintf(__('View all cars in %s', 'bricks-child'), $city_display)); ?></a>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>

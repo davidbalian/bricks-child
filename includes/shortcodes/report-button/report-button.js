@@ -4,18 +4,19 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    const reportStrings = (window.reportButtonData && reportButtonData.strings) || {};
     // PRODUCTION SAFETY: Only log in development environments
-window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' || 
+window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' ||
                                                window.location.hostname.includes('staging') ||
                                                window.location.search.includes('debug=true'));
-    
+
     // === REPORT BUTTON FUNCTIONALITY ===
     const reportBtn = document.querySelector('.report-btn');
     const reportModal = document.querySelector('.report-modal');
     const closeReportModal = document.querySelector('.close-report-modal');
     const cancelReportBtn = document.querySelector('.cancel-report-btn');
     const reportForm = document.getElementById('report-listing-form');
-    
+
     // Store original parent and position for restoration
     let originalParent = null;
     let originalNextSibling = null;
@@ -25,14 +26,14 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         reportBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            
+
             // Store original position
             originalParent = reportModal.parentNode;
             originalNextSibling = reportModal.nextSibling;
-            
+
             // Move modal to body to ensure highest stacking context
             document.body.appendChild(reportModal);
-            
+
             // Show modal
             reportModal.style.display = 'flex';
             document.body.style.overflow = 'hidden'; // Prevent background scrolling
@@ -44,7 +45,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         if (reportModal) {
             reportModal.style.display = 'none';
             document.body.style.overflow = 'auto'; // Restore scrolling
-            
+
             // Restore modal to original position
             if (originalParent) {
                 if (originalNextSibling) {
@@ -53,7 +54,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                     originalParent.appendChild(reportModal);
                 }
             }
-            
+
             // Reset form
             if (reportForm) {
                 reportForm.reset();
@@ -83,21 +84,21 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     if (reportForm) {
         reportForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             if (typeof reportButtonData === 'undefined') {
-                alert('Error: Unable to submit report. Please refresh the page and try again.');
+                alert(reportStrings.unavailable || 'Error: Unable to submit report. Please refresh the page and try again.');
                 return;
             }
-            
+
             const submitBtn = this.querySelector('.submit-report-btn');
             const originalText = submitBtn.textContent;
-            
+
             // Show loading state
-            submitBtn.textContent = 'Submitting...';
+            submitBtn.textContent = reportStrings.submitting || 'Submitting...';
             submitBtn.disabled = true;
 
             const formData = new FormData(this);
-            
+
             fetch(reportButtonData.ajaxurl, {
                 method: 'POST',
                 body: formData,
@@ -106,15 +107,15 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Thank you for your report. We will review it and take appropriate action if necessary.');
+                    alert(reportStrings.success || 'Thank you for your report. We will review it and take appropriate action if necessary.');
                     closeModal();
                 } else {
-                    alert('Error submitting report: ' + (data.data || 'Unknown error occurred'));
+                    alert((reportStrings.errorPrefix || 'Error submitting report:') + ' ' + (data.data || reportStrings.unknownError || 'Unknown error occurred'));
                 }
             })
             .catch(error => {
                 if (isDevelopment) console.error('Error:', error);
-                alert('Failed to submit report. Please try again later.');
+                alert(reportStrings.failed || 'Failed to submit report. Please try again later.');
             })
             .finally(() => {
                 // Reset button state
@@ -123,4 +124,4 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             });
         });
     }
-}); 
+});

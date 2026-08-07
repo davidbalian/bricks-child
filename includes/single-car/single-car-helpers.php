@@ -35,6 +35,16 @@ function autoagora_single_car_has_value($value) {
 }
 
 /**
+ * Translate a stored public-facing choice while preserving non-string values.
+ *
+ * @param mixed $value Stored ACF/meta value.
+ * @return mixed
+ */
+function autoagora_single_car_translated_value($value) {
+    return is_string($value) && $value !== '' ? translate($value, 'bricks-child') : $value;
+}
+
+/**
  * Format a stored numeric car value.
  *
  * @param mixed $value Numeric value, possibly containing separators.
@@ -187,8 +197,11 @@ function autoagora_single_car_list_labels(array $values, $type) {
  */
 function autoagora_single_car_mot_label($value) {
     $value = trim((string) $value);
-    if ($value === '' || strcasecmp($value, 'Expired') === 0) {
-        return $value;
+    if ($value === '') {
+        return '';
+    }
+    if (strcasecmp($value, 'Expired') === 0) {
+        return __('Expired', 'bricks-child');
     }
 
     $timestamp = strtotime($value . '-01');
@@ -242,7 +255,7 @@ function autoagora_single_car_city_url($city) {
     );
     $key = sanitize_key($city);
 
-    return isset($slugs[$key]) ? trailingslashit(home_url('/' . $slugs[$key] . '/')) : '';
+    return isset($slugs[$key]) ? autoagora_localized_page_url($slugs[$key]) : '';
 }
 
 /**

@@ -15,13 +15,13 @@ function single_car_template_gallery_shortcode( $atts ) {
     $post_id = intval( $atts['post_id'] );
 
     if ( ! $post_id ) {
-        return '<p>No post ID provided for gallery.</p>';
+        return '<p>' . esc_html__( 'No post ID provided for gallery.', 'bricks-child' ) . '</p>';
     }
 
     $car_images = get_field( 'car_images', $post_id );
 
     if ( ! $car_images || ! is_array( $car_images ) ) {
-        return '<p>No images found for this car.</p>';
+        return '<p>' . esc_html__( 'No images found for this car.', 'bricks-child' ) . '</p>';
     }
 
     $total = count( $car_images );
@@ -36,6 +36,11 @@ function single_car_template_gallery_shortcode( $atts ) {
     $theme_dir = get_stylesheet_directory_uri();
     wp_enqueue_style( 'single-car-gallery-css', $theme_dir . '/assets/css/single-car-template-gallery.css', array(), filemtime( get_stylesheet_directory() . '/assets/css/single-car-template-gallery.css' ) );
     wp_enqueue_script( 'single-car-gallery-js', $theme_dir . '/assets/js/single-car-template-gallery.js', array(), filemtime( get_stylesheet_directory() . '/assets/js/single-car-template-gallery.js' ), true );
+    wp_localize_script( 'single-car-gallery-js', 'singleCarGalleryData', array(
+        'closeGallery'  => __( 'Close gallery', 'bricks-child' ),
+        'previousImage' => __( 'Previous image', 'bricks-child' ),
+        'nextImage'     => __( 'Next image', 'bricks-child' ),
+    ) );
 
     ob_start();
     ?>
@@ -59,10 +64,10 @@ function single_car_template_gallery_shortcode( $atts ) {
                     </div>
 
                     <!-- Navigation arrows -->
-                    <button type="button" class="custom-prev-btn" aria-label="Previous image">
+                    <button type="button" class="custom-prev-btn" aria-label="<?php esc_attr_e( 'Previous image', 'bricks-child' ); ?>">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <button type="button" class="custom-next-btn" aria-label="Next image">
+                    <button type="button" class="custom-next-btn" aria-label="<?php esc_attr_e( 'Next image', 'bricks-child' ); ?>">
                         <i class="fas fa-chevron-right"></i>
                     </button>
 
@@ -73,9 +78,9 @@ function single_car_template_gallery_shortcode( $atts ) {
 
                     <!-- View all images button -->
                     <div class="view-all-button">
-                        <button type="button" class="scg-view-all-btn" aria-label="View all images">
+                        <button type="button" class="scg-view-all-btn" aria-label="<?php esc_attr_e( 'View all images', 'bricks-child' ); ?>">
                             <img src="<?php echo esc_url( $scg_expand_icon_url ); ?>" alt="" class="scg-view-all-icon" width="14" height="14" decoding="async" />
-                            <span class="scg-view-all-label">View All</span>
+                            <span class="scg-view-all-label"><?php esc_html_e( 'View All', 'bricks-child' ); ?></span>
                         </button>
                     </div>
                 </div>

@@ -52,7 +52,7 @@ function favorite_button_shortcode( $atts ) {
 
     ob_start();
     ?>
-    <button class="<?php echo esc_attr($button_class); ?>" data-car-id="<?php echo esc_attr($car_id); ?>" title="<?php echo $is_favorite ? 'Remove from favorites' : 'Add to favorites'; ?>">
+    <button class="<?php echo esc_attr($button_class); ?>" data-car-id="<?php echo esc_attr($car_id); ?>" title="<?php echo esc_attr($is_favorite ? __('Remove from favorites', 'bricks-child') : __('Add to favorites', 'bricks-child')); ?>">
         <i class="<?php echo esc_attr($heart_class); ?>"></i>
     </button>
     <?php
@@ -88,6 +88,14 @@ function enqueue_favorite_button_assets() {
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('toggle_favorite_car'),
             'is_user_logged_in' => is_user_logged_in(),
+            'strings' => array(
+                'add' => __('Add to favorites', 'bricks-child'),
+                'remove' => __('Remove from favorites', 'bricks-child'),
+                'login' => __('Log in to favourite a listing.', 'bricks-child'),
+                'missingData' => __('Error: Missing data. Please refresh the page and try again.', 'bricks-child'),
+                'updateFailed' => __('Failed to update favorites:', 'bricks-child'),
+                'genericFailure' => __('Failed to update favorites. An error occurred.', 'bricks-child'),
+            ),
         ));
     }
 }

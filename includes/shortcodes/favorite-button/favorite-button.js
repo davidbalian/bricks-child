@@ -4,6 +4,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    const favoriteStrings = (window.favoriteButtonData && favoriteButtonData.strings) || {};
     // PRODUCTION SAFETY: Only log in development environments
 window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' || 
                                                window.location.hostname.includes('staging') ||
@@ -25,13 +26,13 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         
         // Check if user is logged in first
         if (typeof favoriteButtonData === 'undefined' || !favoriteButtonData.is_user_logged_in) {
-            alert('Log in to favourite a listing.');
+            alert(favoriteStrings.login || 'Log in to favourite a listing.');
             return;
         }
         
         // Security checks for logged-in users
         if (typeof favoriteButtonData.ajaxurl === 'undefined' || typeof favoriteButtonData.nonce === 'undefined') {
-            alert('Error: Missing data. Please refresh the page and try again.');
+            alert(favoriteStrings.missingData || 'Error: Missing data. Please refresh the page and try again.');
             return;
         }
 
@@ -44,11 +45,11 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         if (isActive) {
             heartIcon.classList.remove('fas');
             heartIcon.classList.add('far');
-            favoriteBtn.title = 'Add to favorites';
+            favoriteBtn.title = favoriteStrings.add || 'Add to favorites';
         } else {
             heartIcon.classList.remove('far');
             heartIcon.classList.add('fas');
-            favoriteBtn.title = 'Remove from favorites';
+            favoriteBtn.title = favoriteStrings.remove || 'Remove from favorites';
         }
 
         // Prepare AJAX data
@@ -78,7 +79,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                 // Show specific error message
                 const errorMessage = data.data || 'Unknown error occurred';
                 if (isDevelopment) console.error('Favorite toggle failed:', errorMessage);
-                alert('Failed to update favorites: ' + errorMessage);
+                alert((favoriteStrings.updateFailed || 'Failed to update favorites:') + ' ' + errorMessage);
             }
             // Success - UI already updated optimistically
         })
@@ -86,7 +87,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             // Revert the visual changes on error
             revertFavoriteUI(favoriteBtn, isActive, heartIcon);
             if (isDevelopment) console.error('Error:', error);
-            alert('Failed to update favorites. An error occurred.');
+            alert(favoriteStrings.genericFailure || 'Failed to update favorites. An error occurred.');
         });
     }
     
@@ -95,11 +96,11 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         if (wasActive) {
             heartIcon.classList.remove('far');
             heartIcon.classList.add('fas');
-            favoriteBtn.title = 'Remove from favorites';
+            favoriteBtn.title = favoriteStrings.remove || 'Remove from favorites';
         } else {
             heartIcon.classList.remove('fas');
             heartIcon.classList.add('far');
-            favoriteBtn.title = 'Add to favorites';
+            favoriteBtn.title = favoriteStrings.add || 'Add to favorites';
         }
     }
 });
