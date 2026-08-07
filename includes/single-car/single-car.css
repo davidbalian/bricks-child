@@ -46,12 +46,12 @@
     min-width: 0;
 }
 
-.autoagora-single-car__summary {
+.autoagora-single-car__gallery {
     position: sticky;
     top: 1.5rem;
 }
 
-body.admin-bar .autoagora-single-car__summary {
+body.admin-bar .autoagora-single-car__gallery {
     top: calc(32px + 1.5rem);
 }
 
@@ -542,8 +542,8 @@ body.admin-bar .autoagora-single-car__summary {
         gap: 1.5rem;
     }
 
-    .autoagora-single-car__summary,
-    body.admin-bar .autoagora-single-car__summary {
+    .autoagora-single-car__gallery,
+    body.admin-bar .autoagora-single-car__gallery {
         position: static;
     }
 
