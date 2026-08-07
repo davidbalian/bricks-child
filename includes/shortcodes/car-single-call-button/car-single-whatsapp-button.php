@@ -38,7 +38,7 @@ function car_single_whatsapp_button_shortcode($atts) {
         $car_make = get_field('make', $post_id);
         $car_model = get_field('model', $post_id);
         $message_text = urlencode(sprintf(
-            __("Hi, I found your %1$s %2$s %3$s on AutoAgora.cy and I'm interested. Is it still available?", 'bricks-child'),
+            __('Hi, I found your %1$s %2$s %3$s on AutoAgora.cy and I\'m interested. Is it still available?', 'bricks-child'),
             $car_year,
             $car_make,
             $car_model
