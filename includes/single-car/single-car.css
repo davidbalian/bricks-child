@@ -428,6 +428,18 @@ body.admin-bar .autoagora-single-car__gallery {
     text-decoration: none;
 }
 
+.autoagora-single-car__map {
+    width: 100%;
+    height: clamp(17rem, 32vw, 23rem);
+    margin-top: 1.35rem;
+    overflow: hidden;
+    border: 1px solid var(--single-car-border);
+    border-radius: .85rem;
+    background: #edf1f4;
+    box-shadow: 0 .45rem 1.35rem rgba(35, 53, 72, .08);
+    isolation: isolate;
+}
+
 .autoagora-single-car__detail-section + .autoagora-single-car__detail-section {
     margin-top: 1.25rem;
 }

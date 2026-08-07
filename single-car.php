@@ -17,8 +17,30 @@ if ($post_id <= 0 || get_post_type($post_id) !== 'car') {
     return;
 }
 
+$latitude  = (float) autoagora_single_car_field($post_id, 'car_latitude');
+$longitude = (float) autoagora_single_car_field($post_id, 'car_longitude');
+$has_map   = defined('GOOGLE_MAPS_API_KEY')
+    && GOOGLE_MAPS_API_KEY
+    && $latitude >= -90.0
+    && $latitude <= 90.0
+    && $longitude >= -180.0
+    && $longitude <= 180.0
+    && $latitude !== 0.0
+    && $longitude !== 0.0;
+
 $asset_path = get_stylesheet_directory() . '/includes/single-car/';
 $asset_url  = get_stylesheet_directory_uri() . '/includes/single-car/';
+
+if ($has_map) {
+    $maps_url = add_query_arg(
+        array(
+            'key'      => GOOGLE_MAPS_API_KEY,
+            'language' => function_exists('autoagora_current_language') ? autoagora_current_language() : 'en',
+        ),
+        'https://maps.googleapis.com/maps/api/js'
+    );
+    wp_enqueue_script('google-maps', $maps_url, array(), null, true);
+}
 
 wp_enqueue_style(
     'autoagora-single-car',
@@ -29,7 +51,7 @@ wp_enqueue_style(
 wp_enqueue_script(
     'autoagora-single-car',
     $asset_url . 'single-car.js',
-    array(),
+    $has_map ? array('google-maps') : array(),
     filemtime($asset_path . 'single-car.js'),
     true
 );
@@ -39,6 +61,11 @@ wp_localize_script(
     array(
         'readMore' => __('Read More', 'bricks-child'),
         'readLess' => __('Read Less', 'bricks-child'),
+        'map' => $has_map ? array(
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'zoom' => 15,
+        ) : null,
     )
 );
 
@@ -271,7 +298,7 @@ get_header();
                 <?php endif; ?>
             </div>
 
-            <?php if (($terms['model'] instanceof WP_Term) || ($city && $city_url)) : ?>
+            <?php if (($terms['model'] instanceof WP_Term) || ($city && $city_url) || $has_map) : ?>
                 <hr>
                 <div class="autoagora-single-car__browse-links">
                     <?php if ($terms['model'] instanceof WP_Term) : ?>
@@ -285,6 +312,14 @@ get_header();
                         <a href="<?php echo esc_url($city_url); ?>"><?php echo esc_html(sprintf(__('View all cars in %s', 'bricks-child'), $city_display)); ?></a>
                     <?php endif; ?>
                 </div>
+                <?php if ($has_map) : ?>
+                    <div
+                        id="autoagora-single-car-map"
+                        class="autoagora-single-car__map"
+                        role="region"
+                        aria-label="<?php esc_attr_e('Car location map', 'bricks-child'); ?>"
+                    ></div>
+                <?php endif; ?>
             <?php endif; ?>
         </section>
 

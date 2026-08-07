@@ -24,9 +24,46 @@
         });
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initDescriptionToggle);
-    } else {
+    function initLocationMap() {
+        var mapElement = document.getElementById('autoagora-single-car-map');
+        var config = window.autoagoraSingleCar && window.autoagoraSingleCar.map;
+
+        if (!mapElement || !config || !window.google || !window.google.maps) {
+            return;
+        }
+
+        var position = {
+            lat: Number(config.latitude),
+            lng: Number(config.longitude)
+        };
+
+        if (!Number.isFinite(position.lat) || !Number.isFinite(position.lng)) {
+            return;
+        }
+
+        var map = new window.google.maps.Map(mapElement, {
+            center: position,
+            zoom: Number(config.zoom) || 15,
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: true,
+            clickableIcons: false
+        });
+
+        new window.google.maps.Marker({
+            position: position,
+            map: map
+        });
+    }
+
+    function initSingleCarPage() {
         initDescriptionToggle();
+        initLocationMap();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSingleCarPage);
+    } else {
+        initSingleCarPage();
     }
 }());

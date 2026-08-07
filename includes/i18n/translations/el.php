@@ -245,6 +245,7 @@ return array(
 	'Posted %d months ago' => 'Δημοσιεύτηκε πριν από %d μήνες',
 	'Help the seller by mentioning you found this on Autoagora' => 'Βοηθήστε τον πωλητή αναφέροντας ότι βρήκατε την αγγελία στο AutoAgora',
 	'Car specifications' => 'Χαρακτηριστικά αυτοκινήτου',
+	'Car location map' => 'Χάρτης τοποθεσίας αυτοκινήτου',
 	'Engine & Performance' => 'Κινητήρας & Επιδόσεις',
 	'Body & Design' => 'Αμάξωμα & Σχεδιασμός',
 	'Doors' => 'Θύρες',
