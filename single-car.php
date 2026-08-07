@@ -109,7 +109,7 @@ if ($page_title === '') {
 $summary_specs = array_filter(
     array(
         $year,
-        $formatted_miles !== '' ? $formatted_miles . 'km' : '',
+        autoagora_single_car_has_value($mileage) && $formatted_miles !== '' ? $formatted_miles . 'km' : '',
         $transmission_display,
         $fuel_type_display,
     ),
@@ -174,7 +174,7 @@ get_header();
                     </div>
                 <?php endif; ?>
 
-                <?php if ($formatted_price !== '') : ?>
+                <?php if (autoagora_single_car_has_value($price) && $formatted_price !== '') : ?>
                     <p class="autoagora-single-car__price">&euro;<?php echo esc_html($formatted_price); ?></p>
                 <?php endif; ?>
 

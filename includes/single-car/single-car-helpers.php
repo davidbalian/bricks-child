@@ -25,13 +25,21 @@ function autoagora_single_car_field($post_id, $key) {
 }
 
 /**
- * Whether a car field contains a displayable value. Numeric zero is valid.
+ * Whether a car field contains a displayable, non-zero value.
  *
  * @param mixed $value Field value.
  * @return bool
  */
 function autoagora_single_car_has_value($value) {
-    return $value !== '' && $value !== null && $value !== false;
+    if ($value === null || $value === false) {
+        return false;
+    }
+
+    if (is_string($value) && trim($value) === '') {
+        return false;
+    }
+
+    return !is_numeric($value) || (float) $value !== 0.0;
 }
 
 /**
