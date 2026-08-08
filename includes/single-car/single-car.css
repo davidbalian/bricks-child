@@ -1,11 +1,34 @@
 .autoagora-single-car {
     --single-car-border: #e1e4e8;
-    --single-car-muted: #657080;
+    --single-car-text: #222831;
+    --single-car-text-strong: var(--single-car-text);
+    --single-car-text-secondary: #52606d;
+    --single-car-text-muted: var(--single-car-text-secondary);
     --single-car-surface: #fff;
     --single-car-page: #f7f8fa;
     --single-car-primary: #357fca;
+    --single-car-link: var(--single-car-primary);
+    --single-car-font-note: 13px;
+    --single-car-font-meta: 14px;
+    --single-car-font-body: 16px;
+    --single-car-font-heading: 24px;
+    --single-car-font-title: clamp(24px, 2.1vw, 32px);
+    --single-car-font-price: clamp(32px, 3.1vw, 43px);
+    --single-car-weight-regular: 400;
+    --single-car-weight-medium: 500;
+    --single-car-weight-strong: 600;
+    --single-car-leading-tight: 1.2;
+    --single-car-leading-heading: 1.3;
+    --single-car-leading-ui: 1.5;
+    --single-car-leading-copy: 1.65;
+    --single-car-tracking-tight: -.5px;
+    --single-car-radius-panel: 10px;
+    --single-car-radius-card: 13px;
+    --single-car-radius-pill: 999px;
     background: var(--single-car-page);
-    color: #222831;
+    color: var(--single-car-text);
+    font-size: var(--single-car-font-body);
+    font-weight: var(--single-car-weight-regular);
     padding: 1.25rem 0 0;
 }
 
@@ -24,8 +47,8 @@
     align-items: center;
     gap: .55rem;
     margin: 0 0 1.25rem;
-    color: #343b45;
-    font-size: 1rem;
+    color: var(--single-car-text);
+    font-size: var(--single-car-font-body);
 }
 
 .autoagora-single-car__breadcrumbs a {
@@ -35,7 +58,7 @@
 
 .autoagora-single-car__breadcrumbs a:hover,
 .autoagora-single-car__browse-links a:hover {
-    color: var(--single-car-primary);
+    color: var(--single-car-link);
 }
 
 .autoagora-single-car__hero {
@@ -69,14 +92,16 @@ body.admin-bar .autoagora-single-car__gallery {
 .autoagora-single-car__card {
     background: var(--single-car-surface);
     border: 1px solid var(--single-car-border);
-    border-radius: .8rem;
+    border-radius: var(--single-car-radius-card);
     padding: 2.5rem;
 }
 
 .autoagora-single-car__summary h1 {
     margin: 0;
-    font-size: clamp(1.65rem, 2.1vw, 2rem);
-    line-height: 1.2;
+    font-size: var(--single-car-font-title);
+    font-weight: var(--single-car-weight-medium);
+    letter-spacing: var(--single-car-tracking-tight);
+    line-height: var(--single-car-leading-tight);
 }
 
 .autoagora-single-car__summary-specs {
@@ -92,17 +117,19 @@ body.admin-bar .autoagora-single-car__gallery {
     min-height: 2.25rem;
     padding: .45rem .85rem;
     background: #fafafa;
-    border-radius: .2rem;
-    color: #20242a;
-    font-size: .95rem;
+    border-radius: var(--single-car-radius-pill);
+    color: var(--single-car-text-strong);
+    font-size: var(--single-car-font-meta);
+    line-height: var(--single-car-leading-ui);
 }
 
 .autoagora-single-car__price {
     margin: 2rem 0 .15rem;
     color: var(--single-car-primary);
-    font-size: clamp(2rem, 3.1vw, 2.7rem);
-    font-weight: 500;
-    line-height: 1;
+    font-size: var(--single-car-font-price);
+    font-weight: var(--single-car-weight-medium);
+    letter-spacing: var(--single-car-tracking-tight);
+    line-height: var(--single-car-leading-tight);
 }
 
 .autoagora-single-car__posted {
@@ -110,8 +137,8 @@ body.admin-bar .autoagora-single-car__gallery {
     align-items: center;
     gap: .45rem;
     margin: .6rem 0 2.2rem;
-    color: #52606d;
-    font-size: .83rem;
+    color: var(--single-car-text-secondary);
+    font-size: var(--single-car-font-note);
 }
 
 .autoagora-single-car__posted > span {
@@ -142,7 +169,7 @@ body.admin-bar .autoagora-single-car__gallery {
     height: 5rem;
     place-items: center;
     overflow: hidden;
-    border-radius: .3rem;
+    border-radius: var(--single-car-radius-panel);
     background: #f3f5f7;
     color: var(--single-car-primary);
 }
@@ -164,9 +191,9 @@ body.admin-bar .autoagora-single-car__gallery {
     display: flex;
     align-items: flex-start;
     gap: .4rem;
-    color: #3377b7;
-    font-size: .92rem;
-    line-height: 1.4;
+    color: var(--single-car-link);
+    font-size: var(--single-car-font-meta);
+    line-height: var(--single-car-leading-ui);
 }
 
 .autoagora-single-car__seller-name i {
@@ -179,8 +206,9 @@ body.admin-bar .autoagora-single-car__gallery {
     max-width: max-content;
     margin-left: 0;
     margin-right: 0;
-    color: #29313a;
-    font-size: .9rem;
+    border-radius: var(--single-car-radius-pill);
+    color: var(--single-car-text-strong);
+    font-size: var(--single-car-font-meta);
 }
 
 .autoagora-single-car__seller .seller-reviews-container {
@@ -196,19 +224,21 @@ body.admin-bar .autoagora-single-car__gallery {
     align-items: flex-start;
     gap: .55rem;
     margin: 1.45rem 0;
-    font-size: .92rem;
-    line-height: 1.45;
+    color: var(--single-car-text-secondary);
+    font-size: var(--single-car-font-meta);
+    line-height: var(--single-car-leading-ui);
 }
 
 .autoagora-single-car__address i {
     margin-top: .18rem;
-    color: #263b58;
+    color: var(--single-car-text-secondary);
 }
 
 .autoagora-single-car__contact-note {
     margin: 0 0 1.25rem;
-    color: #535d68;
-    font-size: .78rem;
+    color: var(--single-car-text-muted);
+    font-size: var(--single-car-font-note);
+    line-height: var(--single-car-leading-ui);
 }
 
 .autoagora-single-car__contact-actions {
@@ -222,7 +252,8 @@ body.admin-bar .autoagora-single-car__gallery {
 .autoagora-single-car__contact-actions .car-whatsapp-button {
     width: 100%;
     min-height: 3.1rem;
-    border-radius: 999px !important;
+    border-radius: var(--single-car-radius-pill) !important;
+    font-size: var(--single-car-font-body);
     white-space: nowrap;
 }
 
@@ -256,8 +287,8 @@ body.admin-bar .autoagora-single-car__gallery {
 }
 
 .autoagora-single-car__views {
-    color: #59636e;
-    font-size: .88rem;
+    color: var(--single-car-text-muted);
+    font-size: var(--single-car-font-meta);
 }
 
 .autoagora-single-car__utility-actions button {
@@ -269,7 +300,7 @@ body.admin-bar .autoagora-single-car__gallery {
     border: 1px solid var(--single-car-border);
     border-radius: 50%;
     background: #fff;
-    color: #263b58;
+    color: var(--single-car-text);
     cursor: pointer;
 }
 
@@ -292,7 +323,7 @@ body.admin-bar .autoagora-single-car__gallery {
     width: min(100%, 560px);
     max-height: calc(100dvh - 2rem);
     overflow-y: auto;
-    border-radius: .8rem;
+    border-radius: var(--single-car-radius-card);
     background: #fff;
     box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, .25);
 }
@@ -308,7 +339,7 @@ body.admin-bar .autoagora-single-car__gallery {
 
 .report-modal-header h3 {
     margin: 0;
-    font-size: 1.35rem;
+    font-size: var(--single-car-font-heading);
 }
 
 .close-report-modal {
@@ -335,7 +366,7 @@ body.admin-bar .autoagora-single-car__gallery {
 }
 
 .report-form-group label {
-    font-weight: 600;
+    font-weight: var(--single-car-weight-strong);
 }
 
 .report-form-group select,
@@ -343,14 +374,15 @@ body.admin-bar .autoagora-single-car__gallery {
 .report-form-group input {
     width: 100%;
     padding: .75rem .85rem;
-    border: 1px solid #ccd3da;
-    border-radius: .4rem;
+    border: 1px solid var(--single-car-border);
+    border-radius: var(--single-car-radius-panel);
     background: #fff;
-    color: #222831;
+    color: var(--single-car-text);
+    font-size: var(--single-car-font-body);
 }
 
 .report-form-group small {
-    color: var(--single-car-muted);
+    color: var(--single-car-text-muted);
 }
 
 .report-form-actions {
@@ -364,13 +396,13 @@ body.admin-bar .autoagora-single-car__gallery {
     min-height: 2.75rem;
     padding: .65rem 1.15rem;
     border: 0;
-    border-radius: .4rem;
+    border-radius: var(--single-car-radius-pill);
     cursor: pointer;
 }
 
 .cancel-report-btn {
     background: #edf1f4;
-    color: #29313a;
+    color: var(--single-car-text);
 }
 
 .submit-report-btn {
@@ -387,8 +419,9 @@ body.admin-bar .autoagora-single-car__gallery {
 
 .autoagora-single-car__card h2 {
     margin: 0 0 1.25rem;
-    font-size: clamp(1.3rem, 1.6vw, 1.5rem);
-    line-height: 1.3;
+    font-size: var(--single-car-font-heading);
+    font-weight: var(--single-car-weight-medium);
+    line-height: var(--single-car-leading-heading);
 }
 
 .autoagora-single-car__card hr {
@@ -422,7 +455,7 @@ body.admin-bar .autoagora-single-car__gallery {
 .autoagora-single-car__table-wrap {
     overflow: hidden;
     border: 1px solid var(--single-car-border);
-    border-radius: .65rem;
+    border-radius: var(--single-car-radius-panel);
 }
 
 .autoagora-single-car__spec-table {
@@ -431,7 +464,8 @@ body.admin-bar .autoagora-single-car__gallery {
     border: 0;
     border-collapse: collapse;
     background: #fff;
-    font-size: .94rem;
+    color: var(--single-car-text);
+    font-size: var(--single-car-font-body);
 }
 
 .autoagora-single-car__spec-table tr:not(:last-child) {
@@ -446,19 +480,19 @@ body.admin-bar .autoagora-single-car__gallery {
 .autoagora-single-car__spec-table td {
     padding: .9rem 1rem;
     border: 0;
-    line-height: 1.35;
+    line-height: var(--single-car-leading-ui);
 }
 
 .autoagora-single-car__spec-table th {
     width: 56%;
-    color: #52606d;
-    font-weight: 500;
+    color: var(--single-car-text-secondary);
+    font-weight: var(--single-car-weight-medium);
     text-align: left;
 }
 
 .autoagora-single-car__spec-table td {
-    color: #202833;
-    font-weight: 600;
+    color: var(--single-car-text-strong);
+    font-weight: var(--single-car-weight-strong);
     text-align: right;
 }
 
@@ -466,11 +500,12 @@ body.admin-bar .autoagora-single-car__gallery {
     display: flex;
     flex-wrap: wrap;
     gap: .55rem 1rem;
-    font-size: .92rem;
+    font-size: var(--single-car-font-meta);
+    line-height: var(--single-car-leading-ui);
 }
 
 .autoagora-single-car__browse-links a {
-    color: #397db9;
+    color: var(--single-car-link);
     text-decoration: none;
     text-underline-offset: .18em;
     transition: color .18s ease;
@@ -487,7 +522,7 @@ body.admin-bar .autoagora-single-car__gallery {
     margin-top: 1.35rem;
     overflow: hidden;
     border: 1px solid var(--single-car-border);
-    border-radius: .85rem;
+    border-radius: var(--single-car-radius-card);
     background: #edf1f4;
     box-shadow: 0 .45rem 1.35rem rgba(35, 53, 72, .08);
     isolation: isolate;
@@ -500,7 +535,8 @@ body.admin-bar .autoagora-single-car__gallery {
 .autoagora-single-car__description {
     position: relative;
     overflow: hidden;
-    line-height: 1.65;
+    font-size: var(--single-car-font-body);
+    line-height: var(--single-car-leading-copy);
 }
 
 .autoagora-single-car__description.is-collapsible:not(.is-expanded) {
@@ -532,6 +568,8 @@ body.admin-bar .autoagora-single-car__gallery {
     position: relative;
     z-index: 1;
     margin-top: 1rem;
+    border-radius: var(--single-car-radius-pill);
+    font-size: var(--single-car-font-body);
 }
 
 .autoagora-single-car__tag-list {
@@ -545,10 +583,11 @@ body.admin-bar .autoagora-single-car__gallery {
 
 .autoagora-single-car__tag-list li {
     padding: .55rem 1rem;
-    border-radius: 999px;
+    border-radius: var(--single-car-radius-pill);
     background: #f1f4f7;
-    color: #34404d;
-    font-size: .88rem;
+    color: var(--single-car-text-strong);
+    font-size: var(--single-car-font-meta);
+    line-height: var(--single-car-leading-ui);
 }
 
 .autoagora-single-car__related {
@@ -559,7 +598,157 @@ body.admin-bar .autoagora-single-car__gallery {
 
 .autoagora-single-car__related h2 {
     margin: 0 0 1.5rem;
-    font-size: 1.7rem;
+    font-size: var(--single-car-font-heading);
+    font-weight: var(--single-car-weight-medium);
+    line-height: var(--single-car-leading-heading);
+}
+
+/* Keep shortcode and gallery UI on this template's tokens without changing them elsewhere. */
+.autoagora-single-car .single-car-gallery-wrapper,
+.autoagora-single-car .single-car-gallery-container {
+    color: var(--single-car-text);
+    font-size: var(--single-car-font-body);
+}
+
+.autoagora-single-car .scg-main-slider,
+.autoagora-single-car .scg-thumbs {
+    border-color: var(--single-car-border);
+    border-radius: var(--single-car-radius-card);
+}
+
+.autoagora-single-car .scg-thumb,
+.autoagora-single-car .scg-thumb img {
+    border-radius: var(--single-car-radius-panel);
+}
+
+.autoagora-single-car .scg-thumb img,
+.autoagora-single-car .scg-thumb.scg-thumb-active img,
+.autoagora-single-car .scg-thumb:hover img {
+    border-color: var(--single-car-border);
+}
+
+.autoagora-single-car .scg-thumb.scg-thumb-active img {
+    outline: 2px solid var(--single-car-primary);
+    outline-offset: -2px;
+}
+
+.autoagora-single-car .photo-counter,
+.autoagora-single-car .scg-view-all-btn {
+    border-radius: var(--single-car-radius-pill);
+    color: var(--single-car-text);
+    font-size: var(--single-car-font-meta);
+    font-weight: var(--single-car-weight-medium);
+    line-height: var(--single-car-leading-ui);
+}
+
+.autoagora-single-car .seller-reviews-container--has-reviews {
+    border-color: var(--single-car-border);
+    border-radius: var(--single-car-radius-card);
+}
+
+.autoagora-single-car .seller-reviews-empty-message,
+.autoagora-single-car .seller-reviews-see-all-link,
+.autoagora-single-car .seller-reviews-see-all-link:hover,
+.autoagora-single-car .seller-reviews-see-all-link:focus {
+    color: var(--single-car-text);
+    font-size: var(--single-car-font-meta);
+    letter-spacing: normal;
+    line-height: var(--single-car-leading-ui);
+}
+
+.autoagora-single-car .seller-reviews-see-all-link,
+.autoagora-single-car .seller-reviews-see-all-link:hover,
+.autoagora-single-car .seller-reviews-see-all-link:focus {
+    color: var(--single-car-link);
+}
+
+.autoagora-single-car .car-whatsapp-button,
+.autoagora-single-car .car-whatsapp-button span,
+.autoagora-single-car .car-whatsapp-button i {
+    color: var(--single-car-text) !important;
+}
+
+.autoagora-single-car .car-card,
+.autoagora-single-car .car-card-slider,
+.autoagora-single-car .car-card-body {
+    border-color: var(--single-car-border);
+    color: var(--single-car-text);
+}
+
+.autoagora-single-car .car-card,
+.autoagora-single-car .car-card-slider {
+    border-radius: var(--single-car-radius-card);
+}
+
+.autoagora-single-car .car-card-body {
+    border-radius: 0 0 var(--single-car-radius-card) var(--single-car-radius-card);
+}
+
+.autoagora-single-car .car-card-title {
+    color: var(--single-car-text);
+    font-size: var(--single-car-font-body);
+    font-weight: var(--single-car-weight-medium);
+    line-height: var(--single-car-leading-heading);
+}
+
+.autoagora-single-car .car-card-mileage,
+.autoagora-single-car .car-card-specs,
+.autoagora-single-car .car-card-footer {
+    color: var(--single-car-text-secondary);
+    font-size: var(--single-car-font-meta);
+    line-height: var(--single-car-leading-ui);
+}
+
+.autoagora-single-car .car-card-price {
+    color: var(--single-car-primary);
+    font-size: var(--single-car-font-heading);
+    font-weight: var(--single-car-weight-strong);
+    letter-spacing: var(--single-car-tracking-tight);
+    line-height: var(--single-car-leading-tight);
+}
+
+.autoagora-single-car .car-card .car-card-badge,
+.autoagora-single-car .car-card .car-card-counter,
+.autoagora-single-car .car-card .car-card-price-insight {
+    border-color: var(--single-car-border);
+    border-radius: var(--single-car-radius-pill);
+    font-size: var(--single-car-font-note);
+    line-height: var(--single-car-leading-tight);
+}
+
+.autoagora-single-car .car-card-view-all-btn {
+    border-radius: var(--single-car-radius-pill);
+    font-size: var(--single-car-font-body);
+}
+
+.autoagora-single-car .autoagora-facebook-card {
+    border-color: var(--single-car-border);
+    border-radius: var(--single-car-radius-card);
+    color: var(--single-car-text);
+}
+
+.autoagora-single-car .autoagora-facebook-card h3 {
+    color: var(--single-car-text);
+    font-size: var(--single-car-font-heading);
+    font-weight: var(--single-car-weight-medium);
+    line-height: var(--single-car-leading-heading);
+}
+
+.autoagora-single-car .autoagora-facebook-card p {
+    color: var(--single-car-text-secondary);
+    font-size: var(--single-car-font-body);
+    line-height: var(--single-car-leading-copy);
+}
+
+.autoagora-single-car .autoagora-facebook-admin-note {
+    color: var(--single-car-text-muted);
+    font-size: var(--single-car-font-note);
+    line-height: var(--single-car-leading-ui);
+}
+
+.autoagora-single-car .autoagora-facebook-card-action .btn {
+    border-radius: var(--single-car-radius-pill);
+    font-size: var(--single-car-font-body);
 }
 
 .autoagora-single-car__related-grid {
@@ -622,7 +811,7 @@ body.admin-bar .autoagora-single-car__gallery {
 
     .autoagora-single-car__breadcrumbs {
         gap: .45rem;
-        font-size: .9rem;
+        font-size: var(--single-car-font-meta);
     }
 
     .autoagora-single-car__card {
@@ -630,7 +819,7 @@ body.admin-bar .autoagora-single-car__gallery {
     }
 
     .autoagora-single-car__summary h1 {
-        font-size: 1.55rem;
+        font-size: var(--single-car-font-heading);
     }
 
     .autoagora-single-car__summary-specs {
@@ -645,7 +834,7 @@ body.admin-bar .autoagora-single-car__gallery {
 
     .autoagora-single-car__price {
         margin-top: 2rem;
-        font-size: 2.2rem;
+        font-size: 32px;
     }
 
     .autoagora-single-car__seller-logo {
