@@ -93,6 +93,63 @@ function autoagora_code_header_menu_items() {
 }
 
 /**
+ * Render a compact Polylang language switcher.
+ *
+ * Polylang supplies the translated URL for the current page. When a page has
+ * no translation, fall back to that language's homepage rather than outputting
+ * an empty or broken link.
+ *
+ * @param string $modifier_class Optional presentation modifier.
+ */
+function autoagora_code_header_render_language_switcher( $modifier_class = '' ) {
+	if ( ! function_exists( 'pll_the_languages' ) ) {
+		return;
+	}
+
+	$languages = pll_the_languages(
+		array(
+			'raw'                    => 1,
+			'hide_if_empty'          => 0,
+			'hide_if_no_translation' => 0,
+			'hide_current'           => 0,
+		)
+	);
+
+	if ( ! is_array( $languages ) || count( $languages ) < 2 ) {
+		return;
+	}
+
+	$class_name = 'aag-site-header__language-switcher';
+	if ( $modifier_class ) {
+		$class_name .= ' ' . $modifier_class;
+	}
+	?>
+	<nav class="<?php echo esc_attr( $class_name ); ?>" aria-label="<?php esc_attr_e( 'Language selector', 'bricks-child' ); ?>">
+		<ul>
+			<?php foreach ( $languages as $language ) : ?>
+				<?php
+				$slug = isset( $language['slug'] ) ? sanitize_key( $language['slug'] ) : '';
+				$name = isset( $language['name'] ) ? $language['name'] : strtoupper( $slug );
+				$url  = isset( $language['url'] ) ? $language['url'] : '';
+
+				if ( ! $url && $slug && function_exists( 'pll_home_url' ) ) {
+					$url = pll_home_url( $slug );
+				}
+
+				if ( ! $slug || ! $url ) {
+					continue;
+				}
+				?>
+				<li>
+					<a href="<?php echo esc_url( $url ); ?>" lang="<?php echo esc_attr( $slug ); ?>" hreflang="<?php echo esc_attr( $slug ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Switch to %s', 'bricks-child' ), $name ) ); ?>"<?php echo ! empty( $language['current_lang'] ) ? ' aria-current="true"' : ''; ?>><?php echo esc_html( strtoupper( $slug ) ); ?></a>
+				</li>
+			<?php endforeach; ?>
+		</ul>
+	</nav>
+	<?php
+}
+
+/**
  * Return a localized frontend URL using the project's existing resolver.
  */
 function autoagora_code_header_url( $slug = '' ) {
@@ -187,6 +244,7 @@ function autoagora_render_code_header() {
 					<?php autoagora_code_header_render_menu( 'aag-site-header__menu' ); ?>
 				</nav>
 				<div class="aag-site-header__desktop-account">
+					<?php autoagora_code_header_render_language_switcher(); ?>
 					<?php if ( is_user_logged_in() ) : ?>
 						<details class="aag-site-header__details">
 							<summary>
@@ -224,9 +282,12 @@ function autoagora_render_code_header() {
 			<button type="button" class="aag-site-header__drawer-close" aria-label="<?php esc_attr_e( 'Close menu', 'bricks-child' ); ?>">
 				<?php echo autoagora_code_header_icon( 'close' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</button>
-			<nav aria-label="<?php esc_attr_e( 'Mobile navigation', 'bricks-child' ); ?>">
-				<?php autoagora_code_header_render_menu( 'aag-site-header__drawer-menu' ); ?>
-			</nav>
+			<div class="aag-site-header__drawer-content">
+				<nav aria-label="<?php esc_attr_e( 'Mobile navigation', 'bricks-child' ); ?>">
+					<?php autoagora_code_header_render_menu( 'aag-site-header__drawer-menu' ); ?>
+				</nav>
+				<?php autoagora_code_header_render_language_switcher( 'aag-site-header__language-switcher--drawer' ); ?>
+			</div>
 		</div>
 	</header>
 
