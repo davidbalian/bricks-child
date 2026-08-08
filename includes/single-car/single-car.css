@@ -47,8 +47,9 @@
     align-items: center;
     gap: .55rem;
     margin: 0 0 1.25rem;
-    color: var(--single-car-text);
-    font-size: var(--single-car-font-body);
+    color: var(--single-car-text-secondary);
+    font-size: var(--single-car-font-meta);
+    line-height: var(--single-car-leading-ui);
 }
 
 .autoagora-single-car__breadcrumbs a {
