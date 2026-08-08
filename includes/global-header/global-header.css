@@ -12,6 +12,16 @@
     font-family: Inter, sans-serif;
 }
 
+.autoagora-code-header-active .aag-site-header {
+    --aag-mobile-admin-bar-offset: 0px;
+}
+
+@media (max-width: 767px) {
+    .autoagora-code-header-active.admin-bar .aag-site-header {
+        --aag-mobile-admin-bar-offset: 46px;
+    }
+}
+
 .autoagora-code-header-active .aag-site-header *,
 .autoagora-code-header-active .aag-mobile-dock * {
     box-sizing: border-box;
@@ -238,18 +248,18 @@
     inset: 0;
     display: grid;
     place-items: center;
-    padding: 72px 24px 32px;
+    padding: calc(72px + var(--aag-mobile-admin-bar-offset)) 24px 32px;
     background: #fff;
     overflow-y: auto;
 }
 
 .aag-site-header__drawer-close {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    width: 32px;
-    height: 32px;
-    padding: 4px;
+    position: fixed;
+    top: calc(var(--aag-mobile-admin-bar-offset) + 12.5px);
+    right: 16px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
     color: var(--aag-header-navy);
     background: transparent;
     border: 0;
