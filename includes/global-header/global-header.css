@@ -306,7 +306,7 @@ html.aag-site-header-menu-open {
 
     .aag-site-header__menu {
         flex-wrap: wrap;
-        justify-content: center;
+        justify-content: flex-start;
         gap: 1.5rem;
     }
 }
