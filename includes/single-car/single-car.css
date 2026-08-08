@@ -162,6 +162,11 @@ body.admin-bar .autoagora-single-car__gallery {
     text-decoration: none;
 }
 
+.autoagora-single-car__seller-profile:hover .autoagora-single-car__seller-name,
+.autoagora-single-car__seller-profile:focus-visible .autoagora-single-car__seller-name {
+    text-decoration: underline;
+}
+
 .autoagora-single-car__seller-logo {
     display: grid;
     flex: 0 0 5rem;
@@ -660,6 +665,17 @@ body.admin-bar .autoagora-single-car__gallery {
 .autoagora-single-car .seller-reviews-see-all-link:hover,
 .autoagora-single-car .seller-reviews-see-all-link:focus {
     color: var(--single-car-link);
+}
+
+.autoagora-single-car__seller-name,
+.autoagora-single-car .seller-reviews-see-all-link {
+    text-decoration: none;
+    text-underline-offset: .18em;
+}
+
+.autoagora-single-car .seller-reviews-see-all-link:hover,
+.autoagora-single-car .seller-reviews-see-all-link:focus-visible {
+    text-decoration: underline;
 }
 
 .autoagora-single-car .car-whatsapp-button,
