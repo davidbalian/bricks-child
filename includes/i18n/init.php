@@ -59,7 +59,8 @@ function autoagora_translate_child_theme_string( $translation, $text, $domain ) 
 	$catalog = autoagora_translation_catalog();
 	return isset( $catalog[ $text ] ) ? $catalog[ $text ] : $translation;
 }
-add_filter( 'gettext_bricks-child', 'autoagora_translate_child_theme_string', 10, 3 );
+// Temporarily disabled until the code-owned translation catalog is complete.
+// add_filter( 'gettext_bricks-child', 'autoagora_translate_child_theme_string', 10, 3 );
 
 /**
  * Translate singular/plural strings in the child theme.
@@ -70,7 +71,8 @@ function autoagora_translate_child_theme_plural( $translation, $single, $plural,
 
 	return isset( $catalog[ $key ] ) ? $catalog[ $key ] : $translation;
 }
-add_filter( 'ngettext_bricks-child', 'autoagora_translate_child_theme_plural', 10, 4 );
+// Temporarily disabled until the code-owned translation catalog is complete.
+// add_filter( 'ngettext_bricks-child', 'autoagora_translate_child_theme_plural', 10, 4 );
 
 /**
  * Resolve a translated page URL while retaining an English fallback.
