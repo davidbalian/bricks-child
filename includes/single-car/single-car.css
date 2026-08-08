@@ -120,6 +120,7 @@ body.admin-bar .autoagora-single-car__gallery {
     border-radius: var(--single-car-radius-pill);
     color: var(--single-car-text-strong);
     font-size: var(--single-car-font-meta);
+    font-weight: var(--single-car-weight-medium);
     line-height: var(--single-car-leading-ui);
 }
 
@@ -138,7 +139,8 @@ body.admin-bar .autoagora-single-car__gallery {
     gap: .45rem;
     margin: .6rem 0 2.2rem;
     color: var(--single-car-text-secondary);
-    font-size: var(--single-car-font-note);
+    font-size: var(--single-car-font-meta);
+    line-height: var(--single-car-leading-ui);
 }
 
 .autoagora-single-car__posted > span {
