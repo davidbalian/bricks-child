@@ -6,8 +6,8 @@
 .autoagora-code-header-active .aag-site-header,
 .autoagora-code-header-active .aag-mobile-dock {
     --aag-header-blue: #0d86e3;
-    --aag-header-text: #363636;
-    --aag-header-navy: #22304e;
+    --aag-header-text: #222831;
+    --aag-header-navy: #222831;
     --aag-header-border: #dddede;
     font-family: Inter, sans-serif;
 }
@@ -397,11 +397,15 @@ html.aag-site-header-menu-open {
     }
 
     .aag-mobile-dock__item--primary {
-        color: var(--aag-header-blue);
+        color: var(--aag-header-text);
+    }
+
+    .aag-mobile-dock__item--primary svg {
+        stroke: none;
     }
 
     .aag-mobile-dock__item[aria-current="page"]:not(.aag-mobile-dock__item--primary) {
-        color: var(--aag-header-blue);
+        color: var(--aag-header-text);
     }
 
     .aag-mobile-dock__account {
