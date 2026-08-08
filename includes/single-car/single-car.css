@@ -509,6 +509,28 @@ body.admin-bar .autoagora-single-car__gallery {
     text-align: right;
 }
 
+.autoagora-single-car__spec-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .55rem;
+    color: var(--single-car-link);
+    font-weight: var(--single-car-weight-medium);
+    text-decoration: none;
+    text-underline-offset: .18em;
+    white-space: nowrap;
+}
+
+.autoagora-single-car__spec-link:hover > span:first-child,
+.autoagora-single-car__spec-link:focus-visible > span:first-child {
+    text-decoration: underline;
+}
+
+.autoagora-single-car__spec-link-arrow {
+    flex: 0 0 auto;
+    text-decoration: none;
+}
+
 .autoagora-single-car__browse-links {
     display: flex;
     flex-wrap: wrap;

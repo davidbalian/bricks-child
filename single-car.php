@@ -140,6 +140,22 @@ $gallery_html     = do_shortcode('[single_car_template_gallery post_id="' . (int
 $seller_reviews_html = $author_id
     ? do_shortcode('[seller_reviews seller_id="' . $author_id . '" show_reviews="false" show_form="true"]')
     : '';
+$make_url = '';
+$model_url = '';
+
+if ($terms['make'] instanceof WP_Term) {
+    $make_term_url = get_term_link($terms['make']);
+    if (!is_wp_error($make_term_url)) {
+        $make_url = $make_term_url;
+    }
+}
+
+if ($terms['model'] instanceof WP_Term) {
+    $model_term_url = get_term_link($terms['model']);
+    if (!is_wp_error($model_term_url)) {
+        $model_url = $model_term_url;
+    }
+}
 
 if ($page_title === '') {
     $page_title = trim(implode(' ', array_filter(array($year, $make, $model))));
@@ -159,6 +175,16 @@ $summary_specs = array_filter(
 
 $performance_specs = array_filter(
     array(
+        array(
+            'label' => __('Make', 'bricks-child'),
+            'value' => $terms['make'] instanceof WP_Term ? $terms['make']->name : $make,
+            'url'   => $make_url,
+        ),
+        array(
+            'label' => __('Model', 'bricks-child'),
+            'value' => $terms['model'] instanceof WP_Term ? $terms['model']->name : $model,
+            'url'   => $model_url,
+        ),
         array('label' => __('Engine Capacity', 'bricks-child'), 'value' => autoagora_single_car_has_value($engine_capacity) ? $engine_capacity . 'L' : ''),
         array('label' => __('Fuel Type', 'bricks-child'), 'value' => $fuel_type_display),
         array('label' => __('Transmission', 'bricks-child'), 'value' => $transmission_display),
@@ -277,14 +303,23 @@ get_header();
                 <div class="autoagora-single-car__spec-column">
                     <?php if ($performance_specs) : ?>
                         <div class="autoagora-single-car__spec-section">
-                            <h2><?php esc_html_e('Engine & Performance', 'bricks-child'); ?></h2>
+                            <h2><?php esc_html_e('Overview & Performance', 'bricks-child'); ?></h2>
                             <div class="autoagora-single-car__table-wrap">
                                 <table class="autoagora-single-car__spec-table">
                                     <tbody>
                                         <?php foreach ($performance_specs as $spec) : ?>
                                             <tr>
                                                 <th scope="row"><?php echo esc_html($spec['label']); ?></th>
-                                                <td><?php echo esc_html($spec['value']); ?></td>
+                                                <td>
+                                                    <?php if (!empty($spec['url'])) : ?>
+                                                        <a class="autoagora-single-car__spec-link" href="<?php echo esc_url($spec['url']); ?>">
+                                                            <span><?php echo esc_html($spec['value']); ?></span>
+                                                            <span class="autoagora-single-car__spec-link-arrow" aria-hidden="true">→</span>
+                                                        </a>
+                                                    <?php else : ?>
+                                                        <?php echo esc_html($spec['value']); ?>
+                                                    <?php endif; ?>
+                                                </td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
@@ -359,15 +394,6 @@ get_header();
                 <?php endif; ?>
             </div>
 
-            <?php if ($terms['model'] instanceof WP_Term) : ?>
-                <?php $model_url = get_term_link($terms['model']); ?>
-                <?php if (!is_wp_error($model_url)) : ?>
-                    <hr>
-                    <div class="autoagora-single-car__browse-links">
-                        <a href="<?php echo esc_url($model_url); ?>"><?php echo esc_html(sprintf(__('View all %s cars', 'bricks-child'), $terms['model']->name)); ?></a>
-                    </div>
-                <?php endif; ?>
-            <?php endif; ?>
         </section>
 
         <?php if ($has_background) : ?>

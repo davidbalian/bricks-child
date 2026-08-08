@@ -247,6 +247,7 @@ return array(
 	'Car specifications' => 'Χαρακτηριστικά αυτοκινήτου',
 	'Car location map' => 'Χάρτης τοποθεσίας αυτοκινήτου',
 	'Engine & Performance' => 'Κινητήρας & Επιδόσεις',
+	'Overview & Performance' => 'Επισκόπηση & Επιδόσεις',
 	'Body & Design' => 'Αμάξωμα & Σχεδιασμός',
 	'Doors' => 'Θύρες',
 	'Seats' => 'Θέσεις',
