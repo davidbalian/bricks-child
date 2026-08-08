@@ -201,7 +201,14 @@ body.admin-bar .autoagora-single-car__gallery {
     line-height: var(--single-car-leading-ui);
 }
 
-.autoagora-single-car__seller-name i {
+.autoagora-single-car__hugeicon {
+    display: block;
+    width: 1.15em;
+    height: 1.15em;
+    flex: 0 0 auto;
+}
+
+.autoagora-single-car__seller-name .autoagora-single-car__hugeicon {
     margin-top: .2rem;
 }
 
@@ -234,16 +241,23 @@ body.admin-bar .autoagora-single-car__gallery {
     line-height: var(--single-car-leading-ui);
 }
 
-.autoagora-single-car__address i {
+.autoagora-single-car__address .autoagora-single-car__hugeicon {
     margin-top: .18rem;
     color: var(--single-car-text-secondary);
 }
 
 .autoagora-single-car__contact-note {
+    display: flex;
+    align-items: flex-start;
+    gap: .45rem;
     margin: 0 0 1.25rem;
     color: var(--single-car-text-muted);
     font-size: var(--single-car-font-note);
     line-height: var(--single-car-leading-ui);
+}
+
+.autoagora-single-car__contact-note .autoagora-single-car__hugeicon {
+    margin-top: .12rem;
 }
 
 .autoagora-single-car__contact-actions {
@@ -261,6 +275,14 @@ body.admin-bar .autoagora-single-car__gallery {
     font-size: var(--single-car-font-body);
     font-weight: var(--single-car-weight-strong);
     white-space: nowrap;
+}
+
+.autoagora-single-car__contact-actions .car-call-button-icon,
+.autoagora-single-car__utility-actions .share-btn-icon,
+.autoagora-single-car__utility-actions .favorite-btn-icon,
+.autoagora-single-car__utility-actions .report-btn-icon,
+.autoagora-single-car .report-btn-close-icon {
+    display: contents;
 }
 
 @container single-car-summary (max-width: 400px) {
@@ -315,6 +337,11 @@ body.admin-bar .autoagora-single-car__gallery {
     background: #fff;
     color: var(--single-car-text);
     cursor: pointer;
+}
+
+.autoagora-single-car__utility-actions .autoagora-single-car__hugeicon {
+    width: 1.2rem;
+    height: 1.2rem;
 }
 
 .autoagora-single-car__utility-actions .favorite-btn.active {
@@ -529,6 +556,11 @@ body.admin-bar .autoagora-single-car__gallery {
 .autoagora-single-car__spec-link-arrow {
     flex: 0 0 auto;
     text-decoration: none;
+}
+
+.autoagora-single-car__spec-link-arrow .autoagora-single-car__hugeicon {
+    width: 1.15rem;
+    height: 1.15rem;
 }
 
 .autoagora-single-car__browse-links {

@@ -22,6 +22,7 @@ function report_button_shortcode( $atts ) {
         'design' => 'default', // 'default', 'single', 'minimal'
         'size' => 'normal', // 'small', 'normal', 'large'
         'text' => '', // Optional text next to icon
+        'icon_set' => 'fontawesome',
     ), $atts );
 
     // Get car ID - prioritize attribute, then URL parameter, then current post ID
@@ -53,7 +54,11 @@ function report_button_shortcode( $atts ) {
             <div class="report-modal-header">
                 <h3><?php esc_html_e('Report this listing', 'bricks-child'); ?></h3>
                 <button class="close-report-modal">
-                    <i class="fas fa-times"></i>
+                    <?php if ($atts['icon_set'] === 'hugeicons' && function_exists('autoagora_single_car_hugeicon')) : ?>
+                        <i class="report-btn-close-icon" aria-hidden="true"><?php echo autoagora_single_car_hugeicon('cancel'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></i>
+                    <?php else : ?>
+                        <i class="fas fa-times"></i>
+                    <?php endif; ?>
                 </button>
             </div>
             <form id="report-listing-form" method="post">
@@ -93,7 +98,11 @@ function report_button_shortcode( $atts ) {
 
     <!-- Report Button -->
     <button class="<?php echo esc_attr($button_class); ?>" data-car-id="<?php echo esc_attr($car_id); ?>" title="<?php esc_attr_e('Report this listing', 'bricks-child'); ?>">
-        <i class="fas fa-flag"></i>
+        <?php if ($atts['icon_set'] === 'hugeicons' && function_exists('autoagora_single_car_hugeicon')) : ?>
+            <i class="report-btn-icon" aria-hidden="true"><?php echo autoagora_single_car_hugeicon('flag'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></i>
+        <?php else : ?>
+            <i class="fas fa-flag"></i>
+        <?php endif; ?>
         <?php if (!empty($atts['text'])): ?>
             <span class="report-btn-text"><?php echo esc_html($atts['text']); ?></span>
         <?php endif; ?>

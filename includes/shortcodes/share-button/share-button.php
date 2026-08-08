@@ -20,6 +20,7 @@ function share_button_shortcode( $atts ) {
         'design' => 'default', // 'default', 'single', 'minimal'
         'size' => 'normal', // 'small', 'normal', 'large'
         'text' => '', // Optional text next to icon
+        'icon_set' => 'fontawesome',
     ), $atts );
 
     // Build CSS classes based on design parameter
@@ -32,7 +33,11 @@ function share_button_shortcode( $atts ) {
     ob_start();
     ?>
     <button class="<?php echo esc_attr($button_class); ?>" title="<?php esc_attr_e('Share this listing', 'bricks-child'); ?>">
-        <i class="fas fa-share-alt"></i>
+        <?php if ($atts['icon_set'] === 'hugeicons' && function_exists('autoagora_single_car_hugeicon')) : ?>
+            <i class="share-btn-icon" aria-hidden="true"><?php echo autoagora_single_car_hugeicon('share'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></i>
+        <?php else : ?>
+            <i class="fas fa-share-alt"></i>
+        <?php endif; ?>
         <?php if (!empty($atts['text'])): ?>
             <span class="share-btn-text"><?php echo esc_html($atts['text']); ?></span>
         <?php endif; ?>

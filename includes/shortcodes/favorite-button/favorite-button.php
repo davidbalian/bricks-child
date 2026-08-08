@@ -20,6 +20,7 @@ function favorite_button_shortcode( $atts ) {
         'car_id' => null,
         'design' => 'default', // 'default', 'listing', 'single'
         'size' => 'normal', // 'small', 'normal', 'large'
+        'icon_set' => 'fontawesome',
     ), $atts );
 
     // Get car ID - prioritize attribute, then URL parameter, then current post ID
@@ -53,7 +54,11 @@ function favorite_button_shortcode( $atts ) {
     ob_start();
     ?>
     <button class="<?php echo esc_attr($button_class); ?>" data-car-id="<?php echo esc_attr($car_id); ?>" title="<?php echo esc_attr($is_favorite ? __('Remove from favorites', 'bricks-child') : __('Add to favorites', 'bricks-child')); ?>">
-        <i class="<?php echo esc_attr($heart_class); ?>"></i>
+        <?php if ($atts['icon_set'] === 'hugeicons' && function_exists('autoagora_single_car_hugeicon')) : ?>
+            <i class="favorite-btn-icon <?php echo esc_attr($heart_class); ?>" aria-hidden="true"><?php echo autoagora_single_car_hugeicon('favourite'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></i>
+        <?php else : ?>
+            <i class="<?php echo esc_attr($heart_class); ?>"></i>
+        <?php endif; ?>
     </button>
     <?php
     return ob_get_clean();

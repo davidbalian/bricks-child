@@ -10,6 +10,7 @@ if (!defined('ABSPATH')) {
 }
 
 require_once get_stylesheet_directory() . '/includes/single-car/single-car-helpers.php';
+require_once get_stylesheet_directory() . '/includes/single-car/single-car-hugeicons.php';
 
 $post_id = (int) get_queried_object_id();
 if ($post_id <= 0 || get_post_type($post_id) !== 'car') {
@@ -267,7 +268,7 @@ get_header();
                                 </span>
                             <?php endif; ?>
                             <span class="autoagora-single-car__seller-copy">
-                                <span class="autoagora-single-car__seller-name"><i class="fa-solid fa-user" aria-hidden="true"></i><?php echo esc_html($author_name); ?></span>
+                                <span class="autoagora-single-car__seller-name"><?php echo autoagora_single_car_hugeicon('user'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?><?php echo esc_html($author_name); ?></span>
                                 <?php echo do_shortcode('[dealership_verified user_id="' . $author_id . '"]'); ?>
                             </span>
                         </a>
@@ -275,25 +276,25 @@ get_header();
                     <?php endif; ?>
 
                     <?php if ($address) : ?>
-                        <p class="autoagora-single-car__address"><i class="fa-solid fa-location-dot" aria-hidden="true"></i><?php echo esc_html($address); ?></p>
+                        <p class="autoagora-single-car__address"><?php echo autoagora_single_car_hugeicon('location'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?><?php echo esc_html($address); ?></p>
                     <?php endif; ?>
 
                     <div class="autoagora-single-car__contact-actions">
-                        <?php echo do_shortcode('[car_single_call_button]'); ?>
+                        <?php echo do_shortcode('[car_single_call_button icon_set="hugeicons"]'); ?>
                         <?php echo do_shortcode('[car_single_whatsapp_button]'); ?>
                     </div>
                 </div>
 
                 <div class="autoagora-single-car__utility-row">
                     <div class="autoagora-single-car__utility-row-main">
-                        <div class="autoagora-single-car__views"><i class="fa-regular fa-eye" aria-hidden="true"></i><?php echo do_shortcode('[car_views_counter_single car_id="' . (int) $post_id . '"]'); ?></div>
+                        <div class="autoagora-single-car__views"><?php echo autoagora_single_car_hugeicon('view'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?><?php echo do_shortcode('[car_views_counter_single car_id="' . (int) $post_id . '"]'); ?></div>
                         <div class="autoagora-single-car__utility-actions">
-                            <?php echo do_shortcode('[share_button design="single" size="normal"]'); ?>
-                            <?php echo do_shortcode('[favorite_button car_id="' . (int) $post_id . '" design="single" size="normal"]'); ?>
-                            <?php echo do_shortcode('[report_button car_id="' . (int) $post_id . '" design="single" size="normal"]'); ?>
+                            <?php echo do_shortcode('[share_button design="single" size="normal" icon_set="hugeicons"]'); ?>
+                            <?php echo do_shortcode('[favorite_button car_id="' . (int) $post_id . '" design="single" size="normal" icon_set="hugeicons"]'); ?>
+                            <?php echo do_shortcode('[report_button car_id="' . (int) $post_id . '" design="single" size="normal" icon_set="hugeicons"]'); ?>
                         </div>
                     </div>
-                    <p class="autoagora-single-car__contact-note">ⓘ <?php esc_html_e('Help the seller by mentioning you found this on Autoagora', 'bricks-child'); ?></p>
+                    <p class="autoagora-single-car__contact-note"><?php echo autoagora_single_car_hugeicon('information'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?><?php esc_html_e('Help the seller by mentioning you found this on Autoagora', 'bricks-child'); ?></p>
                 </div>
             </aside>
         </section>
@@ -314,7 +315,7 @@ get_header();
                                                     <?php if (!empty($spec['url'])) : ?>
                                                         <a class="autoagora-single-car__spec-link" href="<?php echo esc_url($spec['url']); ?>">
                                                             <span><?php echo esc_html($spec['value']); ?></span>
-                                                            <span class="autoagora-single-car__spec-link-arrow" aria-hidden="true">→</span>
+                                                            <span class="autoagora-single-car__spec-link-arrow" aria-hidden="true"><?php echo autoagora_single_car_hugeicon('arrow-right'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></span>
                                                         </a>
                                                     <?php else : ?>
                                                         <?php echo esc_html($spec['value']); ?>
