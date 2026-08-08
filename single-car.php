@@ -349,7 +349,7 @@ get_header();
 
                 <?php if ($description) : ?>
                     <div class="autoagora-single-car__detail-section autoagora-single-car__overview-section">
-                        <h2><?php esc_html_e('Overview', 'bricks-child'); ?></h2>
+                        <h2><?php esc_html_e('Description', 'bricks-child'); ?></h2>
                         <div id="single-car-overview-description" class="autoagora-single-car__description is-collapsible" data-single-car-description>
                             <?php echo wpautop(wp_kses_post($description)); ?>
                         </div>
