@@ -405,7 +405,7 @@ html.aag-site-header-menu-open {
         padding: 12px 32px calc(12px + env(safe-area-inset-bottom));
         display: block;
         background: #fff;
-        border-top: 1px solid #f0f1f2;
+        border-top: 1px solid #e1e4e8;
         transform: translate3d(0, 0, 0);
         -webkit-transform: translate3d(0, 0, 0);
         backface-visibility: hidden;
