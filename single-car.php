@@ -314,12 +314,46 @@ get_header();
                 <?php if ($description) : ?>
                     <div class="autoagora-single-car__detail-section autoagora-single-car__overview-section">
                         <h2><?php esc_html_e('Overview', 'bricks-child'); ?></h2>
-                        <div id="single-car-overview-description" class="autoagora-single-car__description" data-single-car-description>
+                        <div id="single-car-overview-description" class="autoagora-single-car__description is-collapsible" data-single-car-description>
                             <?php echo wpautop(wp_kses_post($description)); ?>
                         </div>
-                        <button type="button" class="btn btn-primary autoagora-single-car__read-more" data-single-car-read-more hidden aria-expanded="false" aria-controls="single-car-overview-description">
+                        <button type="button" class="btn btn-primary autoagora-single-car__read-more" data-single-car-read-more aria-expanded="false" aria-controls="single-car-overview-description">
                             <?php esc_html_e('Read More', 'bricks-child'); ?>
                         </button>
+                        <noscript>
+                            <style>
+                                #single-car-overview-description { max-height: none; }
+                                #single-car-overview-description::after,
+                                .autoagora-single-car__read-more { display: none; }
+                            </style>
+                        </noscript>
+                        <script>
+                            (function () {
+                                if (!window.matchMedia('(min-width: 821px)').matches) {
+                                    return;
+                                }
+
+                                var description = document.getElementById('single-car-overview-description');
+                                var overview = description && description.closest('.autoagora-single-car__overview-section');
+                                var column = document.querySelector('.autoagora-single-car__spec-column');
+                                var button = overview && overview.querySelector('[data-single-car-read-more]');
+                                var heading = overview && overview.querySelector('h2');
+
+                                if (!description || !column || !button || !heading) {
+                                    return;
+                                }
+
+                                var headingStyle = window.getComputedStyle(heading);
+                                var buttonStyle = window.getComputedStyle(button);
+                                var chromeHeight = heading.getBoundingClientRect().height
+                                    + (parseFloat(headingStyle.marginBottom) || 0)
+                                    + button.getBoundingClientRect().height
+                                    + (parseFloat(buttonStyle.marginTop) || 0);
+                                var collapsedHeight = Math.max(160, column.getBoundingClientRect().height - chromeHeight);
+
+                                description.style.setProperty('--single-car-overview-collapsed-height', collapsedHeight + 'px');
+                            }());
+                        </script>
                     </div>
                 <?php endif; ?>
             </div>
