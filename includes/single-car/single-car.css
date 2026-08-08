@@ -12,8 +12,8 @@
     --single-car-font-meta: 14px;
     --single-car-font-body: 16px;
     --single-car-font-heading: 24px;
-    --single-car-font-title: clamp(24px, 2.1vw, 32px);
-    --single-car-font-price: clamp(32px, 3.1vw, 43px);
+    --single-car-font-title: clamp(20px, 1.8vw, 27px);
+    --single-car-font-price: clamp(27px, 2.65vw, 37px);
     --single-car-weight-regular: 400;
     --single-car-weight-medium: 500;
     --single-car-weight-strong: 600;
