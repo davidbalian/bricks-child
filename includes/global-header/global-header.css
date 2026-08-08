@@ -364,6 +364,12 @@ html.aag-site-header-menu-open {
         background: #fff;
     }
 
+    .aag-site-header__mobile .aag-site-header__logo {
+        width: 112.5px;
+        height: 23.4px;
+        flex-basis: 112.5px;
+    }
+
     .aag-site-header__mobile-shortcuts {
         margin-left: auto;
         display: flex;
@@ -454,8 +460,8 @@ html.aag-site-header-menu-open {
     }
 
     .aag-mobile-dock__item--primary svg {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         stroke: currentColor;
         stroke-width: 2.75;
     }
