@@ -69,8 +69,8 @@ function car_single_call_button_shortcode($atts) {
             text-decoration: none;
             color: #ffffff;
         ">
-            <?php if ($atts['icon_set'] === 'hugeicons' && function_exists('autoagora_single_car_hugeicon')) : ?>
-                <i class="car-call-button-icon" aria-hidden="true"><?php echo autoagora_single_car_hugeicon('call'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></i>
+            <?php if ($atts['icon_set'] === 'lucide' && function_exists('autoagora_single_car_lucide_icon')) : ?>
+                <i class="car-call-button-icon" aria-hidden="true"><?php echo autoagora_single_car_lucide_icon('phone'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></i>
             <?php else : ?>
                 <i class="fas fa-phone" style="color: #ffffff; font-size: 1rem;"></i>
             <?php endif; ?>
@@ -183,4 +183,3 @@ function car_call_button_enqueue_scripts() {
     }
 }
 add_action('wp_enqueue_scripts', 'car_call_button_enqueue_scripts');
-

@@ -54,8 +54,8 @@ function report_button_shortcode( $atts ) {
             <div class="report-modal-header">
                 <h3><?php esc_html_e('Report this listing', 'bricks-child'); ?></h3>
                 <button class="close-report-modal">
-                    <?php if ($atts['icon_set'] === 'hugeicons' && function_exists('autoagora_single_car_hugeicon')) : ?>
-                        <i class="report-btn-close-icon" aria-hidden="true"><?php echo autoagora_single_car_hugeicon('cancel'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></i>
+                    <?php if ($atts['icon_set'] === 'lucide' && function_exists('autoagora_single_car_lucide_icon')) : ?>
+                        <i class="report-btn-close-icon" aria-hidden="true"><?php echo autoagora_single_car_lucide_icon('x'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></i>
                     <?php else : ?>
                         <i class="fas fa-times"></i>
                     <?php endif; ?>
@@ -98,8 +98,8 @@ function report_button_shortcode( $atts ) {
 
     <!-- Report Button -->
     <button class="<?php echo esc_attr($button_class); ?>" data-car-id="<?php echo esc_attr($car_id); ?>" title="<?php esc_attr_e('Report this listing', 'bricks-child'); ?>">
-        <?php if ($atts['icon_set'] === 'hugeicons' && function_exists('autoagora_single_car_hugeicon')) : ?>
-            <i class="report-btn-icon" aria-hidden="true"><?php echo autoagora_single_car_hugeicon('flag'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></i>
+        <?php if ($atts['icon_set'] === 'lucide' && function_exists('autoagora_single_car_lucide_icon')) : ?>
+            <i class="report-btn-icon" aria-hidden="true"><?php echo autoagora_single_car_lucide_icon('flag'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></i>
         <?php else : ?>
             <i class="fas fa-flag"></i>
         <?php endif; ?>

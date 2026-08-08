@@ -33,8 +33,8 @@ function share_button_shortcode( $atts ) {
     ob_start();
     ?>
     <button class="<?php echo esc_attr($button_class); ?>" title="<?php esc_attr_e('Share this listing', 'bricks-child'); ?>">
-        <?php if ($atts['icon_set'] === 'hugeicons' && function_exists('autoagora_single_car_hugeicon')) : ?>
-            <i class="share-btn-icon" aria-hidden="true"><?php echo autoagora_single_car_hugeicon('share'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></i>
+        <?php if ($atts['icon_set'] === 'lucide' && function_exists('autoagora_single_car_lucide_icon')) : ?>
+            <i class="share-btn-icon" aria-hidden="true"><?php echo autoagora_single_car_lucide_icon('share-2'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></i>
         <?php else : ?>
             <i class="fas fa-share-alt"></i>
         <?php endif; ?>

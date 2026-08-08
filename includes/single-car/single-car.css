@@ -203,14 +203,14 @@ body.admin-bar .autoagora-single-car__gallery {
     line-height: var(--single-car-leading-ui);
 }
 
-.autoagora-single-car__hugeicon {
+.autoagora-single-car__lucide-icon {
     display: block;
     width: 1.15em;
     height: 1.15em;
     flex: 0 0 auto;
 }
 
-.autoagora-single-car__seller-name .autoagora-single-car__hugeicon {
+.autoagora-single-car__seller-name .autoagora-single-car__lucide-icon {
     margin-top: .2rem;
 }
 
@@ -243,7 +243,7 @@ body.admin-bar .autoagora-single-car__gallery {
     line-height: var(--single-car-leading-ui);
 }
 
-.autoagora-single-car__address .autoagora-single-car__hugeicon {
+.autoagora-single-car__address .autoagora-single-car__lucide-icon {
     margin-top: .18rem;
     color: var(--single-car-text-secondary);
 }
@@ -258,7 +258,7 @@ body.admin-bar .autoagora-single-car__gallery {
     line-height: var(--single-car-leading-ui);
 }
 
-.autoagora-single-car__contact-note .autoagora-single-car__hugeicon {
+.autoagora-single-car__contact-note .autoagora-single-car__lucide-icon {
     margin-top: .12rem;
 }
 
@@ -341,7 +341,7 @@ body.admin-bar .autoagora-single-car__gallery {
     cursor: pointer;
 }
 
-.autoagora-single-car__utility-actions .autoagora-single-car__hugeicon {
+.autoagora-single-car__utility-actions .autoagora-single-car__lucide-icon {
     width: 1.2rem;
     height: 1.2rem;
 }
@@ -560,7 +560,7 @@ body.admin-bar .autoagora-single-car__gallery {
     text-decoration: none;
 }
 
-.autoagora-single-car__spec-link-arrow .autoagora-single-car__hugeicon {
+.autoagora-single-car__spec-link-arrow .autoagora-single-car__lucide-icon {
     width: 1.15rem;
     height: 1.15rem;
 }
@@ -665,7 +665,7 @@ body.admin-bar .autoagora-single-car__gallery {
     flex: 0 0 auto;
 }
 
-.autoagora-single-car__read-more-icon .autoagora-single-car__hugeicon {
+.autoagora-single-car__read-more-icon .autoagora-single-car__lucide-icon {
     width: 1.15rem;
     height: 1.15rem;
 }

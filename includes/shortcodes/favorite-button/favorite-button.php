@@ -54,8 +54,8 @@ function favorite_button_shortcode( $atts ) {
     ob_start();
     ?>
     <button class="<?php echo esc_attr($button_class); ?>" data-car-id="<?php echo esc_attr($car_id); ?>" title="<?php echo esc_attr($is_favorite ? __('Remove from favorites', 'bricks-child') : __('Add to favorites', 'bricks-child')); ?>">
-        <?php if ($atts['icon_set'] === 'hugeicons' && function_exists('autoagora_single_car_hugeicon')) : ?>
-            <i class="favorite-btn-icon <?php echo esc_attr($heart_class); ?>" aria-hidden="true"><?php echo autoagora_single_car_hugeicon('favourite'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></i>
+        <?php if ($atts['icon_set'] === 'lucide' && function_exists('autoagora_single_car_lucide_icon')) : ?>
+            <i class="favorite-btn-icon <?php echo esc_attr($heart_class); ?>" aria-hidden="true"><?php echo autoagora_single_car_lucide_icon('heart'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></i>
         <?php else : ?>
             <i class="<?php echo esc_attr($heart_class); ?>"></i>
         <?php endif; ?>
