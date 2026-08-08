@@ -423,8 +423,14 @@ get_header();
             </section>
         <?php endif; ?>
 
-        <?php if (($city && $city_url) || $has_map) : ?>
-            <section class="autoagora-single-car__card autoagora-single-car__location-card">
+        <?php
+        $has_location_card = ($city && $city_url) || $has_map;
+        $has_pills_card = $extras || $vehicle_history;
+        ?>
+        <?php if ($has_location_card || $has_pills_card) : ?>
+            <div class="autoagora-single-car__supporting-grid<?php echo ($has_location_card && $has_pills_card) ? '' : ' autoagora-single-car__supporting-grid--single'; ?>">
+            <?php if ($has_location_card) : ?>
+                <section class="autoagora-single-car__card autoagora-single-car__location-card">
                 <h2><?php esc_html_e('Location', 'bricks-child'); ?></h2>
                 <?php if ($city && $city_url) : ?>
                     <div class="autoagora-single-car__browse-links">
@@ -440,11 +446,11 @@ get_header();
                         aria-label="<?php esc_attr_e('Car location map', 'bricks-child'); ?>"
                     ></div>
                 <?php endif; ?>
-            </section>
-        <?php endif; ?>
+                </section>
+            <?php endif; ?>
 
-        <?php if ($extras || $vehicle_history) : ?>
-            <section class="autoagora-single-car__card autoagora-single-car__pills-card">
+            <?php if ($has_pills_card) : ?>
+                <section class="autoagora-single-car__card autoagora-single-car__pills-card">
                 <?php if ($extras) : ?>
                     <div class="autoagora-single-car__detail-section">
                         <h2><?php esc_html_e('Extras', 'bricks-child'); ?></h2>
@@ -463,7 +469,9 @@ get_header();
                         </ul>
                     </div>
                 <?php endif; ?>
-            </section>
+                </section>
+            <?php endif; ?>
+            </div>
         <?php endif; ?>
     </div>
 
