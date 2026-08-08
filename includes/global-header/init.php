@@ -244,7 +244,7 @@ function autoagora_render_code_header() {
 					<?php autoagora_code_header_render_menu( 'aag-site-header__menu' ); ?>
 				</nav>
 				<div class="aag-site-header__desktop-account">
-					<?php autoagora_code_header_render_language_switcher(); ?>
+					<?php // autoagora_code_header_render_language_switcher(); // Temporarily disabled until translations are complete. ?>
 					<?php if ( is_user_logged_in() ) : ?>
 						<details class="aag-site-header__details">
 							<summary>
@@ -286,7 +286,7 @@ function autoagora_render_code_header() {
 				<nav aria-label="<?php esc_attr_e( 'Mobile navigation', 'bricks-child' ); ?>">
 					<?php autoagora_code_header_render_menu( 'aag-site-header__drawer-menu' ); ?>
 				</nav>
-				<?php autoagora_code_header_render_language_switcher( 'aag-site-header__language-switcher--drawer' ); ?>
+				<?php // autoagora_code_header_render_language_switcher( 'aag-site-header__language-switcher--drawer' ); // Temporarily disabled until translations are complete. ?>
 			</div>
 		</div>
 	</header>
