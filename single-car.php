@@ -271,74 +271,48 @@ get_header();
             </aside>
         </section>
 
-        <section class="autoagora-single-car__card autoagora-single-car__specification-card" aria-label="<?php esc_attr_e('Car specifications', 'bricks-child'); ?>">
-            <div class="autoagora-single-car__spec-tables">
-                <?php if ($performance_specs) : ?>
-                    <div class="autoagora-single-car__spec-section">
-                        <h2><?php esc_html_e('Engine & Performance', 'bricks-child'); ?></h2>
-                        <div class="autoagora-single-car__table-wrap">
-                            <table class="autoagora-single-car__spec-table">
-                                <tbody>
-                                    <?php foreach ($performance_specs as $spec) : ?>
-                                        <tr>
-                                            <th scope="row"><?php echo esc_html($spec['label']); ?></th>
-                                            <td><?php echo esc_html($spec['value']); ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+        <section class="autoagora-single-car__card autoagora-single-car__specification-card">
+            <div class="autoagora-single-car__spec-tables<?php echo $description ? '' : ' autoagora-single-car__spec-tables--single'; ?>">
+                <div class="autoagora-single-car__spec-column">
+                    <?php if ($performance_specs) : ?>
+                        <div class="autoagora-single-car__spec-section">
+                            <h2><?php esc_html_e('Engine & Performance', 'bricks-child'); ?></h2>
+                            <div class="autoagora-single-car__table-wrap">
+                                <table class="autoagora-single-car__spec-table">
+                                    <tbody>
+                                        <?php foreach ($performance_specs as $spec) : ?>
+                                            <tr>
+                                                <th scope="row"><?php echo esc_html($spec['label']); ?></th>
+                                                <td><?php echo esc_html($spec['value']); ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
-                <?php endif; ?>
-
-                <?php if ($design_specs) : ?>
-                    <div class="autoagora-single-car__spec-section">
-                        <h2><?php esc_html_e('Body & Design', 'bricks-child'); ?></h2>
-                        <div class="autoagora-single-car__table-wrap">
-                            <table class="autoagora-single-car__spec-table">
-                                <tbody>
-                                    <?php foreach ($design_specs as $spec) : ?>
-                                        <tr>
-                                            <th scope="row"><?php echo esc_html($spec['label']); ?></th>
-                                            <td><?php echo esc_html($spec['value']); ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                <?php endif; ?>
-            </div>
-
-            <?php if (($terms['model'] instanceof WP_Term) || ($city && $city_url) || $has_map) : ?>
-                <hr>
-                <div class="autoagora-single-car__browse-links">
-                    <?php if ($terms['model'] instanceof WP_Term) : ?>
-                        <?php $model_url = get_term_link($terms['model']); ?>
-                        <?php if (!is_wp_error($model_url)) : ?>
-                            <a href="<?php echo esc_url($model_url); ?>"><?php echo esc_html(sprintf(__('View all %s cars', 'bricks-child'), $terms['model']->name)); ?></a>
-                        <?php endif; ?>
                     <?php endif; ?>
-                    <?php if ($city && $city_url) : ?>
-                        <span><?php echo esc_html(sprintf(__('This car is in %s.', 'bricks-child'), $city_display)); ?></span>
-                        <a href="<?php echo esc_url($city_url); ?>"><?php echo esc_html(sprintf(__('View all cars in %s', 'bricks-child'), $city_display)); ?></a>
+
+                    <?php if ($design_specs) : ?>
+                        <div class="autoagora-single-car__spec-section">
+                            <h2><?php esc_html_e('Body & Design', 'bricks-child'); ?></h2>
+                            <div class="autoagora-single-car__table-wrap">
+                                <table class="autoagora-single-car__spec-table">
+                                    <tbody>
+                                        <?php foreach ($design_specs as $spec) : ?>
+                                            <tr>
+                                                <th scope="row"><?php echo esc_html($spec['label']); ?></th>
+                                                <td><?php echo esc_html($spec['value']); ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     <?php endif; ?>
                 </div>
-                <?php if ($has_map) : ?>
-                    <div
-                        id="autoagora-single-car-map"
-                        class="autoagora-single-car__map"
-                        role="region"
-                        aria-label="<?php esc_attr_e('Car location map', 'bricks-child'); ?>"
-                    ></div>
-                <?php endif; ?>
-            <?php endif; ?>
-        </section>
 
-        <?php if ($description || $has_background || $extras || $vehicle_history) : ?>
-            <section class="autoagora-single-car__card autoagora-single-car__details-card">
                 <?php if ($description) : ?>
-                    <div class="autoagora-single-car__detail-section">
+                    <div class="autoagora-single-car__detail-section autoagora-single-car__overview-section">
                         <h2><?php esc_html_e('Overview', 'bricks-child'); ?></h2>
                         <div id="single-car-overview-description" class="autoagora-single-car__description" data-single-car-description>
                             <?php echo wpautop(wp_kses_post($description)); ?>
@@ -348,28 +322,60 @@ get_header();
                         </button>
                     </div>
                 <?php endif; ?>
+            </div>
 
-                <?php if ($has_background) : ?>
+            <?php if ($terms['model'] instanceof WP_Term) : ?>
+                <?php $model_url = get_term_link($terms['model']); ?>
+                <?php if (!is_wp_error($model_url)) : ?>
                     <hr>
-                    <div class="autoagora-single-car__detail-section">
-                        <h2><?php esc_html_e('Registration & Background Info', 'bricks-child'); ?></h2>
-                        <div class="autoagora-single-car__table-wrap">
-                            <table class="autoagora-single-car__spec-table">
-                                <tbody>
-                                    <?php foreach ($background_specs as $spec) : ?>
-                                        <tr>
-                                            <th scope="row"><?php echo esc_html($spec['label']); ?></th>
-                                            <td><?php echo esc_html($spec['value']); ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="autoagora-single-car__browse-links">
+                        <a href="<?php echo esc_url($model_url); ?>"><?php echo esc_html(sprintf(__('View all %s cars', 'bricks-child'), $terms['model']->name)); ?></a>
                     </div>
                 <?php endif; ?>
+            <?php endif; ?>
+        </section>
 
+        <?php if ($has_background) : ?>
+            <section class="autoagora-single-car__card autoagora-single-car__details-card">
+                <h2><?php esc_html_e('Registration & Background Info', 'bricks-child'); ?></h2>
+                <div class="autoagora-single-car__table-wrap">
+                    <table class="autoagora-single-car__spec-table">
+                        <tbody>
+                            <?php foreach ($background_specs as $spec) : ?>
+                                <tr>
+                                    <th scope="row"><?php echo esc_html($spec['label']); ?></th>
+                                    <td><?php echo esc_html($spec['value']); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <?php if (($city && $city_url) || $has_map) : ?>
+            <section class="autoagora-single-car__card autoagora-single-car__location-card">
+                <h2><?php esc_html_e('Location', 'bricks-child'); ?></h2>
+                <?php if ($city && $city_url) : ?>
+                    <div class="autoagora-single-car__browse-links">
+                        <span><?php echo esc_html(sprintf(__('This car is in %s.', 'bricks-child'), $city_display)); ?></span>
+                        <a href="<?php echo esc_url($city_url); ?>"><?php echo esc_html(sprintf(__('View all cars in %s', 'bricks-child'), $city_display)); ?></a>
+                    </div>
+                <?php endif; ?>
+                <?php if ($has_map) : ?>
+                    <div
+                        id="autoagora-single-car-map"
+                        class="autoagora-single-car__map"
+                        role="region"
+                        aria-label="<?php esc_attr_e('Car location map', 'bricks-child'); ?>"
+                    ></div>
+                <?php endif; ?>
+            </section>
+        <?php endif; ?>
+
+        <?php if ($extras || $vehicle_history) : ?>
+            <section class="autoagora-single-car__card autoagora-single-car__pills-card">
                 <?php if ($extras) : ?>
-                    <hr>
                     <div class="autoagora-single-car__detail-section">
                         <h2><?php esc_html_e('Extras', 'bricks-child'); ?></h2>
                         <ul class="autoagora-single-car__tag-list">
@@ -379,7 +385,7 @@ get_header();
                 <?php endif; ?>
 
                 <?php if ($vehicle_history) : ?>
-                    <hr>
+                    <?php if ($extras) : ?><hr><?php endif; ?>
                     <div class="autoagora-single-car__detail-section">
                         <h2><?php esc_html_e('Vehicle History', 'bricks-child'); ?></h2>
                         <ul class="autoagora-single-car__tag-list">

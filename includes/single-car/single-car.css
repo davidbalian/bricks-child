@@ -351,7 +351,9 @@ body.admin-bar .autoagora-single-car__gallery {
 }
 
 .autoagora-single-car__specification-card,
-.autoagora-single-car__details-card {
+.autoagora-single-car__details-card,
+.autoagora-single-car__location-card,
+.autoagora-single-car__pills-card {
     margin-top: 1.5rem;
 }
 
@@ -371,6 +373,22 @@ body.admin-bar .autoagora-single-car__gallery {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 2rem;
+    align-items: start;
+}
+
+.autoagora-single-car__spec-tables--single {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.autoagora-single-car__spec-column {
+    display: grid;
+    gap: 2rem;
+    align-content: start;
+    min-width: 0;
+}
+
+.autoagora-single-car__overview-section {
+    min-width: 0;
 }
 
 .autoagora-single-car__table-wrap {
