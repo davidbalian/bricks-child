@@ -663,9 +663,11 @@ body.admin-bar .autoagora-single-car__gallery {
 }
 
 .autoagora-single-car .car-whatsapp-button,
+.autoagora-single-car .car-whatsapp-button:hover,
+.autoagora-single-car .car-whatsapp-button:focus-visible,
 .autoagora-single-car .car-whatsapp-button span,
 .autoagora-single-car .car-whatsapp-button i {
-    color: var(--single-car-text) !important;
+    color: #fff !important;
 }
 
 .autoagora-single-car .car-card,
