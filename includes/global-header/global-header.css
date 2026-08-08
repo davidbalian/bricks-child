@@ -402,11 +402,28 @@ html.aag-site-header-menu-open {
     }
 
     .aag-mobile-dock__item--primary {
-        color: var(--aag-header-text);
+        width: 40px;
+        height: 40px;
+        margin: -6px;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        background: #0d86e3;
+        border-radius: 999px;
+        box-shadow: 0 3px 8px rgba(13, 134, 227, 0.25);
+        transition: background-color 0.1s ease;
+    }
+
+    .aag-mobile-dock__item--primary:hover,
+    .aag-mobile-dock__item--primary:focus-visible {
+        background: color-mix(in srgb, #0d86e3 90%, #000);
     }
 
     .aag-mobile-dock__item--primary svg {
-        stroke: none;
+        width: 22px;
+        height: 22px;
+        stroke: currentColor;
+        stroke-width: 2.75;
     }
 
     .aag-mobile-dock__item[aria-current="page"]:not(.aag-mobile-dock__item--primary) {
