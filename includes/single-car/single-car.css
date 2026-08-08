@@ -225,10 +225,6 @@ body.admin-bar .autoagora-single-car__gallery {
     height: 1.15rem;
 }
 
-.autoagora-single-car__contact-actions .lucide-phone {
-    transform: scaleX(-1);
-}
-
 .autoagora-single-car__seller .seller-verification-badge {
     align-self: flex-start;
     width: fit-content;
@@ -296,6 +292,7 @@ body.admin-bar .autoagora-single-car__gallery {
     border-radius: var(--single-car-radius-pill) !important;
     font-size: var(--single-car-font-meta);
     font-weight: var(--single-car-weight-strong);
+    line-height: 1;
     white-space: nowrap;
     transition: background-color .1s ease;
 }
