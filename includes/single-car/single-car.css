@@ -116,7 +116,7 @@ body.admin-bar .autoagora-single-car__gallery {
     align-items: center;
     min-height: 2.25rem;
     padding: .45rem .85rem;
-    background: #fafafa;
+    background: #f1f4f7;
     border-radius: var(--single-car-radius-pill);
     color: var(--single-car-text-strong);
     font-size: var(--single-car-font-meta);
@@ -656,6 +656,7 @@ body.admin-bar .autoagora-single-car__gallery {
     background: #f1f4f7;
     color: var(--single-car-text-strong);
     font-size: var(--single-car-font-meta);
+    font-weight: var(--single-car-weight-medium);
     line-height: var(--single-car-leading-ui);
 }
 
