@@ -121,6 +121,12 @@ body.admin-bar .autoagora-single-car__gallery {
     background: #5ed275;
 }
 
+.autoagora-single-car__seller {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
 .autoagora-single-car__seller-profile {
     display: flex;
     align-items: center;
@@ -209,6 +215,7 @@ body.admin-bar .autoagora-single-car__gallery {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: .75rem;
+    margin-top: auto;
 }
 
 .autoagora-single-car__contact-actions .car-call-button,
@@ -236,7 +243,7 @@ body.admin-bar .autoagora-single-car__gallery {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    margin-top: auto;
+    margin-top: 1.5rem;
     padding-top: 1.1rem;
     border-top: 1px solid var(--single-car-border);
 }
