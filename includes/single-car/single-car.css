@@ -210,6 +210,12 @@ body.admin-bar .autoagora-single-car__gallery {
     min-height: 3.1rem;
 }
 
+.autoagora-single-car__contact-actions .car-whatsapp-button,
+.autoagora-single-car__contact-actions .car-whatsapp-button:hover,
+.autoagora-single-car__contact-actions .car-whatsapp-button:focus-visible {
+    background-color: rgb(103, 172, 93) !important;
+}
+
 .autoagora-single-car__utility-row {
     display: flex;
     align-items: center;
