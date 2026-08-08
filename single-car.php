@@ -258,6 +258,10 @@ get_header();
                     <p class="autoagora-single-car__posted"><?php if ($is_posted_today) : ?><span aria-hidden="true"></span><?php endif; ?><?php echo esc_html($posted_label); ?></p>
                 <?php endif; ?>
 
+                <?php if ($address) : ?>
+                    <p class="autoagora-single-car__address"><?php echo autoagora_single_car_lucide_icon('map-pin'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?><?php echo esc_html($address); ?></p>
+                <?php endif; ?>
+
                 <div class="autoagora-single-car__seller">
                     <?php if ($author_id) : ?>
                         <?php $logo = do_shortcode('[dealership_logo user_id="' . $author_id . '" size="medium" class="autoagora-single-car__seller-logo-image"]'); ?>
@@ -273,10 +277,6 @@ get_header();
                             </span>
                         </a>
                         <?php echo $seller_reviews_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Shortcode output. ?>
-                    <?php endif; ?>
-
-                    <?php if ($address) : ?>
-                        <p class="autoagora-single-car__address"><?php echo autoagora_single_car_lucide_icon('map-pin'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?><?php echo esc_html($address); ?></p>
                     <?php endif; ?>
 
                     <div class="autoagora-single-car__contact-actions">
