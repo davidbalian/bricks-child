@@ -16,9 +16,15 @@
     --aag-mobile-admin-bar-offset: 0px;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 782px) {
     .autoagora-code-header-active.admin-bar .aag-site-header {
         --aag-mobile-admin-bar-offset: 46px;
+    }
+}
+
+@media (min-width: 783px) and (max-width: 840px) {
+    .autoagora-code-header-active.admin-bar .aag-site-header {
+        --aag-mobile-admin-bar-offset: 32px;
     }
 }
 
@@ -309,7 +315,7 @@ html.aag-site-header-menu-open {
     }
 }
 
-@media (min-width: 768px) and (max-width: 1200px) {
+@media (min-width: 841px) and (max-width: 1200px) {
     .aag-site-header__desktop-inner {
         min-height: 104px;
         padding-top: 14px;
@@ -334,13 +340,13 @@ html.aag-site-header-menu-open {
     }
 
     .aag-site-header__menu {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         justify-content: flex-start;
         gap: 1.5rem;
     }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 840px) {
     .autoagora-code-header-active {
         padding-bottom: calc(56px + env(safe-area-inset-bottom));
     }

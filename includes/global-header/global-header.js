@@ -9,6 +9,7 @@
     var dockViewportBaseline = window.visualViewport ? Math.max(window.innerHeight, window.visualViewport.height) : window.innerHeight;
     var dockViewportWidth = window.innerWidth;
     var drawerCloseTimer;
+    var mobileHeaderBreakpoint = 840;
     var detailsElements = Array.prototype.slice.call(document.querySelectorAll('.aag-site-header__details'));
 
     function closeDetails(except) {
@@ -106,7 +107,7 @@
     });
 
     window.addEventListener('resize', function () {
-        if (window.innerWidth > 767 && drawer && !drawer.hidden) {
+        if (window.innerWidth > mobileHeaderBreakpoint && drawer && !drawer.hidden) {
             setDrawerOpen(false);
         }
     });
@@ -117,7 +118,7 @@
      * Safari/Chrome toolbar animations are much smaller and remain unaffected.
      */
     function syncDockWithVisualViewport() {
-        if (!mobileDock || !window.visualViewport || window.innerWidth > 767) {
+        if (!mobileDock || !window.visualViewport || window.innerWidth > mobileHeaderBreakpoint) {
             return;
         }
 
