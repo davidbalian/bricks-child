@@ -31,7 +31,7 @@
     display: grid;
     grid-template-columns: 125px minmax(0, 1fr) auto;
     align-items: center;
-    gap: clamp(20px, 4.4vw, 64px);
+    gap: clamp(24px, 2vw, 32px);
 }
 
 .aag-site-header__logo {
@@ -59,7 +59,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(12px, 1.7vw, 24px);
+    gap: clamp(1.5rem, 2vw, 2rem);
 }
 
 .aag-site-header__menu a,
@@ -103,6 +103,7 @@
     gap: 8px;
     color: var(--aag-header-text);
     font-size: 14px;
+    font-weight: 500;
     line-height: 1;
 }
 
@@ -113,6 +114,7 @@
 }
 
 .aag-site-header__account-icon svg,
+.aag-site-header__chevron svg,
 .aag-site-header__saved-icon svg,
 .aag-mobile-dock svg,
 .aag-site-header__menu-toggle svg,
@@ -131,6 +133,10 @@
     width: 14px;
     height: 14px;
     transition: transform 0.15s ease;
+}
+
+.aag-site-header__chevron svg {
+    stroke-width: 2;
 }
 
 .aag-site-header__details[open] .aag-site-header__chevron {
@@ -269,21 +275,7 @@ html.aag-site-header-menu-open {
     overflow: hidden;
 }
 
-@media (min-width: 901px) and (max-width: 1100px) {
-    .aag-site-header__desktop-inner {
-        gap: 20px;
-    }
-
-    .aag-site-header__menu {
-        gap: 10px;
-    }
-
-    .aag-site-header__menu a {
-        font-size: 12px;
-    }
-}
-
-@media (min-width: 768px) and (max-width: 900px) {
+@media (min-width: 768px) and (max-width: 1200px) {
     .aag-site-header__desktop-inner {
         min-height: 104px;
         padding-top: 14px;
@@ -308,12 +300,9 @@ html.aag-site-header-menu-open {
     }
 
     .aag-site-header__menu {
-        justify-content: space-between;
-        gap: 12px;
-    }
-
-    .aag-site-header__menu a {
-        font-size: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.5rem;
     }
 }
 
