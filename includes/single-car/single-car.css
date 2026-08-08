@@ -93,7 +93,7 @@ body.admin-bar .autoagora-single-car__gallery {
     background: var(--single-car-surface);
     border: 1px solid var(--single-car-border);
     border-radius: var(--single-car-radius-card);
-    padding: 2.5rem;
+    padding: 2rem;
 }
 
 .autoagora-single-car__summary h1 {
