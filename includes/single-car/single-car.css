@@ -359,7 +359,8 @@ body.admin-bar .autoagora-single-car__gallery {
 
 .autoagora-single-car__card h2 {
     margin: 0 0 1.25rem;
-    font-size: 1.13rem;
+    font-size: clamp(1.3rem, 1.6vw, 1.5rem);
+    font-weight: 650;
     line-height: 1.3;
 }
 
@@ -444,6 +445,13 @@ body.admin-bar .autoagora-single-car__gallery {
 .autoagora-single-car__browse-links a {
     color: #397db9;
     text-decoration: none;
+    text-underline-offset: .18em;
+    transition: color .18s ease;
+}
+
+.autoagora-single-car__browse-links a:hover,
+.autoagora-single-car__browse-links a:focus-visible {
+    text-decoration: underline;
 }
 
 .autoagora-single-car__map {
@@ -469,7 +477,7 @@ body.admin-bar .autoagora-single-car__gallery {
 }
 
 .autoagora-single-car__description.is-collapsible:not(.is-expanded) {
-    max-height: 21rem;
+    max-height: var(--single-car-overview-collapsed-height, 21rem);
 }
 
 .autoagora-single-car__description.is-collapsible::after {
