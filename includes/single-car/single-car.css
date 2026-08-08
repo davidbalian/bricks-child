@@ -665,6 +665,10 @@ body.admin-bar .autoagora-single-car__gallery {
     cursor: pointer;
 }
 
+.autoagora-single-car__read-more[hidden] {
+    display: none;
+}
+
 .autoagora-single-car__read-more:hover > span:first-child,
 .autoagora-single-car__read-more:focus-visible > span:first-child {
     text-decoration: underline;

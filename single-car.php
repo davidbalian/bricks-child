@@ -354,7 +354,7 @@ get_header();
                         <div id="single-car-overview-description" class="autoagora-single-car__description is-collapsible" data-single-car-description>
                             <?php echo wpautop(wp_kses_post($description)); ?>
                         </div>
-                        <button type="button" class="autoagora-single-car__read-more" data-single-car-read-more aria-expanded="false" aria-controls="single-car-overview-description">
+                        <button type="button" class="autoagora-single-car__read-more" data-single-car-read-more aria-expanded="false" aria-controls="single-car-overview-description" hidden>
                             <span data-single-car-read-more-label><?php esc_html_e('Read More', 'bricks-child'); ?></span>
                             <span class="autoagora-single-car__read-more-icon autoagora-single-car__read-more-icon--down"><?php echo autoagora_single_car_lucide_icon('chevron-down'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></span>
                             <span class="autoagora-single-car__read-more-icon autoagora-single-car__read-more-icon--up"><?php echo autoagora_single_car_lucide_icon('chevron-up'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></span>
@@ -382,6 +382,7 @@ get_header();
                                     return;
                                 }
 
+                                button.hidden = false;
                                 var headingStyle = window.getComputedStyle(heading);
                                 var buttonStyle = window.getComputedStyle(button);
                                 var chromeHeight = heading.getBoundingClientRect().height
@@ -391,6 +392,11 @@ get_header();
                                 var collapsedHeight = Math.max(160, column.getBoundingClientRect().height - chromeHeight);
 
                                 description.style.setProperty('--single-car-overview-collapsed-height', collapsedHeight + 'px');
+
+                                if (description.scrollHeight <= collapsedHeight + 8) {
+                                    description.classList.remove('is-collapsible');
+                                    button.hidden = true;
+                                }
                             }());
                         </script>
                     </div>
