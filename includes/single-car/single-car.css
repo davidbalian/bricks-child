@@ -534,7 +534,6 @@ body.admin-bar .autoagora-single-car__gallery {
     border: 1px solid var(--single-car-border);
     border-radius: var(--single-car-radius-card);
     background: #edf1f4;
-    box-shadow: 0 .45rem 1.35rem rgba(35, 53, 72, .08);
     isolation: isolate;
 }
 
