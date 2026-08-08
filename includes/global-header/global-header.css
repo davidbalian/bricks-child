@@ -78,6 +78,14 @@
     gap: clamp(1.5rem, 2vw, 2rem);
 }
 
+html[lang^="el"] .aag-site-header__menu {
+    gap: clamp(10px, 1vw, 16px);
+}
+
+html[lang^="el"] .aag-site-header__menu a {
+    font-size: 12px;
+}
+
 .aag-site-header__menu a,
 .aag-site-header__auth-links a {
     color: var(--aag-header-text);

@@ -4,6 +4,29 @@
  */
 
 return array(
+	// Global header, account navigation, and mobile navigation.
+	'Used Cars' => 'Μεταχειρισμένα',
+	'Sell my Car' => 'Πώληση Αυτοκινήτου',
+	'Sell My Car' => 'Πώληση Αυτοκινήτου',
+	'Blog' => 'Blog',
+	'Buyer Requests' => 'Αιτήματα Αγοραστών',
+	'Dealerships' => 'Έμποροι',
+	'Autoportal Blog' => 'Autoportal Blog',
+	'Contact' => 'Επικοινωνία',
+	'Become a Dealer' => 'Γίνετε Έμπορος',
+	'My account' => 'Ο λογαριασμός μου',
+	'My Account' => 'Ο λογαριασμός μου',
+	'Log out' => 'Αποσύνδεση',
+	'Login' => 'Σύνδεση',
+	'Autoagora home' => 'Αρχική σελίδα AutoAgora',
+	'Primary navigation' => 'Κύρια πλοήγηση',
+	'Language selector' => 'Επιλογή γλώσσας',
+	'Switch to %s' => 'Αλλαγή γλώσσας σε %s',
+	'Open menu' => 'Άνοιγμα μενού',
+	'Close menu' => 'Κλείσιμο μενού',
+	'Mobile navigation' => 'Πλοήγηση για κινητά',
+	'Mobile shortcuts' => 'Συντομεύσεις για κινητά',
+
 	'Your listing has been submitted successfully!' => 'Η αγγελία σας υποβλήθηκε με επιτυχία!',
 	'Thank you for submitting your car listing. It will be reviewed by our team and published soon.' => 'Ευχαριστούμε για την υποβολή της αγγελίας σας. Η ομάδα μας θα την ελέγξει και θα τη δημοσιεύσει σύντομα.',
 	'Give your listing a stronger start' => 'Δώστε στην αγγελία σας ένα πιο δυνατό ξεκίνημα',
