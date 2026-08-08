@@ -288,6 +288,10 @@ body.admin-bar .autoagora-single-car__gallery {
     gap: 1rem;
 }
 
+.autoagora-single-car__utility-row > .autoagora-single-car__contact-note {
+    margin: 1.25rem 0 0;
+}
+
 .autoagora-single-car__views,
 .autoagora-single-car__utility-actions {
     display: flex;

@@ -259,7 +259,6 @@ get_header();
                 </div>
 
                 <div class="autoagora-single-car__utility-row">
-                    <p class="autoagora-single-car__contact-note">ⓘ <?php esc_html_e('Help the seller by mentioning you found this on Autoagora', 'bricks-child'); ?></p>
                     <div class="autoagora-single-car__utility-row-main">
                         <div class="autoagora-single-car__views"><i class="fa-regular fa-eye" aria-hidden="true"></i><?php echo do_shortcode('[car_views_counter_single car_id="' . (int) $post_id . '"]'); ?></div>
                         <div class="autoagora-single-car__utility-actions">
@@ -268,6 +267,7 @@ get_header();
                             <?php echo do_shortcode('[report_button car_id="' . (int) $post_id . '" design="single" size="normal"]'); ?>
                         </div>
                     </div>
+                    <p class="autoagora-single-car__contact-note">ⓘ <?php esc_html_e('Help the seller by mentioning you found this on Autoagora', 'bricks-child'); ?></p>
                 </div>
             </aside>
         </section>
