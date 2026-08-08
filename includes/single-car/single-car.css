@@ -259,6 +259,7 @@ body.admin-bar .autoagora-single-car__gallery {
     min-height: 3.1rem;
     border-radius: var(--single-car-radius-pill) !important;
     font-size: var(--single-car-font-body);
+    font-weight: var(--single-car-weight-strong);
     white-space: nowrap;
 }
 
