@@ -234,6 +234,7 @@ body.admin-bar .autoagora-single-car__gallery {
 
 .autoagora-single-car .favorite-btn .autoagora-single-car__lucide-icon.lucide-heart {
     fill: none;
+    color: #e44c5e;
 }
 
 .autoagora-single-car .favorite-btn.active .autoagora-single-car__lucide-icon.lucide-heart {
@@ -241,6 +242,8 @@ body.admin-bar .autoagora-single-car__gallery {
 }
 
 .autoagora-single-car__seller-name .autoagora-single-car__lucide-icon {
+    width: 1.15rem;
+    height: 1.15rem;
     margin-top: .2rem;
 }
 
