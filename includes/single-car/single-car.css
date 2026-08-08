@@ -897,7 +897,7 @@ body.admin-bar .autoagora-single-car__gallery {
 
     .autoagora-single-car__spec-tables {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: 3rem;
     }
 
     .autoagora-single-car__related-grid {
