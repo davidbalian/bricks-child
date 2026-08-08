@@ -5,6 +5,7 @@
         var strings = window.autoagoraSingleCar || {};
         var description = document.querySelector('[data-single-car-description]');
         var button = document.querySelector('[data-single-car-read-more]');
+        var buttonLabel = button && button.querySelector('[data-single-car-read-more-label]');
         var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         var desktopColumns = window.matchMedia('(min-width: 821px)');
         var overviewSection = description && description.closest('.autoagora-single-car__overview-section');
@@ -12,7 +13,7 @@
         var collapsedHeight = 0;
         var resizeFrame = null;
 
-        if (!description || !button) {
+        if (!description || !button || !buttonLabel) {
             return;
         }
 
@@ -68,7 +69,7 @@
 
             description.classList.toggle('is-expanded', expanded);
             button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-            button.textContent = expanded ? (strings.readLess || 'Read Less') : (strings.readMore || 'Read More');
+            buttonLabel.textContent = expanded ? (strings.readLess || 'Read Less') : (strings.readMore || 'Read More');
 
             if (prefersReducedMotion || typeof description.animate !== 'function') {
                 return;

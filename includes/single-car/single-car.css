@@ -636,9 +636,47 @@ body.admin-bar .autoagora-single-car__gallery {
 .autoagora-single-car__read-more {
     position: relative;
     z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: .4rem;
     margin-top: 1rem;
-    border-radius: var(--single-car-radius-pill);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--single-car-link);
     font-size: var(--single-car-font-body);
+    font-weight: var(--single-car-weight-medium);
+    line-height: var(--single-car-leading-ui);
+    text-decoration: none;
+    text-underline-offset: .18em;
+    cursor: pointer;
+}
+
+.autoagora-single-car__read-more:hover > span:first-child,
+.autoagora-single-car__read-more:focus-visible > span:first-child {
+    text-decoration: underline;
+}
+
+.autoagora-single-car__read-more-icon {
+    display: block;
+    flex: 0 0 auto;
+}
+
+.autoagora-single-car__read-more-icon .autoagora-single-car__hugeicon {
+    width: 1.15rem;
+    height: 1.15rem;
+}
+
+.autoagora-single-car__read-more-icon--up,
+.autoagora-single-car__read-more[aria-expanded="true"] .autoagora-single-car__read-more-icon--down {
+    display: none;
+}
+
+.autoagora-single-car__read-more[aria-expanded="true"] .autoagora-single-car__read-more-icon--up {
+    display: block;
 }
 
 .autoagora-single-car__tag-list {

@@ -354,8 +354,10 @@ get_header();
                         <div id="single-car-overview-description" class="autoagora-single-car__description is-collapsible" data-single-car-description>
                             <?php echo wpautop(wp_kses_post($description)); ?>
                         </div>
-                        <button type="button" class="btn btn-primary autoagora-single-car__read-more" data-single-car-read-more aria-expanded="false" aria-controls="single-car-overview-description">
-                            <?php esc_html_e('Read More', 'bricks-child'); ?>
+                        <button type="button" class="autoagora-single-car__read-more" data-single-car-read-more aria-expanded="false" aria-controls="single-car-overview-description">
+                            <span data-single-car-read-more-label><?php esc_html_e('Read More', 'bricks-child'); ?></span>
+                            <span class="autoagora-single-car__read-more-icon autoagora-single-car__read-more-icon--down"><?php echo autoagora_single_car_hugeicon('chevron-down'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></span>
+                            <span class="autoagora-single-car__read-more-icon autoagora-single-car__read-more-icon--up"><?php echo autoagora_single_car_hugeicon('chevron-up'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG. ?></span>
                         </button>
                         <noscript>
                             <style>
