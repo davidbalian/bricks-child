@@ -8,6 +8,7 @@
     var mobileDock = document.querySelector('.aag-mobile-dock');
     var dockViewportBaseline = window.visualViewport ? Math.max(window.innerHeight, window.visualViewport.height) : window.innerHeight;
     var dockViewportWidth = window.innerWidth;
+    var drawerCloseTimer;
     var detailsElements = Array.prototype.slice.call(document.querySelectorAll('.aag-site-header__details'));
 
     function closeDetails(except) {
@@ -37,14 +38,29 @@
             return;
         }
 
-        drawer.hidden = !isOpen;
+        window.clearTimeout(drawerCloseTimer);
         openButton.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         root.classList.toggle('aag-site-header-menu-open', isOpen);
 
-        if (isOpen && closeButton) {
-            closeButton.focus();
-        } else if (!isOpen && document.activeElement === closeButton) {
-            openButton.focus();
+        if (isOpen) {
+            drawer.hidden = false;
+            window.requestAnimationFrame(function () {
+                window.requestAnimationFrame(function () {
+                    drawer.classList.add('is-open');
+                    if (closeButton) {
+                        closeButton.focus();
+                    }
+                });
+            });
+        } else {
+            drawer.classList.remove('is-open');
+            drawerCloseTimer = window.setTimeout(function () {
+                drawer.hidden = true;
+            }, 180);
+
+            if (document.activeElement === closeButton) {
+                openButton.focus();
+            }
         }
     }
 
