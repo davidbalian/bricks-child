@@ -127,7 +127,7 @@ body.admin-bar .autoagora-single-car__gallery {
     margin: 2rem 0 .15rem;
     color: var(--single-car-primary);
     font-size: var(--single-car-font-price);
-    font-weight: var(--single-car-weight-medium);
+    font-weight: var(--single-car-weight-strong);
     letter-spacing: var(--single-car-tracking-tight);
     line-height: var(--single-car-leading-tight);
 }
