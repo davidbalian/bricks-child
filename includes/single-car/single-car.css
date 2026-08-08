@@ -515,6 +515,7 @@ body.admin-bar .autoagora-single-car__gallery {
 
 .autoagora-single-car__browse-links a {
     color: var(--single-car-link);
+    font-weight: var(--single-car-weight-medium);
     text-decoration: none;
     text-underline-offset: .18em;
     transition: color .18s ease;
@@ -673,6 +674,7 @@ body.admin-bar .autoagora-single-car__gallery {
 
 .autoagora-single-car__seller-name,
 .autoagora-single-car .seller-reviews-see-all-link {
+    font-weight: var(--single-car-weight-medium);
     text-decoration: none;
     text-underline-offset: .18em;
 }
