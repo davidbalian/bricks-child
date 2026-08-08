@@ -50,6 +50,10 @@
     min-width: 0;
 }
 
+.autoagora-single-car__summary {
+    container: single-car-summary / inline-size;
+}
+
 .autoagora-single-car__gallery {
     position: sticky;
     top: 1.5rem;
@@ -200,7 +204,7 @@ body.admin-bar .autoagora-single-car__gallery {
 
 .autoagora-single-car__contact-actions {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: .75rem;
 }
 
@@ -208,6 +212,14 @@ body.admin-bar .autoagora-single-car__gallery {
 .autoagora-single-car__contact-actions .car-whatsapp-button {
     width: 100%;
     min-height: 3.1rem;
+    border-radius: 999px !important;
+    white-space: nowrap;
+}
+
+@container single-car-summary (max-width: 400px) {
+    .autoagora-single-car__contact-actions {
+        grid-template-columns: 1fr;
+    }
 }
 
 .autoagora-single-car__contact-actions .car-whatsapp-button,
