@@ -33,7 +33,7 @@
 }
 
 .autoagora-single-car__container {
-    width: min(1440px, calc(100% - 2rem));
+    width: min(1200px, calc(100% - 2rem));
     margin-inline: auto;
 }
 
