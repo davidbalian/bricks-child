@@ -340,10 +340,10 @@ get_header();
                 <?php if ($description) : ?>
                     <div class="autoagora-single-car__detail-section">
                         <h2><?php esc_html_e('Overview', 'bricks-child'); ?></h2>
-                        <div class="autoagora-single-car__description" data-single-car-description>
+                        <div id="single-car-overview-description" class="autoagora-single-car__description" data-single-car-description>
                             <?php echo wpautop(wp_kses_post($description)); ?>
                         </div>
-                        <button type="button" class="btn btn-primary autoagora-single-car__read-more" data-single-car-read-more hidden aria-expanded="false">
+                        <button type="button" class="btn btn-primary autoagora-single-car__read-more" data-single-car-read-more hidden aria-expanded="false" aria-controls="single-car-overview-description">
                             <?php esc_html_e('Read More', 'bricks-child'); ?>
                         </button>
                     </div>

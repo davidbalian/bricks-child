@@ -454,7 +454,7 @@ body.admin-bar .autoagora-single-car__gallery {
     max-height: 21rem;
 }
 
-.autoagora-single-car__description.is-collapsible:not(.is-expanded)::after {
+.autoagora-single-car__description.is-collapsible::after {
     position: absolute;
     right: 0;
     bottom: 0;
@@ -462,7 +462,13 @@ body.admin-bar .autoagora-single-car__gallery {
     height: 5.5rem;
     background: linear-gradient(transparent, #fff);
     content: '';
+    opacity: 1;
     pointer-events: none;
+    transition: opacity .2s ease;
+}
+
+.autoagora-single-car__description.is-collapsible.is-expanded::after {
+    opacity: 0;
 }
 
 .autoagora-single-car__description p:last-child {
