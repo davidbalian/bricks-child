@@ -208,6 +208,36 @@ body.admin-bar .autoagora-single-car__gallery {
     width: 1.15em;
     height: 1.15em;
     flex: 0 0 auto;
+    stroke-width: 2.35;
+}
+
+.autoagora-single-car__lucide-icon:is(
+    .lucide-eye,
+    .lucide-share-2,
+    .lucide-flag,
+    .lucide-map-pin,
+    .lucide-phone,
+    .lucide-user,
+    .lucide-info
+) {
+    fill: currentColor;
+}
+
+.autoagora-single-car__lucide-icon.lucide-eye circle,
+.autoagora-single-car__lucide-icon.lucide-map-pin circle {
+    fill: var(--single-car-surface);
+}
+
+.autoagora-single-car__lucide-icon.lucide-info path {
+    stroke: var(--single-car-surface);
+}
+
+.autoagora-single-car .favorite-btn .autoagora-single-car__lucide-icon.lucide-heart {
+    fill: none;
+}
+
+.autoagora-single-car .favorite-btn.active .autoagora-single-car__lucide-icon.lucide-heart {
+    fill: currentColor;
 }
 
 .autoagora-single-car__seller-name .autoagora-single-car__lucide-icon {
