@@ -253,7 +253,9 @@ function render_car_card($post_id, $context = array()) {
             <div class="car-card-specs">
                 <?php
                 $specs = array();
-                if ($engine_capacity) $specs[] = esc_html($engine_capacity) . 'L';
+                if (car_card_should_show_engine_capacity($engine_capacity, $fuel_type)) {
+                    $specs[] = esc_html($engine_capacity) . 'L';
+                }
                 if ($fuel_type)       $specs[] = esc_html($fuel_type);
                 if ($transmission)    $specs[] = esc_html($transmission);
                 echo implode(' <span class="car-card-specs-sep">|</span> ', $specs);
@@ -305,6 +307,24 @@ function render_car_card($post_id, $context = array()) {
  */
 function car_card_get_meta_value($post_id, $meta_key) {
     return get_post_meta($post_id, $meta_key, true);
+}
+
+/**
+ * Determine whether engine capacity belongs in a card's compact specs.
+ *
+ * Electric listings store a locked 0.0 engine-capacity value, which should
+ * never be presented as a combustion-engine size.
+ *
+ * @param mixed $engine_capacity Engine-capacity meta value.
+ * @param mixed $fuel_type       Fuel-type meta value.
+ * @return bool
+ */
+function car_card_should_show_engine_capacity($engine_capacity, $fuel_type) {
+    if (strcasecmp(trim((string) $fuel_type), 'Electric') === 0) {
+        return false;
+    }
+
+    return !empty($engine_capacity);
 }
 
 /**

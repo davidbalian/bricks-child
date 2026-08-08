@@ -122,7 +122,7 @@ function car_card_build_listing_json_payload($post_id, $listing_index, $is_favor
     }
 
     $specs = array();
-    if ($engine_capacity) {
+    if (car_card_should_show_engine_capacity($engine_capacity, $fuel_type)) {
         $specs[] = $engine_capacity . 'L';
     }
     if ($fuel_type) {
