@@ -5,6 +5,9 @@
     var drawer = document.getElementById('aag-site-header-drawer');
     var openButton = document.querySelector('.aag-site-header__menu-toggle');
     var closeButton = document.querySelector('.aag-site-header__drawer-close');
+    var mobileDock = document.querySelector('.aag-mobile-dock');
+    var dockViewportBaseline = window.visualViewport ? Math.max(window.innerHeight, window.visualViewport.height) : window.innerHeight;
+    var dockViewportWidth = window.innerWidth;
     var detailsElements = Array.prototype.slice.call(document.querySelectorAll('.aag-site-header__details'));
 
     function closeDetails(except) {
@@ -91,4 +94,42 @@
             setDrawerOpen(false);
         }
     });
+
+    /*
+     * Mobile browsers may move fixed controls above the software keyboard.
+     * Hide the dock only for a material visual-viewport reduction; normal
+     * Safari/Chrome toolbar animations are much smaller and remain unaffected.
+     */
+    function syncDockWithVisualViewport() {
+        if (!mobileDock || !window.visualViewport || window.innerWidth > 767) {
+            return;
+        }
+
+        var visualViewport = window.visualViewport;
+        var obscuredHeight = Math.max(0, window.innerHeight - visualViewport.height - visualViewport.offsetTop);
+        var activeElement = document.activeElement;
+        var hasTextInputFocus = activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(activeElement.tagName);
+
+        if (Math.abs(window.innerWidth - dockViewportWidth) > 50) {
+            dockViewportWidth = window.innerWidth;
+            dockViewportBaseline = Math.max(window.innerHeight, visualViewport.height);
+        } else if (!hasTextInputFocus) {
+            dockViewportBaseline = Math.max(dockViewportBaseline, window.innerHeight, visualViewport.height);
+        }
+
+        var viewportReduction = Math.max(0, dockViewportBaseline - visualViewport.height);
+        var keyboardIsOpen = hasTextInputFocus && Math.max(obscuredHeight, viewportReduction) > 120;
+
+        mobileDock.classList.toggle('aag-mobile-dock--keyboard-open', keyboardIsOpen);
+    }
+
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', syncDockWithVisualViewport);
+        window.visualViewport.addEventListener('scroll', syncDockWithVisualViewport);
+        document.addEventListener('focusin', syncDockWithVisualViewport);
+        document.addEventListener('focusout', function () {
+            window.setTimeout(syncDockWithVisualViewport, 0);
+        });
+        syncDockWithVisualViewport();
+    }
 }());

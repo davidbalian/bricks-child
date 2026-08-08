@@ -363,16 +363,27 @@ html.aag-site-header-menu-open {
     }
 
     .aag-mobile-dock {
-        position: fixed;
+        position: fixed !important;
         z-index: 1000;
-        right: 0;
-        bottom: 0;
-        left: 0;
+        inset: auto 0 0 !important;
         height: calc(56px + env(safe-area-inset-bottom));
         padding: 12px 32px calc(12px + env(safe-area-inset-bottom));
         display: block;
         background: #fff;
         border-top: 1px solid #f0f1f2;
+        transform: translate3d(0, 0, 0);
+        -webkit-transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        will-change: transform;
+        contain: layout paint;
+        isolation: isolate;
+        overscroll-behavior: none;
+    }
+
+    .aag-mobile-dock.aag-mobile-dock--keyboard-open {
+        visibility: hidden;
+        pointer-events: none;
     }
 
     .aag-mobile-dock__inner {
