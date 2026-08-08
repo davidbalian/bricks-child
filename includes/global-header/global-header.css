@@ -107,6 +107,11 @@
     line-height: 1;
 }
 
+.aag-site-header__desktop-account .aag-site-header__details > summary:hover,
+.aag-site-header__desktop-account .aag-site-header__details > summary:focus-visible {
+    color: var(--aag-header-blue);
+}
+
 .aag-site-header__account-icon {
     width: 24px;
     height: 24px;
