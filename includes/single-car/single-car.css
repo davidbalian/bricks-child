@@ -670,57 +670,8 @@ body.admin-bar .autoagora-single-car__gallery {
     color: #fff !important;
 }
 
-.autoagora-single-car .car-card,
-.autoagora-single-car .car-card-slider,
-.autoagora-single-car .car-card-body {
-    border-color: var(--single-car-border);
-    color: var(--single-car-text);
-}
-
-.autoagora-single-car .car-card,
-.autoagora-single-car .car-card-slider {
-    border-radius: var(--single-car-radius-card);
-}
-
-.autoagora-single-car .car-card-body {
-    border-radius: 0 0 var(--single-car-radius-card) var(--single-car-radius-card);
-}
-
-.autoagora-single-car .car-card-title {
-    color: var(--single-car-text);
-    font-size: var(--single-car-font-body);
-    font-weight: var(--single-car-weight-medium);
-    line-height: var(--single-car-leading-heading);
-}
-
-.autoagora-single-car .car-card-mileage,
-.autoagora-single-car .car-card-specs,
-.autoagora-single-car .car-card-footer {
-    color: var(--single-car-text-secondary);
-    font-size: var(--single-car-font-meta);
-    line-height: var(--single-car-leading-ui);
-}
-
-.autoagora-single-car .car-card-price {
-    color: var(--single-car-primary);
-    font-size: var(--single-car-font-heading);
-    font-weight: var(--single-car-weight-strong);
-    letter-spacing: var(--single-car-tracking-tight);
-    line-height: var(--single-car-leading-tight);
-}
-
-.autoagora-single-car .car-card .car-card-badge,
-.autoagora-single-car .car-card .car-card-counter,
-.autoagora-single-car .car-card .car-card-price-insight {
-    border-color: var(--single-car-border);
-    border-radius: var(--single-car-radius-pill);
-    font-size: var(--single-car-font-note);
-    line-height: var(--single-car-leading-tight);
-}
-
-.autoagora-single-car .car-card-view-all-btn {
-    border-radius: var(--single-car-radius-pill);
-    font-size: var(--single-car-font-body);
+.autoagora-single-car__related .car-card {
+    font-size: 15px;
 }
 
 .autoagora-single-car .autoagora-facebook-card {
