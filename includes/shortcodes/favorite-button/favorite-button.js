@@ -39,16 +39,21 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         const carId = favoriteBtn.getAttribute('data-car-id');
         const isActive = favoriteBtn.classList.contains('active');
         const heartIcon = favoriteBtn.querySelector('i');
+        const usesLucide = favoriteBtn.querySelector('.lucide') !== null;
 
         // Optimistically update UI
         favoriteBtn.classList.toggle('active');
         if (isActive) {
-            heartIcon.classList.remove('fas');
-            heartIcon.classList.add('far');
+            if (!usesLucide && heartIcon) {
+                heartIcon.classList.remove('fas');
+                heartIcon.classList.add('far');
+            }
             favoriteBtn.title = favoriteStrings.add || 'Add to favorites';
         } else {
-            heartIcon.classList.remove('far');
-            heartIcon.classList.add('fas');
+            if (!usesLucide && heartIcon) {
+                heartIcon.classList.remove('far');
+                heartIcon.classList.add('fas');
+            }
             favoriteBtn.title = favoriteStrings.remove || 'Remove from favorites';
         }
 
@@ -74,7 +79,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         .then(data => {
             if (!data.success) {
                 // Revert the visual changes on failure
-                revertFavoriteUI(favoriteBtn, isActive, heartIcon);
+                revertFavoriteUI(favoriteBtn, isActive, heartIcon, usesLucide);
                 
                 // Show specific error message
                 const errorMessage = data.data || 'Unknown error occurred';
@@ -85,21 +90,25 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         })
         .catch(error => {
             // Revert the visual changes on error
-            revertFavoriteUI(favoriteBtn, isActive, heartIcon);
+            revertFavoriteUI(favoriteBtn, isActive, heartIcon, usesLucide);
             if (isDevelopment) console.error('Error:', error);
             alert(favoriteStrings.genericFailure || 'Failed to update favorites. An error occurred.');
         });
     }
     
-    function revertFavoriteUI(favoriteBtn, wasActive, heartIcon) {
+    function revertFavoriteUI(favoriteBtn, wasActive, heartIcon, usesLucide) {
         favoriteBtn.classList.toggle('active');
         if (wasActive) {
-            heartIcon.classList.remove('far');
-            heartIcon.classList.add('fas');
+            if (!usesLucide && heartIcon) {
+                heartIcon.classList.remove('far');
+                heartIcon.classList.add('fas');
+            }
             favoriteBtn.title = favoriteStrings.remove || 'Remove from favorites';
         } else {
-            heartIcon.classList.remove('fas');
-            heartIcon.classList.add('far');
+            if (!usesLucide && heartIcon) {
+                heartIcon.classList.remove('fas');
+                heartIcon.classList.add('far');
+            }
             favoriteBtn.title = favoriteStrings.add || 'Add to favorites';
         }
     }
