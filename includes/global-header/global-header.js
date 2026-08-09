@@ -22,6 +22,7 @@
         }
 
         siteHeader.classList.toggle('aag-site-header--hidden', isHidden);
+        document.body.classList.toggle('aag-site-header-is-hidden', isHidden);
     }
 
     function updateHeaderVisibility() {

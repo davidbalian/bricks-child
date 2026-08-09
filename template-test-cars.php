@@ -29,7 +29,7 @@ add_action( 'wp_head', function() {
     if ( ! is_page_template( 'template-test-cars.php' ) ) {
         return;
     }
-    echo "<style id=\"tcp-critical-cls-guard\">.tcp-filters-modal-overlay{display:none}.tcp-filters-bar{position:sticky;top:0;font-family:Inter,sans-serif}.tcp-main{width:100%;max-width:2000px;margin:0 auto;padding:1.5rem 1rem 6rem;box-sizing:border-box;font-family:Inter,sans-serif}</style>\n";
+    echo "<style id=\"tcp-critical-cls-guard\">.tcp-filters-modal-overlay{display:none}.tcp-filters-bar{position:sticky;top:calc(var(--aag-site-header-top,0px) + var(--aag-site-header-height,0px));font-family:Inter,sans-serif}.tcp-main{width:100%;max-width:2000px;margin:0 auto;padding:1.5rem 1rem 6rem;box-sizing:border-box;font-family:Inter,sans-serif}</style>\n";
 }, 1 );
 
 add_action( 'wp_head', function() {
