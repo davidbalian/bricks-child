@@ -503,7 +503,7 @@ html.aag-site-header-menu-open {
         z-index: 1000;
         inset: auto 0 0 !important;
         height: calc(60px + env(safe-area-inset-bottom));
-        padding: 6px 16px calc(6px + env(safe-area-inset-bottom));
+        padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
         display: block;
         background: #fff;
         border-top: 1px solid #e1e4e8;
@@ -659,7 +659,7 @@ html.aag-site-header-menu-open {
     }
 
     .aag-mobile-dock {
-        padding-right: 12px;
-        padding-left: 12px;
+        padding-right: 6px;
+        padding-left: 6px;
     }
 }
