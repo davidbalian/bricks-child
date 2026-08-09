@@ -140,12 +140,28 @@ function render_car_card($post_id, $context = array()) {
         $relative_date = '<span class="post-date">' . $months . ' months ago</span>';
     }
 
-    // Badges and current promotion snapshot.
+    // Badges and current promotion snapshot. The optional preview overrides are
+    // used only by the authenticated Car Card Lab and never alter listing meta.
     $show_full_badge = car_card_get_meta_value($post_id, 'fulldetailsbadge');
     $show_extra_badge = car_card_get_meta_value($post_id, 'extradetailsbadge');
     $popular_badge = car_card_get_meta_value($post_id, 'popular_badge');
     $promotion_tier = function_exists('autoagora_get_listing_promotion_tier') ? autoagora_get_listing_promotion_tier($post_id) : 'none';
     $promotion_label = function_exists('autoagora_listing_promotion_label') ? autoagora_listing_promotion_label($promotion_tier) : '';
+
+    $preview = isset($context['preview']) && is_array($context['preview']) ? $context['preview'] : array();
+    if (array_key_exists('full_badge', $preview)) {
+        $show_full_badge = $preview['full_badge'] ? '1' : '0';
+    }
+    if (array_key_exists('extra_badge', $preview)) {
+        $show_extra_badge = $preview['extra_badge'] ? '1' : '0';
+    }
+    if (array_key_exists('popular_badge', $preview)) {
+        $popular_badge = $preview['popular_badge'] ? '1' : '0';
+    }
+    if (isset($preview['promotion_tier']) && in_array($preview['promotion_tier'], array('none', 'priority', 'showcase'), true)) {
+        $promotion_tier = $preview['promotion_tier'];
+        $promotion_label = function_exists('autoagora_listing_promotion_label') ? autoagora_listing_promotion_label($promotion_tier) : '';
+    }
     $is_featured = $promotion_tier !== 'none';
 
     // Images — handle both ID array and associative array formats
@@ -188,11 +204,12 @@ function render_car_card($post_id, $context = array()) {
         <div class="car-card-slider" data-total="<?php echo esc_attr($total_images); ?>" data-slides="<?php echo esc_attr($slide_count); ?>">
 
             <!-- Badges (top-left) -->
-            <?php if ($promotion_label || $show_full_badge || $show_extra_badge) : ?>
+            <?php if ($show_full_badge || $show_extra_badge) : ?>
                 <div class="car-card-badges">
-                    <?php if ($promotion_label) : ?>
+                    <?php /* Promotion pills intentionally hidden; tier outlines remain visible.
+                    if ($promotion_label) : ?>
                         <span class="car-card-badge car-card-promotion-badge car-card-promotion-badge--<?php echo esc_attr($promotion_tier); ?>"><?php echo esc_html($promotion_label); ?></span>
-                    <?php endif; ?>
+                    <?php endif; */ ?>
                     <?php if ($show_full_badge) : ?>
                     <span class="car-card-badge badge-full"><?php esc_html_e('Full Details', 'bricks-child'); ?></span>
                     <?php endif; ?>
@@ -263,7 +280,12 @@ function render_car_card($post_id, $context = array()) {
             </div>
 
             <div class="car-card-signal-badges">
-                <?php car_card_render_price_insight_badge($post_id); ?>
+                <?php
+                $price_insight_override = array_key_exists('price_insight_band', $preview)
+                    ? (string) $preview['price_insight_band']
+                    : false;
+                car_card_render_price_insight_badge($post_id, $price_insight_override);
+                ?>
                 <?php if ($popular_badge === '1') : ?>
                 <span class="car-card-signal-badge car-card-signal-badge--popular"><?php esc_html_e('Popular', 'bricks-child'); ?></span>
                 <?php endif; ?>
@@ -330,11 +352,14 @@ function car_card_should_show_engine_capacity($engine_capacity, $fuel_type) {
 /**
  * Renders price insight label when meta is populated (see includes/price-insight).
  *
- * @param int $post_id Listing post ID.
+ * @param int          $post_id       Listing post ID.
+ * @param string|false $band_override Optional preview-only price band override.
  * @return void
  */
-function car_card_render_price_insight_badge($post_id) {
-    $band = car_card_get_meta_value($post_id, 'price_insight_band');
+function car_card_render_price_insight_badge($post_id, $band_override = false) {
+    $band = $band_override !== false
+        ? $band_override
+        : car_card_get_meta_value($post_id, 'price_insight_band');
     if ($band === '' || $band === null || $band === 'none') {
         return;
     }

@@ -1,0 +1,82 @@
+.autoagora-card-lab {
+    --lab-border: #dfe2e6;
+    max-width: 1500px;
+}
+
+.autoagora-card-lab__sample,
+.autoagora-card-lab__toolbar {
+    display: flex;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1.25rem 0;
+    padding: 1rem;
+    border: 1px solid var(--lab-border);
+    border-radius: 0.75rem;
+    background: #fff;
+}
+
+.autoagora-card-lab__sample label,
+.autoagora-card-lab__toolbar label {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.autoagora-card-lab__toolbar label > span {
+    font-weight: 600;
+}
+
+.autoagora-card-lab__visible {
+    margin: 0 0 0 auto;
+    align-self: center;
+    color: #50575e;
+}
+
+.autoagora-card-lab__grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    align-items: stretch;
+    margin-top: 1.5rem;
+    padding-bottom: 4rem;
+}
+
+.autoagora-card-lab__variant {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.autoagora-card-lab__variant[hidden] {
+    display: none;
+}
+
+.autoagora-card-lab__label {
+    display: grid;
+    gap: 0.15rem;
+    min-height: 3rem;
+    padding: 0 0.25rem 0.6rem;
+    color: #2a3546;
+}
+
+.autoagora-card-lab__label span {
+    color: #646970;
+}
+
+.autoagora-card-lab .car-card {
+    flex: 1;
+}
+
+.autoagora-card-lab .car-card a,
+.autoagora-card-lab .car-card button {
+    pointer-events: none;
+}
+
+.autoagora-card-lab .favorite-btn i {
+    color: #ef4444;
+}
+
+@media (max-width: 782px) {
+    .autoagora-card-lab__visible {
+        width: 100%;
+        margin-left: 0;
+    }
+}

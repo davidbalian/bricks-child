@@ -401,6 +401,7 @@ require_once get_stylesheet_directory() . '/includes/shortcodes/buyer-request-ca
 require_once get_stylesheet_directory() . '/includes/shortcodes/buyer-request-call-button/buyer-request-whatsapp-button.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/homepage-filters/homepage-filters.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-card/car-card.php';
+require_once get_stylesheet_directory() . '/includes/admin/car-card-lab.php';
 require_once get_stylesheet_directory() . '/includes/price-insight/init.php';
 require_once get_stylesheet_directory() . '/includes/listing-rank/ListingRankManager.php';
 require_once get_stylesheet_directory() . '/includes/shortcodes/car-listings/car-listings.php';
