@@ -100,7 +100,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    font-size: 0.875rem;
+    font-size: var(--small-font-size, 14px);
     font-weight: 500;
     line-height: 1.2;
     white-space: nowrap;
@@ -151,7 +151,7 @@ body {
     border-radius: 0.5rem;
     background: #fff;
     color: #2a3546;
-    font-size: 0.9375rem;
+    font-size: var(--small-font-size, 14px);
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
@@ -267,7 +267,7 @@ body {
     border-radius: 2rem;
     background: #f0f4f8;
     color: #2a3546;
-    font-size: 0.8125rem;
+    font-size: var(--small-font-size, 14px);
     font-weight: 500;
     white-space: nowrap;
     flex-shrink: 0;
@@ -300,7 +300,7 @@ body {
     border-radius: 2rem;
     background: none;
     color: #0d86e3;
-    font-size: 0.8125rem;
+    font-size: var(--small-font-size, 14px);
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
