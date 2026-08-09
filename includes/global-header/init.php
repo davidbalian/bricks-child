@@ -315,7 +315,9 @@ function autoagora_render_code_header() {
 				?>
 				<a class="aag-mobile-dock__item<?php echo ! empty( $item['primary'] ) ? ' aag-mobile-dock__item--primary' : ''; ?>" href="<?php echo esc_url( $url ); ?>" aria-label="<?php echo esc_attr( $item['label'] ); ?>"<?php echo $is_current ? ' aria-current="page"' : ''; ?>>
 					<span class="aag-mobile-dock__icon"><?php echo autoagora_code_header_icon( $item['icon'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-					<span class="aag-mobile-dock__label"><?php echo esc_html( $item['label'] ); ?></span>
+					<?php if ( empty( $item['primary'] ) ) : ?>
+						<span class="aag-mobile-dock__label"><?php echo esc_html( $item['label'] ); ?></span>
+					<?php endif; ?>
 				</a>
 			<?php endforeach; ?>
 

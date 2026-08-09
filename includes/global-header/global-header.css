@@ -575,6 +575,7 @@ html.aag-site-header-menu-open {
 
     .aag-mobile-dock .aag-mobile-dock__item.aag-mobile-dock__item--primary {
         display: grid;
+        grid-template-rows: 40px;
         color: #52606d !important;
         background: transparent !important;
         opacity: 1 !important;
@@ -584,8 +585,12 @@ html.aag-site-header-menu-open {
     .aag-mobile-dock .aag-mobile-dock__item.aag-mobile-dock__item--primary .aag-mobile-dock__icon {
         position: relative;
         z-index: 2;
-        width: 30px;
-        height: 30px;
+        width: 40px;
+        min-width: 40px;
+        max-width: 40px;
+        height: 40px;
+        min-height: 40px;
+        max-height: 40px;
         background-color: #0d86e3 !important;
         border-radius: 999px;
         transition: background-color 0.1s ease;
