@@ -30,14 +30,14 @@ $archive_intro = $city_label !== ''
             <h1><?php echo esc_html($archive_title); ?></h1>
             <p><?php echo esc_html($archive_intro); ?></p>
         </div>
-        <a class="btn btn-primary" href="<?php echo esc_url(home_url('/cars/')); ?>">
+        <a class="btn btn-primary" href="<?php echo esc_url(autoagora_localized_page_url('cars')); ?>">
             <?php esc_html_e('Browse cars', 'bricks-child'); ?>
         </a>
     </section>
 
     <?php if (!empty($city_options)) : ?>
         <nav class="dealer-profile-city-nav" aria-label="<?php esc_attr_e('Dealer profile city filters', 'bricks-child'); ?>">
-            <a class="<?php echo $city_slug === '' ? 'is-active' : ''; ?>" href="<?php echo esc_url(trailingslashit(home_url('/dealers/'))); ?>">
+            <a class="<?php echo $city_slug === '' ? 'is-active' : ''; ?>" href="<?php echo esc_url(autoagora_dealer_profile_city_archive_url('')); ?>">
                 <?php esc_html_e('All Cyprus', 'bricks-child'); ?>
             </a>
             <?php foreach ($city_options as $slug => $label) : ?>
@@ -89,7 +89,7 @@ $archive_intro = $city_label !== ''
             <h2><?php esc_html_e('No dealer profiles here yet', 'bricks-child'); ?></h2>
             <p><?php esc_html_e('Try another city or browse all dealers across Cyprus.', 'bricks-child'); ?></p>
             <?php if ($city_slug !== '') : ?>
-                <a class="btn btn-secondary" href="<?php echo esc_url(trailingslashit(home_url('/dealers/'))); ?>">
+                <a class="btn btn-secondary" href="<?php echo esc_url(autoagora_dealer_profile_city_archive_url('')); ?>">
                     <?php esc_html_e('View all dealers', 'bricks-child'); ?>
                 </a>
             <?php endif; ?>

@@ -640,7 +640,7 @@ function optimized_media_handle_upload($file_handler, $post_id) {
     
     // Basic file validation
     if ($file['error'] !== UPLOAD_ERR_OK) {
-        return new WP_Error('upload_error', 'File upload error: ' . $file['error']);
+        return new WP_Error('upload_error', __('File upload error: ', 'bricks-child') . $file['error']);
     }
     
     // Move uploaded file to WordPress uploads directory
@@ -663,7 +663,7 @@ function optimized_media_handle_upload($file_handler, $post_id) {
     $attachment_id = wp_insert_attachment($attachment, $upload['file'], $post_id);
     
     if (!$attachment_id) {
-        return new WP_Error('db_error', 'Failed to create attachment');
+        return new WP_Error('db_error', __('Failed to create attachment', 'bricks-child'));
     }
     
     // Store basic metadata without generating image sizes yet
@@ -891,20 +891,20 @@ function handle_edit_car_listing() {
     
     // Verify nonce
     if (!validate_edit_listing_nonce($_POST)) {
-        handle_edit_listing_redirect('error', 'nonce_failed', home_url('/my-listings/'));
+        handle_edit_listing_redirect('error', 'nonce_failed', autoagora_localized_page_url('my-listings'));
         return;
     }
     
     // Get car ID
     $car_id = isset($_POST['car_id']) ? intval($_POST['car_id']) : 0;
     if (!$car_id) {
-        handle_edit_listing_redirect('error', 'invalid_car', home_url('/my-listings/'));
+        handle_edit_listing_redirect('error', 'invalid_car', autoagora_localized_page_url('my-listings'));
         return;
     }
     
     // Check if user owns the car
     if (!validate_car_ownership($car_id, get_current_user_id())) {
-        handle_edit_listing_redirect('error', 'unauthorized', home_url('/my-listings/'));
+        handle_edit_listing_redirect('error', 'unauthorized', autoagora_localized_page_url('my-listings'));
         return;
     }
     

@@ -13,7 +13,10 @@ function display_my_listings($atts) {
     // Check if user is logged in
     if (!is_user_logged_in()) {
         $login_url = wp_login_url(get_permalink());
-        return '<p>Please <a class="my-listings-login-link" href="' . esc_url($login_url) . '">log in</a> to view your listings.</p>';
+        return '<p>' . sprintf(
+            wp_kses_post(__('Please <a class="my-listings-login-link" href="%s">log in</a> to view your listings.', 'bricks-child')),
+            esc_url($login_url)
+        ) . '</p>';
     }
 
     // Get current user
@@ -48,7 +51,7 @@ function display_my_listings($atts) {
     wp_enqueue_script(
         'refresh-listing-js',
         get_stylesheet_directory_uri() . '/includes/user-manage-listings/refresh-listing/refresh-listing.js',
-        array('jquery'),
+        array('jquery', 'autoagora-i18n'),
         '1.0.0',
         true
     );
@@ -66,7 +69,7 @@ function display_my_listings($atts) {
     wp_enqueue_script(
         'my-listings-js',
         get_stylesheet_directory_uri() . '/includes/user-account/my-listings/my-listings.js',
-        array('jquery'),
+        array('jquery', 'autoagora-i18n'),
         '1.0.0',
         true
     );
@@ -89,23 +92,23 @@ function display_my_listings($atts) {
     ?>
     
     <div class="my-listings-container">
-        <h2>My Car Listings</h2>
+        <h2><?php esc_html_e('My Car Listings', 'bricks-child'); ?></h2>
         
         <?php
         // Show success/error messages
         if (isset($_GET['deleted'])) {
             if ($_GET['deleted'] === 'success') {
-                echo '<div class="notice notice-success"><p>Car listing deleted successfully.</p></div>';
+                echo '<div class="notice notice-success"><p>' . esc_html__('Car listing deleted successfully.', 'bricks-child') . '</p></div>';
             } elseif ($_GET['deleted'] === 'error') {
-                echo '<div class="notice notice-error"><p>Error deleting car listing. Please try again.</p></div>';
+                echo '<div class="notice notice-error"><p>' . esc_html__('Error deleting car listing. Please try again.', 'bricks-child') . '</p></div>';
             }
         }
         if (isset($_GET['promotion_payment'])) {
             $promotion_payment = sanitize_key(wp_unslash($_GET['promotion_payment']));
             if ($promotion_payment === 'success') {
-                echo '<div class="notice notice-success"><p>Payment completed. Stripe is confirming your promotion; it should appear shortly.</p></div>';
+                echo '<div class="notice notice-success"><p>' . esc_html__('Payment completed. Stripe is confirming your promotion; it should appear shortly.', 'bricks-child') . '</p></div>';
             } elseif ($promotion_payment === 'cancelled') {
-                echo '<div class="notice notice-warning"><p>Promotion checkout was cancelled. You were not charged.</p></div>';
+                echo '<div class="notice notice-warning"><p>' . esc_html__('Promotion checkout was cancelled. You were not charged.', 'bricks-child') . '</p></div>';
             }
         }
         ?>
@@ -120,41 +123,41 @@ function display_my_listings($atts) {
             ?>
             <div class="listings-layout">
 
-                <div class="my-listings-stats" aria-label="My listing performance statistics">
+                <div class="my-listings-stats" aria-label="<?php esc_attr_e('My listing performance statistics', 'bricks-child'); ?>">
                     <div class="my-listings-stat-card">
-                        <span class="my-listings-stat-label">Total cars posted</span>
+                        <span class="my-listings-stat-label"><?php esc_html_e('Total cars posted', 'bricks-child'); ?></span>
                         <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['total_listings'])); ?></strong>
                     </div>
                     <div class="my-listings-stat-card">
-                        <span class="my-listings-stat-label">Active listings</span>
+                        <span class="my-listings-stat-label"><?php esc_html_e('Active listings', 'bricks-child'); ?></span>
                         <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['active_listings'])); ?></strong>
                     </div>
                     <div class="my-listings-stat-card">
-                        <span class="my-listings-stat-label">Pending approval</span>
+                        <span class="my-listings-stat-label"><?php esc_html_e('Pending approval', 'bricks-child'); ?></span>
                         <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['pending_listings'])); ?></strong>
                     </div>
                     <div class="my-listings-stat-card">
-                        <span class="my-listings-stat-label">Sold listings</span>
+                        <span class="my-listings-stat-label"><?php esc_html_e('Sold listings', 'bricks-child'); ?></span>
                         <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['sold_listings'])); ?></strong>
                     </div>
                     <div class="my-listings-stat-card">
-                        <span class="my-listings-stat-label">Expired listings</span>
+                        <span class="my-listings-stat-label"><?php esc_html_e('Expired listings', 'bricks-child'); ?></span>
                         <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) ($user_stats['expired_listings'] ?? 0))); ?></strong>
                     </div>
                     <div class="my-listings-stat-card">
-                        <span class="my-listings-stat-label">Total views generated</span>
+                        <span class="my-listings-stat-label"><?php esc_html_e('Total views generated', 'bricks-child'); ?></span>
                         <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['total_views'])); ?></strong>
                     </div>
                     <div class="my-listings-stat-card">
-                        <span class="my-listings-stat-label">Unique visitors</span>
+                        <span class="my-listings-stat-label"><?php esc_html_e('Unique visitors', 'bricks-child'); ?></span>
                         <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['unique_views'])); ?></strong>
                     </div>
                     <div class="my-listings-stat-card">
-                        <span class="my-listings-stat-label">Contact Action Clicks</span>
+                        <span class="my-listings-stat-label"><?php esc_html_e('Contact Action Clicks', 'bricks-child'); ?></span>
                         <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((int) $user_stats['total_leads'])); ?></strong>
                     </div>
                     <div class="my-listings-stat-card">
-                        <span class="my-listings-stat-label">Avg. views per listing</span>
+                        <span class="my-listings-stat-label"><?php esc_html_e('Avg. views per listing', 'bricks-child'); ?></span>
                         <strong class="my-listings-stat-value"><?php echo esc_html(number_format_i18n((float) $user_stats['average_views_per_listing'], 1)); ?></strong>
                     </div>
                 </div>
@@ -182,26 +185,26 @@ function display_my_listings($atts) {
 
                 <div class="listings-filter">
                     <form method="get" class="status-filter-form">
-                        <label for="status-filter">Filter by status:</label>
+                        <label for="status-filter"><?php esc_html_e('Filter by status:', 'bricks-child'); ?></label>
                         <select name="status" id="status-filter">
-                            <option value="all" <?php selected($current_filter, 'all'); ?>>All Listings</option>
-                            <option value="pending" <?php selected($current_filter, 'pending'); ?>>Pending</option>
-                            <option value="publish" <?php selected($current_filter, 'publish'); ?>>Published</option>
-                            <option value="sold" <?php selected($current_filter, 'sold'); ?>>Sold</option>
+                            <option value="all" <?php selected($current_filter, 'all'); ?>><?php esc_html_e('All Listings', 'bricks-child'); ?></option>
+                            <option value="pending" <?php selected($current_filter, 'pending'); ?>><?php esc_html_e('Pending', 'bricks-child'); ?></option>
+                            <option value="publish" <?php selected($current_filter, 'publish'); ?>><?php esc_html_e('Published', 'bricks-child'); ?></option>
+                            <option value="sold" <?php selected($current_filter, 'sold'); ?>><?php esc_html_e('Sold', 'bricks-child'); ?></option>
                         </select>
                     </form>
                     <div class="sort-container">
-                        <label for="sort-select">Sort by:</label>
+                        <label for="sort-select"><?php esc_html_e('Sort by:', 'bricks-child'); ?></label>
                         <select id="sort-select" class="sort-select">
-                            <option value="newest" <?php selected($current_sort, 'newest'); ?>>Newest First</option>
-                            <option value="oldest" <?php selected($current_sort, 'oldest'); ?>>Oldest First</option>
-                            <option value="price-high" <?php selected($current_sort, 'price-high'); ?>>Price: High to Low</option>
-                            <option value="price-low" <?php selected($current_sort, 'price-low'); ?>>Price: Low to High</option>
+                            <option value="newest" <?php selected($current_sort, 'newest'); ?>><?php esc_html_e('Newest First', 'bricks-child'); ?></option>
+                            <option value="oldest" <?php selected($current_sort, 'oldest'); ?>><?php esc_html_e('Oldest First', 'bricks-child'); ?></option>
+                            <option value="price-high" <?php selected($current_sort, 'price-high'); ?>><?php esc_html_e('Price: High to Low', 'bricks-child'); ?></option>
+                            <option value="price-low" <?php selected($current_sort, 'price-low'); ?>><?php esc_html_e('Price: Low to High', 'bricks-child'); ?></option>
                         </select>
                     </div>
                     <div class="search-container">
-                        <label for="listing-search">Search:</label>
-                        <input type="text" id="listing-search" placeholder="Search listings..." class="search-input">
+                        <label for="listing-search"><?php esc_html_e('Search:', 'bricks-child'); ?></label>
+                        <input type="text" id="listing-search" placeholder="<?php esc_attr_e('Search listings...', 'bricks-child'); ?>" class="search-input">
                     </div>
                 </div>
 
@@ -293,8 +296,8 @@ function display_my_listings($atts) {
                 </div>
                 <?php 
                 else :
-                    echo '<p>You haven\'t created any car listings yet.</p>';
-                    echo '<p><a href="' . esc_url(home_url('/add-listing/')) . '" class="btn btn-primary">Add New Listing</a></p>';
+                    echo '<p>' . esc_html__("You haven't created any car listings yet.", 'bricks-child') . '</p>';
+                    echo '<p><a href="' . esc_url(autoagora_localized_page_url('add-listing')) . '" class="btn btn-primary">' . esc_html__('Add New Listing', 'bricks-child') . '</a></p>';
                 endif;
                 
                 wp_reset_postdata();
@@ -319,17 +322,17 @@ function handle_frontend_car_deletion() {
     
     // Early exit for invalid input
     if ($car_id <= 0) {
-        wp_die('Invalid car listing ID.');
+        wp_die(esc_html__('Invalid car listing ID.', 'bricks-child'));
     }
     
     // Verify nonce
     if (!wp_verify_nonce($nonce, 'delete_car_listing_' . $car_id)) {
-        wp_die('Security check failed. Please try again.');
+        wp_die(esc_html__('Security check failed. Please try again.', 'bricks-child'));
     }
     
     // Check if user is logged in
     if (!is_user_logged_in()) {
-        wp_die('You must be logged in to delete listings.');
+        wp_die(esc_html__('You must be logged in to delete listings.', 'bricks-child'));
     }
     
     $current_user_id = get_current_user_id();
@@ -337,17 +340,17 @@ function handle_frontend_car_deletion() {
     // Check if car exists
     $car = get_post($car_id);
     if (!$car || $car->post_type !== 'car') {
-        wp_die('Car listing not found.');
+        wp_die(esc_html__('Car listing not found.', 'bricks-child'));
     }
     
     // Check if post is already in trash
     if ($car->post_status === 'trash') {
-        wp_die('This car listing is already in the trash.');
+        wp_die(esc_html__('This car listing is already in the trash.', 'bricks-child'));
     }
     
     // Check if user owns this car listing
     if ($car->post_author != $current_user_id) {
-        wp_die('Access denied. You can only delete your own listings.');
+        wp_die(esc_html__('Access denied. You can only delete your own listings.', 'bricks-child'));
     }
     
     // Check if user has permission to delete posts
@@ -358,7 +361,7 @@ function handle_frontend_car_deletion() {
                   current_user_can('administrator');
     
     if (!$can_delete) {
-        wp_die('Permission denied. You do not have sufficient privileges to delete this listing.');
+        wp_die(esc_html__('Permission denied. You do not have sufficient privileges to delete this listing.', 'bricks-child'));
     }
     
     // Clean any output buffers before redirect to prevent "headers already sent" errors
@@ -371,10 +374,10 @@ function handle_frontend_car_deletion() {
     
     if ($deleted) {
         // Redirect back to my listings with success message
-        wp_redirect(add_query_arg('deleted', 'success', home_url('/my-listings/')));
+        wp_redirect(add_query_arg('deleted', 'success', autoagora_localized_page_url('my-listings')));
     } else {
         // Redirect back with error message
-        wp_redirect(add_query_arg('deleted', 'error', home_url('/my-listings/')));
+        wp_redirect(add_query_arg('deleted', 'error', autoagora_localized_page_url('my-listings')));
     }
     exit;
 }

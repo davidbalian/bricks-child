@@ -87,7 +87,7 @@ function increment_otp_rate_counter( $context, $identifier, $window_seconds ) {
 function ajax_send_otp() {
     // Security check: Prevent logged-in users from using registration OTP
     if (is_user_logged_in()) {
-        wp_send_json_error(array('message' => esc_html__('Access denied: Already logged in', 'astra-child')));
+        wp_send_json_error(array('message' => esc_html__('Access denied: Already logged in', 'bricks-child')));
         return;
     }
     
@@ -95,7 +95,7 @@ function ajax_send_otp() {
     // check_ajax_referer( 'your_nonce_action', 'nonce' );
 
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'custom_registration_nonce')) {
-        wp_send_json_error(['message' => esc_html__('Security check failed.', 'astra-child')]);
+        wp_send_json_error(['message' => esc_html__('Security check failed.', 'bricks-child')]);
         return;
     }
     
@@ -103,20 +103,20 @@ function ajax_send_otp() {
     $phone = isset($_POST['phone']) ? sanitize_text_field($_POST['phone']) : '';
 
     if (empty($phone)) {
-        wp_send_json_error(array('message' => esc_html__('Phone number is required.', 'astra-child')));
+        wp_send_json_error(array('message' => esc_html__('Phone number is required.', 'bricks-child')));
         return;
     }
 
     // Only allow Cyprus phone numbers (E.164 +357... or 357...) to reach Twilio.
     $normalized_phone = preg_replace('/[\s\-]/', '', $phone);
     if (strpos($normalized_phone, '+357') !== 0 && strpos($normalized_phone, '357') !== 0) {
-        wp_send_json_error(array('message' => esc_html__('Only Cypriot (+357) phone numbers are supported for verification.', 'astra-child')));
+        wp_send_json_error(array('message' => esc_html__('Only Cypriot (+357) phone numbers are supported for verification.', 'bricks-child')));
         return;
     }
 
     $ts_token = isset($_POST['turnstile_token']) ? sanitize_text_field($_POST['turnstile_token']) : '';
     if (!custom_verify_turnstile_token($ts_token)) {
-        wp_send_json_error(['message' => esc_html__('Verification failed. Please try again.', 'astra-child')]);
+        wp_send_json_error(['message' => esc_html__('Verification failed. Please try again.', 'bricks-child')]);
         return;
     }
 
@@ -129,7 +129,7 @@ function ajax_send_otp() {
     if (has_exceeded_otp_rate_limit('ip', $client_ip, 5, 10 * 60)
         || has_exceeded_otp_rate_limit('phone', $normalized_phone, 3, 60 * 60)
     ) {
-        wp_send_json_error(array('message' => esc_html__('Too many verification attempts. Please try again later.', 'astra-child')));
+        wp_send_json_error(array('message' => esc_html__('Too many verification attempts. Please try again later.', 'bricks-child')));
         return;
     }
 
@@ -141,7 +141,7 @@ function ajax_send_otp() {
         'count_total' => false,
     ));
     if (!empty($user_by_phone)) {
-        wp_send_json_error(array('message' => esc_html__('This phone number is already registered.', 'astra-child')));
+        wp_send_json_error(array('message' => esc_html__('This phone number is already registered.', 'bricks-child')));
         return; // Stop execution if user exists
     }
     // *** END USER EXISTENCE CHECK ***
@@ -152,7 +152,7 @@ function ajax_send_otp() {
 
     if (empty($twilio_sid) || empty($twilio_token) || empty($twilio_verify_sid)) {
         error_log('Twilio Verify configuration is missing.');
-        wp_send_json_error(array('message' => esc_html__('SMS configuration error. Please contact admin.', 'astra-child')));
+        wp_send_json_error(array('message' => esc_html__('SMS configuration error. Please contact admin.', 'bricks-child')));
         return;
     }
 
@@ -168,10 +168,10 @@ function ajax_send_otp() {
             ->create($phone, "sms");
 
         error_log("Verification started: SID " . $verification->sid);
-        wp_send_json_success(array('message' => esc_html__('Verification code sent successfully.', 'astra-child')));
+        wp_send_json_success(array('message' => esc_html__('Verification code sent successfully.', 'bricks-child')));
     } catch (\Twilio\Exceptions\RestException $e) {
         error_log('Twilio Verify error: ' . $e->getMessage());
-        wp_send_json_error(array('message' => esc_html__('Failed to send verification code. Please try again later.', 'astra-child')));
+        wp_send_json_error(array('message' => esc_html__('Failed to send verification code. Please try again later.', 'bricks-child')));
     }
 }
 
@@ -185,7 +185,7 @@ add_action('wp_ajax_send_otp', 'ajax_send_otp');
 function ajax_verify_otp() {
     // Security check: Prevent logged-in users from using registration OTP
     if (is_user_logged_in()) {
-        wp_send_json_error(array('message' => esc_html__('Access denied: Already logged in', 'astra-child')));
+        wp_send_json_error(array('message' => esc_html__('Access denied: Already logged in', 'bricks-child')));
         return;
     }
     
@@ -193,7 +193,7 @@ function ajax_verify_otp() {
     $code = isset($_POST['otp']) ? sanitize_text_field($_POST['otp']) : '';
 
     if (empty($phone) || empty($code)) {
-        wp_send_json_error(array('message' => esc_html__('Phone and code are required.', 'astra-child')));
+        wp_send_json_error(array('message' => esc_html__('Phone and code are required.', 'bricks-child')));
         return;
     }
 
@@ -202,7 +202,7 @@ function ajax_verify_otp() {
     $twilio_verify_sid = defined('TWILIO_VERIFY_SID') ? TWILIO_VERIFY_SID : '';
 
     if (empty($twilio_sid) || empty($twilio_token) || empty($twilio_verify_sid)) {
-        wp_send_json_error(array('message' => esc_html__('Twilio Verify config is missing.', 'astra-child')));
+        wp_send_json_error(array('message' => esc_html__('Twilio Verify config is missing.', 'bricks-child')));
         return;
     }
 
@@ -227,13 +227,13 @@ function ajax_verify_otp() {
                 10 * 60 // 10 minutes
             );
 
-            wp_send_json_success(array('message' => esc_html__('Phone number verified successfully!', 'astra-child')));
+            wp_send_json_success(array('message' => esc_html__('Phone number verified successfully!', 'bricks-child')));
         } else {
-            wp_send_json_error(array('message' => esc_html__('Invalid verification code.', 'astra-child')));
+            wp_send_json_error(array('message' => esc_html__('Invalid verification code.', 'bricks-child')));
         }
     } catch (\Twilio\Exceptions\RestException $e) {
         error_log('Twilio Verify check error: ' . $e->getMessage());
-        wp_send_json_error(array('message' => esc_html__('Verification failed. Try again.', 'astra-child')));
+        wp_send_json_error(array('message' => esc_html__('Verification failed. Try again.', 'bricks-child')));
     }
 }
 
@@ -352,7 +352,7 @@ function ajax_filter_car_listings_handler() {
                             echo '<div class="car-listing-image' . ($index === 0 ? ' active' : '') . '" data-index="' . $index . '">';
                             echo '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($clean_year . ' ' . $make . ' ' . $model) . '">'; // Use clean year in alt
                             if ($index === count($all_images) - 1 && count($all_images) > 1) {
-                                echo '<a href="' . esc_url(get_permalink(get_the_ID())) . '" class="see-all-images" style="display: none;">See All Images</a>';
+                                echo '<a href="' . esc_url(get_permalink(get_the_ID())) . '" class="see-all-images" style="display: none;">' . esc_html__('See All Images', 'bricks-child') . '</a>';
                             }
                             echo '</div>';
                         }
@@ -422,7 +422,7 @@ function ajax_filter_car_listings_handler() {
                                 update_post_meta(get_the_ID(), 'publication_date', $publication_date);
                             }
                             $formatted_date = date_i18n('F j, Y', strtotime($publication_date));
-                            echo '<div class="car-publication-date">Listed on ' . esc_html($formatted_date) . '</div>';
+                            echo '<div class="car-publication-date">' . esc_html(sprintf(__('Listed on %s', 'bricks-child'), $formatted_date)) . '</div>';
                             ?>
                             <p class="car-location"><i class="fas fa-map-marker-alt"></i> <span class="location-text"><?php echo esc_html($display_location_handler); ?></span></p>
                         </div>
@@ -433,7 +433,7 @@ function ajax_filter_car_listings_handler() {
             // --- END Card Rendering Logic ---
         endwhile;
     else :
-        echo '<p class="no-listings">No car listings found matching your criteria.</p>';
+        echo '<p class="no-listings">' . esc_html__('No car listings found matching your criteria.', 'bricks-child') . '</p>';
     endif;
     $listings_html = ob_get_clean();
 
@@ -473,33 +473,33 @@ add_action('wp_ajax_mark_car_as_sold', 'handle_mark_car_as_sold');
 function handle_mark_car_as_sold() {
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'mark_car_as_sold')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     // Get car ID
     $car_id = isset($_POST['car_id']) ? intval($_POST['car_id']) : 0;
     if (!$car_id) {
-        wp_send_json_error('Invalid car ID');
+        wp_send_json_error(__('Invalid car ID', 'bricks-child'));
         return;
     }
 
     // Check if user owns the car
     $car = get_post($car_id);
     if (!$car || $car->post_author != get_current_user_id()) {
-        wp_send_json_error('Unauthorized');
+        wp_send_json_error(__('Unauthorized', 'bricks-child'));
         return;
     }
 
     if (ListingStateManager::is_marked_expired($car_id)) {
-        wp_send_json_error('This listing is expired. Reactivate it from the editor before changing sold status.');
+        wp_send_json_error(__('This listing is expired. Reactivate it from the editor before changing sold status.', 'bricks-child'));
         return;
     }
 
     // Get the new status
     $status = isset($_POST['status']) ? sanitize_text_field($_POST['status']) : 'sold';
     if (!in_array($status, array('sold', 'available'))) {
-        wp_send_json_error('Invalid status');
+        wp_send_json_error(__('Invalid status', 'bricks-child'));
         return;
     }
 
@@ -518,32 +518,32 @@ add_action('wp_ajax_toggle_car_status', 'handle_toggle_car_status');
 function handle_toggle_car_status() {
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'toggle_car_status_nonce')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     // Check if user is logged in
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
 
     // Get and validate car ID
     $car_id = isset($_POST['car_id']) ? intval($_POST['car_id']) : 0;
     if (!$car_id) {
-        wp_send_json_error('Invalid car ID');
+        wp_send_json_error(__('Invalid car ID', 'bricks-child'));
         return;
     }
 
     // Check if user owns the car
     $car = get_post($car_id);
     if (!$car || $car->post_author != get_current_user_id()) {
-        wp_send_json_error('Unauthorized');
+        wp_send_json_error(__('Unauthorized', 'bricks-child'));
         return;
     }
 
     if (ListingStateManager::is_marked_expired($car_id)) {
-        wp_send_json_error('This listing is expired. Reactivate it from the editor before changing sold status.');
+        wp_send_json_error(__('This listing is expired. Reactivate it from the editor before changing sold status.', 'bricks-child'));
         return;
     }
 
@@ -555,7 +555,7 @@ function handle_toggle_car_status() {
         wp_send_json_success();
     }
 
-    wp_send_json_error('Failed to update car status');
+    wp_send_json_error(__('Failed to update car status', 'bricks-child'));
 } 
 
 /**
@@ -565,13 +565,13 @@ function handle_toggle_car_status() {
 function toggle_favorite_car() {
     // Check nonce for security
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'toggle_favorite_car')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
     
     // Check if user is logged in
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
     
@@ -580,7 +580,7 @@ function toggle_favorite_car() {
     $is_favorite = isset($_POST['is_favorite']) ? (bool)$_POST['is_favorite'] : false;
     
     if ($car_id <= 0) {
-        wp_send_json_error('Invalid car ID');
+        wp_send_json_error(__('Invalid car ID', 'bricks-child'));
         return;
     }
     
@@ -613,4 +613,4 @@ function toggle_favorite_car() {
     ));
 }
 add_action('wp_ajax_toggle_favorite_car', 'toggle_favorite_car');
-add_action('wp_ajax_nopriv_toggle_favorite_car', 'toggle_favorite_car'); 
+add_action('wp_ajax_nopriv_toggle_favorite_car', 'toggle_favorite_car');

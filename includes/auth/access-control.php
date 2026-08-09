@@ -26,7 +26,7 @@ function restrict_backend_access() {
         $restricted_roles = array('subscriber', 'client', 'dealership');
         
         if ( array_intersect( $restricted_roles, $user_roles ) ) {
-            wp_safe_redirect( home_url() ); // Redirect to the homepage
+            wp_safe_redirect( autoagora_localized_page_url() ); // Redirect to the homepage
             exit;
         }
     }

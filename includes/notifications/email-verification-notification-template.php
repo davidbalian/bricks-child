@@ -22,13 +22,13 @@ if (function_exists('get_email_verification_banner_html')) {
             <div class="text-and-icon">
                 <span class="notice-icon"><i class="fas fa-envelope"></i></span>
                 <span class="notice-text">
-                    To receive notifications, activate <strong><?php echo esc_html($user_email); ?></strong>
+                    <?php echo wp_kses_post(sprintf(__('To receive notifications, activate <strong>%s</strong>', 'bricks-child'), esc_html($user_email))); ?>
                 </span>
             </div>
             <button class="btn btn-primary-gradient send-verification-btn" data-email="<?php echo esc_attr($user_email); ?>">
-                Send Verification Email
+                <?php esc_html_e('Send Verification Email', 'bricks-child'); ?>
             </button>
-            <button class="dismiss-notice-btn" title="Dismiss notification">×</button>
+            <button class="dismiss-notice-btn" title="<?php esc_attr_e('Dismiss notification', 'bricks-child'); ?>">&times;</button>
         </div>
     </div> 
     <?php

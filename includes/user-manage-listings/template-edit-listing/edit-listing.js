@@ -1,4 +1,5 @@
 jQuery(document).ready(function($) {
+    const t = window.autoagoraTranslate || ((source) => source);
     // PRODUCTION SAFETY: Only log in development environments
 window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' ||
                                                window.location.hostname.includes('staging') ||
@@ -8,15 +9,15 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     // FORM VALIDATION CONFIGURATION
     // =====================================================
     const requiredFields = {
-        'edit-listing-year': { type: 'dropdown', label: 'Year' },
-        'edit-listing-availability': { type: 'dropdown', label: 'Availability' },
-        'edit-listing-engine-capacity': { type: 'dropdown', label: 'Engine Capacity' },
-        'edit-listing-fuel-type': { type: 'dropdown', label: 'Fuel Type' },
-        'edit-listing-transmission': { type: 'dropdown', label: 'Transmission' },
-        'edit-listing-body-type': { type: 'dropdown', label: 'Body Type' },
-        'edit-listing-exterior-color': { type: 'dropdown', label: 'Exterior Color' },
-        'mileage': { type: 'text', label: 'Mileage' },
-        'price': { type: 'text', label: 'Price' }
+        'edit-listing-year': { type: 'dropdown', label: t('Year') },
+        'edit-listing-availability': { type: 'dropdown', label: t('Availability') },
+        'edit-listing-engine-capacity': { type: 'dropdown', label: t('Engine Capacity') },
+        'edit-listing-fuel-type': { type: 'dropdown', label: t('Fuel Type') },
+        'edit-listing-transmission': { type: 'dropdown', label: t('Transmission') },
+        'edit-listing-body-type': { type: 'dropdown', label: t('Body Type') },
+        'edit-listing-exterior-color': { type: 'dropdown', label: t('Exterior Color') },
+        'mileage': { type: 'text', label: t('Mileage') },
+        'price': { type: 'text', label: t('Price') }
     };
 
     // Initialize Async Upload Manager (ADDED FROM ADD LISTING PAGE)
@@ -96,7 +97,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                 $engineCapacitySelect.val('');
                 $engineCapacityDropdown.find('.car-filter-dropdown-option').removeClass('selected');
                 $engineCapacityDropdown.find('.car-filter-dropdown-option[data-value=""]').addClass('selected');
-                $engineCapacityButton.find('.car-filter-dropdown-text').addClass('placeholder').text('Select Engine Capacity');
+                $engineCapacityButton.find('.car-filter-dropdown-text').addClass('placeholder').text(t('Select Engine Capacity'));
             }
 
             // Remove electric-only option
@@ -160,7 +161,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         // Check images first (minimum 2) - they're at the top of the page
         const imageCount = getImageCount();
         if (imageCount < 2) {
-            errors.push({ fieldId: 'image-preview', label: 'Images (minimum 2)', type: 'images' });
+            errors.push({ fieldId: 'image-preview', label: t('Images (minimum 2)'), type: 'images' });
         }
 
         // Check all required fields
@@ -173,7 +174,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         // Check location
         const locationValue = $('#location').val();
         if (!locationValue || locationValue.trim() === '') {
-            errors.push({ fieldId: 'location-row', label: 'Location', type: 'location' });
+            errors.push({ fieldId: 'location-row', label: t('Location'), type: 'location' });
         }
 
         return {
@@ -206,7 +207,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             const $imagesSection = $('.add-listing-images-section');
             $imagesSection.addClass('images-section-has-error');
             if (!$imagesSection.find('.images-section-error').length) {
-                $imagesSection.append('<p class="images-section-error">Please ensure at least 2 images</p>');
+                $imagesSection.append('<p class="images-section-error">' + t('Please ensure at least 2 images') + '</p>');
             }
             return;
         } else {
@@ -219,7 +220,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
             // Add error message if not already present
             if (!$container.find('.field-error-message').length) {
-                $container.append('<span class="field-error-message">This field is required</span>');
+                $container.append('<span class="field-error-message">' + t('This field is required') + '</span>');
             }
         }
     }
@@ -578,7 +579,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         const selectedMake = $(this).val();
         const modelSelect = $('#model');
         
-        modelSelect.html('<option value="">Select Model</option>');
+        modelSelect.html('<option value="">' + t('Select Model') + '</option>');
         
         if (selectedMake && makesData[selectedMake]) {
             // makesData[selectedMake] is now a simple array of models
@@ -689,7 +690,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             for (const file of candidateFiles) {
                 // Check if adding this file would exceed the maximum
             if (currentExistingImageDOMCount + accumulatedFilesList.length >= maxTotalFiles) {
-                alert('Maximum ' + maxTotalFiles + ' total images allowed. Cannot add "' + file.name + '".');
+                alert(t('Maximum %d total images allowed. Cannot add "%s".', maxTotalFiles, file.name));
                     break;
             }
 
@@ -713,18 +714,18 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             }
 
             if (!allowedTypes.includes(file.type)) {
-                alert(`File type not allowed for ${file.name}. Only JPG, PNG, GIF, and WebP are permitted.`);
+                alert(t('File type not allowed for %s. Only JPG, PNG, GIF, and WebP are permitted.', file.name));
                     continue;
             }
 
             if (file.size > maxFileSize) {
-                alert(`File ${file.name} is too large (max 12MB).`);
+                alert(t('File %s is too large (max 12MB).', file.name));
                     continue;
                 }
 
                 try {
                     // Update processing status
-                    updateProcessingStatus('Optimizing ' + file.name + '...');
+                    updateProcessingStatus(t('Optimizing %s...', file.name));
 
                     const originalSize = file.size;
                     totalOriginalSize += originalSize;
@@ -744,7 +745,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                     // ASYNC UPLOAD INTEGRATION - Start background upload
                     if (asyncUploadManager) {
                         try {
-                            updateProcessingStatus('Uploading ' + file.name + '...');
+                            updateProcessingStatus(t('Uploading %s...', file.name));
                             const fileKey = await asyncUploadManager.addFileToQueue(optimizedFile, file);
                             
                             // Store the file key for tracking (FIXED TO MATCH ADD LISTING)
@@ -856,7 +857,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             
             // Add initial upload status if async upload is starting (FIXED TO MATCH ADD LISTING)
             if (file.asyncFileKey) {
-                previewItem.append('<div class="upload-status upload-pending">⏳ Uploading...</div>');
+                previewItem.append('<div class="upload-status upload-pending">⏳ ' + t('Uploading...') + '</div>');
             }
 
             // Add compression stats if available
@@ -1017,12 +1018,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         
         if (totalImages < 2) {
             e.preventDefault();
-            alert('Please ensure there are at least 2 images for your car listing (including existing and newly added).');
+            alert(t('Please ensure there are at least 2 images for your car listing (including existing and newly added).'));
             return false;
         }
         if (totalImages > 25) {
             e.preventDefault();
-            alert('You can have a maximum of 25 images for your car listing (including existing and newly added).');
+            alert(t('You can have a maximum of 25 images for your car listing (including existing and newly added).'));
             return false;
         }
 
@@ -1035,7 +1036,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             
             if (pendingUploads > 0) {
                 e.preventDefault();
-                alert(`Please wait for ${pendingUploads} image(s) to finish uploading before submitting.`);
+                alert(t('Please wait for %d image(s) to finish uploading before submitting.', pendingUploads));
                 return false;
             }
             
@@ -1150,7 +1151,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                 const indicator = $(`
                     <div class="image-processing-indicator">
                         <div class="processing-spinner"></div>
-                        <span class="processing-text">Optimizing images...</span>
+                        <span class="processing-text">${t('Optimizing images...')}</span>
                         <span class="processing-status"></span>
                     </div>
                 `);
@@ -1170,9 +1171,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         $('.optimization-summary, .error-summary').remove();
         
         const summaryClass = errors > 0 ? 'error-summary' : 'optimization-summary';
-        const message = errors > 0 
-            ? `${fileCount} images processed with ${errors} optimization errors`
-            : `${fileCount} images optimized! Saved ${(totalSavings/1024).toFixed(1)}KB (${compressionPercent}% compression)`;
+        const message = errors > 0
+            ? t('%d images processed with %d optimization errors', fileCount, errors)
+            : t('%d images optimized! Saved %sKB (%d%% compression)', fileCount, (totalSavings/1024).toFixed(1), compressionPercent);
             
         const summary = $(`<div class="${summaryClass}">${message}</div>`);
         imagePreviewContainer.before(summary);
@@ -1215,7 +1216,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
             const $preview = $(`.image-preview[data-async-key="${fileKey}"]`);
             $preview.find('.upload-status').remove();
-            $preview.append('<div class="upload-status upload-success">✓ Uploaded</div>');
+            $preview.append('<div class="upload-status upload-success">✓ ' + t('Uploaded') + '</div>');
 
             setTimeout(() => {
                 $preview.find('.upload-success').fadeOut(() => {
@@ -1241,7 +1242,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             
             const $preview = $(`.image-preview[data-async-key="${fileKey}"]`);
             $preview.find('.upload-status').remove();
-            $preview.append('<div class="upload-status upload-error">✗ Upload failed</div>');
+            $preview.append('<div class="upload-status upload-error">✗ ' + t('Upload failed') + '</div>');
             
             // Show fallback message below upload area
             showAsyncUploadFallbackMessage();
@@ -1256,7 +1257,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             const message = $(`
                 <div class="async-upload-fallback-message">
                     <i class="fas fa-info-circle fallback-icon"></i>
-                    <span>Background upload failed but images will submit normally when you press submit. You may continue filling the form.</span>
+                    <span>${t('Background upload failed but images will submit normally when you press submit. You may continue filling the form.')}</span>
                 </div>
             `);
             
@@ -1546,7 +1547,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         const $button = $dropdownWrapper.find(".car-filter-dropdown-button");
         const $search = $dropdownWrapper.find(".car-filter-dropdown-search");
 
-        const placeholder = "Recently used locations";
+        const placeholder = t('Recently used locations');
 
         // Build options HTML
         let html = '<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="">' + placeholder + "</button>";
@@ -1697,7 +1698,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         $button.find(".car-filter-dropdown-text")
             .addClass("placeholder")
             .removeClass("location-selected")
-            .text("Recently used locations");
+            .text(t('Recently used locations'));
 
         // Reset selection
         $options.find(".car-filter-dropdown-option").removeClass("selected");
@@ -1729,4 +1730,4 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
     // Initialize saved locations on page load
     initSavedLocations();
-}); 
+});

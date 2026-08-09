@@ -143,7 +143,7 @@ function validate_image_requirements($existing_images, $removed_images, $new_ima
     if ($final_count < 2) {
         return array(
             'valid' => false,
-            'message' => 'At least 2 images are required. Current count: ' . $final_count
+            'message' => sprintf(__('At least 2 images are required. Current count: %d', 'bricks-child'), $final_count)
         );
     }
     

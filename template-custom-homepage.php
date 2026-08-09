@@ -188,7 +188,7 @@ get_header();
     <?php
     autoagora_custom_homepage_collection(
         __('Latest cars', 'bricks-child'),
-        home_url('/cars/'),
+        autoagora_localized_page_url('cars'),
         __('View All Used Cars in Cyprus', 'bricks-child'),
         array(),
         true
@@ -212,13 +212,13 @@ get_header();
             __('Search Nicosia, Limassol, and all of Cyprus with absolute confidence.', 'bricks-child'),
         ),
         __('View All Used Cars in Cyprus', 'bricks-child'),
-        home_url('/cars/'),
+        autoagora_localized_page_url('cars'),
         'one'
     );
 
     autoagora_custom_homepage_collection(
         __('Budget cars under €5,000', 'bricks-child'),
-        home_url('/cars/budget-cars/'),
+        autoagora_localized_page_url('cars/budget-cars'),
         __('View All Budget Cars in Cyprus', 'bricks-child'),
         array(
             array(
@@ -232,7 +232,7 @@ get_header();
 
     autoagora_custom_homepage_collection(
         __('Family SUVs', 'bricks-child'),
-        home_url('/cars/family-suvs/'),
+        autoagora_localized_page_url('cars/family-suvs'),
         __('View All Family SUVs in Cyprus', 'bricks-child'),
         array(
             array(
@@ -251,13 +251,13 @@ get_header();
             __('Listing is fast, secure, and free. Reach buyers across Nicosia, Limassol, Paphos, and Larnaca instantly.', 'bricks-child'),
         ),
         __('Sell My Car', 'bricks-child'),
-        home_url('/add-listing/'),
+        autoagora_localized_page_url('add-listing'),
         'two'
     );
 
     autoagora_custom_homepage_collection(
         __('Luxury Cars Above €100,000', 'bricks-child'),
-        home_url('/cars/luxury-cars/'),
+        autoagora_localized_page_url('cars/luxury-cars'),
         __('View All Luxury Cars in Cyprus', 'bricks-child'),
         array(
             array(
@@ -271,7 +271,7 @@ get_header();
 
     autoagora_custom_homepage_collection(
         __('Sporty Coupes/Convertibles', 'bricks-child'),
-        home_url('/cars/sporty-coupes-convertibles/'),
+        autoagora_localized_page_url('cars/sporty-coupes-convertibles'),
         __('View All Coupes/Convertibles in Cyprus', 'bricks-child'),
         array(
             array(
@@ -290,7 +290,7 @@ get_header();
             __('The fastest way to join is through a quick chat.', 'bricks-child'),
         ),
         __('Become a Dealer', 'bricks-child'),
-        home_url('/become-a-dealer/'),
+        autoagora_localized_page_url('become-a-dealer'),
         'three'
     );
     ?>

@@ -40,7 +40,7 @@ function redirect_logged_in_users_from_registration() {
             // Prevent caching of this redirect
             nocache_headers();
             
-            wp_redirect( home_url( '/my-account' ) );
+            wp_redirect( autoagora_localized_page_url( 'my-account' ) );
             exit;
         }
     }

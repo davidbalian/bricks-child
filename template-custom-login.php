@@ -15,7 +15,7 @@ if ( is_user_logged_in() ) {
 	// Prevent caching of this redirect
 	nocache_headers();
 	
-	wp_redirect( home_url( '/my-account' ) );
+	wp_redirect( autoagora_localized_page_url( 'my-account' ) );
 	exit;
 }
 
@@ -79,7 +79,7 @@ get_header(); ?>
 								</p>
 								<p class="login-submit">
 									<input type="submit" name="wp-submit" id="wp-submit" class="btn btn-primary" value="<?php esc_attr_e( 'Log In', 'bricks-child' ); ?>" />
-									<input type="hidden" name="redirect_to" value="<?php echo esc_url( home_url() ); ?>" />
+									<input type="hidden" name="redirect_to" value="<?php echo esc_url( autoagora_localized_page_url() ); ?>" />
 									<!-- Add custom redirect for failed login -->
 									<input type="hidden" name="login_failed_redirect" value="<?php echo esc_url( get_permalink() ); ?>?login=failed" />
 								</p>

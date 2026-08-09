@@ -1,6 +1,8 @@
 (function ($) {
   "use strict";
 
+  var t = window.autoagoraTranslate || function (source) { return source; };
+
   /**
    * Toggle car sold/available status via AJAX.
    * This mirrors the original inline implementation but uses
@@ -21,8 +23,8 @@
     if (
       !window.confirm(
         markAsSold
-          ? "Are you sure you want to mark this car as sold?"
-          : "Are you sure you want to mark this car as available?"
+          ? t("Are you sure you want to mark this car as sold?")
+          : t("Are you sure you want to mark this car as available?")
       )
     ) {
       return;
@@ -51,7 +53,7 @@
           window.location.reload();
         } else {
           // eslint-disable-next-line no-alert
-          window.alert("Error updating car status. Please try again.");
+          window.alert(t("Error updating car status. Please try again."));
         }
       })
       .fail(function (jqXHR, textStatus, errorThrown) {
@@ -63,7 +65,7 @@
           });
         }
         // eslint-disable-next-line no-alert
-        window.alert("Error updating car status. Please try again.");
+        window.alert(t("Error updating car status. Please try again."));
       });
   }
 
@@ -100,7 +102,7 @@
     var $paginationContainer = $(".my-listings-pagination-container");
 
     // Loader
-    var $loader = $('<div class="my-listings-loader" style="display:none;">Loading...</div>');
+    var $loader = $('<div class="my-listings-loader" style="display:none;">' + t("Loading...") + '</div>');
 
     if ($paginationContainer.length) {
       $paginationContainer.before($loader);

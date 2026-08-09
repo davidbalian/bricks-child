@@ -1,11 +1,12 @@
 jQuery(document).ready(function ($) {
+  const t = window.autoagoraTranslate || ((source) => source);
   // =====================================================
   // FORM VALIDATION CONFIGURATION
   // =====================================================
   const requiredFields = {
-    'buyer-request-make': { type: 'dropdown', label: 'Make' },
-    'buyer-request-year': { type: 'dropdown', label: 'Year' },
-    'buyer_price': { type: 'text', label: 'Price' }
+    'buyer-request-make': { type: 'dropdown', label: t('Make') },
+    'buyer-request-year': { type: 'dropdown', label: t('Year') },
+    'buyer_price': { type: 'text', label: t('Price') }
     // Note: buyer-request-model and buyer_description are optional
   };
 
@@ -80,9 +81,9 @@ jQuery(document).ready(function ($) {
 
       // Add error message if not already present
       if (!$container.find('.field-error-message').length) {
-        let errorMsg = 'This field is required';
+        let errorMsg = t('This field is required');
         if (fieldId === 'buyer_price') {
-          errorMsg = 'Please enter a valid price';
+          errorMsg = t('Please enter a valid price');
         }
         $container.append('<span class="field-error-message">' + errorMsg + '</span>');
       }
@@ -282,7 +283,7 @@ jQuery(document).ready(function ($) {
       
       if (isLoading) {
         $button.prop('disabled', true);
-        $options.html('<div class="car-filter-loading" style="padding: 0.75rem; color: #6b7280; text-align: center;">Loading...</div>');
+        $options.html('<div class="car-filter-loading" style="padding: 0.75rem; color: #6b7280; text-align: center;">' + t('Loading...') + '</div>');
       } else {
         $button.prop('disabled', false);
       }
@@ -303,7 +304,7 @@ jQuery(document).ready(function ($) {
         selectHtml += '<option value="' + opt.value + '">' + opt.label + '</option>';
       });
       
-      html += '<div class="car-filter-no-results hidden">No matching results</div>';
+      html += '<div class="car-filter-no-results hidden">' + t('No matching results') + '</div>';
       
       $options.html(html);
       $select.html(selectHtml);
@@ -342,7 +343,7 @@ jQuery(document).ready(function ($) {
       $button.find('.car-filter-dropdown-text').addClass('placeholder').text(placeholder);
       
       var html = '<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="">' + placeholder + '</button>';
-      html += '<div class="car-filter-no-results hidden">No matching results</div>';
+      html += '<div class="car-filter-no-results hidden">' + t('No matching results') + '</div>';
       $options.html(html);
       $select.html('<option value="">' + placeholder + '</option>');
     },
@@ -388,7 +389,7 @@ jQuery(document).ready(function ($) {
     
     if (!makeName || makeName === '') {
       // Reset model dropdown if no make selected
-      BuyerRequestDropdown.disable($modelDropdown, 'Select Model');
+      BuyerRequestDropdown.disable($modelDropdown, t('Select Model'));
       return;
     }
     
@@ -428,7 +429,7 @@ jQuery(document).ready(function ($) {
           console.log('Buyer Request: Updating model dropdown with', options.length, 'options');
           
           // Update options (this will enable the dropdown if options exist)
-          BuyerRequestDropdown.updateOptions($modelDropdown, options, 'Select Model');
+          BuyerRequestDropdown.updateOptions($modelDropdown, options, t('Select Model'));
           
           // Explicitly enable the dropdown to ensure it's enabled
           BuyerRequestDropdown.enable($modelDropdown);
@@ -436,7 +437,7 @@ jQuery(document).ready(function ($) {
           console.log('Buyer Request: Model dropdown enabled. Button disabled?', $modelDropdown.find('.car-filter-dropdown-button').prop('disabled'));
         } else {
           console.log('Buyer Request: No models found or error in response');
-          BuyerRequestDropdown.disable($modelDropdown, response.data && response.data.length === 0 ? 'No models available' : 'Error loading models');
+          BuyerRequestDropdown.disable($modelDropdown, response.data && response.data.length === 0 ? t('No models available') : t('Error loading models'));
         }
       },
       error: function(xhr, status, error) {
@@ -446,7 +447,7 @@ jQuery(document).ready(function ($) {
         var $modelDropdown = $('#buyer-request-model-wrapper');
         
         BuyerRequestDropdown.setLoading($modelDropdown, false);
-        BuyerRequestDropdown.disable($modelDropdown, 'Error loading models');
+        BuyerRequestDropdown.disable($modelDropdown, t('Error loading models'));
         console.error('Buyer Request: AJAX error:', error);
       }
     });

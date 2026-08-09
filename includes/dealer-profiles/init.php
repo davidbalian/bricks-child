@@ -444,13 +444,19 @@ function autoagora_dealer_profile_claim_url(int $post_id): string
             'claim_dealer_profile' => $post_id,
             'dealer' => sanitize_title(get_the_title($post_id)),
         ),
-        home_url('/contact/')
+        autoagora_localized_page_url('contact')
     );
 }
 
 function autoagora_dealer_profile_city_archive_url(string $city_slug): string
 {
-    return trailingslashit(home_url('/dealers/' . sanitize_title($city_slug)));
+    $archive_url = get_post_type_archive_link(AUTOAGORA_DEALER_PROFILE_POST_TYPE);
+    $archive_url = $archive_url ?: home_url('/dealers/');
+    $city_slug = sanitize_title($city_slug);
+
+    return $city_slug === ''
+        ? trailingslashit($archive_url)
+        : trailingslashit(trailingslashit($archive_url) . $city_slug);
 }
 
 function autoagora_dealer_profile_active_listing_count(int $post_id): int
@@ -1090,7 +1096,7 @@ function autoagora_dealer_profile_get_seo_context(): array
             : __('Browse car dealer profiles across Cyprus. Find dealership locations, websites, social links, and active car listings on AutoAgora.', 'bricks-child');
         $canonical = $city !== ''
             ? autoagora_dealer_profile_city_archive_url($city_slug)
-            : trailingslashit(home_url('/dealers/'));
+            : autoagora_dealer_profile_city_archive_url('');
 
         return array(
             'title'       => $title,

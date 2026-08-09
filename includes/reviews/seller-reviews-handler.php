@@ -57,7 +57,7 @@ function can_user_leave_review($user_id) {
 function handle_submit_seller_review() {
     // Verify nonce for security
     if (!isset($_POST['seller_review_nonce']) || !wp_verify_nonce($_POST['seller_review_nonce'], 'submit_seller_review_nonce')) {
-        wp_send_json_error(array('message' => 'Security check failed'));
+        wp_send_json_error(array('message' => __('Security check failed', 'bricks-child')));
         return;
     }
     
@@ -65,12 +65,12 @@ function handle_submit_seller_review() {
 
     if ($strict) {
         if (!is_user_logged_in()) {
-            wp_send_json_error(array('message' => 'You must be logged in to leave a review'));
+            wp_send_json_error(array('message' => __('You must be logged in to leave a review', 'bricks-child')));
             return;
         }
         $reviewer_id = get_current_user_id();
         if (!can_user_leave_review($reviewer_id)) {
-            wp_send_json_error(array('message' => 'Please verify your email before leaving a review.'));
+            wp_send_json_error(array('message' => __('Please verify your email before leaving a review.', 'bricks-child')));
             return;
         }
     } else {
@@ -92,7 +92,7 @@ function handle_submit_seller_review() {
             }
         }
         if (!is_email($reviewer_email_raw)) {
-            wp_send_json_error(array('message' => 'Please enter a valid email address.'));
+            wp_send_json_error(array('message' => __('Please enter a valid email address.', 'bricks-child')));
             return;
         }
 
@@ -101,7 +101,7 @@ function handle_submit_seller_review() {
             $rate_key = 'seller_review_guest_' . md5($ip);
             $recent = (int) get_transient($rate_key);
             if ($recent >= 10) {
-                wp_send_json_error(array('message' => 'Too many review attempts. Please try again later.'));
+                wp_send_json_error(array('message' => __('Too many review attempts. Please try again later.', 'bricks-child')));
                 return;
             }
         }
@@ -109,36 +109,36 @@ function handle_submit_seller_review() {
 
     // Validate required fields
     if (!$seller_id || !$rating) {
-        wp_send_json_error(array('message' => 'Seller and rating are required'));
+        wp_send_json_error(array('message' => __('Seller and rating are required', 'bricks-child')));
         return;
     }
     
     // Validate rating range
     if ($rating < 1 || $rating > 5) {
-        wp_send_json_error(array('message' => 'Rating must be between 1 and 5 stars'));
+        wp_send_json_error(array('message' => __('Rating must be between 1 and 5 stars', 'bricks-child')));
         return;
     }
     
     // Validate comment length (140 characters like design spec)
     if (strlen($comment) > 140) {
-        wp_send_json_error(array('message' => 'Comment must be 140 characters or less'));
+        wp_send_json_error(array('message' => __('Comment must be 140 characters or less', 'bricks-child')));
         return;
     }
     
     // Check if seller exists and is not the reviewer
     $seller = get_userdata($seller_id);
     if (!$seller) {
-        wp_send_json_error(array('message' => 'Seller not found'));
+        wp_send_json_error(array('message' => __('Seller not found', 'bricks-child')));
         return;
     }
     
     if ($seller_id == $reviewer_id) {
-        wp_send_json_error(array('message' => 'You cannot review yourself'));
+        wp_send_json_error(array('message' => __('You cannot review yourself', 'bricks-child')));
         return;
     }
 
     if (!$strict && !empty($seller->user_email) && strtolower($seller->user_email) === strtolower($reviewer_email_raw)) {
-        wp_send_json_error(array('message' => 'You cannot review your own account using this email.'));
+        wp_send_json_error(array('message' => __('You cannot review your own account using this email.', 'bricks-child')));
         return;
     }
     
@@ -358,4 +358,4 @@ function init_seller_reviews_global() {
 }
 
 // Initialize the global instance
-add_action('init', 'init_seller_reviews_global'); 
+add_action('init', 'init_seller_reviews_global');

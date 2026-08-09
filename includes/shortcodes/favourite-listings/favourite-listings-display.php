@@ -28,16 +28,16 @@ if ( ! $user_id ) {
             <div class="favorites-icon">
                 <i class="fas fa-heart"></i>
             </div>
-            <h1>Save your favourite adverts</h1>
-            <p>Save an advert, and view across all your devices.</p>
+            <h1><?php esc_html_e('Save your favourite adverts', 'bricks-child'); ?></h1>
+            <p><?php esc_html_e('Save an advert, and view it across all your devices.', 'bricks-child'); ?></p>
             
-            <h2>Manage your saved adverts</h2>
-            <p>Simply sign in or register to manage your saved adverts.</p>
+            <h2><?php esc_html_e('Manage your saved adverts', 'bricks-child'); ?></h2>
+            <p><?php esc_html_e('Simply sign in or register to manage your saved adverts.', 'bricks-child'); ?></p>
             
             <div class="favorites-auth-buttons">
-                <a href="<?php echo esc_url( wp_login_url( get_permalink() ) ); ?>" class="btn favorites-signin-btn">Sign in</a>
+                <a href="<?php echo esc_url( wp_login_url( get_permalink() ) ); ?>" class="btn favorites-signin-btn"><?php esc_html_e('Sign in', 'bricks-child'); ?></a>
                 <span class="auth-separator">/</span>
-                <a href="<?php echo esc_url( ($register_page = get_page_by_path('register')) ? get_permalink($register_page->ID) : wp_registration_url() ); ?>" class="btn favorites-register-btn">Register</a>
+                <a href="<?php echo esc_url(autoagora_localized_page_url('register')); ?>" class="btn favorites-register-btn"><?php esc_html_e('Register', 'bricks-child'); ?></a>
             </div>
         </div>
     </div>
@@ -53,9 +53,9 @@ if (empty($favorite_car_ids)) {
     ?>
     <div class="favorite-listings-container">
         <div class="no-favorites-message">
-            <h2>No Favorite Cars Yet</h2>
-            <p>You haven't added any cars to your favorites yet.</p>
-            <a href="<?php echo esc_url(get_permalink(get_page_by_path('car-listings'))); ?>" class="btn btn-primary browse-cars-button">Browse Cars</a>
+            <h2><?php esc_html_e('No Favorite Cars Yet', 'bricks-child'); ?></h2>
+            <p><?php esc_html_e("You haven't added any cars to your favorites yet.", 'bricks-child'); ?></p>
+            <a href="<?php echo esc_url(autoagora_localized_page_url('cars')); ?>" class="btn btn-primary browse-cars-button"><?php esc_html_e('Browse Cars', 'bricks-child'); ?></a>
         </div>
     </div>
     <?php
@@ -80,9 +80,14 @@ $car_query = new WP_Query($args);
 ?>
 
 <div class="favorite-listings-container">
-    <h1 class="favorite-listings-title">My Favorite Cars</h1>
+    <h1 class="favorite-listings-title"><?php esc_html_e('My Favorite Cars', 'bricks-child'); ?></h1>
     <?php if ($car_query->found_posts > 0): ?>
-    <div class="results-counter">Showing <span class="count"><?php echo esc_html($car_query->found_posts); ?></span> results</div>
+        <div class="results-counter"><?php
+            printf(
+                esc_html(_n('Showing %s result', 'Showing %s results', (int) $car_query->found_posts, 'bricks-child')),
+                '<span class="count">' . esc_html(number_format_i18n((int) $car_query->found_posts)) . '</span>'
+            );
+        ?></div>
     <?php endif; ?>
     
     <!-- Listings Grid -->
@@ -148,7 +153,7 @@ $car_query = new WP_Query($args);
                                 echo '<div class="car-listing-image' . ($index === 0 ? ' active' : '') . '" data-index="' . $index . '">';
                                 echo '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($year . ' ' . $make . ' ' . $model) . '">';
                                 if ($index === count($all_images) - 1 && count($all_images) > 1) {
-                                    echo '<a href="' . get_permalink() . '" class="see-all-images" style="display: none;">See All Images</a>';
+                            echo '<a href="' . esc_url(get_permalink()) . '" class="see-all-images" style="display: none;">' . esc_html__('See All Images', 'bricks-child') . '</a>';
                                 }
                                 echo '</div>';
                             }
@@ -192,7 +197,7 @@ $car_query = new WP_Query($args);
                                 update_post_meta($post_id, 'publication_date', $publication_date);
                             }
                             $formatted_date = date_i18n('F j, Y', strtotime($publication_date));
-                            echo '<div class="car-publication-date">Listed on ' . esc_html($formatted_date) . '</div>';
+                        echo '<div class="car-publication-date">' . esc_html(sprintf(__('Listed on %s', 'bricks-child'), $formatted_date)) . '</div>';
                             ?>
                             <div class="car-location"><i class="fas fa-map-marker-alt"></i> <span class="location-text"><?php echo esc_html($fav_display_location); ?></span></div>
                         </div>
@@ -201,7 +206,7 @@ $car_query = new WP_Query($args);
             <?php
             endwhile;
         else :
-            echo '<p class="no-listings">No favorite car listings found.</p>';
+            echo '<p class="no-listings">' . esc_html__('No favorite car listings found.', 'bricks-child') . '</p>';
         endif;
         wp_reset_postdata();
         ?>
@@ -218,4 +223,4 @@ $car_query = new WP_Query($args);
         ));
         ?>
     </div>
-</div> 
+</div>

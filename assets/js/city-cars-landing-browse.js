@@ -5,10 +5,13 @@
     'use strict';
 
     var cfg = window.autoagoraCityCarsBrowse || {};
+    var strings = cfg.strings || {};
     var listingsId = cfg.listingsId || '';
     var group = cfg.group || '';
-    var resultsSuffix = (cfg.strings && cfg.strings.resultsSuffix) ? cfg.strings.resultsSuffix : 'results found';
-    var sortNewestLabel = (cfg.strings && cfg.strings.sortNewest) ? cfg.strings.sortNewest : 'Newest';
+    var resultsSuffix = strings.resultsSuffix || 'results found';
+    var sortDefaultLabel = strings.sortDefault || 'Best Match';
+    var clearAllFiltersLabel = strings.clearAllFilters || 'Clear all filters';
+    var selectedAreaLabel = strings.selectedArea || 'Selected area';
 
     var $container = $('#' + listingsId);
     if (!$container.length || !group) {
@@ -109,7 +112,9 @@
         if (count === 0) {
             var $noResults = $wrapper.find('.car-listings-no-results');
             if ($noResults.length) {
-                $noResults.after('<button type="button" class="tcp-clear-all-filters-btn" id="tcp-no-results-clear-btn">Clear all filters</button>');
+                $('<button type="button" class="tcp-clear-all-filters-btn" id="tcp-no-results-clear-btn"></button>')
+                    .text(clearAllFiltersLabel)
+                    .insertAfter($noResults);
             }
         }
     }
@@ -118,7 +123,7 @@
         var $sort = $('#tcp-sort');
         $sort.find('.tcp-sort-option').removeClass('selected');
         $sort.find('.tcp-sort-option').first().addClass('selected');
-        $('#tcp-sort-label').text(sortNewestLabel);
+        $('#tcp-sort-label').text(sortDefaultLabel);
         var atts = $container.data('atts') || {};
         atts.orderby = 'score';
         atts.order = 'DESC';
@@ -127,15 +132,15 @@
     }
 
     var filterLabels = {
-        price_min: 'Price min',
-        price_max: 'Price max',
-        mileage_min: 'Mileage min',
-        mileage_max: 'Mileage max',
-        year_min: 'Year min',
-        year_max: 'Year max',
-        fuel_type: 'Fuel',
-        body_type: 'Body',
-        location_radius: 'Location'
+        price_min: strings.priceMin || 'Price min',
+        price_max: strings.priceMax || 'Price max',
+        mileage_min: strings.mileageMin || 'Mileage min',
+        mileage_max: strings.mileageMax || 'Mileage max',
+        year_min: strings.yearMin || 'Year min',
+        year_max: strings.yearMax || 'Year max',
+        fuel_type: strings.fuel || 'Fuel',
+        body_type: strings.body || 'Body',
+        location_radius: strings.location || 'Location'
     };
 
     $('#tcp-filters-btn').on('click', function () {
@@ -216,7 +221,7 @@
             }
         });
         if (locationState.active && locationState.lat && locationState.lng && locationState.radiusKm > 0) {
-            var locationLabel = locationState.label || 'Selected area';
+            var locationLabel = locationState.label || selectedAreaLabel;
             html += chip('location_radius', filterLabels.location_radius + ': ' + locationLabel);
             hasAny = true;
         }
@@ -427,7 +432,7 @@
             return;
         }
         if (!locationState.label) {
-            locationState.label = $('#tcp-location-search').val() || 'Selected area';
+            locationState.label = $('#tcp-location-search').val() || selectedAreaLabel;
         }
         locationState.active = true;
         closeLocationModal();

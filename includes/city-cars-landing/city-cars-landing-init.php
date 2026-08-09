@@ -146,7 +146,18 @@ function autoagora_city_cars_landing_enqueue_assets($city) {
             'mapFallbackLng'  => isset($city['lng']) ? (string) $city['lng'] : '33.3823',
             'strings'         => array(
                 'resultsSuffix' => __('results found', 'bricks-child'),
-                'sortNewest'    => __('Newest', 'bricks-child'),
+                'sortDefault'   => __('Best Match', 'bricks-child'),
+                'clearAllFilters' => __('Clear all filters', 'bricks-child'),
+                'priceMin'      => __('Price min', 'bricks-child'),
+                'priceMax'      => __('Price max', 'bricks-child'),
+                'mileageMin'    => __('Mileage min', 'bricks-child'),
+                'mileageMax'    => __('Mileage max', 'bricks-child'),
+                'yearMin'       => __('Year min', 'bricks-child'),
+                'yearMax'       => __('Year max', 'bricks-child'),
+                'fuel'          => __('Fuel', 'bricks-child'),
+                'body'          => __('Body', 'bricks-child'),
+                'location'      => __('Location', 'bricks-child'),
+                'selectedArea'  => __('Selected area', 'bricks-child'),
             ),
         )
     );

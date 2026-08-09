@@ -92,7 +92,7 @@ add_shortcode('car_single_call_button', 'car_single_call_button_shortcode');
 function handle_car_call_button_click() {
     // Verify nonce for security
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'car_call_button_click')) {
-        wp_send_json_error('Security check failed');
+        wp_send_json_error(__('Security check failed', 'bricks-child'));
         return;
     }
     
@@ -100,7 +100,7 @@ function handle_car_call_button_click() {
     $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
     
     if (!$post_id || get_post_type($post_id) !== 'car') {
-        wp_send_json_error('Invalid post ID');
+        wp_send_json_error(__('Invalid post ID', 'bricks-child'));
         return;
     }
     
@@ -122,7 +122,7 @@ function handle_car_call_button_click() {
             'new_count' => $new_count
         ));
     } else {
-        wp_send_json_error('Failed to update click count');
+        wp_send_json_error(__('Failed to update click count', 'bricks-child'));
     }
 }
 

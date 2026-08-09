@@ -24,7 +24,7 @@ require_once get_stylesheet_directory() . '/includes/shortcodes/car-filters/filt
 $car_id = isset($_GET['car_id']) ? intval($_GET['car_id']) : 0;
 
 if (!$car_id) {
-    wp_redirect(home_url('/my-listings/'));
+    wp_redirect(autoagora_localized_page_url('my-listings'));
     exit;
 }
 
@@ -33,7 +33,7 @@ $car = get_post($car_id);
 
 // Check if the car exists and belongs to the current user
 if (!$car || $car->post_type !== 'car' || $car->post_author != get_current_user_id()) {
-    wp_redirect(home_url('/my-listings/'));
+    wp_redirect(autoagora_localized_page_url('my-listings'));
     exit;
 }
 
@@ -177,4 +177,4 @@ wp_localize_script('edit-listing-script', 'editListingData', array(
 // Include the separated display file
 include get_stylesheet_directory() . '/includes/user-manage-listings/template-edit-listing/edit-listing-display.php';
 
-get_footer(); 
+get_footer();

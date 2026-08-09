@@ -6,6 +6,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    const t = window.autoagoraTranslate || ((source) => source);
     // PRODUCTION SAFETY: Only log in development environments
 window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' || 
                                                window.location.hostname.includes('staging') ||
@@ -63,7 +64,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         var lastName = document.getElementById('last-name').value.trim();
         
         if (firstName === '' && lastName === '') {
-            alert('Please enter at least a first name or last name');
+            alert(t('Please enter at least a first name or last name'));
             return;
         }
 
@@ -99,12 +100,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                 // Refresh the page with success parameter
                 window.location.href = window.location.pathname + '?name_updated=1';
             } else {
-                alert('Error updating name: ' + (data.data || 'Unknown error'));
+                    alert(t('Error updating name: %s', data.data || t('Unknown error')));
             }
         })
         .catch(error => {
             if (isDevelopment) console.error('Error:', error);
-            alert('Error updating name. Please try again.');
+                alert(t('Error updating name. Please try again.'));
         });
     });
 
@@ -173,7 +174,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
             // Require exactly 8 digits for the local part on the client side
             if (localPart.length !== 8) {
-                alert('Please enter a valid 8-digit phone number (without country code).');
+            alert(t('Please enter a valid 8-digit phone number (without country code).'));
                 return;
             }
 
@@ -210,7 +211,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
                         // Once a valid secondary phone is saved, the action becomes "Edit"
                         if (editSecondaryPhoneBtn) {
-                            editSecondaryPhoneBtn.textContent = 'Edit';
+                    editSecondaryPhoneBtn.textContent = t('Edit');
                         }
 
                         secondaryPhoneRow.style.display = 'flex';
@@ -218,12 +219,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                             row.style.display = 'none';
                         });
                     } else {
-                        var errorMsg = (data && data.data) ? data.data : 'Error updating secondary phone number. Please try again.';
+                    var errorMsg = (data && data.data) ? data.data : t('Error updating secondary phone number. Please try again.');
                         alert(errorMsg);
                     }
                 })
                 .catch(function () {
-                    alert('Error updating secondary phone number. Please try again.');
+                alert(t('Error updating secondary phone number. Please try again.'));
                 });
         });
 
@@ -241,7 +242,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         e.preventDefault();
         if (isDevelopment) console.log('Reset password clicked');
         
-        if (confirm('Are you sure you want to reset your password? A verification code will be sent to your phone number.')) {
+        if (confirm(t('Are you sure you want to reset your password? A verification code will be sent to your phone number.'))) {
             initiatePasswordReset();
         }
     });
@@ -259,15 +260,15 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Verification code sent to your phone number. Please check your messages.');
+                    alert(t('Verification code sent to your phone number. Please check your messages.'));
                 window.location.href = window.location.pathname + '?password_reset_step=verify';
             } else {
-                alert('Error: ' + (data.data || 'Unable to send verification code'));
+                    alert(t('Error: %s', data.data || t('Unable to send verification code')));
             }
         })
         .catch(error => {
             if (isDevelopment) console.error('Error:', error);
-            alert('Error sending verification code. Please try again.');
+                alert(t('Error sending verification code. Please try again.'));
         });
     }
 
@@ -289,7 +290,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         notificationRequestInFlight = true;
 
         if (notificationFeedback) {
-            notificationFeedback.textContent = 'Saving preferences...';
+        notificationFeedback.textContent = t('Saving preferences...');
             notificationFeedback.classList.remove('success', 'error');
         }
 
@@ -313,10 +314,10 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             }
 
             if (data.success) {
-                notificationFeedback.textContent = 'Preferences saved.';
+                    notificationFeedback.textContent = t('Preferences saved.');
                 notificationFeedback.classList.add('success');
             } else {
-                notificationFeedback.textContent = data.data || 'Unable to save preferences.';
+                    notificationFeedback.textContent = data.data || t('Unable to save preferences.');
                 notificationFeedback.classList.add('error');
             }
         })
@@ -326,7 +327,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                 return;
             }
 
-            notificationFeedback.textContent = 'Connection error. Please try again.';
+                notificationFeedback.textContent = t('Connection error. Please try again.');
             notificationFeedback.classList.add('error');
         });
     }
@@ -374,7 +375,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         logoRequestInFlight = isLoading;
         if (uploadLogoBtn) {
             uploadLogoBtn.disabled = isLoading;
-            uploadLogoBtn.textContent = isLoading ? 'Uploading...' : (logoImage && logoImage.src ? 'Change Logo' : 'Upload Logo');
+            uploadLogoBtn.textContent = isLoading ? t('Uploading...') : (logoImage && logoImage.src ? t('Change Logo') : t('Upload Logo'));
         }
         if (removeLogoBtn) {
             removeLogoBtn.disabled = isLoading;
@@ -450,17 +451,17 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                                 removeLogoBtn.type = 'button';
                                 removeLogoBtn.className = 'btn btn-secondary';
                                 removeLogoBtn.id = 'remove-account-logo-btn';
-                                removeLogoBtn.textContent = 'Remove Logo';
+                        removeLogoBtn.textContent = t('Remove Logo');
                                 actions.insertBefore(removeLogoBtn, actions.querySelector('.account-logo-help-text'));
                                 removeLogoBtn.addEventListener('click', handleRemoveLogo);
                             }
                         }
                         if (uploadLogoBtn) {
-                            uploadLogoBtn.textContent = 'Change Logo';
+                    uploadLogoBtn.textContent = t('Change Logo');
                         }
                         setLogoFeedback(data.data.message || 'Logo updated successfully.', 'success');
                     } else {
-                        var errorMsg = data && data.data ? data.data : 'Failed to upload logo.';
+                    var errorMsg = data && data.data ? data.data : t('Failed to upload logo.');
                         setLogoFeedback(errorMsg, 'error');
                     }
                 })
@@ -482,7 +483,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             return;
         }
 
-        if (!confirm('Remove your account logo? This cannot be undone.')) {
+            if (!confirm(t('Remove your account logo? This cannot be undone.'))) {
             return;
         }
 
@@ -518,11 +519,11 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                         removeLogoBtn = null;
                     }
                     if (uploadLogoBtn) {
-                        uploadLogoBtn.textContent = 'Upload Logo';
+                    uploadLogoBtn.textContent = t('Upload Logo');
                     }
                     setLogoFeedback('Logo removed successfully.', 'success');
                 } else {
-                    var errorMsg = data && data.data ? data.data : 'Failed to remove logo.';
+                    var errorMsg = data && data.data ? data.data : t('Failed to remove logo.');
                     setLogoFeedback(errorMsg, 'error');
                 }
             })
@@ -591,24 +592,24 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                 // Validate URL fields
                 if (fieldName.includes('website') || fieldName.includes('instagram') || fieldName.includes('facebook')) {
                     if (newValue && !isValidUrl(newValue)) {
-                        alert('Please enter a valid URL (e.g., https://example.com)');
+                    alert(t('Please enter a valid URL (e.g., https://example.com)'));
                         return;
                     }
                     // Validate length for URL fields (max 500 characters)
                     if (newValue && newValue.length > 500) {
-                        alert('URL must be 500 characters or less');
+                    alert(t('URL must be 500 characters or less'));
                         return;
                     }
                 }
                 
                 // Validate length for text fields
                 if (fieldName === 'dealer_maps_url' && newValue && newValue.length > 1000) {
-                    alert('Maps URL must be 1000 characters or less');
+                    alert(t('Maps URL must be 1000 characters or less'));
                     return;
                 }
                 
                 if (fieldName === 'dealer_maps_address' && newValue && newValue.length > 500) {
-                    alert('Maps address must be 500 characters or less');
+                    alert(t('Maps address must be 500 characters or less'));
                     return;
                 }
 
@@ -618,7 +619,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                 formData.append('nonce', MyAccountAjax[nonceKey]);
 
                 saveBtn.disabled = true;
-                saveBtn.textContent = 'Saving...';
+            saveBtn.textContent = t('Saving...');
 
                 fetch(MyAccountAjax.ajax_url, {
                     method: 'POST',
@@ -630,7 +631,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                     if (data && data.success) {
                         originalValue = newValue;
                         if (displayElement) {
-                            displayElement.textContent = newValue || 'Not set';
+                    displayElement.textContent = newValue || t('Not set');
                         }
                         displayRow.style.display = 'flex';
                         editRows.forEach(function(row) {
@@ -638,7 +639,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                         });
                         showDealerFeedback('Updated successfully', 'success');
                     } else {
-                        var errorMsg = (data && data.data) ? data.data : 'Error updating ' + fieldName + '. Please try again.';
+                    var errorMsg = (data && data.data) ? data.data : t('Error updating %s. Please try again.', fieldName);
                         showDealerFeedback(errorMsg, 'error');
                     }
                 })
@@ -647,7 +648,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                 })
                 .finally(function() {
                     saveBtn.disabled = false;
-                    saveBtn.textContent = 'Save Changes';
+                saveBtn.textContent = t('Save Changes');
                 });
             });
 
@@ -715,6 +716,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
  */
 
 jQuery(document).ready(function($) {
+    const t = window.autoagoraTranslate || ((source) => source);
     
     // Email editing functionality
     $('.edit-email-btn').on('click', function() {
@@ -747,18 +749,18 @@ jQuery(document).ready(function($) {
         
         // Basic validation
         if (!email) {
-            alert('Please enter an email address');
+            alert(t('Please enter an email address'));
             return;
         }
         
         if (!isValidEmail(email)) {
-            alert('Please enter a valid email address');
+            alert(t('Please enter a valid email address'));
             return;
         }
         
         // Check if user is trying to verify the same email that's already verified
         if (isCurrentEmailVerified && !isEmailChange) {
-            alert('✅ This email address is already verified!\n\n💡 If you want to use a different email, please enter a new email address.');
+            alert('✅ ' + t('This email address is already verified!') + '\n\n💡 ' + t('If you want to use a different email, please enter a new email address.'));
             return;
         }
         
@@ -768,15 +770,15 @@ jQuery(document).ready(function($) {
         }
         
         // Disable button and show loading with better messaging
-        button.prop('disabled', true).text('Sending Email...');
+        button.prop('disabled', true).text(t('Sending Email...'));
         $('.cancel-email-btn').prop('disabled', true);
         
         // Remove any existing progress messages first
         $('.email-progress-message').remove();
         
         // Add a progress indicator with context-aware messaging (above the buttons)
-        const actionText = isEmailChange ? 'Sending email change verification' : 'Sending verification email';
-        const progressMsg = $('<div class="email-progress-message" style="background: #e7f3ff; color: #0073aa; padding: 10px; border-radius: 4px; margin: 10px 0; border: 1px solid #c3d9ed;">📧 ' + actionText + '... This may take up to 2 minutes to arrive.</div>');
+        const actionText = isEmailChange ? t('Sending email change verification') : t('Sending verification email');
+        const progressMsg = $('<div class="email-progress-message" style="background: #e7f3ff; color: #0073aa; padding: 10px; border-radius: 4px; margin: 10px 0; border: 1px solid #c3d9ed;">📧 ' + actionText + '... ' + t('This may take up to 2 minutes to arrive.') + '</div>');
         $('.email-edit-row:last').before(progressMsg);
         
         // Send AJAX request
@@ -796,10 +798,10 @@ jQuery(document).ready(function($) {
                 
                 if (response.success) {
                     // Create context-aware success message
-                    const actionType = isEmailChange ? 'email change' : 'verification';
-                    const actionVerb = isEmailChange ? 'Email change verification' : 'Verification email';
+                const actionType = isEmailChange ? t('email change') : t('verification');
+                const actionVerb = isEmailChange ? t('Email change verification') : t('Verification email');
                     
-                    alert('✅ ' + actionVerb + ' sent successfully!\n\n📧 Please check your inbox (and spam folder) in the next 1-2 minutes.\n\n⏱️ Note: Email delivery can sometimes take up to 5 minutes depending on your email provider.\n\n🔄 If you don\'t receive it within 5 minutes, you can try sending another ' + actionType + ' email.');
+                alert('✅ ' + t('%s sent successfully!', actionVerb) + '\n\n📧 ' + t('Please check your inbox (and spam folder) in the next 1-2 minutes.') + '\n\n⏱️ ' + t('Note: Email delivery can sometimes take up to 5 minutes depending on your email provider.') + '\n\n🔄 ' + t("If you don't receive it within 5 minutes, you can try sending another %s email.", actionType));
                     
                     // Update the displayed email to the new email
                     $('#display-email').text(email);
@@ -807,8 +809,8 @@ jQuery(document).ready(function($) {
                     // Update verification status - reset to not verified for email changes
                     if (isEmailChange) {
                         $('.email-status').removeClass('verified').addClass('not-verified')
-                                          .html('❌ Not Verified');
-                        $('.edit-email-btn').text('Edit & Verify');
+                    .html('❌ ' + t('Not Verified'));
+                $('.edit-email-btn').text(t('Edit & Verify'));
                     }
                     
                     // Hide edit form and show main row
@@ -816,8 +818,8 @@ jQuery(document).ready(function($) {
                     $('.email-row').show();
                     
                     // Show context-aware persistent success message
-                    const successText = isEmailChange ? 'Email change verification sent to ' + email + '!' : 'Verification email sent to ' + email + '!';
-                    const successMsg = $('<div class="email-success-message" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 4px; margin: 10px 0; border: 1px solid #c3e6cb; font-weight: 600;">📧 ' + successText + '<br><small style="font-weight: normal; margin-top: 5px; display: block;">⏱️ Allow up to 5 minutes for delivery. Check your spam folder if needed.</small></div>');
+                const successText = isEmailChange ? t('Email change verification sent to %s!', email) : t('Verification email sent to %s!', email);
+                const successMsg = $('<div class="email-success-message" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 4px; margin: 10px 0; border: 1px solid #c3e6cb; font-weight: 600;">📧 ' + successText + '<br><small style="font-weight: normal; margin-top: 5px; display: block;">⏱️ ' + t('Allow up to 5 minutes for delivery. Check your spam folder if needed.') + '</small></div>');
                     $('.email-row').after(successMsg);
                     
                     // Remove success message after 30 seconds
@@ -829,7 +831,7 @@ jQuery(document).ready(function($) {
                     
                 } else {
                     if (isDevelopment) console.log('AJAX Error Response:', response.data);
-                    alert('❌ Error: ' + response.data + '\n\nPlease try again in a moment.');
+                alert('❌ ' + t('Error: %s', response.data) + '\n\n' + t('Please try again in a moment.'));
                     // DON'T hide the edit form on error - let user try again
                 }
             },
@@ -840,13 +842,13 @@ jQuery(document).ready(function($) {
                 // Remove progress message
                 $('.email-progress-message').remove();
                 
-                alert('❌ Connection error occurred. Please check your internet connection and try again.\n\nTechnical details logged to console.');
+            alert('❌ ' + t('Connection error occurred. Please check your internet connection and try again.') + '\n\n' + t('Technical details logged to console.'));
                 // DON'T hide the edit form on error - let user try again
             },
             complete: function() {
                 // Re-enable buttons after a 5-second delay to prevent rapid clicking
                 setTimeout(function() {
-                    button.prop('disabled', false).text('Send Verification Email');
+            button.prop('disabled', false).text(t('Send Verification Email'));
                     $('.cancel-email-btn').prop('disabled', false);
                 }, 5000);
             }
@@ -864,7 +866,7 @@ jQuery(document).ready(function($) {
     const emailVerified = urlParams.get('email_verified');
     
     if (emailVerified === 'success') {
-        const successMsg = $('<div class="email-success-message" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 4px; margin: 20px 0; border: 1px solid #c3e6cb; font-weight: 600;">✅ Email verified successfully! Your email notifications are now active.</div>');
+        const successMsg = $('<div class="email-success-message" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 4px; margin: 20px 0; border: 1px solid #c3e6cb; font-weight: 600;">✅ ' + t('Email verified successfully! Your email notifications are now active.') + '</div>');
         $('.my-account-container h2').after(successMsg);
         
         // Remove URL parameter and reload to show updated status
@@ -873,7 +875,7 @@ jQuery(document).ready(function($) {
         }, 3000);
         
     } else if (emailVerified === 'error') {
-        const errorMsg = $('<div class="email-error-message" style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 4px; margin: 20px 0; border: 1px solid #f5c6cb; font-weight: 600;">❌ Email verification failed. The link may be expired or invalid.</div>');
+        const errorMsg = $('<div class="email-error-message" style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 4px; margin: 20px 0; border: 1px solid #f5c6cb; font-weight: 600;">❌ ' + t('Email verification failed. The link may be expired or invalid.') + '</div>');
         $('.my-account-container h2').after(errorMsg);
         
         // Remove URL parameter
@@ -881,4 +883,4 @@ jQuery(document).ready(function($) {
             window.location.href = window.location.pathname;
         }, 5000);
     }
-}); 
+});

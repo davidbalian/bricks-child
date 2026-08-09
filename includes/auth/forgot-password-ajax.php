@@ -27,33 +27,33 @@ add_action('wp_ajax_nopriv_update_forgot_password', 'handle_update_forgot_passwo
 function handle_send_forgot_password_otp() {
     // Security check: Prevent logged-in users from using forgot password
     if (is_user_logged_in()) {
-        wp_send_json_error('Access denied: Already logged in');
+        wp_send_json_error(__('Access denied: Already logged in', 'bricks-child'));
         return;
     }
 
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'send_forgot_password_otp_nonce')) {
-        wp_send_json_error('Invalid security token');
+        wp_send_json_error(__('Invalid security token', 'bricks-child'));
         return;
     }
 
     $phone = isset($_POST['phone']) ? sanitize_text_field($_POST['phone']) : '';
     
     if (empty($phone)) {
-        wp_send_json_error('Phone number is required');
+        wp_send_json_error(__('Phone number is required', 'bricks-child'));
         return;
     }
 
     // Only allow Cyprus phone numbers (E.164 +357... or 357...) to reach Twilio.
     $normalized_phone = preg_replace('/[\s\-]/', '', $phone);
     if (strpos($normalized_phone, '+357') !== 0 && strpos($normalized_phone, '357') !== 0) {
-        wp_send_json_error('Only Cypriot (+357) phone numbers are supported for verification');
+        wp_send_json_error(__('Only Cypriot (+357) phone numbers are supported for verification', 'bricks-child'));
         return;
     }
 
     $ts_token = isset($_POST['turnstile_token']) ? sanitize_text_field($_POST['turnstile_token']) : '';
     if (!custom_verify_turnstile_token($ts_token)) {
-        wp_send_json_error(['message' => esc_html__('Verification failed. Please try again.', 'astra-child')]);
+        wp_send_json_error(['message' => __('Verification failed. Please try again.', 'bricks-child')]);
         return;
     }
 
@@ -69,7 +69,7 @@ function handle_send_forgot_password_otp() {
         if (has_exceeded_otp_rate_limit('forgot_ip', $client_ip, 5, 10 * 60)
             || has_exceeded_otp_rate_limit('forgot_phone', $normalized_phone, 3, 60 * 60)
         ) {
-            wp_send_json_error(array('message' => esc_html__('Too many verification attempts. Please try again later.', 'astra-child')));
+            wp_send_json_error(array('message' => __('Too many verification attempts. Please try again later.', 'bricks-child')));
             return;
         }
     }
@@ -83,7 +83,7 @@ function handle_send_forgot_password_otp() {
     ));
 
     if (empty($users)) {
-        wp_send_json_error('No account found with this phone number');
+        wp_send_json_error(__('No account found with this phone number', 'bricks-child'));
         return;
     }
     
@@ -98,7 +98,7 @@ function handle_send_forgot_password_otp() {
 
     if (empty($twilio_sid) || empty($twilio_token) || empty($twilio_verify_sid)) {
         error_log('Twilio Verify configuration is missing for forgot password.');
-        wp_send_json_error('SMS service configuration error. Please contact support.');
+        wp_send_json_error(__('SMS service configuration error. Please contact support.', 'bricks-child'));
         return;
     }
 
@@ -126,12 +126,12 @@ function handle_send_forgot_password_otp() {
         ), 300); // 5 minutes expiry
 
         wp_send_json_success(array(
-            'message' => 'Verification code sent to your phone number'
+            'message' => __('Verification code sent to your phone number', 'bricks-child')
         ));
 
     } catch (Exception $e) {
         error_log('Twilio Verify error in forgot password: ' . $e->getMessage());
-        wp_send_json_error('Failed to send verification code. Please try again later.');
+        wp_send_json_error(__('Failed to send verification code. Please try again later.', 'bricks-child'));
     }
 }
 
@@ -141,13 +141,13 @@ function handle_send_forgot_password_otp() {
 function handle_verify_forgot_password_otp() {
     // Security check: Prevent logged-in users from using forgot password
     if (is_user_logged_in()) {
-        wp_send_json_error('Access denied: Already logged in');
+        wp_send_json_error(__('Access denied: Already logged in', 'bricks-child'));
         return;
     }
     
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'verify_forgot_password_otp_nonce')) {
-        wp_send_json_error('Invalid security token');
+        wp_send_json_error(__('Invalid security token', 'bricks-child'));
         return;
     }
 
@@ -155,12 +155,12 @@ function handle_verify_forgot_password_otp() {
     $otp = isset($_POST['otp']) ? sanitize_text_field($_POST['otp']) : '';
 
     if (empty($phone) || empty($otp)) {
-        wp_send_json_error('Phone number and verification code are required');
+        wp_send_json_error(__('Phone number and verification code are required', 'bricks-child'));
         return;
     }
 
     if (strlen($otp) !== 6) {
-        wp_send_json_error('Verification code must be 6 digits');
+        wp_send_json_error(__('Verification code must be 6 digits', 'bricks-child'));
         return;
     }
 
@@ -168,7 +168,7 @@ function handle_verify_forgot_password_otp() {
     $verification_session = get_transient('forgot_password_verification_' . md5($phone));
     
     if (!$verification_session) {
-        wp_send_json_error('Verification session expired. Please start over.');
+        wp_send_json_error(__('Verification session expired. Please start over.', 'bricks-child'));
         return;
     }
 
@@ -178,7 +178,7 @@ function handle_verify_forgot_password_otp() {
     $twilio_verify_sid = defined('TWILIO_VERIFY_SID') ? TWILIO_VERIFY_SID : '';
 
     if (empty($twilio_sid) || empty($twilio_token) || empty($twilio_verify_sid)) {
-        wp_send_json_error('SMS service configuration error. Please contact support.');
+        wp_send_json_error(__('SMS service configuration error. Please contact support.', 'bricks-child'));
         return;
     }
 
@@ -205,15 +205,15 @@ function handle_verify_forgot_password_otp() {
             delete_transient('forgot_password_verification_' . md5($phone));
             
             wp_send_json_success(array(
-                'message' => 'Code verified successfully',
+                'message' => __('Code verified successfully', 'bricks-child'),
                 'user_id' => $verification_session['user_id']
             ));
         } else {
-            wp_send_json_error('Invalid verification code');
+            wp_send_json_error(__('Invalid verification code', 'bricks-child'));
         }
     } catch (Exception $e) {
         error_log('Twilio verification check error in forgot password: ' . $e->getMessage());
-        wp_send_json_error('Error verifying code. Please try again.');
+        wp_send_json_error(__('Error verifying code. Please try again.', 'bricks-child'));
     }
 }
 
@@ -223,13 +223,13 @@ function handle_verify_forgot_password_otp() {
 function handle_update_forgot_password() {
     // Security check: Prevent logged-in users from using forgot password
     if (is_user_logged_in()) {
-        wp_send_json_error('Access denied: Already logged in');
+        wp_send_json_error(__('Access denied: Already logged in', 'bricks-child'));
         return;
     }
     
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_forgot_password_nonce')) {
-        wp_send_json_error('Invalid security token');
+        wp_send_json_error(__('Invalid security token', 'bricks-child'));
         return;
     }
 
@@ -237,7 +237,7 @@ function handle_update_forgot_password() {
     $new_password = isset($_POST['new_password']) ? $_POST['new_password'] : '';
 
     if (empty($phone) || empty($new_password)) {
-        wp_send_json_error('Phone number and new password are required');
+        wp_send_json_error(__('Phone number and new password are required', 'bricks-child'));
         return;
     }
 
@@ -245,35 +245,35 @@ function handle_update_forgot_password() {
     $verified_session = get_transient('forgot_password_verified_' . md5($phone));
     
     if (!$verified_session || !$verified_session['verified']) {
-        wp_send_json_error('Session expired. Please start over.');
+        wp_send_json_error(__('Session expired. Please start over.', 'bricks-child'));
         return;
     }
 
     // Apply the same strict validation as registration
     // Password Length Check (8-16 characters)
     if (strlen($new_password) < 8 || strlen($new_password) > 16) {
-        wp_send_json_error('Password must be between 8 and 16 characters long');
+        wp_send_json_error(__('Password must be between 8 and 16 characters long', 'bricks-child'));
         return;
     }
 
     // Password Complexity Checks
     if (!preg_match('/[a-z]/', $new_password)) {
-        wp_send_json_error('Password must contain at least one lowercase letter');
+        wp_send_json_error(__('Password must contain at least one lowercase letter', 'bricks-child'));
         return;
     }
     
     if (!preg_match('/[A-Z]/', $new_password)) {
-        wp_send_json_error('Password must contain at least one uppercase letter');
+        wp_send_json_error(__('Password must contain at least one uppercase letter', 'bricks-child'));
         return;
     }
     
     if (!preg_match('/[0-9]/', $new_password)) {
-        wp_send_json_error('Password must contain at least one number');
+        wp_send_json_error(__('Password must contain at least one number', 'bricks-child'));
         return;
     }
     
     if (!preg_match('/[!@#$%^&*(),.?":{}|<>\-_=+;\[\]~`]/', $new_password)) {
-        wp_send_json_error('Password must contain at least one symbol (e.g., !@#$%^&*)');
+        wp_send_json_error(__('Password must contain at least one symbol (e.g., !@#$%^&*)', 'bricks-child'));
         return;
     }
 
@@ -287,7 +287,7 @@ function handle_update_forgot_password() {
     $result = wp_update_user($user_data);
 
     if (is_wp_error($result)) {
-        wp_send_json_error('Failed to update password: ' . $result->get_error_message());
+        wp_send_json_error(sprintf(__('Failed to update password: %s', 'bricks-child'), $result->get_error_message()));
         return;
     }
 
@@ -298,6 +298,6 @@ function handle_update_forgot_password() {
     error_log("Forgot password completed for user ID: $user_id");
 
     wp_send_json_success(array(
-        'message' => 'Password updated successfully'
+        'message' => __('Password updated successfully', 'bricks-child')
     ));
-} 
+}

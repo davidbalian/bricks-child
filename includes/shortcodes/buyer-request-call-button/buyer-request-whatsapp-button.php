@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
 function handle_buyer_request_whatsapp_button_click() {
     // Verify nonce for security
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'buyer_request_whatsapp_button_click')) {
-        wp_send_json_error('Security check failed');
+        wp_send_json_error(__('Security check failed', 'bricks-child'));
         return;
     }
 
@@ -26,7 +26,7 @@ function handle_buyer_request_whatsapp_button_click() {
     $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
 
     if (!$post_id || get_post_type($post_id) !== 'buyer_request') {
-        wp_send_json_error('Invalid post ID');
+        wp_send_json_error(__('Invalid post ID', 'bricks-child'));
         return;
     }
 
@@ -46,7 +46,7 @@ function handle_buyer_request_whatsapp_button_click() {
             'new_count' => $new_count
         ));
     } else {
-        wp_send_json_error('Failed to update WhatsApp click count');
+        wp_send_json_error(__('Failed to update WhatsApp click count', 'bricks-child'));
     }
 }
 

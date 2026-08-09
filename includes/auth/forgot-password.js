@@ -6,6 +6,7 @@
  */
 
 jQuery(document).ready(function ($) {
+  const t = window.autoagoraTranslate || ((source) => source);
   // PRODUCTION SAFETY: Only log in development environments
 window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' || 
                                                window.location.hostname.includes('staging') ||
@@ -59,12 +60,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
   // Password requirements (same as registration)
   const requirements = {
-    length: { text: "8-16 characters", regex: /.{8,16}/ },
-    lowercase: { text: "At least one lowercase letter", regex: /[a-z]/ },
-    uppercase: { text: "At least one uppercase letter", regex: /[A-Z]/ },
-    number: { text: "At least one number", regex: /[0-9]/ },
+    length: { text: t("8-16 characters"), regex: /.{8,16}/ },
+    lowercase: { text: t("At least one lowercase letter"), regex: /[a-z]/ },
+    uppercase: { text: t("At least one uppercase letter"), regex: /[A-Z]/ },
+    number: { text: t("At least one number"), regex: /[0-9]/ },
     symbol: {
-      text: "At least one symbol (e.g., !@#$%^&*)",
+      text: t("At least one symbol (e.g., !@#$%^&*)"),
       regex: /[!@#$%^&*(),.?":{}|<>\-_=+;\[\]~`]/,
     },
   };
@@ -103,13 +104,13 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     if (isDevelopment) console.log("Send OTP button clicked");
 
     messagesDiv.hide();
-    button.prop("disabled", true).text("Sending...");
+    button.prop("disabled", true).text(t("Sending..."));
 
     // Get number from intl-tel-input instance
     if (!iti) {
       if (isDevelopment) console.error("Phone input not initialized");
-      showMessage("Phone input failed to initialize.", true);
-      button.prop("disabled", false).text("Send Verification Code");
+      showMessage(t("Phone input failed to initialize."), true);
+      button.prop("disabled", false).text(t("Send Verification Code"));
       return;
     }
     const fullPhoneNumber = iti.getNumber(); // Includes country code
@@ -118,8 +119,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     // Basic validation from library
     if (!iti.isValidNumber()) {
       if (isDevelopment) console.error("Invalid phone number");
-      showMessage("Please enter a valid phone number.", true);
-      button.prop("disabled", false).text("Send Verification Code");
+      showMessage(t("Please enter a valid phone number."), true);
+      button.prop("disabled", false).text(t("Send Verification Code"));
       return;
     }
 
@@ -127,8 +128,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       document.querySelector('input[name="cf-turnstile-response"]')?.value || '';
 
     if (!tsToken) {
-      showMessage("Please complete the verification and try again.", true);
-      button.prop("disabled", false).text("Send Verification Code");
+      showMessage(t("Please complete the verification and try again."), true);
+      button.prop("disabled", false).text(t("Send Verification Code"));
       if (window.turnstile) turnstile.reset();
       return;
     }
@@ -154,11 +155,11 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         } else {
           if (isDevelopment) console.error("Send OTP failed:", response.data.message);
           showMessage(
-            response.data.message || "Failed to send verification code.",
+            response.data.message || t("Failed to send verification code."),
             true
           );
           if (window.turnstile) turnstile.reset();
-          button.prop("disabled", false).text("Send Verification Code");
+          button.prop("disabled", false).text(t("Send Verification Code"));
         }
       },
       error: function (jqXHR, textStatus, errorThrown) {
@@ -167,9 +168,9 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
           error: errorThrown,
           response: jqXHR.responseText,
         });
-        showMessage("An error occurred. Please try again.", true);
+        showMessage(t("An error occurred. Please try again."), true);
         if (window.turnstile) turnstile.reset();
-        button.prop("disabled", false).text("Send Verification Code");
+        button.prop("disabled", false).text(t("Send Verification Code"));
       },
     });
   });
@@ -181,7 +182,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     if (isDevelopment) console.log("Verify OTP button clicked");
 
     messagesDiv.hide();
-    button.prop("disabled", true).text("Verifying...");
+    button.prop("disabled", true).text(t("Verifying..."));
     $("#change-forgot-phone-button, #resend-forgot-otp-button").prop(
       "disabled",
       true
@@ -189,8 +190,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
     if (!otp || otp.length !== 6) {
       if (isDevelopment) console.error("Invalid OTP format");
-      showMessage("Please enter a valid 6-digit verification code.", true);
-      button.prop("disabled", false).text("Verify Code");
+      showMessage(t("Please enter a valid 6-digit verification code."), true);
+      button.prop("disabled", false).text(t("Verify Code"));
       $("#change-forgot-phone-button, #resend-forgot-otp-button").prop(
         "disabled",
         false
@@ -224,10 +225,10 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         } else {
           if (isDevelopment) console.error("Verify OTP failed:", response.data.message);
           showMessage(
-            response.data.message || "Invalid verification code.",
+            response.data.message || t("Invalid verification code."),
             true
           );
-          button.prop("disabled", false).text("Verify Code");
+          button.prop("disabled", false).text(t("Verify Code"));
           $("#change-forgot-phone-button, #resend-forgot-otp-button").prop(
             "disabled",
             false
@@ -241,10 +242,10 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
           response: jqXHR.responseText,
         });
         showMessage(
-          "An error occurred verifying the code. Please try again.",
+          t("An error occurred verifying the code. Please try again."),
           true
         );
-        button.prop("disabled", false).text("Verify Code");
+        button.prop("disabled", false).text(t("Verify Code"));
         $("#change-forgot-phone-button, #resend-forgot-otp-button").prop(
           "disabled",
           false
@@ -268,7 +269,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     stepPhone.show();
     $("#send-forgot-otp-button")
       .prop("disabled", false)
-      .text("Send Verification Code");
+      .text(t("Send Verification Code"));
   });
 
   // --- Resend OTP ---
@@ -277,7 +278,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     if (isDevelopment) console.log("Resend OTP button clicked");
 
     messagesDiv.hide();
-    button.prop("disabled", true).text("Resending...");
+    button.prop("disabled", true).text(t("Resending..."));
 
     if (isDevelopment) console.log("Sending AJAX request to resend OTP");
     $.ajax({
@@ -291,12 +292,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       success: function (response) {
         if (isDevelopment) console.log("Resend OTP response:", response);
         if (response.success) {
-          showMessage("Verification code sent again to your phone number.");
+          showMessage(t("Verification code sent again to your phone number."));
         } else {
           if (isDevelopment) console.error("Resend OTP failed:", response.data.message);
-          showMessage(response.data.message || "Failed to resend code.", true);
+          showMessage(response.data.message || t("Failed to resend code."), true);
         }
-        button.prop("disabled", false).text("Resend Code");
+        button.prop("disabled", false).text(t("Resend Code"));
       },
       error: function (jqXHR, textStatus, errorThrown) {
         if (isDevelopment) console.error("Resend OTP AJAX error:", {
@@ -304,8 +305,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
           error: errorThrown,
           response: jqXHR.responseText,
         });
-        showMessage("An error occurred. Please try again.", true);
-        button.prop("disabled", false).text("Resend Code");
+        showMessage(t("An error occurred. Please try again."), true);
+        button.prop("disabled", false).text(t("Resend Code"));
       },
     });
   });
@@ -361,14 +362,14 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
       // Check levels - require length met for medium/strong
       else if (!requirements.length.regex.test(password) || score <= 2) {
         strengthLevel = "strength-weak";
-        strengthLabel = "⚠️ Weak";
+        strengthLabel = "⚠️ " + t("Weak");
       } else if (score <= 4) {
         strengthLevel = "strength-medium";
-        strengthLabel = "⚡ Moderate";
+        strengthLabel = "⚡ " + t("Moderate");
       } else {
         // Score is 5 and length is met
         strengthLevel = "strength-strong";
-        strengthLabel = "✅ Safe";
+        strengthLabel = "✅ " + t("Safe");
       }
 
       // Update indicator and text classes/content
@@ -444,41 +445,41 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
     const confirmPassword = $("#forgot-confirm-password").val();
 
     messagesDiv.hide();
-    button.prop("disabled", true).text("Updating...");
+    button.prop("disabled", true).text(t("Updating..."));
 
     // Client-side validation (same as registration)
     let errors = [];
 
     // Password Length Check (8-16 characters)
     if (newPassword.length < 8 || newPassword.length > 16) {
-      errors.push("Password must be between 8 and 16 characters long.");
+      errors.push(t("Password must be between 8 and 16 characters long."));
     }
 
     // Password Complexity Checks
     if (!/[a-z]/.test(newPassword)) {
-      errors.push("Password must contain at least one lowercase letter.");
+      errors.push(t("Password must contain at least one lowercase letter."));
     }
     if (!/[A-Z]/.test(newPassword)) {
-      errors.push("Password must contain at least one uppercase letter.");
+      errors.push(t("Password must contain at least one uppercase letter."));
     }
     if (!/[0-9]/.test(newPassword)) {
-      errors.push("Password must contain at least one number.");
+      errors.push(t("Password must contain at least one number."));
     }
     if (!/[!@#$%^&*(),.?":{}|<>\-_=+;\[\]~`]/.test(newPassword)) {
       errors.push(
-        "Password must contain at least one symbol (e.g., !@#$%^&*)."
+        t("Password must contain at least one symbol (e.g., !@#$%^&*).")
       );
     }
 
     // Password match check
     if (newPassword !== confirmPassword) {
-      errors.push("Passwords do not match. Please re-enter.");
+      errors.push(t("Passwords do not match. Please re-enter."));
     }
 
     // Check if any errors occurred
     if (errors.length > 0) {
       showMessage(errors.join("<br>"), true);
-      button.prop("disabled", false).text("Update Password");
+      button.prop("disabled", false).text(t("Update Password"));
       return;
     }
 
@@ -498,25 +499,25 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
           messagesDiv.hide();
         } else {
           showMessage(
-            response.data.message || "Failed to update password.",
+            response.data.message || t("Failed to update password."),
             true
           );
-          button.prop("disabled", false).text("Update Password");
+          button.prop("disabled", false).text(t("Update Password"));
         }
       },
       error: function () {
         showMessage(
-          "An error occurred updating the password. Please try again.",
+          t("An error occurred updating the password. Please try again."),
           true
         );
-        button.prop("disabled", false).text("Update Password");
+        button.prop("disabled", false).text(t("Update Password"));
       },
     });
   });
 
   // --- Cancel Password Reset ---
   $("#cancel-forgot-password-button").on("click", function () {
-    if (confirm("Are you sure you want to cancel the password reset?")) {
+    if (confirm(t("Are you sure you want to cancel the password reset?"))) {
       window.location.href = ForgotPasswordAjax.login_url || "/wp-login.php";
     }
   });

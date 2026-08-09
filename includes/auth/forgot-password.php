@@ -18,8 +18,8 @@ if (!defined('ABSPATH')) {
 
 <div class="forgot-password-container">
     <div class="forgot-password-header">
-        <h1>Reset Your Password</h1>
-        <p>Enter your phone number to receive a verification code</p>
+        <h1><?php esc_html_e('Reset Your Password', 'bricks-child'); ?></h1>
+        <p><?php esc_html_e('Enter your phone number to receive a verification code', 'bricks-child'); ?></p>
     </div>
 
     <div id="forgot-password-messages"></div> <!-- Area for success/error messages -->
@@ -28,43 +28,43 @@ if (!defined('ABSPATH')) {
         
         <!-- Step 1: Phone Number Input -->
         <div id="step-phone" class="forgot-password-step">
-            <h2>Step 1: Enter Phone Number</h2>
+            <h2><?php esc_html_e('Step 1: Enter Phone Number', 'bricks-child'); ?></h2>
             <div class="form-group">
-                <label for="forgot-phone-number-display">Phone Number:</label>
-                <input type="tel" name="forgot_phone_number_display" id="forgot-phone-number-display" required placeholder="Enter your phone number">
+                <label for="forgot-phone-number-display"><?php esc_html_e('Phone Number:', 'bricks-child'); ?></label>
+                <input type="tel" name="forgot_phone_number_display" id="forgot-phone-number-display" required placeholder="<?php esc_attr_e('Enter your phone number', 'bricks-child'); ?>">
             </div>
             <div class="cf-turnstile" data-sitekey="<?php echo esc_attr(TURNSTILE_SITE_KEY); ?>"></div>
             <div class="form-actions">
-                <button type="button" id="send-forgot-otp-button" class="btn btn-primary">Send Verification Code</button>
-                <a href="<?php echo wp_login_url(); ?>" class="btn btn-secondary">Back to Login</a>
+                <button type="button" id="send-forgot-otp-button" class="btn btn-primary"><?php esc_html_e('Send Verification Code', 'bricks-child'); ?></button>
+                <a href="<?php echo esc_url(wp_login_url()); ?>" class="btn btn-secondary"><?php esc_html_e('Back to Login', 'bricks-child'); ?></a>
             </div>
         </div>
 
         <!-- Step 2: OTP Verification (Initially Hidden) -->
         <div id="step-otp" class="forgot-password-step" style="display: none;">
-            <h2>Step 2: Enter Verification Code</h2>
-            <p class="step-description">We've sent a 6-digit code to your phone number. Please enter it below:</p>
+            <h2><?php esc_html_e('Step 2: Enter Verification Code', 'bricks-child'); ?></h2>
+            <p class="step-description"><?php esc_html_e("We've sent a 6-digit code to your phone number. Please enter it below:", 'bricks-child'); ?></p>
             <div class="form-group">
-                <label for="forgot-verification-code">Verification Code:</label>
+                <label for="forgot-verification-code"><?php esc_html_e('Verification Code:', 'bricks-child'); ?></label>
                 <input type="text" name="forgot_verification_code" id="forgot-verification-code" maxlength="6" required placeholder="000000" class="verification-input">
             </div>
             <div class="form-actions">
-                <button type="button" id="verify-forgot-otp-button" class="btn btn-primary">Verify Code</button>
-                <button type="button" id="change-forgot-phone-button" class="btn btn-secondary">Change Phone Number</button>
+                <button type="button" id="verify-forgot-otp-button" class="btn btn-primary"><?php esc_html_e('Verify Code', 'bricks-child'); ?></button>
+                <button type="button" id="change-forgot-phone-button" class="btn btn-secondary"><?php esc_html_e('Change Phone Number', 'bricks-child'); ?></button>
             </div>
             <div class="form-actions">
-                <button type="button" id="resend-forgot-otp-button" class="btn btn-link">Resend Code</button>
+                <button type="button" id="resend-forgot-otp-button" class="btn btn-link"><?php esc_html_e('Resend Code', 'bricks-child'); ?></button>
             </div>
         </div>
 
         <!-- Step 3: Set New Password (Initially Hidden) -->
         <div id="step-password" class="forgot-password-step" style="display: none;">
-            <h2>Step 3: Set New Password</h2>
-            <p class="step-description">Create a strong password for your account.</p>
+            <h2><?php esc_html_e('Step 3: Set New Password', 'bricks-child'); ?></h2>
+            <p class="step-description"><?php esc_html_e('Create a strong password for your account.', 'bricks-child'); ?></p>
             
             <div class="form-group">
-                <label for="forgot-new-password">New Password:</label>
-                <input type="password" name="forgot_new_password" id="forgot-new-password" required aria-describedby="forgot-password-strength forgot-password-remaining-reqs" placeholder="Enter new password">
+                <label for="forgot-new-password"><?php esc_html_e('New Password:', 'bricks-child'); ?></label>
+                <input type="password" name="forgot_new_password" id="forgot-new-password" required aria-describedby="forgot-password-strength forgot-password-remaining-reqs" placeholder="<?php esc_attr_e('Enter new password', 'bricks-child'); ?>">
                 <div id="forgot-password-strength" class="password-strength" aria-live="polite"></div>
                 <div id="forgot-password-remaining-reqs" class="password-requirements">
                     <!-- Requirements list will be populated by JS -->
@@ -72,24 +72,24 @@ if (!defined('ABSPATH')) {
             </div>
             
             <div class="form-group">
-                <label for="forgot-confirm-password">Confirm Password:</label>
-                <input type="password" name="forgot_confirm_password" id="forgot-confirm-password" required placeholder="Confirm new password">
+                <label for="forgot-confirm-password"><?php esc_html_e('Confirm Password:', 'bricks-child'); ?></label>
+                <input type="password" name="forgot_confirm_password" id="forgot-confirm-password" required placeholder="<?php esc_attr_e('Confirm new password', 'bricks-child'); ?>">
             </div>
             
             <div class="form-actions">
-                <button type="button" id="update-forgot-password-button" class="btn btn-primary">Update Password</button>
-                <button type="button" id="cancel-forgot-password-button" class="btn btn-secondary">Cancel</button>
+                <button type="button" id="update-forgot-password-button" class="btn btn-primary"><?php esc_html_e('Update Password', 'bricks-child'); ?></button>
+                <button type="button" id="cancel-forgot-password-button" class="btn btn-secondary"><?php esc_html_e('Cancel', 'bricks-child'); ?></button>
             </div>
         </div>
 
         <!-- Step 4: Success Message (Initially Hidden) -->
         <div id="step-success" class="forgot-password-step success-step" style="display: none;">
             <div class="success-icon">✅</div>
-            <h2>Password Reset Complete!</h2>
-            <p class="step-description">Your password has been successfully updated. You can now log in with your new password.</p>
+            <h2><?php esc_html_e('Password Reset Complete!', 'bricks-child'); ?></h2>
+            <p class="step-description"><?php esc_html_e('Your password has been successfully updated. You can now log in with your new password.', 'bricks-child'); ?></p>
             <div class="form-actions">
-                <a href="<?php echo wp_login_url(); ?>" class="btn btn-primary">Go to Login</a>
-                <a href="<?php echo home_url(); ?>" class="btn btn-secondary">Go to Homepage</a>
+                <a href="<?php echo esc_url(wp_login_url()); ?>" class="btn btn-primary"><?php esc_html_e('Go to Login', 'bricks-child'); ?></a>
+                <a href="<?php echo esc_url(autoagora_localized_page_url()); ?>" class="btn btn-secondary"><?php esc_html_e('Go to Homepage', 'bricks-child'); ?></a>
             </div>
         </div>
 
@@ -98,4 +98,4 @@ if (!defined('ABSPATH')) {
         <input type="hidden" id="user-id-for-reset" value="">
         
     </form>
-</div> 
+</div>

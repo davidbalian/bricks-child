@@ -5,7 +5,7 @@ add_shortcode('autocy_bulk_upload', 'autocy_bulk_upload_shortcode');
 
 function autocy_bulk_upload_shortcode($atts) {
     if (!is_user_logged_in() || !current_user_can('edit_posts')) {
-        return '<p>You must be logged in with appropriate permissions to use the bulk uploader.</p>';
+        return '<p>' . esc_html__('You must be logged in with appropriate permissions to use the bulk uploader.', 'bricks-child') . '</p>';
     }
 
     autocy_bulk_upload_enqueue_assets();
@@ -15,71 +15,71 @@ function autocy_bulk_upload_shortcode($atts) {
     <div id="bulk-upload-app">
         <!-- Phase 1: Images + Location -->
         <div class="bu-phase bu-phase-1 active" data-phase="1">
-            <h2>Step 1: Upload Images & Set Location</h2>
-            <p class="bu-phase-desc">Upload all images for all listings at once, then pick a shared location.</p>
+            <h2><?php esc_html_e('Step 1: Upload Images & Set Location', 'bricks-child'); ?></h2>
+            <p class="bu-phase-desc"><?php esc_html_e('Upload all images for all listings at once, then pick a shared location.', 'bricks-child'); ?></p>
 
             <div class="bu-section">
-                <h3>Images</h3>
+                <h3><?php esc_html_e('Images', 'bricks-child'); ?></h3>
                 <div id="bu-upload-area" class="bu-upload-area">
                     <div class="bu-upload-placeholder">
                         <span class="bu-upload-icon">&#128247;</span>
-                        <p>Drag & drop images here or <label for="bu-file-input" class="bu-browse-link">browse</label></p>
-                        <p class="bu-upload-hint">Upload all images for all listings. Name files like <code>image_folder_01.jpg</code></p>
+                        <p><?php esc_html_e('Drag & drop images here or', 'bricks-child'); ?> <label for="bu-file-input" class="bu-browse-link"><?php esc_html_e('browse', 'bricks-child'); ?></label></p>
+                        <p class="bu-upload-hint"><?php esc_html_e('Upload all images for all listings. Name files like', 'bricks-child'); ?> <code>image_folder_01.jpg</code></p>
                     </div>
                     <input type="file" id="bu-file-input" multiple accept="image/*" style="display:none;">
                 </div>
                 <div id="bu-upload-stats" class="bu-upload-stats" style="display:none;">
-                    <span id="bu-uploaded-count">0</span> images uploaded
-                    <span id="bu-uploading-count" style="display:none;">(<span id="bu-uploading-num">0</span> uploading...)</span>
-                    <span id="bu-error-count" style="display:none;"> | <span id="bu-error-num">0</span> failed</span>
+                    <span id="bu-uploaded-count">0</span> <?php esc_html_e('images uploaded', 'bricks-child'); ?>
+                    <span id="bu-uploading-count" style="display:none;">(<span id="bu-uploading-num">0</span> <?php esc_html_e('uploading...', 'bricks-child'); ?>)</span>
+                    <span id="bu-error-count" style="display:none;"> | <span id="bu-error-num">0</span> <?php esc_html_e('failed', 'bricks-child'); ?></span>
                 </div>
             </div>
 
             <div class="bu-section">
-                <h3>Location</h3>
+                <h3><?php esc_html_e('Location', 'bricks-child'); ?></h3>
                 <form id="bu-location-form">
-                    <input type="text" id="location" class="bu-location-display" placeholder="No location selected" readonly>
-                    <button type="button" class="choose-location-btn">Choose Location on Map</button>
+                    <input type="text" id="location" class="bu-location-display" placeholder="<?php esc_attr_e('No location selected', 'bricks-child'); ?>" readonly>
+                    <button type="button" class="choose-location-btn"><?php esc_html_e('Choose Location on Map', 'bricks-child'); ?></button>
                 </form>
             </div>
 
-            <button type="button" id="bu-continue-btn" class="bu-btn bu-btn-primary" disabled>Continue to CSV Upload</button>
+            <button type="button" id="bu-continue-btn" class="bu-btn bu-btn-primary" disabled><?php esc_html_e('Continue to CSV Upload', 'bricks-child'); ?></button>
         </div>
 
         <!-- Phase 2: CSV & Preview -->
         <div class="bu-phase bu-phase-2" data-phase="2">
-            <h2>Step 2: Upload CSV & Review Listings</h2>
+            <h2><?php esc_html_e('Step 2: Upload CSV & Review Listings', 'bricks-child'); ?></h2>
 
             <div class="bu-section">
-                <label for="bu-csv-input" class="bu-btn bu-btn-secondary">Choose CSV File</label>
+                <label for="bu-csv-input" class="bu-btn bu-btn-secondary"><?php esc_html_e('Choose CSV File', 'bricks-child'); ?></label>
                 <input type="file" id="bu-csv-input" accept=".csv" style="display:none;">
                 <span id="bu-csv-filename"></span>
             </div>
 
             <div id="bu-summary" class="bu-summary" style="display:none;">
-                <span id="bu-total-listings">0</span> listings parsed |
-                <span class="bu-valid-text"><span id="bu-valid-count">0</span> valid</span> |
-                <span class="bu-error-text"><span id="bu-error-listing-count">0</span> with errors (will be skipped)</span>
+                <span id="bu-total-listings">0</span> <?php esc_html_e('listings parsed', 'bricks-child'); ?> |
+                <span class="bu-valid-text"><span id="bu-valid-count">0</span> <?php esc_html_e('valid', 'bricks-child'); ?></span> |
+                <span class="bu-error-text"><span id="bu-error-listing-count">0</span> <?php esc_html_e('with errors (will be skipped)', 'bricks-child'); ?></span>
             </div>
 
             <div id="bu-slider" class="bu-slider" style="display:none;">
                 <div class="bu-slider-nav">
-                    <button type="button" id="bu-prev-btn" class="bu-nav-btn" disabled>&larr; Previous</button>
-                    <span id="bu-slider-counter" class="bu-slider-counter">Listing 1 of 1</span>
-                    <button type="button" id="bu-next-btn" class="bu-nav-btn">Next &rarr;</button>
+                    <button type="button" id="bu-prev-btn" class="bu-nav-btn" disabled>&larr; <?php esc_html_e('Previous', 'bricks-child'); ?></button>
+                    <span id="bu-slider-counter" class="bu-slider-counter"><?php esc_html_e('Listing 1 of 1', 'bricks-child'); ?></span>
+                    <button type="button" id="bu-next-btn" class="bu-nav-btn"><?php esc_html_e('Next', 'bricks-child'); ?> &rarr;</button>
                 </div>
                 <div id="bu-listing-card" class="bu-listing-card"></div>
             </div>
 
             <div class="bu-phase-actions">
-                <button type="button" id="bu-back-btn" class="bu-btn bu-btn-secondary">Back</button>
-                <button type="button" id="bu-submit-btn" class="bu-btn bu-btn-primary" disabled>Submit Valid Listings</button>
+                <button type="button" id="bu-back-btn" class="bu-btn bu-btn-secondary"><?php esc_html_e('Back', 'bricks-child'); ?></button>
+                <button type="button" id="bu-submit-btn" class="bu-btn bu-btn-primary" disabled><?php esc_html_e('Submit Valid Listings', 'bricks-child'); ?></button>
             </div>
         </div>
 
         <!-- Phase 3: Progress & Results -->
         <div class="bu-phase bu-phase-3" data-phase="3">
-            <h2>Step 3: Creating Listings</h2>
+            <h2><?php esc_html_e('Step 3: Creating Listings', 'bricks-child'); ?></h2>
 
             <div class="bu-progress-wrapper">
                 <div class="bu-progress-bar">
@@ -108,7 +108,7 @@ function autocy_bulk_upload_enqueue_assets() {
     $theme_uri = get_stylesheet_directory_uri();
 
     // Google Maps + Location Picker (replicating pattern from google-maps-assets.php)
-    $google_maps_url = 'https://maps.googleapis.com/maps/api/js?key=' . urlencode(GOOGLE_MAPS_API_KEY) . '&libraries=places&language=en';
+    $google_maps_url = 'https://maps.googleapis.com/maps/api/js?key=' . urlencode(GOOGLE_MAPS_API_KEY) . '&libraries=places&language=' . rawurlencode(autoagora_current_language());
     wp_enqueue_script('google-maps', $google_maps_url, [], null, true);
 
     wp_enqueue_style('autoagora-location-picker', $theme_uri . '/assets/css/location-picker.css', [], filemtime($theme_dir . '/assets/css/location-picker.css'));
@@ -117,6 +117,16 @@ function autocy_bulk_upload_enqueue_assets() {
         'defaultLat' => 35.1856,
         'defaultLng' => 33.3823,
         'zoom' => 8,
+        'language' => autoagora_current_language(),
+        'i18n' => [
+            'findCurrentLocation' => __('Find my current location', 'bricks-child'),
+            'geolocationUnsupported' => __('Geolocation is not supported by your browser.', 'bricks-child'),
+            'geolocationError' => __('Error getting location: {message}', 'bricks-child'),
+            'chooseLocation' => __('Choose Location', 'bricks-child'),
+            'continue' => __('Continue', 'bricks-child'),
+            'searchLocation' => __('Search for a location in Cyprus...', 'bricks-child'),
+            'close' => __('Close', 'bricks-child'),
+        ],
         'debug' => (strpos($_SERVER['HTTP_HOST'], 'staging') !== false || strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)
     ]);
 
@@ -135,7 +145,7 @@ function autocy_bulk_upload_enqueue_assets() {
 
     // Bulk upload own assets
     wp_enqueue_style('autocy-bulk-upload', $theme_uri . '/includes/shortcodes/autocy-bulk-upload/autocy-bulk-upload.css', [], filemtime($theme_dir . '/includes/shortcodes/autocy-bulk-upload/autocy-bulk-upload.css'));
-    wp_enqueue_script('autocy-bulk-upload', $theme_uri . '/includes/shortcodes/autocy-bulk-upload/autocy-bulk-upload.js', ['jquery', 'async-uploads', 'image-optimizer', 'autoagora-location-picker'], filemtime($theme_dir . '/includes/shortcodes/autocy-bulk-upload/autocy-bulk-upload.js'), true);
+    wp_enqueue_script('autocy-bulk-upload', $theme_uri . '/includes/shortcodes/autocy-bulk-upload/autocy-bulk-upload.js', ['jquery', 'async-uploads', 'image-optimizer', 'autoagora-location-picker', 'autoagora-i18n'], filemtime($theme_dir . '/includes/shortcodes/autocy-bulk-upload/autocy-bulk-upload.js'), true);
     wp_localize_script('autocy-bulk-upload', 'autocyBulkUploadConfig', [
         'ajaxUrl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('autocy_bulk_upload_nonce'),
@@ -149,7 +159,7 @@ function handle_autocy_bulk_upload_create_listing() {
     check_ajax_referer('autocy_bulk_upload_nonce', 'nonce');
 
     if (!is_user_logged_in() || !current_user_can('edit_posts')) {
-        wp_send_json_error(['message' => 'Unauthorized']);
+        wp_send_json_error(['message' => __('Unauthorized', 'bricks-child')]);
     }
 
     // Sanitize fields
@@ -181,7 +191,7 @@ function handle_autocy_bulk_upload_create_listing() {
 
     // Validate required fields
     if (empty($make) || empty($model) || empty($year) || empty($price)) {
-        wp_send_json_error(['message' => 'Missing required fields (make, model, year, price)']);
+        wp_send_json_error(['message' => __('Missing required fields (make, model, year, price)', 'bricks-child')]);
     }
 
     $title = intval($year) . ' ' . $make . ' ' . $model;

@@ -632,12 +632,12 @@ function car_listings_render_output($car_query, $atts) {
             <?php if ($infinite_scroll && $car_query->max_num_pages > 1) : ?>
                 <div class="car-listings-loader" style="display: none;">
                     <span class="loader-spinner"></span>
-                    <span class="loader-text">Loading more...</span>
+                    <span class="loader-text"><?php esc_html_e('Loading more...', 'bricks-child'); ?></span>
                 </div>
             <?php endif; ?>
 
         <?php else : ?>
-            <p class="car-listings-no-results">No car listings found.</p>
+            <p class="car-listings-no-results"><?php esc_html_e('No car listings found.', 'bricks-child'); ?></p>
         <?php endif; ?>
     </div>
     <?php
@@ -684,11 +684,11 @@ function car_listings_render_card($post_id) {
                          alt="<?php echo esc_attr($clean_year . ' ' . $make . ' ' . $model); ?>"
                          loading="lazy">
                 <?php else : ?>
-                    <div class="car-listings-no-image">No Image</div>
+                    <div class="car-listings-no-image"><?php esc_html_e('No Image', 'bricks-child'); ?></div>
                 <?php endif; ?>
 
                 <?php if ($is_sold) : ?>
-                    <span class="car-listings-sold-badge">SOLD</span>
+                    <span class="car-listings-sold-badge"><?php esc_html_e('SOLD', 'bricks-child'); ?></span>
                 <?php endif; ?>
             </div>
 

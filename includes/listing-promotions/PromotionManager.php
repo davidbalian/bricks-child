@@ -90,14 +90,14 @@ final class AutoAgora_Promotion_Manager
     public function grant_paid($listing_id, $tier, $duration_seconds, $provider, $reference, $notes = '', array $payment_data = array())
     {
         if (!AutoAgora_Promotion_Schema::exists()) {
-            return new WP_Error('promotion_table_missing', 'The listing promotions table is unavailable.');
+            return new WP_Error('promotion_table_missing', __('The listing promotions table is unavailable.', 'bricks-child'));
         }
         $provider = sanitize_key($provider);
         $reference = sanitize_text_field($reference);
         $provider = substr($provider, 0, 32);
         $reference = function_exists('mb_substr') ? mb_substr($reference, 0, 191) : substr($reference, 0, 191);
         if ($provider === '' || $reference === '') {
-            return new WP_Error('promotion_payment_reference', 'A payment provider and unique payment reference are required.');
+            return new WP_Error('promotion_payment_reference', __('A payment provider and unique payment reference are required.', 'bricks-child'));
         }
 
         $existing = $this->repository->find_payment_event($provider, $reference);
@@ -121,16 +121,16 @@ final class AutoAgora_Promotion_Manager
         $duration_seconds = (int) $duration_seconds;
         $post = get_post($listing_id);
         if (!$post || $post->post_type !== 'car') {
-            return new WP_Error('promotion_listing_invalid', 'The selected listing does not exist or is not a car.');
+            return new WP_Error('promotion_listing_invalid', __('The selected listing does not exist or is not a car.', 'bricks-child'));
         }
         if (!self::is_seller_purchase_eligible($listing_id)) {
-            return new WP_Error('promotion_listing_inactive', 'Only active published listings or listings awaiting review can receive a promotion.');
+            return new WP_Error('promotion_listing_inactive', __('Only active published listings or listings awaiting review can receive a promotion.', 'bricks-child'));
         }
         if ($duration_seconds < HOUR_IN_SECONDS || $duration_seconds > YEAR_IN_SECONDS) {
-            return new WP_Error('promotion_duration_invalid', 'Promotion duration must be between one hour and one year.');
+            return new WP_Error('promotion_duration_invalid', __('Promotion duration must be between one hour and one year.', 'bricks-child'));
         }
         if (!AutoAgora_Promotion_Schema::exists()) {
-            return new WP_Error('promotion_table_missing', 'The listing promotions table is unavailable.');
+            return new WP_Error('promotion_table_missing', __('The listing promotions table is unavailable.', 'bricks-child'));
         }
 
         if (self::is_initial_approval_pending($listing_id)) {
@@ -162,20 +162,20 @@ final class AutoAgora_Promotion_Manager
         $duration_seconds = (int) $duration_seconds;
         $post = get_post($listing_id);
         if (!$post || $post->post_type !== 'car') {
-            return new WP_Error('promotion_listing_invalid', 'The selected listing does not exist or is not a car.');
+            return new WP_Error('promotion_listing_invalid', __('The selected listing does not exist or is not a car.', 'bricks-child'));
         }
         if (!$allow_inactive && ($post->post_status !== 'publish' || (class_exists('ListingStateManager') && ListingStateManager::resolve_state($listing_id) !== ListingStateManager::STATE_ACTIVE))) {
-            return new WP_Error('promotion_listing_inactive', 'Only published, active listings can receive a promotion.');
+            return new WP_Error('promotion_listing_inactive', __('Only published, active listings can receive a promotion.', 'bricks-child'));
         }
         $awaiting_initial_approval_requested = $source === 'payment' && !empty($payment_data['awaiting_initial_approval']);
         if (!isset(self::tiers()[$tier])) {
-            return new WP_Error('promotion_tier_invalid', 'The selected promotion tier is invalid.');
+            return new WP_Error('promotion_tier_invalid', __('The selected promotion tier is invalid.', 'bricks-child'));
         }
         if ($duration_seconds < HOUR_IN_SECONDS || $duration_seconds > YEAR_IN_SECONDS) {
-            return new WP_Error('promotion_duration_invalid', 'Promotion duration must be between one hour and one year.');
+            return new WP_Error('promotion_duration_invalid', __('Promotion duration must be between one hour and one year.', 'bricks-child'));
         }
         if (!AutoAgora_Promotion_Schema::exists()) {
-            return new WP_Error('promotion_table_missing', 'The listing promotions table is unavailable.');
+            return new WP_Error('promotion_table_missing', __('The listing promotions table is unavailable.', 'bricks-child'));
         }
 
         $amount_minor = $source === 'payment' && isset($payment_data['amount_minor']) ? max(0, (int) $payment_data['amount_minor']) : 0;
@@ -186,24 +186,24 @@ final class AutoAgora_Promotion_Manager
         $currency = substr($currency, 0, 3);
         $checkout_session_id = function_exists('mb_substr') ? mb_substr($checkout_session_id, 0, 191) : substr($checkout_session_id, 0, 191);
         if ($source === 'payment' && ($amount_minor < 50 || $currency !== 'eur' || strpos($checkout_session_id, 'cs_') !== 0)) {
-            return new WP_Error('promotion_payment_snapshot_invalid', 'The paid promotion details are incomplete.');
+            return new WP_Error('promotion_payment_snapshot_invalid', __('The paid promotion details are incomplete.', 'bricks-child'));
         }
 
         if (!$this->acquire_listing_lock($listing_id)) {
-            return new WP_Error('promotion_listing_busy', 'This listing is receiving another promotion. Please retry.');
+            return new WP_Error('promotion_listing_busy', __('This listing is receiving another promotion. Please retry.', 'bricks-child'));
         }
 
         try {
             clean_post_cache($listing_id);
             $post = get_post($listing_id);
             if (!$post || $post->post_type !== 'car') {
-                return new WP_Error('promotion_listing_invalid', 'The selected listing does not exist or is not a car.');
+                return new WP_Error('promotion_listing_invalid', __('The selected listing does not exist or is not a car.', 'bricks-child'));
             }
             $awaiting_initial_approval = $awaiting_initial_approval_requested
                 && self::is_initial_approval_pending($listing_id)
                 && self::is_seller_purchase_eligible($listing_id);
             if ($awaiting_initial_approval_requested && !$awaiting_initial_approval && $post->post_status !== 'publish') {
-                return new WP_Error('promotion_listing_inactive', 'The pending listing can no longer wait for initial approval. Refund this payment from Stripe.');
+                return new WP_Error('promotion_listing_inactive', __('The pending listing can no longer wait for initial approval. Refund this payment from Stripe.', 'bricks-child'));
             }
             if ($provider && $reference) {
                 $existing = $this->repository->find_payment_event($provider, $reference);
@@ -256,7 +256,7 @@ final class AutoAgora_Promotion_Manager
                         return $this->validate_existing_payment_event($existing, $listing_id, $tier, $duration_seconds, $payment_data);
                     }
                 }
-                return new WP_Error('promotion_insert_failed', 'The promotion could not be saved.');
+                return new WP_Error('promotion_insert_failed', __('The promotion could not be saved.', 'bricks-child'));
             }
 
             $reconciled = $this->reconcile_listing($listing_id);
@@ -274,17 +274,17 @@ final class AutoAgora_Promotion_Manager
     {
         $record = $this->repository->find((int) $promotion_id);
         if (!$record) {
-            return new WP_Error('promotion_not_cancellable', 'This promotion cannot be cancelled.');
+            return new WP_Error('promotion_not_cancellable', __('This promotion cannot be cancelled.', 'bricks-child'));
         }
         if ($record->status === self::STATUS_CANCELLED) {
             $reconciled = $this->reconcile_listing((int) $record->listing_id);
             return is_wp_error($reconciled) ? $reconciled : true;
         }
         if (!in_array($record->status, array(self::STATUS_ACTIVE, self::STATUS_SCHEDULED, self::STATUS_AWAITING_APPROVAL), true)) {
-            return new WP_Error('promotion_not_cancellable', 'This promotion cannot be cancelled.');
+            return new WP_Error('promotion_not_cancellable', __('This promotion cannot be cancelled.', 'bricks-child'));
         }
         if (!$this->repository->update_status((int) $record->id, self::STATUS_CANCELLED)) {
-            return new WP_Error('promotion_status_update_failed', 'The promotion status could not be updated.');
+            return new WP_Error('promotion_status_update_failed', __('The promotion status could not be updated.', 'bricks-child'));
         }
         $reconciled = $this->reconcile_listing((int) $record->listing_id);
         if (is_wp_error($reconciled)) {
@@ -296,14 +296,14 @@ final class AutoAgora_Promotion_Manager
     public function refund_paid($provider, $reference, $amount_minor = 0)
     {
         if (!AutoAgora_Promotion_Schema::exists()) {
-            return new WP_Error('promotion_table_missing', 'The listing promotions table is unavailable.');
+            return new WP_Error('promotion_table_missing', __('The listing promotions table is unavailable.', 'bricks-child'));
         }
         $provider = substr(sanitize_key($provider), 0, 32);
         $reference = sanitize_text_field($reference);
         $reference = function_exists('mb_substr') ? mb_substr($reference, 0, 191) : substr($reference, 0, 191);
         $record = $this->repository->find_payment_event($provider, $reference);
         if (!$record || $record->source !== 'payment') {
-            return new WP_Error('promotion_payment_not_found', 'No paid promotion matches this payment reference.');
+            return new WP_Error('promotion_payment_not_found', __('No paid promotion matches this payment reference.', 'bricks-child'));
         }
         if ($record->status === self::STATUS_REFUNDED) {
             $reconciled = $this->reconcile_listing((int) $record->listing_id);
@@ -315,7 +315,7 @@ final class AutoAgora_Promotion_Manager
             $refund_amount = min($refund_amount, (int) $record->amount_minor);
         }
         if (!$this->repository->mark_refunded((int) $record->id, $refund_amount)) {
-            return new WP_Error('promotion_status_update_failed', 'The promotion refund status could not be saved.');
+            return new WP_Error('promotion_status_update_failed', __('The promotion refund status could not be saved.', 'bricks-child'));
         }
         $reconciled = $this->reconcile_listing((int) $record->listing_id);
         if (is_wp_error($reconciled)) {
@@ -330,7 +330,7 @@ final class AutoAgora_Promotion_Manager
         $listing_id = (int) $listing_id;
         $now = gmdate('Y-m-d H:i:s');
         if ($this->repository->expire_due_for_listing($listing_id, $now) === false) {
-            return new WP_Error('promotion_expiry_update_failed', 'Expired promotions could not be updated.');
+            return new WP_Error('promotion_expiry_update_failed', __('Expired promotions could not be updated.', 'bricks-child'));
         }
 
         $active = $this->repository->active_for_listing($listing_id, $now);
@@ -338,11 +338,11 @@ final class AutoAgora_Promotion_Manager
             $due = $this->repository->due_scheduled_for_listing($listing_id, $now);
             if ($due) {
                 if (!$this->repository->update_status((int) $due[0]->id, self::STATUS_ACTIVE)) {
-                    return new WP_Error('promotion_status_update_failed', 'The scheduled promotion could not be activated.');
+                    return new WP_Error('promotion_status_update_failed', __('The scheduled promotion could not be activated.', 'bricks-child'));
                 }
                 $activated = $this->repository->find((int) $due[0]->id);
                 if (!$activated) {
-                    return new WP_Error('promotion_record_missing', 'The activated promotion could not be loaded.');
+                    return new WP_Error('promotion_record_missing', __('The activated promotion could not be loaded.', 'bricks-child'));
                 }
                 $active = array($activated);
             }
@@ -362,16 +362,16 @@ final class AutoAgora_Promotion_Manager
         $listing_id = (int) $listing_id;
         $post = get_post($listing_id);
         if (!$post || $post->post_type !== 'car' || $post->post_status !== 'publish') {
-            return new WP_Error('promotion_listing_inactive', 'The listing is not published yet.');
+            return new WP_Error('promotion_listing_inactive', __('The listing is not published yet.', 'bricks-child'));
         }
         if (class_exists('ListingStateManager') && ListingStateManager::resolve_state($listing_id) !== ListingStateManager::STATE_ACTIVE) {
-            return new WP_Error('promotion_listing_inactive', 'The listing is not active.');
+            return new WP_Error('promotion_listing_inactive', __('The listing is not active.', 'bricks-child'));
         }
         if (!AutoAgora_Promotion_Schema::exists()) {
-            return new WP_Error('promotion_table_missing', 'The listing promotions table is unavailable.');
+            return new WP_Error('promotion_table_missing', __('The listing promotions table is unavailable.', 'bricks-child'));
         }
         if (!$this->acquire_listing_lock($listing_id)) {
-            return new WP_Error('promotion_listing_busy', 'This listing is receiving another promotion. Please retry.');
+            return new WP_Error('promotion_listing_busy', __('This listing is receiving another promotion. Please retry.', 'bricks-child'));
         }
 
         try {
@@ -386,7 +386,7 @@ final class AutoAgora_Promotion_Manager
                 $end = gmdate('Y-m-d H:i:s', strtotime($next_start . ' UTC') + (int) $record->duration_seconds);
                 $status = $next_start <= $now ? self::STATUS_ACTIVE : self::STATUS_SCHEDULED;
                 if (!$this->repository->schedule_awaiting_approval((int) $record->id, $status, $next_start, $end)) {
-                    return new WP_Error('promotion_status_update_failed', 'A waiting promotion could not be scheduled.');
+                    return new WP_Error('promotion_status_update_failed', __('A waiting promotion could not be scheduled.', 'bricks-child'));
                 }
                 do_action('autoagora_listing_promotion_approval_activated', (int) $record->id, $listing_id);
                 $next_start = $end;
@@ -477,7 +477,7 @@ final class AutoAgora_Promotion_Manager
         update_post_meta($listing_id, self::META_STARTS_AT, $record->starts_at);
         update_post_meta($listing_id, self::META_ENDS_AT, $record->ends_at);
         if ($this->snapshot_values($listing_id) !== $desired) {
-            return new WP_Error('promotion_snapshot_update_failed', 'The promotion marketplace snapshot could not be saved.');
+            return new WP_Error('promotion_snapshot_update_failed', __('The promotion marketplace snapshot could not be saved.', 'bricks-child'));
         }
         if ($before !== $desired) {
             $this->invalidate_listing_queries($listing_id);
@@ -505,7 +505,7 @@ final class AutoAgora_Promotion_Manager
         delete_post_meta($listing_id, self::META_STARTS_AT);
         delete_post_meta($listing_id, self::META_ENDS_AT);
         if ($this->snapshot_values($listing_id) !== $desired) {
-            return new WP_Error('promotion_snapshot_update_failed', 'The promotion marketplace snapshot could not be cleared.');
+            return new WP_Error('promotion_snapshot_update_failed', __('The promotion marketplace snapshot could not be cleared.', 'bricks-child'));
         }
         if ($before !== $desired) {
             $this->invalidate_listing_queries($listing_id);
@@ -555,19 +555,19 @@ final class AutoAgora_Promotion_Manager
     private function validate_existing_payment_event($record, $listing_id, $tier, $duration_seconds = 0, array $payment_data = array())
     {
         if ((int) $record->listing_id !== (int) $listing_id || (string) $record->tier !== (string) $tier) {
-            return new WP_Error('promotion_payment_reference_conflict', 'This payment reference is already attached to a different promotion.');
+            return new WP_Error('promotion_payment_reference_conflict', __('This payment reference is already attached to a different promotion.', 'bricks-child'));
         }
         if ((int) $duration_seconds > 0 && (int) $record->duration_seconds !== (int) $duration_seconds) {
-            return new WP_Error('promotion_payment_reference_conflict', 'This payment reference has different promotion terms.');
+            return new WP_Error('promotion_payment_reference_conflict', __('This payment reference has different promotion terms.', 'bricks-child'));
         }
         if (isset($payment_data['amount_minor']) && (int) $record->amount_minor !== (int) $payment_data['amount_minor']) {
-            return new WP_Error('promotion_payment_reference_conflict', 'This payment reference has a different paid amount.');
+            return new WP_Error('promotion_payment_reference_conflict', __('This payment reference has a different paid amount.', 'bricks-child'));
         }
         if (isset($payment_data['currency']) && strtolower((string) $record->currency) !== strtolower((string) $payment_data['currency'])) {
-            return new WP_Error('promotion_payment_reference_conflict', 'This payment reference has a different currency.');
+            return new WP_Error('promotion_payment_reference_conflict', __('This payment reference has a different currency.', 'bricks-child'));
         }
         if (isset($payment_data['stripe_checkout_session_id']) && (string) $record->stripe_checkout_session_id !== (string) $payment_data['stripe_checkout_session_id']) {
-            return new WP_Error('promotion_payment_reference_conflict', 'This payment reference has a different Checkout Session.');
+            return new WP_Error('promotion_payment_reference_conflict', __('This payment reference has a different Checkout Session.', 'bricks-child'));
         }
         $reconciled = $this->reconcile_listing((int) $record->listing_id);
         if (is_wp_error($reconciled)) {

@@ -54,7 +54,9 @@ class RefreshListingUI {
         $button_class = $can_refresh ? 'btn btn-success refresh-button' : 'btn btn-success refresh-button';
         $button_disabled = $can_refresh ? '' : ' disabled';
         $icon_class = 'fas fa-sync-alt';
-        $button_text = $can_refresh ? 'Refresh Listing' : 'Available in ' . $time_remaining;
+        $button_text = $can_refresh
+            ? __('Refresh Listing', 'bricks-child')
+            : sprintf(__('Available in %s', 'bricks-child'), $time_remaining);
         
         ob_start();
         ?>
@@ -66,9 +68,9 @@ class RefreshListingUI {
             <span class="refresh-button-text"><?php echo esc_html($button_text); ?></span>
         </button>
         <?php if ($refresh_count > 0): ?>
-            <span class="refresh-info" title="Total refreshes: <?php echo esc_attr($refresh_count); ?>">
+            <span class="refresh-info" title="<?php echo esc_attr(sprintf(__('Total refreshes: %d', 'bricks-child'), $refresh_count)); ?>">
                 <i class="fas fa-info-circle"></i>
-                Refreshed <?php echo esc_html($refresh_count); ?> time<?php echo $refresh_count > 1 ? 's' : ''; ?>
+                <?php echo esc_html(sprintf(_n('Refreshed %d time', 'Refreshed %d times', $refresh_count, 'bricks-child'), $refresh_count)); ?>
             </span>
         <?php endif; ?>
         <?php
@@ -99,7 +101,7 @@ class RefreshListingUI {
         ?>
         <span class="refresh-status">
             <i class="fas fa-clock"></i>
-            Last refreshed <?php echo esc_html($human_time); ?> ago
+            <?php echo esc_html(sprintf(__('Last refreshed %s ago', 'bricks-child'), $human_time)); ?>
         </span>
         <?php
         
@@ -117,13 +119,13 @@ class RefreshListingUI {
         <div class="refresh-info-tooltip">
             <i class="fas fa-question-circle"></i>
             <div class="tooltip-content">
-                <h4>About Refresh Listing</h4>
-                <p>Refreshing your listing moves it to the top of search results and makes it appear as "recently updated".</p>
+                <h4><?php esc_html_e('About Refresh Listing', 'bricks-child'); ?></h4>
+                <p><?php esc_html_e('Refreshing your listing moves it to the top of search results and makes it appear as "recently updated".', 'bricks-child'); ?></p>
                 <ul>
-                    <li>Available once every 7 days</li>
-                    <li>Updates listing's "last modified" date</li>
-                    <li>Increases visibility to buyers</li>
-                    <li>Only available for published, unsold listings</li>
+                    <li><?php esc_html_e('Available once every 7 days', 'bricks-child'); ?></li>
+                    <li><?php esc_html_e("Updates listing's last modified date", 'bricks-child'); ?></li>
+                    <li><?php esc_html_e('Increases visibility to buyers', 'bricks-child'); ?></li>
+                    <li><?php esc_html_e('Only available for published, unsold listings', 'bricks-child'); ?></li>
                 </ul>
             </div>
         </div>

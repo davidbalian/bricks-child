@@ -1,6 +1,8 @@
 (function () {
     'use strict';
 
+    var t = window.autoagoraTranslate || function (source) { return source; };
+
     var KEY = 'autoagora_compare_cars';
     var MAX = 3;
 
@@ -69,24 +71,24 @@
         }
 
         var rows = [
-            ['Price', 'price'],
-            ['Mileage', 'mileage'],
-            ['Year', 'year'],
-            ['Power', 'power'],
-            ['Fuel', 'fuel'],
-            ['Transmission', 'transmission']
+            [t('Price'), 'price'],
+            [t('Mileage'), 'mileage'],
+            [t('Year'), 'year'],
+            [t('Power'), 'power'],
+            [t('Fuel'), 'fuel'],
+            [t('Transmission'), 'transmission']
         ];
 
-        var html = '<div class="autoagora-compare-tray__header"><strong>Compare cars (' + items.length + '/3)</strong><button type="button" class="autoagora-compare-clear">Clear</button></div>';
-        html += '<table class="autoagora-compare-table"><thead><tr><th>Spec</th>';
+        var html = '<div class="autoagora-compare-tray__header"><strong>' + esc(t('Compare cars (%s/3)', items.length)) + '</strong><button type="button" class="autoagora-compare-clear">' + esc(t('Clear')) + '</button></div>';
+        html += '<table class="autoagora-compare-table"><thead><tr><th>' + esc(t('Spec')) + '</th>';
         items.forEach(function (item) {
-            html += '<th><a href="' + esc(item.url) + '">' + esc(item.title) + '</a><br><button type="button" class="autoagora-compare-remove" data-car-id="' + esc(item.id) + '">Remove</button></th>';
+            html += '<th><a href="' + esc(item.url) + '">' + esc(item.title) + '</a><br><button type="button" class="autoagora-compare-remove" data-car-id="' + esc(item.id) + '">' + esc(t('Remove')) + '</button></th>';
         });
         html += '</tr></thead><tbody>';
         rows.forEach(function (row) {
             html += '<tr><th>' + esc(row[0]) + '</th>';
             items.forEach(function (item) {
-                html += '<td>' + esc(item[row[1]] || '-') + '</td>';
+                html += '<td>' + esc(item[row[1]] ? t(item[row[1]]) : '-') + '</td>';
             });
             html += '</tr>';
         });
@@ -100,7 +102,7 @@
         var ids = readItems().map(function (item) { return String(item.id); });
         document.querySelectorAll('[data-autoagora-compare]').forEach(function (btn) {
             var selected = ids.indexOf(String(btn.getAttribute('data-car-id'))) !== -1;
-            var label = selected ? 'Added to compare' : 'Compare';
+            var label = selected ? t('Added to compare') : t('Compare');
             if (btn.classList.contains('is-selected') !== selected) {
                 btn.classList.toggle('is-selected', selected);
             }

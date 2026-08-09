@@ -10,13 +10,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 function favourites_button_shortcode() {
     ob_start();
     
-    $favourites_page = get_page_by_path('favourite-listings');
-    if ($favourites_page) {
+    $favourites_url = autoagora_localized_page_url('favourite-listings');
+    if ($favourites_url) {
         ?>
         <div class="favourites-button">
-            <a href="<?php echo esc_url(get_permalink($favourites_page->ID)); ?>">
+            <a href="<?php echo esc_url($favourites_url); ?>">
                 <i class="fas fa-heart"></i>
-                <span>Saved</span>
+                <span><?php esc_html_e('Saved', 'bricks-child'); ?></span>
             </a>
         </div>
         <?php
@@ -24,4 +24,4 @@ function favourites_button_shortcode() {
     
     return ob_get_clean();
 }
-add_shortcode('favourites_button', 'favourites_button_shortcode'); 
+add_shortcode('favourites_button', 'favourites_button_shortcode');

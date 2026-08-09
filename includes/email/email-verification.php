@@ -75,7 +75,7 @@ function send_verification_email($user_id, $email) {
     $token = generate_email_verification_token($user_id, $email);
     
     // Create verification URL
-    $verification_url = home_url('/verify-email/?token=' . urlencode($token));
+    $verification_url = add_query_arg('token', $token, autoagora_localized_page_url('verify-email'));
     
     // Get user info
     $user = get_user_by('ID', $user_id);
@@ -165,16 +165,16 @@ function handle_email_verification() {
             error_log("Email verification successful for user ID: $user_id, email: $email");
             
             // Redirect to my-account with success message
-            wp_redirect(home_url('/my-account/?email_verified=success'));
+            wp_redirect(add_query_arg('email_verified', 'success', autoagora_localized_page_url('my-account')));
             exit;
         } else {
             // Invalid or expired token
             error_log("Email verification failed - invalid or expired token");
-            wp_redirect(home_url('/my-account/?email_verified=error'));
+            wp_redirect(add_query_arg('email_verified', 'error', autoagora_localized_page_url('my-account')));
             exit;
         }
     }
 }
 
 // Hook to handle verification URLs
-add_action('template_redirect', 'handle_email_verification'); 
+add_action('template_redirect', 'handle_email_verification');

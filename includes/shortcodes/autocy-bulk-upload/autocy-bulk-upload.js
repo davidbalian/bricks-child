@@ -1,6 +1,8 @@
 (function($) {
     'use strict';
 
+    const t = window.autoagoraTranslate || ((source) => source);
+
     const state = {
         phase: 1,
         uploadManager: null,
@@ -195,7 +197,7 @@
             const text = e.target.result;
             const rows = parseCSVText(text);
             if (rows.length < 2) {
-                alert('CSV file appears empty or has no data rows.');
+                alert(t('CSV file appears empty or has no data rows.'));
                 return;
             }
 
@@ -308,11 +310,11 @@
 
     function validateListing(listing) {
         const errors = [];
-        if (!listing.make) errors.push('Missing make');
-        if (!listing.model) errors.push('Missing model');
-        if (!listing.year) errors.push('Missing year');
-        if (!listing.price) errors.push('Missing price');
-        if (listing._images.length < 2) errors.push('Less than 2 matched images (' + listing._images.length + ' found)');
+        if (!listing.make) errors.push(t('Missing make'));
+        if (!listing.model) errors.push(t('Missing model'));
+        if (!listing.year) errors.push(t('Missing year'));
+        if (!listing.price) errors.push(t('Missing price'));
+        if (listing._images.length < 2) errors.push(t('Less than 2 matched images (%d found)', listing._images.length));
         return errors;
     }
 
@@ -336,7 +338,7 @@
         if (!listing) return;
 
         const total = state.listings.length;
-        document.getElementById('bu-slider-counter').textContent = 'Listing ' + (state.sliderIndex + 1) + ' of ' + total;
+        document.getElementById('bu-slider-counter').textContent = t('Listing %d of %d', state.sliderIndex + 1, total);
         document.getElementById('bu-prev-btn').disabled = state.sliderIndex === 0;
         document.getElementById('bu-next-btn').disabled = state.sliderIndex >= total - 1;
 
@@ -350,7 +352,7 @@
         }
 
         const title = (listing.year || '') + ' ' + (listing.make || '') + ' ' + (listing.model || '');
-        const priceFormatted = listing.price ? '€' + Number(listing.price).toLocaleString() : 'N/A';
+        const priceFormatted = listing.price ? '€' + Number(listing.price).toLocaleString() : t('N/A');
 
         html += '<div class="bu-card-header">';
         html += '<span class="bu-card-title">' + escapeHtml(title.trim()) + '</span>';
@@ -365,50 +367,50 @@
             });
             html += '</div>';
         } else {
-            html += '<div class="bu-card-no-images">No matched images</div>';
+            html += '<div class="bu-card-no-images">' + escapeHtml(t('No matched images')) + '</div>';
         }
 
         // Detail grid
         const fields = [
-            ['Make', listing.make],
-            ['Model', listing.model],
-            ['Year', listing.year],
-            ['Price', listing.price],
-            ['Mileage', listing.mileage],
-            ['Fuel Type', listing.fuel_type],
-            ['Transmission', listing.transmission],
-            ['Engine', listing.engine_capacity ? listing.engine_capacity + 'L' : ''],
-            ['Body Type', listing.body_type],
-            ['Drive Type', listing.drive_type],
-            ['Ext. Color', listing.exterior_color],
-            ['Int. Color', listing.interior_color],
-            ['Doors', listing.number_of_doors],
-            ['Seats', listing.number_of_seats],
-            ['Availability', listing.availability],
-            ['Image Folder', listing.image_folder],
+            [t('Make'), listing.make],
+            [t('Model'), listing.model],
+            [t('Year'), listing.year],
+            [t('Price'), listing.price],
+            [t('Mileage'), listing.mileage],
+            [t('Fuel Type'), listing.fuel_type],
+            [t('Transmission'), listing.transmission],
+            [t('Engine'), listing.engine_capacity ? listing.engine_capacity + 'L' : ''],
+            [t('Body Type'), listing.body_type],
+            [t('Drive Type'), listing.drive_type],
+            [t('Ext. Color'), listing.exterior_color],
+            [t('Int. Color'), listing.interior_color],
+            [t('Doors'), listing.number_of_doors],
+            [t('Seats'), listing.number_of_seats],
+            [t('Availability'), listing.availability],
+            [t('Image Folder'), listing.image_folder],
         ];
 
         html += '<div class="bu-card-details">';
         fields.forEach(function(pair) {
             if (pair[1]) {
-                html += '<div class="bu-detail-item"><span class="bu-detail-label">' + escapeHtml(pair[0]) + '</span><span class="bu-detail-value">' + escapeHtml(pair[1]) + '</span></div>';
+                html += '<div class="bu-detail-item"><span class="bu-detail-label">' + escapeHtml(pair[0]) + '</span><span class="bu-detail-value">' + escapeHtml(t(pair[1])) + '</span></div>';
             }
         });
         html += '</div>';
 
         // Extras
         if (listing.extras) {
-            html += '<div class="bu-card-extras"><strong>Extras:</strong> ' + escapeHtml(listing.extras) + '</div>';
+            html += '<div class="bu-card-extras"><strong>' + escapeHtml(t('Extras:')) + '</strong> ' + escapeHtml(listing.extras) + '</div>';
         }
 
         // Description
         if (listing.description) {
-            html += '<div class="bu-card-description"><strong>Description:</strong> ' + escapeHtml(listing.description) + '</div>';
+            html += '<div class="bu-card-description"><strong>' + escapeHtml(t('Description:')) + '</strong> ' + escapeHtml(listing.description) + '</div>';
         }
 
         // Location
         if (state.location) {
-            html += '<div class="bu-card-location"><strong>Location:</strong> ' + escapeHtml(state.location.car_address || state.location.car_city) + '</div>';
+            html += '<div class="bu-card-location"><strong>' + escapeHtml(t('Location:')) + '</strong> ' + escapeHtml(state.location.car_address || state.location.car_city) + '</div>';
         }
 
         card.innerHTML = html;
@@ -497,7 +499,7 @@
                 state.results.push({ success: true, title: title, post_id: result.post_id });
             } catch (err) {
                 failCount++;
-                resultsEl.innerHTML += '<div class="bu-result bu-result-error">&#10007; ' + escapeHtml(title.trim()) + ' — ' + escapeHtml(err.message || 'Unknown error') + '</div>';
+                resultsEl.innerHTML += '<div class="bu-result bu-result-error">&#10007; ' + escapeHtml(title.trim()) + ' — ' + escapeHtml(err.message || t('Unknown error')) + '</div>';
                 state.results.push({ success: false, title: title, error: err.message });
             }
         }
@@ -514,7 +516,9 @@
         // Show done summary
         var doneActions = document.getElementById('bu-done-actions');
         doneActions.style.display = '';
-        document.getElementById('bu-done-summary').textContent = successCount + ' listings created successfully' + (failCount > 0 ? ', ' + failCount + ' failed' : '') + '.';
+        document.getElementById('bu-done-summary').textContent = failCount > 0
+            ? t('%d listings created successfully, %d failed.', successCount, failCount)
+            : t('%d listings created successfully.', successCount);
     }
 
     function createListing(listing) {
@@ -556,11 +560,11 @@
                     if (response.success) {
                         resolve(response.data);
                     } else {
-                        reject(new Error(response.data && response.data.message ? response.data.message : 'Server error'));
+                        reject(new Error(response.data && response.data.message ? response.data.message : t('Server error')));
                     }
                 },
                 error: function(xhr, status, err) {
-                    reject(new Error(err || 'Network error'));
+                    reject(new Error(err || t('Network error')));
                 }
             });
         });
@@ -569,7 +573,7 @@
     function beforeUnloadHandler(e) {
         if (state.submitting) {
             e.preventDefault();
-            e.returnValue = 'Listing creation is in progress. Are you sure you want to leave?';
+            e.returnValue = t('Listing creation is in progress. Are you sure you want to leave?');
             return e.returnValue;
         }
     }

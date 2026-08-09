@@ -119,9 +119,14 @@ function get_dealership_access_message_html() {
     ob_start();
     ?>
     <div class="dealership-claim">
-        <span><i class="fas fa-circle-info dealership-claim__icon" aria-hidden="true"></i><strong>Claim this dealership</strong></span>
+        <span><i class="fas fa-circle-info dealership-claim__icon" aria-hidden="true"></i><strong><?php esc_html_e('Claim this dealership', 'bricks-child'); ?></strong></span>
         <p class="dealership-claim__text">
-            <span>If this is your business, <a href="/contact">contact us</a> to manage your profile.</span>
+            <span><?php
+                printf(
+                    wp_kses_post(__('If this is your business, <a href="%s">contact us</a> to manage your profile.', 'bricks-child')),
+                    esc_url(autoagora_localized_page_url('contact'))
+                );
+            ?></span>
         </p>
     </div>
     <?php

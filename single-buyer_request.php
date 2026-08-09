@@ -67,7 +67,7 @@ get_header(); ?>
                 <!-- Top Actions: Back + Delete (if owner) -->
                 <div class="buyer-request-top-actions">
                     <div class="buyer-request-back">
-                        <a href="<?php echo esc_url( home_url( '/buyer-requests' ) ); ?>" class="buyer-request-back-link">
+                        <a href="<?php echo esc_url( autoagora_localized_page_url( 'buyer-requests' ) ); ?>" class="buyer-request-back-link">
                             <?php echo get_svg_icon('arrow-left'); ?>
                             <?php esc_html_e( 'Back to Buyer Requests', 'bricks-child' ); ?>
                         </a>

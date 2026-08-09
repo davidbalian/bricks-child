@@ -12,6 +12,8 @@
 (function($) {
     'use strict';
 
+    var t = window.autoagoraTranslate || function(source) { return source; };
+
     function autoagoraFilterLog() {
         if (window.console && window.console.info) {
             var args = Array.prototype.slice.call(arguments);
@@ -455,7 +457,7 @@
                                 window.carListingCardsRender.renderInto($wrapper[0], response.data.cards);
                             } catch (renderError) {
                                 console.error('CarFilters: card render error', renderError);
-                                $wrapper.html('<p class="car-listings-no-results">Unable to render listings. Please refresh the page.</p>');
+                $wrapper.html('<p class="car-listings-no-results">' + t('Unable to render listings. Please refresh the page.') + '</p>');
                             }
                         } else if (response.data.html) {
                             $wrapper.html(response.data.html);
@@ -692,7 +694,7 @@
                 var singleLabel = $sel.clone().children('.car-filter-count').remove().end().text().trim();
                 $text.removeClass('placeholder').text(singleLabel);
             } else {
-                $text.removeClass('placeholder').text(selectedValues.length + ' selected');
+            $text.removeClass('placeholder').text(t('%d selected', selectedValues.length));
             }
 
             // Update state with comma-separated string
@@ -895,9 +897,9 @@
                     $button.prop('disabled', true).addClass('car-filter-dropdown-disabled');
                     $dropdown.addClass('car-filter-dropdown-disabled');
                     $search.prop('disabled', true);
-                    $options.html('<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="" data-slug="">All Models</button><div class="car-filter-no-results hidden">No matching results</div>');
-                    $select.html('<option value="">All Models</option>').prop('disabled', true);
-                    $button.find('.car-filter-dropdown-text').addClass('placeholder').text('All Models');
+        $options.html('<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="" data-slug="">' + t('All Models') + '</button><div class="car-filter-no-results hidden">' + t('No matching results') + '</div>');
+        $select.html('<option value="">' + t('All Models') + '</option>').prop('disabled', true);
+        $button.find('.car-filter-dropdown-text').addClass('placeholder').text(t('All Models'));
 
                     // Clear model state
                     CarFilters.setState(group, 'model', '', '');
@@ -907,14 +909,14 @@
                 // Show loading state — CascadeController will populate
                 $button.prop('disabled', true);
                 var $buttonText = $button.find('.car-filter-dropdown-text');
-                $options.html('<div class="car-filter-loading">Loading.</div>');
-                $buttonText.text('Loading.');
+        $options.html('<div class="car-filter-loading">' + t('Loading.') + '</div>');
+        $buttonText.text(t('Loading.'));
 
                 var loadingDots = 1;
                 $dropdown.data('loadingInterval', setInterval(function() {
                     if (!$options.find('.car-filter-loading').length) return;
                     loadingDots = (loadingDots % 3) + 1;
-                    var loadingText = 'Loading' + '.'.repeat(loadingDots);
+            var loadingText = t('Loading') + '.'.repeat(loadingDots);
                     $options.find('.car-filter-loading').text(loadingText);
                     $buttonText.text(loadingText);
                 }, 400));
@@ -1082,7 +1084,7 @@
                             var singleLabel = $sel.clone().children('.car-filter-count').remove().end().text().trim();
                             $text.removeClass('placeholder').text(singleLabel);
                         } else {
-                            $text.removeClass('placeholder').text(remaining.length + ' selected');
+            $text.removeClass('placeholder').text(t('%d selected', remaining.length));
                         }
 
                         CarFilters.setState(group, filterType, newValue);
@@ -1127,8 +1129,8 @@
                 var state = CarFilters.getState(group);
                 var currentModelValue = String(state.model.value);
 
-                var html = '<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="" data-slug="">All Models</button>';
-                var selectHtml = '<option value="">All Models</option>';
+        var html = '<button type="button" class="car-filter-dropdown-option selected" role="option" data-value="" data-slug="">' + t('All Models') + '</button>';
+        var selectHtml = '<option value="">' + t('All Models') + '</option>';
                 var selectedModelExists = false;
 
                 models.forEach(function(model) {
@@ -1142,7 +1144,7 @@
                     selectHtml += '<option value="' + model.term_id + '" data-slug="' + model.slug + '"' + (isSelected ? ' selected' : '') + '>' + model.name + ' (' + model.count + ')</option>';
                 });
 
-                html += '<div class="car-filter-no-results hidden">No matching results</div>';
+            html += '<div class="car-filter-no-results hidden">' + t('No matching results') + '</div>';
 
                 $options.html(html);
                 $select.html(selectHtml).prop('disabled', false);
@@ -1158,7 +1160,7 @@
                     // Deselect "All"
                     $options.find('.car-filter-dropdown-option[data-value=""]').removeClass('selected');
                 } else {
-                    $button.find('.car-filter-dropdown-text').addClass('placeholder').text('Select Model');
+            $button.find('.car-filter-dropdown-text').addClass('placeholder').text(t('Select Model'));
 
                     // Clear model if it was set but no longer available
                     if (currentModelValue) {
@@ -1445,7 +1447,7 @@
                             if (matchCount === 1) {
                                 $text.removeClass('placeholder').text(lastMatchLabel);
                             } else if (matchCount > 1) {
-                                $text.removeClass('placeholder').text(matchCount + ' selected');
+        $text.removeClass('placeholder').text(t('%d selected', matchCount));
                             }
                             $dropdown.find('select').val(values[0]);
                         });

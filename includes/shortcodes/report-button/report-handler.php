@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 function process_listing_report_submission() {
     // Verify nonce
     if (!isset($_POST['report_nonce']) || !wp_verify_nonce($_POST['report_nonce'], 'report_listing_nonce')) {
-        wp_send_json_error('Security check failed');
+        wp_send_json_error(__('Security check failed', 'bricks-child'));
         return;
     }
 
@@ -29,7 +29,7 @@ function process_listing_report_submission() {
     $recent_reports = get_transient($rate_limit_key);
     
     if ($recent_reports && $recent_reports >= 3) {
-        wp_send_json_error('Too many reports submitted. Please wait before submitting another report.');
+        wp_send_json_error(__('Too many reports submitted. Please wait before submitting another report.', 'bricks-child'));
         return;
     }
 
@@ -41,32 +41,32 @@ function process_listing_report_submission() {
 
     // Validate input lengths
     if (strlen($details) > 1000) {
-        wp_send_json_error('Additional details too long (max 1000 characters)');
+        wp_send_json_error(__('Additional details too long (max 1000 characters)', 'bricks-child'));
         return;
     }
     
     if (!empty($reporter_email) && !is_email($reporter_email)) {
-        wp_send_json_error('Invalid email address');
+        wp_send_json_error(__('Invalid email address', 'bricks-child'));
         return;
     }
 
     // Validate required fields
     if (empty($listing_id) || empty($reason)) {
-        wp_send_json_error('Required fields are missing');
+        wp_send_json_error(__('Required fields are missing', 'bricks-child'));
         return;
     }
 
     // Validate listing exists
     $listing = get_post($listing_id);
     if (!$listing || $listing->post_type !== 'car') {
-        wp_send_json_error('Invalid listing');
+        wp_send_json_error(__('Invalid listing', 'bricks-child'));
         return;
     }
 
     // Check if user has already reported this specific listing
     $duplicate_key = 'report_duplicate_' . $user_identifier . '_listing_' . $listing_id;
     if (get_transient($duplicate_key)) {
-        wp_send_json_error('You have already reported this listing.');
+        wp_send_json_error(__('You have already reported this listing.', 'bricks-child'));
         return;
     }
 
@@ -109,7 +109,7 @@ function process_listing_report_submission() {
     set_transient($duplicate_key, true, 30 * DAY_IN_SECONDS);
 
     // Always show success message (don't expose email delivery status)
-    wp_send_json_success('Report submitted successfully');
+    wp_send_json_success(__('Report submitted successfully', 'bricks-child'));
 }
 
 /**

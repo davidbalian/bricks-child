@@ -76,6 +76,8 @@
 
   function relocateSingleListingCard() {
     var placement = document.querySelector("[data-autoagora-facebook-single-placement]");
+    var settings = window.autoagoraFacebookGroup || {};
+    var relatedCarsLabel = String(settings.relatedCarsLabel || "Related Cars").trim().toLowerCase();
     if (!placement) {
       return;
     }
@@ -84,7 +86,7 @@
     if (!relatedSection) {
       Array.prototype.some.call(document.querySelectorAll("main section"), function (section) {
         var heading = section.querySelector("h2, h3, h4");
-        if (heading && heading.textContent.trim().toLowerCase() === "related cars") {
+        if (heading && heading.textContent.trim().toLowerCase() === relatedCarsLabel) {
           relatedSection = section;
           return true;
         }

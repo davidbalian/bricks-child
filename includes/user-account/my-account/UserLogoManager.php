@@ -59,28 +59,28 @@ final class UserLogoManager
         if ($user_id <= 0) {
             return [
                 'success' => false,
-                'message' => 'Invalid user.',
+                'message' => __('Invalid user.', 'bricks-child'),
             ];
         }
 
         if (empty($file_array['tmp_name']) || !is_uploaded_file($file_array['tmp_name'])) {
             return [
                 'success' => false,
-                'message' => 'No file uploaded.',
+                'message' => __('No file uploaded.', 'bricks-child'),
             ];
         }
 
         if (!empty($file_array['error']) && $file_array['error'] !== UPLOAD_ERR_OK) {
             return [
                 'success' => false,
-                'message' => 'Upload error. Please try again.',
+                'message' => __('Upload error. Please try again.', 'bricks-child'),
             ];
         }
 
         if (!empty($file_array['size']) && $file_array['size'] > $max_file_size) {
             return [
                 'success' => false,
-                'message' => 'Image is too large.',
+                'message' => __('Image is too large.', 'bricks-child'),
             ];
         }
 
@@ -94,7 +94,7 @@ final class UserLogoManager
         if (empty($file_type['ext']) || empty($file_type['type'])) {
             return [
                 'success' => false,
-                'message' => 'Invalid file type.',
+                'message' => __('Invalid file type.', 'bricks-child'),
             ];
         }
 
@@ -112,7 +112,7 @@ final class UserLogoManager
         if (!empty($uploaded['error'])) {
             return [
                 'success' => false,
-                'message' => 'Failed to store uploaded file.',
+                'message' => __('Failed to store uploaded file.', 'bricks-child'),
             ];
         }
 
@@ -137,7 +137,7 @@ final class UserLogoManager
 
             return [
                 'success' => false,
-                'message' => 'Failed to create media attachment.',
+                'message' => __('Failed to create media attachment.', 'bricks-child'),
             ];
         }
 
@@ -166,7 +166,7 @@ final class UserLogoManager
 
         return [
             'success' => true,
-            'message' => 'Logo updated successfully.',
+            'message' => __('Logo updated successfully.', 'bricks-child'),
             'logoUrl' => is_string($logo_url) ? $logo_url : $file_url,
         ];
     }

@@ -65,11 +65,11 @@ function autoagora_render_city_cars_landing($slug) {
     <div class="tcp-filters-bar-inner">
         <button type="button" class="tcp-filters-btn" id="tcp-filters-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="1" fill="currentColor" stroke="none"/></svg>
-            Filters
+            <?php esc_html_e('Filters', 'bricks-child'); ?>
         </button>
         <button type="button" class="tcp-filters-btn" id="tcp-location-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.373 7-11a7 7 0 1 0-14 0c0 5.627 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-            Location
+            <?php esc_html_e('Location', 'bricks-child'); ?>
         </button>
         <div class="tcp-active-filters" id="tcp-active-filters"></div>
 
@@ -106,10 +106,11 @@ function autoagora_render_city_cars_landing($slug) {
             <?php
             echo do_shortcode(
                 sprintf(
-                    '[car_filters filters="make,model,price,mileage,fuel,body,year" mode="ajax" target="%1$s" layout="vertical" show_button="false" group="%2$s" city_landing="true" default_car_city="%3$s" results_base_url="/cars/"]',
+                    '[car_filters filters="make,model,price,mileage,fuel,body,year" mode="ajax" target="%1$s" layout="vertical" show_button="false" group="%2$s" city_landing="true" default_car_city="%3$s" results_base_url="%4$s"]',
                     esc_attr($listings_id),
                     esc_attr($group),
-                    $car_city_esc
+                    $car_city_esc,
+                    esc_url(autoagora_localized_page_url('cars'))
                 )
             );
             ?>
@@ -161,7 +162,7 @@ function autoagora_render_city_cars_landing($slug) {
     <h1 class="tcp-heading"><?php echo esc_html($city['h1']); ?></h1>
     <p class="tcp-heading-browse-all">
         <?php echo esc_html($city['browse_lead']); ?>
-        <a class="tcp-heading-browse-all-link" href="<?php echo esc_url(trailingslashit(home_url('/cars/'))); ?>">
+        <a class="tcp-heading-browse-all-link" href="<?php echo esc_url(autoagora_localized_page_url('cars')); ?>">
             <?php echo esc_html($city['browse_link']); ?>
         </a>
     </p>

@@ -82,12 +82,12 @@ class MyListingsAjaxHandler {
             !isset($_POST['nonce']) ||
             !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), self::NONCE_ACTION)
         ) {
-            wp_send_json_error(array('message' => 'Invalid security token.'));
+            wp_send_json_error(array('message' => __('Invalid security token.', 'bricks-child')));
         }
 
         // Ensure user is logged in
         if (!is_user_logged_in()) {
-            wp_send_json_error(array('message' => 'You must be logged in to view listings.'));
+            wp_send_json_error(array('message' => __('You must be logged in to view listings.', 'bricks-child')));
         }
 
         $current_user_id = get_current_user_id();
@@ -229,14 +229,14 @@ class MyListingsAjaxHandler {
         $current_page = max(1, $current_page);
         $max_pages    = max(1, $max_pages);
         ?>
-        <nav class="my-listings-pagination" aria-label="My listings pagination">
+        <nav class="my-listings-pagination" aria-label="<?php esc_attr_e('My listings pagination', 'bricks-child'); ?>">
             <button
                 type="button"
                 class="my-listings-page-link prev"
                 data-page="<?php echo esc_attr(max(1, $current_page - 1)); ?>"
                 <?php disabled($current_page <= 1); ?>
             >
-                &laquo; Prev
+                &laquo; <?php esc_html_e('Prev', 'bricks-child'); ?>
             </button>
 
             <?php for ($i = 1; $i <= $max_pages; $i++) : ?>
@@ -255,7 +255,7 @@ class MyListingsAjaxHandler {
                 data-page="<?php echo esc_attr(min($max_pages, $current_page + 1)); ?>"
                 <?php disabled($current_page >= $max_pages); ?>
             >
-                Next &raquo;
+                <?php esc_html_e('Next', 'bricks-child'); ?> &raquo;
             </button>
         </nav>
         <?php
@@ -332,7 +332,7 @@ class MyListingsAjaxHandler {
                 </div>
                 <div class="listing-meta">
                     <span class="listing-date">
-                        Published: <?php echo esc_html(get_the_date('', $post_id)); ?>
+                        <?php esc_html_e('Published:', 'bricks-child'); ?> <?php echo esc_html(get_the_date('', $post_id)); ?>
                     </span>
                     <span class="listing-status
                         <?php
@@ -346,21 +346,23 @@ class MyListingsAjaxHandler {
                             echo ' status-published';
                         }
                         ?>">
-                        Status:
+                        <?php esc_html_e('Status:', 'bricks-child'); ?>
                         <?php
                         if ($is_sold) {
-                            echo 'SOLD';
+                            esc_html_e('SOLD', 'bricks-child');
                         } elseif ($is_expired) {
-                            echo 'EXPIRED';
+                            esc_html_e('EXPIRED', 'bricks-child');
                         } else {
-                            echo $post_status === 'publish' ? 'Published' : esc_html(ucfirst($post_status));
+                            echo $post_status === 'publish'
+                                ? esc_html__('Published', 'bricks-child')
+                                : esc_html(ucfirst($post_status));
                         }
                         ?>
                     </span>
                     <?php
                     if ($total_views > 0) : ?>
                         <span class="listing-views">
-                            Views: <?php echo esc_html(number_format_i18n($total_views)); ?>
+                            <?php esc_html_e('Views:', 'bricks-child'); ?> <?php echo esc_html(number_format_i18n($total_views)); ?>
                         </span>
                     <?php
                     endif;
@@ -377,8 +379,8 @@ class MyListingsAjaxHandler {
                 }
                 ?>
                 <div class="listing-actions">
-                    <a href="<?php echo esc_url(add_query_arg('car_id', $post_id, home_url('/edit-listing/'))); ?>" class="btn btn-primary my-listing-edit-button">
-                        <i class="fas fa-pencil-alt"></i> Edit
+                    <a href="<?php echo esc_url(add_query_arg('car_id', $post_id, autoagora_localized_page_url('edit-listing'))); ?>" class="btn btn-primary my-listing-edit-button">
+                        <i class="fas fa-pencil-alt"></i> <?php esc_html_e('Edit', 'bricks-child'); ?>
                     </a>
                     <?php
                     if (in_array($post_status, array('publish', 'pending'), true) && ! $is_sold && ! $is_expired && function_exists('autoagora_render_promotion_purchase_controls')) {
@@ -391,7 +393,7 @@ class MyListingsAjaxHandler {
                     }
 
                     if ($post_status === 'publish' && ! $is_expired) {
-                        $button_text = $is_sold ? ' Mark as Available' : ' Mark as Sold';
+                        $button_text = $is_sold ? __('Mark as Available', 'bricks-child') : __('Mark as Sold', 'bricks-child');
                         $button_class = $is_sold
                             ? 'btn btn-primary available-button'
                             : 'btn btn-success sold-button';
@@ -402,7 +404,7 @@ class MyListingsAjaxHandler {
                             data-car-id="<?php echo esc_attr($post_id); ?>"
                             data-is-sold="<?php echo $is_sold ? '1' : '0'; ?>"
                         >
-                            <i class="<?php echo esc_attr($icon_class); ?>"></i><?php echo esc_html($button_text); ?>
+                            <i class="<?php echo esc_attr($icon_class); ?>"></i> <?php echo esc_html($button_text); ?>
                         </button>
                         <?php
                     }
@@ -414,7 +416,7 @@ class MyListingsAjaxHandler {
                     <a
                         href="<?php echo esc_url($delete_url); ?>"
                         class="btn btn-danger delete-button"
-                        onclick="return confirm('Are you sure you want to delete this listing? This action cannot be undone.');"
+                        onclick="return confirm(<?php echo esc_attr(wp_json_encode(__('Are you sure you want to delete this listing? This action cannot be undone.', 'bricks-child'))); ?>);"
                     >
                         <i class="fas fa-trash-alt"></i>
                     </a>

@@ -66,7 +66,7 @@ class AsyncUploadManager {
         // Check for duplicates
         if (this.uploadedImages.has(fileKey)) {
             if (window.isDevelopment) console.log('[AsyncUpload] Duplicate file detected:', file.name);
-            throw new Error('Duplicate file: ' + file.name);
+            throw new Error((window.autoagoraTranslate || ((source) => source))('Duplicate file: %s', file.name));
         }
         
         // Add to uploaded images with pending status
@@ -141,7 +141,7 @@ class AsyncUploadManager {
                 this.onUploadSuccess(fileKey, response.data);
                 
             } else {
-                throw new Error(response.data.message || 'Upload failed');
+                    throw new Error(response.data.message || (window.autoagoraTranslate || ((source) => source))('Upload failed'));
             }
             
         } catch (error) {
@@ -236,7 +236,7 @@ class AsyncUploadManager {
                 this.onImageRemoved(fileKey);
                 
             } else {
-                throw new Error(result.data.message || 'Remove failed');
+                    throw new Error(result.data.message || (window.autoagoraTranslate || ((source) => source))('Remove failed'));
             }
             
         } catch (error) {
@@ -369,4 +369,4 @@ class AsyncUploadManager {
 }
 
 // Make class available globally
-window.AsyncUploadManager = AsyncUploadManager; 
+window.AsyncUploadManager = AsyncUploadManager;

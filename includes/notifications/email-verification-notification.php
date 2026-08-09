@@ -26,7 +26,7 @@ if (!defined('ABSPATH')) {
 function get_email_verification_banner_html($user_email, $args = array()) {
     $defaults = array(
         'id' => 'email-verification-notification',
-        'message_html' => 'To receive notifications, activate <strong>' . esc_html($user_email) . '</strong>',
+        'message_html' => sprintf(__('To receive notifications, activate <strong>%s</strong>', 'bricks-child'), esc_html($user_email)),
         'show_send_button' => true,
         'show_dismiss_button' => true,
         'container_style' => '',
@@ -50,11 +50,11 @@ function get_email_verification_banner_html($user_email, $args = array()) {
             </div>
             <?php if ($args['show_send_button']): ?>
                 <button class="btn btn-primary-gradient send-verification-btn" data-email="<?php echo esc_attr($user_email); ?>">
-                    Send Verification Email
+                    <?php esc_html_e('Send Verification Email', 'bricks-child'); ?>
                 </button>
             <?php endif; ?>
             <?php if ($args['show_dismiss_button']): ?>
-                <button class="dismiss-notice-btn" title="Dismiss notification">×</button>
+                <button class="dismiss-notice-btn" title="<?php esc_attr_e('Dismiss notification', 'bricks-child'); ?>">&times;</button>
             <?php endif; ?>
         </div>
     </div>
@@ -128,13 +128,13 @@ function show_email_verification_notification_footer() {
 function handle_dismiss_email_notification() {
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'dismiss_email_notification')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
     
     // Check if user is logged in
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
     
@@ -146,7 +146,7 @@ function handle_dismiss_email_notification() {
     // Set session flag to dismiss notification
     $_SESSION['email_notification_dismissed'] = true;
     
-    wp_send_json_success('Notification dismissed');
+    wp_send_json_success(__('Notification dismissed', 'bricks-child'));
 }
 
 // Hook to show notification after header
@@ -176,7 +176,7 @@ function enqueue_email_notification_assets() {
         wp_enqueue_script(
             'email-notification-script',
             get_stylesheet_directory_uri() . '/includes/notifications/email-notification.js',
-            array('jquery'),
+            array('jquery', 'autoagora-i18n'),
             '1.0.0',
             true
         );

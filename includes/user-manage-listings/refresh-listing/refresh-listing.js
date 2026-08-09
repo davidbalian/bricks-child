@@ -9,6 +9,8 @@
 
 (function($) {
     'use strict';
+
+    const t = window.autoagoraTranslate || ((source) => source);
     
     /**
      * Refresh Listing Handler
@@ -54,7 +56,7 @@
             const canRefresh = $button.data('can-refresh');
             
             if (!canRefresh || canRefresh === '0') {
-                this.showMessage('This listing cannot be refreshed yet.', 'error');
+            this.showMessage(t('This listing cannot be refreshed yet.'), 'error');
                 return;
             }
             
@@ -72,10 +74,10 @@
          */
         confirmRefresh: function() {
             return confirm(
-                'Refresh this listing?\n\n' +
-                'This will move your listing to the top of search results. ' +
-                'You can refresh again in 7 days.\n\n' +
-                'Continue?'
+                t('Refresh this listing?') + '\n\n' +
+                t('This will move your listing to the top of search results.') + ' ' +
+                t('You can refresh again in 7 days.') + '\n\n' +
+                t('Continue?')
             );
         },
         
@@ -128,7 +130,7 @@
                     location.reload();
                 }, 1500);
             } else {
-                this.showMessage(response.data.message || 'Failed to refresh listing', 'error');
+                this.showMessage(response.data.message || t('Failed to refresh listing'), 'error');
                 this.setButtonLoading($button, false);
             }
         },
@@ -150,7 +152,7 @@
                 });
             }
             
-            this.showMessage('An error occurred. Please try again.', 'error');
+            this.showMessage(t('An error occurred. Please try again.'), 'error');
             this.setButtonLoading($button, false);
         },
         
@@ -168,11 +170,11 @@
                 $button.prop('disabled', true).addClass('loading');
                 $icon.removeClass('fa-sync-alt').addClass('fa-spinner fa-spin');
                 $button.data('original-text', $text.text());
-                $text.text('Refreshing...');
+                $text.text(t('Refreshing...'));
             } else {
                 $button.prop('disabled', false).removeClass('loading');
                 $icon.removeClass('fa-spinner fa-spin').addClass('fa-sync-alt');
-                const originalText = $button.data('original-text') || 'Refresh Listing';
+                const originalText = $button.data('original-text') || t('Refresh Listing');
                 $text.text(originalText);
             }
         },
@@ -195,20 +197,22 @@
             
             // Update icon and text
             $icon.removeClass('fa-spinner fa-spin').addClass('fa-sync-alt');
-            $text.text('Available in 7 days');
+            $text.text(t('Available in 7 days'));
             
             // Update refresh count if element exists
             const $listingItem = $button.closest('.listing-item');
             const $refreshInfo = $listingItem.find('.refresh-info');
             
             if (data.refresh_count) {
-                const countText = data.refresh_count + ' time' + (data.refresh_count > 1 ? 's' : '');
+                const countText = data.refresh_count === 1
+                    ? t('%d time', data.refresh_count)
+                    : t('%d times', data.refresh_count);
                 if ($refreshInfo.length) {
-                    $refreshInfo.html('<i class="fas fa-info-circle"></i> Refreshed ' + countText);
+                    $refreshInfo.html('<i class="fas fa-info-circle"></i> ' + t('Refreshed %s', countText));
                 } else {
                     $button.after(
-                        '<span class="refresh-info" title="Total refreshes: ' + data.refresh_count + '">' +
-                        '<i class="fas fa-info-circle"></i> Refreshed ' + countText +
+                        '<span class="refresh-info" title="' + t('Total refreshes: %d', data.refresh_count) + '">' +
+                        '<i class="fas fa-info-circle"></i> ' + t('Refreshed %s', countText) +
                         '</span>'
                     );
                 }

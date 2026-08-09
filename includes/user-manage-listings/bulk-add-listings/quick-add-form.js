@@ -1,4 +1,5 @@
 jQuery(document).ready(function($) {
+    const t = window.autoagoraTranslate || ((source) => source);
     // PRODUCTION SAFETY: Only log in development environments
 window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' || 
                                                window.location.hostname.includes('staging') ||
@@ -15,36 +16,36 @@ if (isDevelopment) console.log('[Quick Add] Form enhancement loaded');
         // Create quick actions container
         const quickActionsHtml = `
             <div class="quick-actions-section input-wrapper">
-                <h2>⚡ Quick Actions</h2>
+                <h2>⚡ ${t('Quick Actions')}</h2>
                 <div class="quick-actions-buttons">
                     <button type="button" class="btn btn-secondary" id="save-template-btn">
-                        Save as Template
+                        ${t('Save as Template')}
                     </button>
                     <button type="button" class="btn btn-secondary" id="load-template-btn">
-                        Load Template
+                        ${t('Load Template')}
                     </button>
                     <button type="button" class="btn btn-secondary" id="duplicate-form-btn">
-                        Duplicate Form
+                        ${t('Duplicate Form')}
                     </button>
                     <button type="button" class="btn btn-secondary" id="clear-form-btn">
-                        Clear Form
+                        ${t('Clear Form')}
                     </button>
                 </div>
                 
                 <div id="template-controls" style="display: none; margin-top: 1rem;">
                     <div class="template-save-section">
-                        <input type="text" id="template-name" placeholder="Enter template name..." class="form-control" style="width: 200px; display: inline-block; margin-right: 10px;">
-                        <button type="button" class="btn btn-primary" id="confirm-save-template">Save</button>
-                        <button type="button" class="btn btn-secondary" id="cancel-save-template">Cancel</button>
+                        <input type="text" id="template-name" placeholder="${t('Enter template name...')}" class="form-control" style="width: 200px; display: inline-block; margin-right: 10px;">
+                        <button type="button" class="btn btn-primary" id="confirm-save-template">${t('Save')}</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-save-template">${t('Cancel')}</button>
                     </div>
                 </div>
                 
                 <div id="template-load-section" style="display: none; margin-top: 1rem;">
                     <select id="template-selector" class="form-control" style="width: 200px; display: inline-block; margin-right: 10px;">
-                        <option value="">Select a template...</option>
+                        <option value="">${t('Select a template...')}</option>
                     </select>
-                    <button type="button" class="btn btn-primary" id="confirm-load-template">Load</button>
-                    <button type="button" class="btn btn-secondary" id="cancel-load-template">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirm-load-template">${t('Load')}</button>
+                    <button type="button" class="btn btn-secondary" id="cancel-load-template">${t('Cancel')}</button>
                 </div>
             </div>
         `;
@@ -75,14 +76,14 @@ if (isDevelopment) console.log('[Quick Add] Form enhancement loaded');
         
         // Duplicate form button
         $('#duplicate-form-btn').on('click', function() {
-            if (confirm('This will open a new tab with the current form data. Continue?')) {
+            if (confirm(t('This will open a new tab with the current form data. Continue?'))) {
                 duplicateCurrentForm();
             }
         });
         
         // Clear form button
         $('#clear-form-btn').on('click', function() {
-            if (confirm('This will clear all form data. Are you sure?')) {
+            if (confirm(t('This will clear all form data. Are you sure?'))) {
                 clearForm();
             }
         });
@@ -91,7 +92,7 @@ if (isDevelopment) console.log('[Quick Add] Form enhancement loaded');
         $('#confirm-save-template').on('click', function() {
             const templateName = $('#template-name').val().trim();
             if (!templateName) {
-                alert('Please enter a template name');
+                alert(t('Please enter a template name'));
                 return;
             }
             saveTemplate(templateName);
@@ -107,7 +108,7 @@ if (isDevelopment) console.log('[Quick Add] Form enhancement loaded');
         $('#confirm-load-template').on('click', function() {
             const templateName = $('#template-selector').val();
             if (!templateName) {
-                alert('Please select a template');
+                alert(t('Please select a template'));
                 return;
             }
             loadTemplate(templateName);
@@ -133,16 +134,16 @@ if (isDevelopment) console.log('[Quick Add] Form enhancement loaded');
             },
             success: function(response) {
                 if (response.success) {
-                    alert('Template saved successfully!');
+                    alert(t('Template saved successfully!'));
                     $('#template-controls').hide();
                     $('#template-name').val('');
                     loadUserTemplates();
                 } else {
-                    alert('Error saving template: ' + response.data);
+                    alert(t('Error saving template: %s', response.data));
                 }
             },
             error: function() {
-                alert('Error saving template. Please try again.');
+                alert(t('Error saving template. Please try again.'));
             }
         });
     }
@@ -160,13 +161,13 @@ if (isDevelopment) console.log('[Quick Add] Form enhancement loaded');
                 if (response.success) {
                     populateForm(response.data);
                     $('#template-load-section').hide();
-                    alert('Template loaded successfully!');
+                    alert(t('Template loaded successfully!'));
                 } else {
-                    alert('Error loading template: ' + response.data);
+                    alert(t('Error loading template: %s', response.data));
                 }
             },
             error: function() {
-                alert('Error loading template. Please try again.');
+                alert(t('Error loading template. Please try again.'));
             }
         });
     }
@@ -327,4 +328,4 @@ if (isDevelopment) console.log('[Quick Add] Form enhancement loaded');
             $('#duplicate-form-btn').click();
         }
     });
-}); 
+});

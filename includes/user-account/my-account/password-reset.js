@@ -6,6 +6,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    const t = window.autoagoraTranslate || ((source) => source);
     // PRODUCTION SAFETY: Only log in development environments
 window.isDevelopment = window.isDevelopment || (window.location.hostname === 'localhost' || 
                                                window.location.hostname.includes('staging') ||
@@ -55,7 +56,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             const code = verificationInput.value.trim();
             
             if (code.length !== 6) {
-                alert('Please enter a 6-digit verification code');
+                alert(t('Please enter a 6-digit verification code'));
                 return;
             }
             
@@ -107,11 +108,11 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
 
         // Define the same strict requirements as registration
         const requirements = {
-            length: { text: '8-16 characters', regex: /.{8,16}/ },
-            lowercase: { text: 'At least one lowercase letter', regex: /[a-z]/ },
-            uppercase: { text: 'At least one uppercase letter', regex: /[A-Z]/ },
-            number: { text: 'At least one number', regex: /[0-9]/ },
-            symbol: { text: 'At least one symbol (e.g., !@#$%^&*)', regex: /[!@#$%^&*(),.?":{}|<>\-_=+;\[\]~`]/ }
+            length: { text: t('8-16 characters'), regex: /.{8,16}/ },
+            lowercase: { text: t('At least one lowercase letter'), regex: /[a-z]/ },
+            uppercase: { text: t('At least one uppercase letter'), regex: /[A-Z]/ },
+            number: { text: t('At least one number'), regex: /[0-9]/ },
+            symbol: { text: t('At least one symbol (e.g., !@#$%^&*)'), regex: /[!@#$%^&*(),.?":{}|<>\-_=+;\[\]~`]/ }
         };
 
         // Build initial requirements list HTML
@@ -161,13 +162,13 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             // Check levels - require length met for medium/strong
             else if (!requirements.length.regex.test(password) || score <= 2) { 
                 strengthLevel = 'strength-weak';
-                strengthLabel = '⚠️ Weak';
+                strengthLabel = '⚠️ ' + t('Weak');
             } else if (score <= 4) {
                 strengthLevel = 'strength-medium';
-                strengthLabel = '⚡ Moderate';
+                strengthLabel = '⚡ ' + t('Moderate');
             } else { // Score is 5 and length is met
                 strengthLevel = 'strength-strong';
-                strengthLabel = '✅ Safe';
+                strengthLabel = '✅ ' + t('Safe');
             }
 
             // Update indicator and text classes/content
@@ -201,26 +202,26 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             // Apply the same strict validation as registration
             // Password Length Check (8-16 characters)
             if (newPassword.length < 8 || newPassword.length > 16) {
-                errors.push('Password must be between 8 and 16 characters long.');
+                errors.push(t('Password must be between 8 and 16 characters long.'));
             }
 
             // Password Complexity Checks
             if (!/[a-z]/.test(newPassword)) {
-                errors.push('Password must contain at least one lowercase letter.');
+                errors.push(t('Password must contain at least one lowercase letter.'));
             }
             if (!/[A-Z]/.test(newPassword)) {
-                errors.push('Password must contain at least one uppercase letter.');
+                errors.push(t('Password must contain at least one uppercase letter.'));
             }
             if (!/[0-9]/.test(newPassword)) {
-                errors.push('Password must contain at least one number.');
+                errors.push(t('Password must contain at least one number.'));
             }
             if (!/[!@#$%^&*(),.?":{}|<>\-_=+;\[\]~`]/.test(newPassword)) {
-                errors.push('Password must contain at least one symbol (e.g., !@#$%^&*).');
+                errors.push(t('Password must contain at least one symbol (e.g., !@#$%^&*).'));
             }
 
             // Password match check
             if (newPassword !== confirmPassword) {
-                errors.push('Passwords do not match. Please re-enter.');
+                errors.push(t('Passwords do not match. Please re-enter.'));
             }
 
             // Check if any errors occurred
@@ -303,12 +304,12 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             if (data.success) {
                 window.location.href = window.location.pathname + '?password_reset_step=new_password';
             } else {
-                alert('Error: ' + (data.data || 'Invalid verification code'));
+                alert(t('Error: %s', data.data || t('Invalid verification code')));
             }
         })
         .catch(error => {
             if (isDevelopment) console.error('Error:', error);
-            alert('Error verifying code. Please try again.');
+            alert(t('Error verifying code. Please try again.'));
         });
     }
     
@@ -328,14 +329,14 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Verification code sent again to your phone number.');
+                alert(t('Verification code sent again to your phone number.'));
             } else {
-                alert('Error: ' + (data.data || 'Unable to resend code'));
+                alert(t('Error: %s', data.data || t('Unable to resend code')));
             }
         })
         .catch(error => {
             if (isDevelopment) console.error('Error:', error);
-            alert('Error resending code. Please try again.');
+            alert(t('Error resending code. Please try again.'));
         });
     }
     
@@ -346,7 +347,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         const updateBtn = document.querySelector('.update-password-btn');
         if (updateBtn) {
             updateBtn.disabled = true;
-            updateBtn.textContent = 'Updating...';
+            updateBtn.textContent = t('Updating...');
         }
         
         var formData = new FormData();
@@ -364,20 +365,20 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             if (data.success) {
                 window.location.href = window.location.pathname + '?password_reset_step=success';
             } else {
-                alert('Error: ' + (data.data || 'Unable to update password'));
+                alert(t('Error: %s', data.data || t('Unable to update password')));
                 if (updateBtn) {
                     updateBtn.disabled = false;
-                    updateBtn.textContent = 'Update Password';
+                    updateBtn.textContent = t('Update Password');
                 }
             }
         })
         .catch(error => {
             if (isDevelopment) console.error('Error:', error);
-            alert('Error updating password. Please try again.');
+            alert(t('Error updating password. Please try again.'));
             if (updateBtn) {
                 updateBtn.disabled = false;
-                updateBtn.textContent = 'Update Password';
+                updateBtn.textContent = t('Update Password');
             }
         });
     }
-}); 
+});

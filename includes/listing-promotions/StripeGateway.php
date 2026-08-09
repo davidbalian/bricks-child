@@ -149,17 +149,17 @@ final class AutoAgora_Stripe_Gateway
     public static function handle_checkout_ajax()
     {
         if (!is_user_logged_in()) {
-            wp_send_json_error(array('message' => 'You must be logged in to purchase a promotion.'), 401);
+            wp_send_json_error(array('message' => __('You must be logged in to purchase a promotion.', 'bricks-child')), 401);
         }
         if (!check_ajax_referer(self::CHECKOUT_NONCE_ACTION, 'nonce', false)) {
-            wp_send_json_error(array('message' => 'Your session expired. Reload the page and try again.'), 403);
+            wp_send_json_error(array('message' => __('Your session expired. Reload the page and try again.', 'bricks-child')), 403);
         }
         if (!self::is_ready()) {
             AutoAgora_Payment_Logger::log('checkout.rejected', array(
                 'user_id' => get_current_user_id(),
                 'status' => 'gateway_not_ready',
             ), 'error');
-            wp_send_json_error(array('message' => 'Stripe Checkout is not configured yet.'), 503);
+            wp_send_json_error(array('message' => __('Stripe Checkout is not configured yet.', 'bricks-child')), 503);
         }
 
         $listing_id = isset($_POST['listing_id']) ? absint($_POST['listing_id']) : 0;
@@ -191,7 +191,7 @@ final class AutoAgora_Stripe_Gateway
                 'days' => $days,
                 'error_code' => 'stripe_package_unavailable',
             ), 'warning');
-            wp_send_json_error(array('message' => 'Choose a valid promotion and duration.'), 400);
+            wp_send_json_error(array('message' => __('Choose a valid promotion and duration.', 'bricks-child')), 400);
         }
         $schedule_preview = autoagora_promotion_manager()->preview_schedule($listing_id, (int) $package['duration_seconds']);
         if (is_wp_error($schedule_preview)) {
@@ -203,7 +203,7 @@ final class AutoAgora_Stripe_Gateway
             : '';
         if ($client_preview_signature === '' || !hash_equals($formatted_preview['signature'], $client_preview_signature)) {
             wp_send_json_error(array(
-                'message' => 'The promotion schedule changed. Review the updated dates and continue again.',
+                'message' => __('The promotion schedule changed. Review the updated dates and continue again.', 'bricks-child'),
                 'schedule_preview' => $formatted_preview,
             ), 409);
         }
@@ -251,13 +251,13 @@ final class AutoAgora_Stripe_Gateway
     public static function handle_preview_ajax()
     {
         if (!is_user_logged_in()) {
-            wp_send_json_error(array('message' => 'You must be logged in to preview a promotion.'), 401);
+            wp_send_json_error(array('message' => __('You must be logged in to preview a promotion.', 'bricks-child')), 401);
         }
         if (!check_ajax_referer(self::CHECKOUT_NONCE_ACTION, 'nonce', false)) {
-            wp_send_json_error(array('message' => 'Your session expired. Reload the page and try again.'), 403);
+            wp_send_json_error(array('message' => __('Your session expired. Reload the page and try again.', 'bricks-child')), 403);
         }
         if (!self::is_ready()) {
-            wp_send_json_error(array('message' => 'Stripe Checkout is not configured yet.'), 503);
+            wp_send_json_error(array('message' => __('Stripe Checkout is not configured yet.', 'bricks-child')), 503);
         }
 
         $listing_id = isset($_POST['listing_id']) ? absint($_POST['listing_id']) : 0;
@@ -269,7 +269,7 @@ final class AutoAgora_Stripe_Gateway
         }
         $package = self::package_for($tier, $days);
         if (!$package) {
-            wp_send_json_error(array('message' => 'Choose a valid promotion and duration.'), 400);
+            wp_send_json_error(array('message' => __('Choose a valid promotion and duration.', 'bricks-child')), 400);
         }
         $preview = autoagora_promotion_manager()->preview_schedule($listing_id, (int) $package['duration_seconds']);
         if (is_wp_error($preview)) {
@@ -282,7 +282,7 @@ final class AutoAgora_Stripe_Gateway
     {
         $package = self::package_for($tier, $days);
         if (!$package) {
-            return new WP_Error('stripe_package_unavailable', 'Choose a valid promotion and duration.');
+            return new WP_Error('stripe_package_unavailable', __('Choose a valid promotion and duration.', 'bricks-child'));
         }
         $preview = autoagora_promotion_manager()->preview_schedule((int) $listing_id, (int) $package['duration_seconds']);
         if (is_wp_error($preview)) {
@@ -332,8 +332,9 @@ final class AutoAgora_Stripe_Gateway
             $schedule_description = ' Starts after payment confirmation.';
         }
 
-        $success_url = home_url('/my-listings/?promotion_payment=success&session_id={CHECKOUT_SESSION_ID}');
-        $cancel_url = home_url('/my-listings/?promotion_payment=cancelled');
+        $success_url = add_query_arg('promotion_payment', 'success', autoagora_localized_page_url('my-listings'));
+        $success_url .= '&session_id={CHECKOUT_SESSION_ID}';
+        $cancel_url = add_query_arg('promotion_payment', 'cancelled', autoagora_localized_page_url('my-listings'));
         $body = array(
             'mode' => 'payment',
             'payment_method_types' => array('card'),
@@ -369,7 +370,7 @@ final class AutoAgora_Stripe_Gateway
             'body' => http_build_query($body, '', '&'),
         ));
         if (is_wp_error($response)) {
-            return new WP_Error('stripe_unavailable', 'Stripe could not be reached. Please try again.');
+            return new WP_Error('stripe_unavailable', __('Stripe could not be reached. Please try again.', 'bricks-child'));
         }
 
         $status_code = (int) wp_remote_retrieve_response_code($response);
@@ -380,10 +381,10 @@ final class AutoAgora_Stripe_Gateway
             return new WP_Error('stripe_session_failed', $message, array('http_status' => $status_code));
         }
         if (empty($decoded['id']) || empty($decoded['url']) || !self::is_allowed_checkout_url($decoded['url'])) {
-            return new WP_Error('stripe_session_invalid', 'Stripe returned an invalid checkout session.');
+            return new WP_Error('stripe_session_invalid', __('Stripe returned an invalid checkout session.', 'bricks-child'));
         }
         if (isset($decoded['livemode']) && (bool) $decoded['livemode'] !== (self::mode() === 'live')) {
-            return new WP_Error('stripe_mode_mismatch', 'Stripe returned a session from the wrong environment.');
+            return new WP_Error('stripe_mode_mismatch', __('Stripe returned a session from the wrong environment.', 'bricks-child'));
         }
 
         return array(
@@ -517,7 +518,7 @@ final class AutoAgora_Stripe_Gateway
                     return $refund;
                 }
                 if (!$events->mark_processed((int) $pending_refund->id)) {
-                    return new WP_Error('payment_event_update_failed', 'The pending refund receipt could not be completed.');
+                    return new WP_Error('payment_event_update_failed', __('The pending refund receipt could not be completed.', 'bricks-child'));
                 }
                 AutoAgora_Payment_Logger::log('promotion.pending_refund_applied', array_merge($log_context, array(
                     'event_id' => $pending_refund->event_id,
@@ -561,14 +562,14 @@ final class AutoAgora_Stripe_Gateway
     private static function fulfill_checkout_session(array $session)
     {
         if (($session['mode'] ?? '') !== 'payment' || ($session['payment_status'] ?? '') !== 'paid') {
-            return new WP_Error('stripe_payment_unpaid', 'Checkout Session is not paid.');
+            return new WP_Error('stripe_payment_unpaid', __('Checkout Session is not paid.', 'bricks-child'));
         }
         if ((bool) ($session['livemode'] ?? false) !== (self::mode() === 'live')) {
-            return new WP_Error('stripe_mode_mismatch', 'Webhook environment does not match the configured Stripe mode.');
+            return new WP_Error('stripe_mode_mismatch', __('Webhook environment does not match the configured Stripe mode.', 'bricks-child'));
         }
         $metadata = isset($session['metadata']) && is_array($session['metadata']) ? $session['metadata'] : array();
         if (($metadata['integration'] ?? '') !== 'autoagora_listing_promotion_v1') {
-            return new WP_Error('stripe_metadata_invalid', 'Checkout Session is not an AutoAgora promotion purchase.');
+            return new WP_Error('stripe_metadata_invalid', __('Checkout Session is not an AutoAgora promotion purchase.', 'bricks-child'));
         }
 
         $listing_id = isset($metadata['listing_id']) ? absint($metadata['listing_id']) : 0;
@@ -582,10 +583,10 @@ final class AutoAgora_Stripe_Gateway
         $payment_intent = self::webhook_object_reference('checkout.session.completed', $session);
 
         if (!$listing_id || !$user_id || !isset(AutoAgora_Promotion_Manager::tiers()[$tier]) || !in_array($days, self::allowed_days(), true)) {
-            return new WP_Error('stripe_metadata_invalid', 'Required promotion metadata is missing.');
+            return new WP_Error('stripe_metadata_invalid', __('Required promotion metadata is missing.', 'bricks-child'));
         }
         if (strtolower((string) ($metadata['environment'] ?? '')) !== self::mode()) {
-            return new WP_Error('stripe_mode_mismatch', 'Checkout metadata does not match the configured Stripe mode.');
+            return new WP_Error('stripe_mode_mismatch', __('Checkout metadata does not match the configured Stripe mode.', 'bricks-child'));
         }
         if (
             $duration !== $days * DAY_IN_SECONDS
@@ -594,10 +595,10 @@ final class AutoAgora_Stripe_Gateway
             || $currency !== 'eur'
             || strtolower((string) ($metadata['currency'] ?? '')) !== 'eur'
         ) {
-            return new WP_Error('stripe_amount_invalid', 'The paid amount or promotion duration does not match Checkout metadata.');
+            return new WP_Error('stripe_amount_invalid', __('The paid amount or promotion duration does not match Checkout metadata.', 'bricks-child'));
         }
         if ($payment_intent === '' || strpos($payment_intent, 'pi_') !== 0) {
-            return new WP_Error('stripe_payment_reference_invalid', 'Stripe PaymentIntent reference is missing.');
+            return new WP_Error('stripe_payment_reference_invalid', __('Stripe PaymentIntent reference is missing.', 'bricks-child'));
         }
         $ownership_error = self::validate_seller_listing($listing_id, $user_id, false);
         if (is_wp_error($ownership_error)) {
@@ -606,7 +607,7 @@ final class AutoAgora_Stripe_Gateway
 
         $session_id = isset($session['id']) ? sanitize_text_field($session['id']) : '';
         if (strpos($session_id, 'cs_') !== 0) {
-            return new WP_Error('stripe_session_invalid', 'Stripe Checkout Session reference is missing.');
+            return new WP_Error('stripe_session_invalid', __('Stripe Checkout Session reference is missing.', 'bricks-child'));
         }
         return autoagora_grant_paid_listing_promotion(
             $listing_id,
@@ -628,13 +629,13 @@ final class AutoAgora_Stripe_Gateway
     {
         $post = get_post((int) $listing_id);
         if (!$post || $post->post_type !== 'car') {
-            return new WP_Error('stripe_listing_invalid', 'The car listing no longer exists.');
+            return new WP_Error('stripe_listing_invalid', __('The car listing no longer exists.', 'bricks-child'));
         }
         if ((int) $post->post_author !== (int) $user_id && !user_can((int) $user_id, 'manage_options')) {
-            return new WP_Error('stripe_listing_ownership', 'You can only promote your own listing.');
+            return new WP_Error('stripe_listing_ownership', __('You can only promote your own listing.', 'bricks-child'));
         }
         if ($require_active && !AutoAgora_Promotion_Manager::is_seller_purchase_eligible((int) $listing_id)) {
-            return new WP_Error('stripe_listing_inactive', 'Only active published listings or listings awaiting review can be promoted.');
+            return new WP_Error('stripe_listing_inactive', __('Only active published listings or listings awaiting review can be promoted.', 'bricks-child'));
         }
         return true;
     }

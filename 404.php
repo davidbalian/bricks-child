@@ -14,7 +14,7 @@ nocache_headers();
 
 get_header();
 
-$cars_base    = trailingslashit(home_url('/cars/'));
+$cars_base    = autoagora_localized_page_url('cars');
 $suv_url      = esc_url(add_query_arg(array('body_type' => 'SUV'), $cars_base));
 $hatch_url    = esc_url(add_query_arg(array('body_type' => 'Hatchback'), $cars_base));
 $electric_url = esc_url(add_query_arg(array('fuel_type' => 'Electric'), $cars_base));

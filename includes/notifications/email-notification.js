@@ -6,6 +6,7 @@
  */
 
 jQuery(document).ready(function($) {
+    const t = window.autoagoraTranslate || ((source) => source);
     
     // Send verification email (only for notification context)
     $('#email-verification-notification .send-verification-btn').on('click', function() {
@@ -21,7 +22,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         
         // Basic validation
         if (!email) {
-            alert('Email address not found');
+            alert(t('Email address not found'));
             return;
         }
         
@@ -32,7 +33,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         
         // Disable button and show loading
         const originalText = button.text();
-        button.prop('disabled', true).text('Sending...');
+        button.prop('disabled', true).text(t('Sending...'));
         
         // Send AJAX request (same as my-account page)
         $.ajax({
@@ -51,7 +52,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                     $('#email-verification-notification')
                         .addClass('success')
                         .find('.notice-text')
-                        .html('✅ Verification email sent to <strong>' + email + '</strong>! Check your inbox and click the verification link.');
+                        .html('✅ ' + t('Verification email sent to <strong>%s</strong>! Check your inbox and click the verification link.', email));
                     
                     // Hide the buttons
                     $('.send-verification-btn, .dismiss-notice-btn').hide();
@@ -63,7 +64,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                     
                 } else {
                     if (isDevelopment) console.log('Notification AJAX Error:', response.data);
-                    alert('❌ Error: ' + response.data + '\n\nPlease try again.');
+                    alert('❌ ' + t('Error: %s', response.data) + '\n\n' + t('Please try again.'));
                     
                     // Re-enable button
                     button.prop('disabled', false).text(originalText);
@@ -72,7 +73,7 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
             error: function(xhr, status, error) {
                 if (isDevelopment) console.log('Notification AJAX Failed:', {xhr, status, error});
                 
-                alert('❌ Connection error occurred. Please try again.');
+                alert('❌ ' + t('Connection error occurred. Please try again.'));
                 
                 // Re-enable button
                 button.prop('disabled', false).text(originalText);
@@ -119,4 +120,4 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
-}); 
+});

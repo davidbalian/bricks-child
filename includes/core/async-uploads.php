@@ -159,14 +159,14 @@ function handle_async_upload_image() {
         async_upload_error('Nonce verification failed', array(
             'nonce_present' => isset($_POST['nonce'])
         ));
-        wp_send_json_error(array('message' => 'Security check failed'));
+        wp_send_json_error(array('message' => __('Security check failed', 'bricks-child')));
         return;
     }
 
     // Check if user is logged in
     if (!is_user_logged_in()) {
         async_upload_error('User not logged in for async upload');
-        wp_send_json_error(array('message' => 'User not logged in'));
+        wp_send_json_error(array('message' => __('User not logged in', 'bricks-child')));
         return;
     }
 
@@ -178,7 +178,7 @@ function handle_async_upload_image() {
             'file_present' => isset($_FILES['image']),
             'session_id' => isset($_POST['session_id']) ? $_POST['session_id'] : 'not_set'
         ));
-        wp_send_json_error(array('message' => 'File upload error'));
+        wp_send_json_error(array('message' => __('File upload error', 'bricks-child')));
         return;
     }
     
@@ -218,7 +218,7 @@ function handle_async_upload_image() {
             'filename' => $original_filename,
             'session_id' => $session_id
         ));
-        wp_send_json_error(array('message' => 'Invalid file type: ' . $_FILES['image']['type'] . ' (.' . $file_extension . ')'));
+        wp_send_json_error(array('message' => __('Invalid file type: ', 'bricks-child') . $_FILES['image']['type'] . ' (.' . $file_extension . ')'));
         return;
     }
 
@@ -238,7 +238,7 @@ function handle_async_upload_image() {
             'filename' => $original_filename,
             'session_id' => $session_id
         ));
-        wp_send_json_error(array('message' => 'File too large'));
+        wp_send_json_error(array('message' => __('File too large', 'bricks-child')));
         return;
     }
     
@@ -287,7 +287,7 @@ function handle_async_upload_image() {
         ));
         // If database insert failed, clean up the uploaded file
         wp_delete_attachment($attachment_id, true);
-        wp_send_json_error(array('message' => 'Database error: ' . $wpdb->last_error));
+        wp_send_json_error(array('message' => __('Database error: ', 'bricks-child') . $wpdb->last_error));
         return;
     }
 
@@ -307,7 +307,7 @@ function handle_async_upload_image() {
         'attachment_id' => $attachment_id,
         'attachment_url' => $attachment_url,
         'original_filename' => $original_filename,
-        'message' => 'Image uploaded successfully'
+        'message' => __('Image uploaded successfully', 'bricks-child')
     ));
 }
 
@@ -318,14 +318,14 @@ function handle_delete_async_image() {
     // Verify nonce
     if (!wp_verify_nonce($_POST['nonce'], 'async_upload_nonce')) {
         async_upload_error('Delete image nonce verification failed');
-        wp_send_json_error(array('message' => 'Security check failed'));
+        wp_send_json_error(array('message' => __('Security check failed', 'bricks-child')));
         return;
     }
 
     // Check if user is logged in
     if (!is_user_logged_in()) {
         async_upload_error('User not logged in for delete operation');
-        wp_send_json_error(array('message' => 'User not logged in'));
+        wp_send_json_error(array('message' => __('User not logged in', 'bricks-child')));
         return;
     }
     
@@ -371,7 +371,7 @@ function handle_delete_async_image() {
                 'session_id' => $session_id,
                 'user_id' => $user_id
             ));
-            wp_send_json_error(array('message' => 'Upload not found or access denied'));
+            wp_send_json_error(array('message' => __('Upload not found or access denied', 'bricks-child')));
             return;
         }
     }
@@ -394,13 +394,13 @@ function handle_delete_async_image() {
             'attachment_id' => $attachment_id,
             'session_id' => $session_id
         ));
-        wp_send_json_success(array('message' => 'Image deleted successfully'));
+        wp_send_json_success(array('message' => __('Image deleted successfully', 'bricks-child')));
     } else {
         async_upload_error('Failed to delete attachment', array(
             'attachment_id' => $attachment_id,
             'session_id' => $session_id
         ));
-        wp_send_json_error(array('message' => 'Failed to delete image'));
+        wp_send_json_error(array('message' => __('Failed to delete image', 'bricks-child')));
     }
 }
 
@@ -411,14 +411,14 @@ function handle_cleanup_upload_session() {
     // Verify nonce
     if (!wp_verify_nonce($_POST['nonce'], 'async_upload_nonce')) {
         async_upload_error('Cleanup session nonce verification failed');
-        wp_send_json_error(array('message' => 'Security check failed'));
+        wp_send_json_error(array('message' => __('Security check failed', 'bricks-child')));
         return;
     }
 
     // Check if user is logged in
     if (!is_user_logged_in()) {
         async_upload_error('User not logged in for cleanup operation');
-        wp_send_json_error(array('message' => 'User not logged in'));
+        wp_send_json_error(array('message' => __('User not logged in', 'bricks-child')));
         return;
     }
     
@@ -457,7 +457,7 @@ function handle_cleanup_upload_session() {
     ));
 
     wp_send_json_success(array(
-        'message' => "Cleaned up {$deleted_count} uploads",
+        'message' => sprintf(__('Cleaned up %d uploads', 'bricks-child'), $deleted_count),
         'deleted_count' => $deleted_count
     ));
 }
@@ -557,4 +557,4 @@ function cleanup_orphaned_uploads() {
 }
 
 // Initialize the system
-init_async_upload_system(); 
+init_async_upload_system();

@@ -28,28 +28,28 @@ function car_card_listing_relative_date_markup($post_id) {
     $days = floor($time_diff / (60 * 60 * 24));
 
     if ($days == 0) {
-        return '<span class="post-date posted-today">Today</span>';
+        return '<span class="post-date posted-today">' . esc_html__('Today', 'bricks-child') . '</span>';
     }
     if ($days == 1) {
-        return '<span class="post-date">Yesterday</span>';
+        return '<span class="post-date">' . esc_html__('Yesterday', 'bricks-child') . '</span>';
     }
     if ($days >= 2 && $days <= 6) {
-        return '<span class="post-date">' . (int) $days . ' days ago</span>';
+        return '<span class="post-date">' . esc_html(sprintf(__('%d days ago', 'bricks-child'), (int) $days)) . '</span>';
     }
     if ($days >= 7 && $days <= 13) {
-        return '<span class="post-date">1 week ago</span>';
+        return '<span class="post-date">' . esc_html__('1 week ago', 'bricks-child') . '</span>';
     }
     if ($days >= 14 && $days <= 20) {
-        return '<span class="post-date">2 weeks ago</span>';
+        return '<span class="post-date">' . esc_html__('2 weeks ago', 'bricks-child') . '</span>';
     }
     if ($days >= 21 && $days <= 27) {
-        return '<span class="post-date">3 weeks ago</span>';
+        return '<span class="post-date">' . esc_html__('3 weeks ago', 'bricks-child') . '</span>';
     }
     if ($days >= 28 && $days <= 59) {
-        return '<span class="post-date">1 month ago</span>';
+        return '<span class="post-date">' . esc_html__('1 month ago', 'bricks-child') . '</span>';
     }
     $months = floor($days / 30);
-    return '<span class="post-date">' . (int) $months . ' months ago</span>';
+    return '<span class="post-date">' . esc_html(sprintf(__('%d months ago', 'bricks-child'), (int) $months)) . '</span>';
 }
 
 /**
@@ -152,11 +152,15 @@ function car_card_build_listing_json_payload($post_id, $listing_index, $is_favor
             'fair'  => 'Fair Deal',
             'above' => 'Above typical',
         );
-        $price_insight_label = isset($labels[$band]) ? $labels[$band] : '';
+        $price_insight_label = isset($labels[$band]) ? __($labels[$band], 'bricks-child') : '';
         $median = (float) str_replace(',', '', (string) car_card_get_meta_value($post_id, 'price_insight_median'));
         $price_num = (float) str_replace(',', '', (string) $price);
         if ($price_insight_label !== '' && $median > 0 && $price_num > 0 && $price_num < $median && in_array($band, array('great', 'good'), true)) {
-            $price_insight_label .= ' - ' . (int) round((($median - $price_num) / $median) * 100) . '% below typical';
+            $price_insight_label = sprintf(
+                __('%1$s - %2$d%% below typical', 'bricks-child'),
+                $price_insight_label,
+                (int) round((($median - $price_num) / $median) * 100)
+            );
         }
     }
 

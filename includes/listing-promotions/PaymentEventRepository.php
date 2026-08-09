@@ -23,7 +23,7 @@ final class AutoAgora_Payment_Event_Repository
         $object_reference = $this->limited_text($object_reference, 191);
 
         if ($provider === '' || $event_id === '' || $event_type === '') {
-            return new WP_Error('payment_event_invalid', 'The payment event identity is incomplete.');
+            return new WP_Error('payment_event_invalid', __('The payment event identity is incomplete.', 'bricks-child'));
         }
 
         $existing = $this->find($provider, $event_id);
@@ -49,7 +49,7 @@ final class AutoAgora_Payment_Event_Repository
 
         // A concurrent delivery can win the unique-key race.
         $existing = $this->find($provider, $event_id);
-        return $existing ?: new WP_Error('payment_event_insert_failed', 'The payment event could not be recorded.');
+        return $existing ?: new WP_Error('payment_event_insert_failed', __('The payment event could not be recorded.', 'bricks-child'));
     }
 
     public function find($provider, $event_id)
@@ -82,7 +82,7 @@ final class AutoAgora_Payment_Event_Repository
             $object_reference,
             self::STATUS_PENDING
         ));
-        return $wpdb->last_error === '' ? $rows : new WP_Error('payment_event_query_failed', 'Pending refund receipts could not be loaded.');
+        return $wpdb->last_error === '' ? $rows : new WP_Error('payment_event_query_failed', __('Pending refund receipts could not be loaded.', 'bricks-child'));
     }
 
     public function admin_search(array $filters, $limit = 25, $offset = 0)

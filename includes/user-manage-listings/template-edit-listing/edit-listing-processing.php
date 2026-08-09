@@ -328,12 +328,12 @@ function process_edit_listing_images_async($car_id, $async_images, $removed_imag
 function handle_edit_listing_redirect($type, $message_key, $fallback_url = '') {
     if ($type === 'success') {
         // Redirect to my listings page with success message
-        wp_redirect(add_query_arg('listing_updated', '1', home_url('/my-listings/')));
+        wp_redirect(add_query_arg('listing_updated', '1', autoagora_localized_page_url('my-listings')));
     } else {
         // Error redirect
         $redirect_url = wp_get_referer();
         if (!$redirect_url) {
-            $redirect_url = $fallback_url ?: home_url('/my-listings/');
+            $redirect_url = $fallback_url ?: autoagora_localized_page_url('my-listings');
         }
         wp_redirect(add_query_arg('listing_error', $message_key, $redirect_url));
     }

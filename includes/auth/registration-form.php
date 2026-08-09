@@ -74,6 +74,7 @@
 
 <script type="text/javascript">
     jQuery(document).ready(function($) {
+        const t = window.autoagoraTranslate || function(source) { return source; };
         let verifiedPhoneNumber = '';
         const messagesDiv = $('#registration-messages');
         const stepPhone = $('#step-phone');
@@ -112,17 +113,17 @@
             const button = $(this);
             
             if (!iti) {
-                showMessage('Phone input failed to initialize.', true);
+                showMessage(t('Phone input failed to initialize.'), true);
                 return;
             }
             const fullPhoneNumber = iti.getNumber();
 
             messagesDiv.hide();
-            button.prop('disabled', true).text('Sending...');
+            button.prop('disabled', true).text(t('Sending...'));
 
             if (!iti.isValidNumber()) {
-                 showMessage('Please enter a valid phone number.', true);
-                 button.prop('disabled', false).text('Send Verification Code');
+                 showMessage(t('Please enter a valid phone number.'), true);
+                 button.prop('disabled', false).text(t('Send Verification Code'));
                  return;
             }
 
@@ -131,8 +132,8 @@
 
 
             if (!tsToken) {
-                showMessage('Please complete the verification and try again.', true);
-                button.prop('disabled', false).text('Send Verification Code');
+                showMessage(t('Please complete the verification and try again.'), true);
+                button.prop('disabled', false).text(t('Send Verification Code'));
                 if (window.turnstile) turnstile.reset(); // refresh token
                 return;
             }
@@ -156,13 +157,13 @@
                     } else {
                         showMessage(response.data.message, true);
                         if (window.turnstile) turnstile.reset();
-                        button.prop('disabled', false).text('Send Verification Code');
+                        button.prop('disabled', false).text(t('Send Verification Code'));
                     }
                 },
                 error: function() {
-                    showMessage('An error occurred sending the code. Please try again.', true);
+                    showMessage(t('An error occurred sending the code. Please try again.'), true);
                     if (window.turnstile) turnstile.reset();
-                    button.prop('disabled', false).text('Send Verification Code');
+                    button.prop('disabled', false).text(t('Send Verification Code'));
                 }
             });
         });
@@ -171,12 +172,12 @@
             const button = $(this);
             const otp = $('#verification_code').val();
             messagesDiv.hide();
-            button.prop('disabled', true).text('Verifying...');
+            button.prop('disabled', true).text(t('Verifying...'));
             $('#change-phone-button').prop('disabled', true);
 
             if (!otp) {
-                showMessage('Please enter the verification code.', true);
-                button.prop('disabled', false).text('Verify Code & Continue');
+                showMessage(t('Please enter the verification code.'), true);
+                button.prop('disabled', false).text(t('Verify Code & Continue'));
                 $('#change-phone-button').prop('disabled', false);
                 return;
             }
@@ -198,13 +199,13 @@
                         stepDetails.show();
                     } else {
                         showMessage(response.data.message, true);
-                        button.prop('disabled', false).text('Verify Code & Continue');
+                        button.prop('disabled', false).text(t('Verify Code & Continue'));
                         $('#change-phone-button').prop('disabled', false);
                     }
                 },
                 error: function() {
-                    showMessage('An error occurred verifying the code. Please try again.', true);
-                    button.prop('disabled', false).text('Verify Code & Continue');
+                    showMessage(t('An error occurred verifying the code. Please try again.'), true);
+                    button.prop('disabled', false).text(t('Verify Code & Continue'));
                     $('#change-phone-button').prop('disabled', false);
                 }
             });
@@ -215,7 +216,7 @@
             messagesDiv.hide();
             stepOtp.hide();
             stepPhone.show();
-            $('#send-otp-button').prop('disabled', false).text('Send Verification Code');
+            $('#send-otp-button').prop('disabled', false).text(t('Send Verification Code'));
             $('#reg_phone_number_display').val('');
             $('#verification_code').val('');
             verifiedPhoneNumber = '';
@@ -299,37 +300,37 @@
                 let errors = [];
 
                 if (password.length < 8 || password.length > 25) {
-                    errors.push('Password must be between 8 and 25 characters long.');
+                    errors.push(t('Password must be between 8 and 25 characters long.'));
                 }
 
                 if (!/[a-z]/.test(password)) {
-                    errors.push('Password must contain at least one lowercase letter.');
+                    errors.push(t('Password must contain at least one lowercase letter.'));
                 }
                 if (!/[A-Z]/.test(password)) {
-                    errors.push('Password must contain at least one uppercase letter.');
+                    errors.push(t('Password must contain at least one uppercase letter.'));
                 }
                 if (!/[0-9]/.test(password)) {
-                    errors.push('Password must contain at least one number.');
+                    errors.push(t('Password must contain at least one number.'));
                 }
                 if (!/[!@#$%^&*(),.?":{}|<>\-_=+;\[\]~`]/ .test(password)) {
-                     errors.push('Password must contain at least one symbol (e.g., !@#$%^&*).');
+                     errors.push(t('Password must contain at least one symbol (e.g., !@#$%^&*).'));
                 }
 
                 if (password.length >= 8 && password.length <= 25 && password !== confirmPassword) {
-                    errors.push('Passwords do not match. Please re-enter.');
+                    errors.push(t('Passwords do not match. Please re-enter.'));
                 }
 
                 const nameRegex = /^[a-zA-Z -]+$/;
                 if (!nameRegex.test(firstName)) {
-                    errors.push('First Name can only contain letters, spaces, and hyphens (-).');
+                    errors.push(t('First Name can only contain letters, spaces, and hyphens (-).'));
                 } else if (firstName.length < 1 || firstName.length > 50) {
-                     errors.push('First Name must be between 1 and 50 characters.');
+                     errors.push(t('First Name must be between 1 and 50 characters.'));
                 }
 
                 if (!nameRegex.test(lastName)) {
-                    errors.push('Last Name can only contain letters, spaces, and hyphens (-).');
+                    errors.push(t('Last Name can only contain letters, spaces, and hyphens (-).'));
                 } else if (lastName.length < 1 || lastName.length > 50) {
-                    errors.push('Last Name must be between 1 and 50 characters.');
+                    errors.push(t('Last Name must be between 1 and 50 characters.'));
                 }
 
                 if (errors.length > 0) {

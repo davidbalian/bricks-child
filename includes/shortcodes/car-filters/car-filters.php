@@ -36,16 +36,17 @@ add_shortcode('car_filters', 'car_filters_shortcode');
  * Usage: [car_filters filters="make,model,price,mileage" mode="ajax" target="listings-1"]
  */
 function car_filters_shortcode($atts) {
+    $browse_url = autoagora_localized_page_url('cars');
     $atts = shortcode_atts(array(
         'filters'      => 'make,model,price,mileage',  // Comma-separated filter names
         'group'        => 'default',
         'mode'         => 'ajax',                       // ajax or redirect
         'target'       => '',                           // Target car_listings ID
-        'redirect_url' => '/cars/',                     // URL for redirect mode
-        'results_base_url' => '/cars/',                 // Base URL for landing page redirects
+        'redirect_url' => $browse_url,                  // URL for redirect mode
+        'results_base_url' => $browse_url,              // Base URL for landing page redirects
         'layout'       => 'horizontal',                 // horizontal, vertical, inline
         'show_button'  => 'true',
-        'button_text'  => 'Search Cars',
+        'button_text'  => __('Search Cars', 'bricks-child'),
         'landing_make_slug' => '',
         'landing_model_slug' => '',
         'city_landing'       => 'false',
@@ -200,7 +201,7 @@ function car_filters_ajax_get_models() {
     $make_term_id = isset($_POST['make_term_id']) ? intval($_POST['make_term_id']) : 0;
 
     if ($make_term_id <= 0) {
-        wp_send_json_error(array('message' => 'Invalid make term ID'));
+        wp_send_json_error(array('message' => __('Invalid make term ID', 'bricks-child')));
         return;
     }
 
@@ -546,7 +547,7 @@ function car_filters_ajax_filter_listings() {
                 $listing_card_index++;
             }
         } else {
-            echo '<p class="car-listings-no-results">No car listings found matching your criteria.</p>';
+            echo '<p class="car-listings-no-results">' . esc_html__('No car listings found matching your criteria.', 'bricks-child') . '</p>';
         }
         $html = ob_get_clean();
         if ($perf) {
@@ -669,7 +670,7 @@ function car_filters_ajax_resolve_slug() {
     $slug = isset($_POST['slug']) ? sanitize_text_field($_POST['slug']) : '';
 
     if (empty($slug)) {
-        wp_send_json_error(array('message' => 'No slug provided'));
+        wp_send_json_error(array('message' => __('No slug provided', 'bricks-child')));
         return;
     }
 

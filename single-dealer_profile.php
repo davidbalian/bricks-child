@@ -198,11 +198,11 @@ if (have_posts()) :
                         ?>
                     </h2>
                     <?php if ($has_dealer_listings && $is_claimed && $listing_count > 0) : ?>
-                        <a href="<?php echo esc_url(add_query_arg('user_id', autoagora_dealer_profile_get_claimed_user_id($post_id), home_url('/cars/'))); ?>">
+                        <a href="<?php echo esc_url(add_query_arg('user_id', autoagora_dealer_profile_get_claimed_user_id($post_id), autoagora_localized_page_url('cars'))); ?>">
                             <?php esc_html_e('View all', 'bricks-child'); ?>
                         </a>
                     <?php elseif (!$has_dealer_listings) : ?>
-                        <a href="<?php echo esc_url(home_url('/cars/')); ?>">
+                        <a href="<?php echo esc_url(autoagora_localized_page_url('cars')); ?>">
                             <?php esc_html_e('Browse all cars', 'bricks-child'); ?>
                         </a>
                     <?php endif; ?>
@@ -227,7 +227,7 @@ if (have_posts()) :
                     <div class="dealer-profile-empty">
                         <h3><?php esc_html_e('No cars available right now', 'bricks-child'); ?></h3>
                         <p><?php esc_html_e('Browse all used cars in Cyprus to continue your search.', 'bricks-child'); ?></p>
-                        <a class="btn btn-secondary" href="<?php echo esc_url(home_url('/cars/')); ?>">
+                        <a class="btn btn-secondary" href="<?php echo esc_url(autoagora_localized_page_url('cars')); ?>">
                             <?php esc_html_e('Browse all cars', 'bricks-child'); ?>
                         </a>
                     </div>

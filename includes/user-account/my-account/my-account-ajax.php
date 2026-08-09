@@ -53,13 +53,13 @@ add_action('wp_ajax_update_user_name', 'handle_update_user_name');
 function handle_update_user_name() {
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_user_name')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     // Check if user is logged in
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
 
@@ -76,7 +76,7 @@ function handle_update_user_name() {
 
     // Since we've validated the user and nonce, and the client only sends when there are changes,
     // we can assume the update was successful
-    wp_send_json_success('Name updated successfully');
+    wp_send_json_success(__('Name updated successfully', 'bricks-child'));
 }
 
 // Add AJAX handler for updating secondary phone number
@@ -84,20 +84,20 @@ add_action('wp_ajax_update_secondary_phone', 'handle_update_secondary_phone');
 function handle_update_secondary_phone() {
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_secondary_phone')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     // Check if user is logged in
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
 
     $user_id = get_current_user_id();
 
     if (!my_account_user_can_manage_dealership_fields($user_id)) {
-        wp_send_json_error('Not allowed');
+        wp_send_json_error(__('Not allowed', 'bricks-child'));
         return;
     }
 
@@ -108,13 +108,13 @@ function handle_update_secondary_phone() {
     $secondary_phone_digits = preg_replace('/\D+/', '', $secondary_phone_raw);
 
     if ($secondary_phone_digits === '') {
-        wp_send_json_error('Please provide a valid phone number');
+        wp_send_json_error(__('Please provide a valid phone number', 'bricks-child'));
         return;
     }
 
     // Match exactly what the JS sends: country code (357) + 8 local digits
     if (!preg_match('/^357\d{8}$/', $secondary_phone_digits)) {
-        wp_send_json_error('Please enter a valid 8-digit phone number (without country code).');
+        wp_send_json_error(__('Please enter a valid 8-digit phone number (without country code).', 'bricks-child'));
         return;
     }
 
@@ -130,13 +130,13 @@ add_action('wp_ajax_initiate_password_reset', 'handle_initiate_password_reset');
 function handle_initiate_password_reset() {
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'password_reset_nonce')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     // Check if user is logged in
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
 
@@ -145,7 +145,7 @@ function handle_initiate_password_reset() {
     $phone_number = get_user_meta($user_id, 'phone_number', true);
 
     if (empty($phone_number)) {
-        wp_send_json_error('No phone number found for your account');
+        wp_send_json_error(__('No phone number found for your account', 'bricks-child'));
         return;
     }
 
@@ -156,7 +156,7 @@ function handle_initiate_password_reset() {
 
     if (empty($twilio_sid) || empty($twilio_token) || empty($twilio_verify_sid)) {
         error_log('Twilio Verify configuration is missing.');
-        wp_send_json_error('SMS configuration error. Please contact admin.');
+        wp_send_json_error(__('SMS configuration error. Please contact admin.', 'bricks-child'));
         return;
     }
 
@@ -176,10 +176,10 @@ function handle_initiate_password_reset() {
             'timestamp' => time()
         ), 300); // 5 minutes expiry
 
-        wp_send_json_success('Verification code sent successfully');
+        wp_send_json_success(__('Verification code sent successfully', 'bricks-child'));
     } catch (Exception $e) {
         error_log('Twilio Verify error: ' . $e->getMessage());
-        wp_send_json_error('Failed to send verification code. Please try again later.');
+        wp_send_json_error(__('Failed to send verification code. Please try again later.', 'bricks-child'));
     }
 }
 
@@ -188,19 +188,19 @@ add_action('wp_ajax_verify_password_reset_code', 'handle_verify_password_reset_c
 function handle_verify_password_reset_code() {
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'verify_password_reset_nonce')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     // Check if user is logged in
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
 
     $code = isset($_POST['code']) ? sanitize_text_field($_POST['code']) : '';
     if (empty($code) || strlen($code) !== 6) {
-        wp_send_json_error('Invalid verification code format');
+        wp_send_json_error(__('Invalid verification code format', 'bricks-child'));
         return;
     }
 
@@ -209,7 +209,7 @@ function handle_verify_password_reset_code() {
     $reset_session = get_transient('password_reset_' . $user_id);
 
     if (!$reset_session) {
-        wp_send_json_error('Verification session expired. Please start over.');
+        wp_send_json_error(__('Verification session expired. Please start over.', 'bricks-child'));
         return;
     }
 
@@ -219,7 +219,7 @@ function handle_verify_password_reset_code() {
     $twilio_verify_sid = defined('TWILIO_VERIFY_SID') ? TWILIO_VERIFY_SID : '';
 
     if (empty($twilio_sid) || empty($twilio_token) || empty($twilio_verify_sid)) {
-        wp_send_json_error('SMS configuration error. Please contact admin.');
+        wp_send_json_error(__('SMS configuration error. Please contact admin.', 'bricks-child'));
         return;
     }
 
@@ -243,13 +243,13 @@ function handle_verify_password_reset_code() {
             // Clean up the verification session
             delete_transient('password_reset_' . $user_id);
             
-            wp_send_json_success('Code verified successfully');
+            wp_send_json_success(__('Code verified successfully', 'bricks-child'));
         } else {
-            wp_send_json_error('Invalid verification code');
+            wp_send_json_error(__('Invalid verification code', 'bricks-child'));
         }
     } catch (Exception $e) {
         error_log('Twilio verification check error: ' . $e->getMessage());
-        wp_send_json_error('Error verifying code. Please try again.');
+        wp_send_json_error(__('Error verifying code. Please try again.', 'bricks-child'));
     }
 }
 
@@ -258,13 +258,13 @@ add_action('wp_ajax_update_password_reset', 'handle_update_password_reset');
 function handle_update_password_reset() {
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_password_reset_nonce')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     // Check if user is logged in
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
 
@@ -275,7 +275,7 @@ function handle_update_password_reset() {
     $verified_session = get_transient('password_reset_verified_' . $user_id);
     
     if (!$verified_session || !$verified_session['verified']) {
-        wp_send_json_error('Session expired. Please start over.');
+        wp_send_json_error(__('Session expired. Please start over.', 'bricks-child'));
         return;
     }
 
@@ -283,34 +283,34 @@ function handle_update_password_reset() {
     
     // Apply the same strict validation as registration
     if (empty($new_password)) {
-        wp_send_json_error('Password is required');
+        wp_send_json_error(__('Password is required', 'bricks-child'));
         return;
     }
     
     // Password Length Check (8-16 characters)
     if (strlen($new_password) < 8 || strlen($new_password) > 16) {
-        wp_send_json_error('Password must be between 8 and 16 characters long');
+        wp_send_json_error(__('Password must be between 8 and 16 characters long', 'bricks-child'));
         return;
     }
 
     // Password Complexity Checks
     if (!preg_match('/[a-z]/', $new_password)) {
-        wp_send_json_error('Password must contain at least one lowercase letter');
+        wp_send_json_error(__('Password must contain at least one lowercase letter', 'bricks-child'));
         return;
     }
     
     if (!preg_match('/[A-Z]/', $new_password)) {
-        wp_send_json_error('Password must contain at least one uppercase letter');
+        wp_send_json_error(__('Password must contain at least one uppercase letter', 'bricks-child'));
         return;
     }
     
     if (!preg_match('/[0-9]/', $new_password)) {
-        wp_send_json_error('Password must contain at least one number');
+        wp_send_json_error(__('Password must contain at least one number', 'bricks-child'));
         return;
     }
     
     if (!preg_match('/[!@#$%^&*(),.?":{}|<>\-_=+;\[\]~`]/', $new_password)) {
-        wp_send_json_error('Password must contain at least one symbol (e.g., !@#$%^&*)');
+        wp_send_json_error(__('Password must contain at least one symbol (e.g., !@#$%^&*)', 'bricks-child'));
         return;
     }
 
@@ -323,7 +323,7 @@ function handle_update_password_reset() {
     $result = wp_update_user($user_data);
 
     if (is_wp_error($result)) {
-        wp_send_json_error('Failed to update password: ' . $result->get_error_message());
+        wp_send_json_error(sprintf(__('Failed to update password: %s', 'bricks-child'), $result->get_error_message()));
         return;
     }
 
@@ -333,7 +333,7 @@ function handle_update_password_reset() {
     // Log the password change
     error_log("Password reset completed for user ID: $user_id");
 
-    wp_send_json_success('Password updated successfully');
+    wp_send_json_success(__('Password updated successfully', 'bricks-child'));
 }
 
 // Add AJAX handler for sending email verification
@@ -345,14 +345,14 @@ function handle_send_email_verification() {
     // Verify nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'email_verification_nonce')) {
         error_log('Email verification: Invalid nonce');
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     // Check if user is logged in
     if (!is_user_logged_in()) {
         error_log('Email verification: User not logged in');
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
 
@@ -366,7 +366,7 @@ function handle_send_email_verification() {
     
     if (empty($email) || !is_email($email)) {
         error_log('Email verification: Invalid email format');
-        wp_send_json_error('Please enter a valid email address');
+        wp_send_json_error(__('Please enter a valid email address', 'bricks-child'));
         return;
     }
 
@@ -374,7 +374,7 @@ function handle_send_email_verification() {
     $existing_user = get_user_by('email', $email);
     if ($existing_user && $existing_user->ID !== $user_id) {
         error_log('Email verification: Email already in use by user ID: ' . $existing_user->ID);
-        wp_send_json_error('This email address is already in use by another account');
+        wp_send_json_error(__('This email address is already in use by another account', 'bricks-child'));
         return;
     }
 
@@ -395,7 +395,7 @@ function handle_send_email_verification() {
         
         if (is_wp_error($user_update_result)) {
             error_log('Email verification: Failed to update user email: ' . $user_update_result->get_error_message());
-            wp_send_json_error('Failed to update email address');
+            wp_send_json_error(__('Failed to update email address', 'bricks-child'));
             return;
         }
         
@@ -409,7 +409,7 @@ function handle_send_email_verification() {
     if ($last_email_time && (time() - $last_email_time) < 60) {
         $wait_time = 60 - (time() - $last_email_time);
         error_log('Email verification: Rate limit hit for user ' . $user_id . ', wait time: ' . $wait_time . ' seconds');
-        wp_send_json_error('Please wait ' . $wait_time . ' seconds before sending another verification email');
+        wp_send_json_error(sprintf(__('Please wait %d seconds before sending another verification email', 'bricks-child'), $wait_time));
         return;
     }
 
@@ -422,23 +422,23 @@ function handle_send_email_verification() {
     error_log('Email verification: Send result: ' . ($result ? 'SUCCESS' : 'FAILED'));
 
     if ($result) {
-        wp_send_json_success('Verification email sent successfully! Please check your inbox and click the verification link.');
+        wp_send_json_success(__('Verification email sent successfully! Please check your inbox and click the verification link.', 'bricks-child'));
     } else {
         // Remove rate limit if email failed to send
         delete_transient('email_verification_last_sent_' . $user_id);
-        wp_send_json_error('Failed to send verification email. Please try again later.');
+        wp_send_json_error(__('Failed to send verification email. Please try again later.', 'bricks-child'));
     }
 } 
 
 add_action('wp_ajax_update_listing_notification_preferences', 'handle_update_listing_notification_preferences');
 function handle_update_listing_notification_preferences() {
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'notification_preferences_nonce')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
 
@@ -462,24 +462,24 @@ function handle_update_listing_notification_preferences() {
 add_action('wp_ajax_upload_account_logo', 'handle_upload_account_logo');
 function handle_upload_account_logo() {
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'upload_account_logo_nonce')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
 
     if (!isset($_FILES['account_logo'])) {
-        wp_send_json_error('No file uploaded');
+        wp_send_json_error(__('No file uploaded', 'bricks-child'));
         return;
     }
 
     $user_id = get_current_user_id();
 
     if (!my_account_user_can_manage_dealership_fields($user_id)) {
-        wp_send_json_error('Not allowed');
+        wp_send_json_error(__('Not allowed', 'bricks-child'));
         return;
     }
 
@@ -514,19 +514,19 @@ function handle_upload_account_logo() {
 add_action('wp_ajax_remove_account_logo', 'handle_remove_account_logo');
 function handle_remove_account_logo() {
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'remove_account_logo_nonce')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
 
     $user_id = get_current_user_id();
 
     if (!my_account_user_can_manage_dealership_fields($user_id)) {
-        wp_send_json_error('Not allowed');
+        wp_send_json_error(__('Not allowed', 'bricks-child'));
         return;
     }
     $manager = my_account_get_logo_manager();
@@ -534,11 +534,11 @@ function handle_remove_account_logo() {
     $removed = $manager->removeUserLogo($user_id);
 
     if (!$removed) {
-        wp_send_json_error('Failed to remove logo');
+        wp_send_json_error(__('Failed to remove logo', 'bricks-child'));
         return;
     }
 
-    wp_send_json_success('Logo removed successfully');
+    wp_send_json_success(__('Logo removed successfully', 'bricks-child'));
 }
 
 /**
@@ -547,19 +547,19 @@ function handle_remove_account_logo() {
 add_action('wp_ajax_update_dealer_website', 'handle_update_dealer_website');
 function handle_update_dealer_website() {
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_dealer_website_nonce')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
 
     $user_id = get_current_user_id();
 
     if (!my_account_user_can_manage_dealership_fields($user_id)) {
-        wp_send_json_error('Not allowed');
+        wp_send_json_error(__('Not allowed', 'bricks-child'));
         return;
     }
 
@@ -569,20 +569,20 @@ function handle_update_dealer_website() {
     if (!empty($dealer_website)) {
         // Validate URL format
         if (!filter_var($dealer_website, FILTER_VALIDATE_URL)) {
-            wp_send_json_error('Please enter a valid URL (e.g., https://example.com)');
+            wp_send_json_error(__('Please enter a valid URL (e.g., https://example.com)', 'bricks-child'));
             return;
         }
         
         // Validate URL protocol (must be http or https)
         $parsed_url = parse_url($dealer_website);
         if (!isset($parsed_url['scheme']) || !in_array($parsed_url['scheme'], array('http', 'https'))) {
-            wp_send_json_error('URL must start with http:// or https://');
+            wp_send_json_error(__('URL must start with http:// or https://', 'bricks-child'));
             return;
         }
         
         // Validate length (max 500 characters)
         if (strlen($dealer_website) > 500) {
-            wp_send_json_error('Website URL must be 500 characters or less');
+            wp_send_json_error(__('Website URL must be 500 characters or less', 'bricks-child'));
             return;
         }
         
@@ -594,7 +594,7 @@ function handle_update_dealer_website() {
     update_field('dealer_website', $dealer_website, 'user_' . $user_id);
 
     wp_send_json_success(array(
-        'message' => 'Website updated successfully',
+        'message' => __('Website updated successfully', 'bricks-child'),
         'dealer_website' => $dealer_website
     ));
 }
@@ -605,19 +605,19 @@ function handle_update_dealer_website() {
 add_action('wp_ajax_update_dealer_instagram', 'handle_update_dealer_instagram');
 function handle_update_dealer_instagram() {
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_dealer_instagram_nonce')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
 
     $user_id = get_current_user_id();
 
     if (!my_account_user_can_manage_dealership_fields($user_id)) {
-        wp_send_json_error('Not allowed');
+        wp_send_json_error(__('Not allowed', 'bricks-child'));
         return;
     }
 
@@ -627,20 +627,20 @@ function handle_update_dealer_instagram() {
     if (!empty($dealer_instagram)) {
         // Validate URL format
         if (!filter_var($dealer_instagram, FILTER_VALIDATE_URL)) {
-            wp_send_json_error('Please enter a valid URL (e.g., https://instagram.com/username)');
+            wp_send_json_error(__('Please enter a valid URL (e.g., https://instagram.com/username)', 'bricks-child'));
             return;
         }
         
         // Validate URL protocol (must be http or https)
         $parsed_url = parse_url($dealer_instagram);
         if (!isset($parsed_url['scheme']) || !in_array($parsed_url['scheme'], array('http', 'https'))) {
-            wp_send_json_error('URL must start with http:// or https://');
+            wp_send_json_error(__('URL must start with http:// or https://', 'bricks-child'));
             return;
         }
         
         // Validate length (max 500 characters)
         if (strlen($dealer_instagram) > 500) {
-            wp_send_json_error('Instagram URL must be 500 characters or less');
+            wp_send_json_error(__('Instagram URL must be 500 characters or less', 'bricks-child'));
             return;
         }
         
@@ -652,7 +652,7 @@ function handle_update_dealer_instagram() {
     update_field('dealer_instagram', $dealer_instagram, 'user_' . $user_id);
 
     wp_send_json_success(array(
-        'message' => 'Instagram updated successfully',
+        'message' => __('Instagram updated successfully', 'bricks-child'),
         'dealer_instagram' => $dealer_instagram
     ));
 }
@@ -663,19 +663,19 @@ function handle_update_dealer_instagram() {
 add_action('wp_ajax_update_dealer_facebook', 'handle_update_dealer_facebook');
 function handle_update_dealer_facebook() {
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_dealer_facebook_nonce')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
 
     $user_id = get_current_user_id();
 
     if (!my_account_user_can_manage_dealership_fields($user_id)) {
-        wp_send_json_error('Not allowed');
+        wp_send_json_error(__('Not allowed', 'bricks-child'));
         return;
     }
 
@@ -685,20 +685,20 @@ function handle_update_dealer_facebook() {
     if (!empty($dealer_facebook)) {
         // Validate URL format
         if (!filter_var($dealer_facebook, FILTER_VALIDATE_URL)) {
-            wp_send_json_error('Please enter a valid URL (e.g., https://facebook.com/username)');
+            wp_send_json_error(__('Please enter a valid URL (e.g., https://facebook.com/username)', 'bricks-child'));
             return;
         }
         
         // Validate URL protocol (must be http or https)
         $parsed_url = parse_url($dealer_facebook);
         if (!isset($parsed_url['scheme']) || !in_array($parsed_url['scheme'], array('http', 'https'))) {
-            wp_send_json_error('URL must start with http:// or https://');
+            wp_send_json_error(__('URL must start with http:// or https://', 'bricks-child'));
             return;
         }
         
         // Validate length (max 500 characters)
         if (strlen($dealer_facebook) > 500) {
-            wp_send_json_error('Facebook URL must be 500 characters or less');
+            wp_send_json_error(__('Facebook URL must be 500 characters or less', 'bricks-child'));
             return;
         }
         
@@ -710,7 +710,7 @@ function handle_update_dealer_facebook() {
     update_field('dealer_facebook', $dealer_facebook, 'user_' . $user_id);
 
     wp_send_json_success(array(
-        'message' => 'Facebook updated successfully',
+        'message' => __('Facebook updated successfully', 'bricks-child'),
         'dealer_facebook' => $dealer_facebook
     ));
 }
@@ -721,19 +721,19 @@ function handle_update_dealer_facebook() {
 add_action('wp_ajax_update_dealer_maps_url', 'handle_update_dealer_maps_url');
 function handle_update_dealer_maps_url() {
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_dealer_maps_url_nonce')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
 
     $user_id = get_current_user_id();
 
     if (!my_account_user_can_manage_dealership_fields($user_id)) {
-        wp_send_json_error('Not allowed');
+        wp_send_json_error(__('Not allowed', 'bricks-child'));
         return;
     }
 
@@ -741,7 +741,7 @@ function handle_update_dealer_maps_url() {
     
     // Validate length (max 1000 characters for maps URL)
     if (!empty($dealer_maps_url) && strlen($dealer_maps_url) > 1000) {
-        wp_send_json_error('Maps URL must be 1000 characters or less');
+        wp_send_json_error(__('Maps URL must be 1000 characters or less', 'bricks-child'));
         return;
     }
     
@@ -752,7 +752,7 @@ function handle_update_dealer_maps_url() {
     update_field('dealer_maps_url', $dealer_maps_url, 'user_' . $user_id);
 
     wp_send_json_success(array(
-        'message' => 'Maps URL updated successfully',
+        'message' => __('Maps URL updated successfully', 'bricks-child'),
         'dealer_maps_url' => $dealer_maps_url
     ));
 }
@@ -763,19 +763,19 @@ function handle_update_dealer_maps_url() {
 add_action('wp_ajax_update_dealer_maps_address', 'handle_update_dealer_maps_address');
 function handle_update_dealer_maps_address() {
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_dealer_maps_address_nonce')) {
-        wp_send_json_error('Invalid nonce');
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
         return;
     }
 
     if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
         return;
     }
 
     $user_id = get_current_user_id();
 
     if (!my_account_user_can_manage_dealership_fields($user_id)) {
-        wp_send_json_error('Not allowed');
+        wp_send_json_error(__('Not allowed', 'bricks-child'));
         return;
     }
 
@@ -783,7 +783,7 @@ function handle_update_dealer_maps_address() {
     
     // Validate length (max 500 characters for address)
     if (!empty($dealer_maps_address) && strlen($dealer_maps_address) > 500) {
-        wp_send_json_error('Maps address must be 500 characters or less');
+        wp_send_json_error(__('Maps address must be 500 characters or less', 'bricks-child'));
         return;
     }
     
@@ -794,7 +794,7 @@ function handle_update_dealer_maps_address() {
     update_field('dealer_maps_address', $dealer_maps_address, 'user_' . $user_id);
 
     wp_send_json_success(array(
-        'message' => 'Maps address updated successfully',
+        'message' => __('Maps address updated successfully', 'bricks-child'),
         'dealer_maps_address' => $dealer_maps_address
     ));
 }

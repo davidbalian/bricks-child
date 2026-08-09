@@ -20,7 +20,7 @@ function enqueue_quick_add_scripts() {
     wp_enqueue_script(
         'quick-add-form-js',
         get_stylesheet_directory_uri() . '/includes/user-manage-listings/bulk-add-listings/quick-add-form.js',
-        array('jquery'),
+        array('jquery', 'autoagora-i18n'),
         filemtime(get_stylesheet_directory() . '/includes/user-manage-listings/bulk-add-listings/quick-add-form.js'),
         true
     );
@@ -68,7 +68,7 @@ function handle_save_quick_template() {
     $user_templates[$template_name] = $template_data;
     update_user_meta(get_current_user_id(), 'car_form_templates', $user_templates);
     
-    wp_send_json_success(array('message' => 'Template saved successfully'));
+    wp_send_json_success(array('message' => __('Template saved successfully', 'bricks-child')));
 }
 
 /**
@@ -89,7 +89,7 @@ function handle_load_quick_template() {
     if ($user_templates && isset($user_templates[$template_name])) {
         wp_send_json_success($user_templates[$template_name]);
     } else {
-        wp_send_json_error('Template not found');
+        wp_send_json_error(__('Template not found', 'bricks-child'));
     }
 }
 
@@ -107,4 +107,4 @@ function get_user_form_templates() {
 
 // Hook the AJAX functions
 add_action('wp_ajax_save_quick_template', 'handle_save_quick_template');
-add_action('wp_ajax_load_quick_template', 'handle_load_quick_template'); 
+add_action('wp_ajax_load_quick_template', 'handle_load_quick_template');

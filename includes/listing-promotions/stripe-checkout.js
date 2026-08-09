@@ -1,6 +1,8 @@
 (function () {
     'use strict';
 
+    var t = window.autoagoraTranslate || function (source) { return source; };
+
     function attemptId() {
         if (window.crypto && typeof window.crypto.randomUUID === 'function') {
             return window.crypto.randomUUID();
@@ -38,7 +40,7 @@
             amount.textContent = money(dailyAmount * days, config);
         }
         if (label) {
-            label.textContent = tier.getAttribute('data-label') + ' for ' + days + ' ' + (days === 1 ? 'day' : 'days');
+            label.textContent = t('%s for %d %s', tier.getAttribute('data-label'), days, t(days === 1 ? 'day' : 'days'));
         }
     }
 
@@ -120,7 +122,7 @@
                 throw new Error(response.data && response.data.message ? response.data.message : config.genericError);
             }
             if (panel.dataset.previewRequest !== requestKey) {
-                throw new Error('The promotion selection changed.');
+                throw new Error(t('The promotion selection changed.'));
             }
             return response.data;
         });
@@ -154,7 +156,7 @@
         box.classList.remove('is-queued', 'is-immediate', 'is-awaiting', 'is-unselected');
         box.classList.add('is-error');
         if (headline) {
-            headline.textContent = 'Schedule unavailable';
+            headline.textContent = t('Schedule unavailable');
         }
         if (detail) {
             detail.textContent = message;
@@ -182,7 +184,7 @@
                 }
             })
             .catch(function (error) {
-                if (error.message !== 'The promotion selection changed.') {
+                if (error.message !== t('The promotion selection changed.')) {
                     previewError(panel, error.message || config.genericError);
                     if (checkoutButton) {
                         checkoutButton.disabled = true;
@@ -194,7 +196,7 @@
     function remainingTime(seconds) {
         seconds = Math.max(0, Math.floor(seconds));
         if (seconds < 60) {
-            return 'Less than 1 minute';
+            return t('Less than 1 minute');
         }
 
         var days = Math.floor(seconds / 86400);
@@ -202,13 +204,13 @@
         var minutes = Math.floor((seconds % 3600) / 60);
         var parts = [];
         if (days > 0) {
-            parts.push(days + ' ' + (days === 1 ? 'day' : 'days'));
+            parts.push(days + ' ' + t(days === 1 ? 'day' : 'days'));
         }
         if (hours > 0 && parts.length < 2) {
-            parts.push(hours + ' ' + (hours === 1 ? 'hour' : 'hours'));
+            parts.push(hours + ' ' + t(hours === 1 ? 'hour' : 'hours'));
         }
         if (minutes > 0 && parts.length < 2) {
-            parts.push(minutes + ' ' + (minutes === 1 ? 'minute' : 'minutes'));
+            parts.push(minutes + ' ' + t(minutes === 1 ? 'minute' : 'minutes'));
         }
         return parts.join(' ');
     }
@@ -218,7 +220,7 @@
         container.querySelectorAll('[data-promotion-end-timestamp]').forEach(function (element) {
             var end = Number(element.getAttribute('data-promotion-end-timestamp')) || 0;
             if (end > 0) {
-                element.textContent = remainingTime(end - now) + ' left';
+                element.textContent = t('%s left', remainingTime(end - now));
             }
         });
     }

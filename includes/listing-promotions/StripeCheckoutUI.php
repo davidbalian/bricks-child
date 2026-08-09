@@ -19,7 +19,7 @@ function autoagora_enqueue_stripe_checkout_assets()
     wp_enqueue_script(
         'autoagora-stripe-checkout',
         $base_url . 'stripe-checkout.js',
-        array(),
+        array('autoagora-i18n'),
         file_exists($base_path . 'stripe-checkout.js') ? filemtime($base_path . 'stripe-checkout.js') : BRICKS_CHILD_THEME_VERSION,
         true
     );
@@ -30,10 +30,10 @@ function autoagora_enqueue_stripe_checkout_assets()
         'nonce' => wp_create_nonce(AutoAgora_Stripe_Gateway::CHECKOUT_NONCE_ACTION),
         'currency' => 'EUR',
         'locale' => str_replace('_', '-', get_locale()),
-        'workingText' => 'Opening secure checkout...',
-        'checkingScheduleText' => 'Checking the latest promotion schedule...',
-        'scheduleChangedText' => 'The schedule changed. Review the updated dates, then continue again.',
-        'genericError' => 'Checkout could not be started. Please try again.',
+        'workingText' => __('Opening secure checkout...', 'bricks-child'),
+        'checkingScheduleText' => __('Checking the latest promotion schedule...', 'bricks-child'),
+        'scheduleChangedText' => __('The schedule changed. Review the updated dates, then continue again.', 'bricks-child'),
+        'genericError' => __('Checkout could not be started. Please try again.', 'bricks-child'),
     ));
 }
 
@@ -68,7 +68,7 @@ function autoagora_format_promotion_remaining($seconds)
 {
     $seconds = max(0, (int) $seconds);
     if ($seconds < MINUTE_IN_SECONDS) {
-        return 'Less than 1 minute';
+        return __('Less than 1 minute', 'bricks-child');
     }
 
     $days = (int) floor($seconds / DAY_IN_SECONDS);
@@ -113,38 +113,38 @@ function autoagora_render_seller_promotion_status($listing_id)
     $tier_class = sanitize_html_class((string) $primary->tier);
     ?>
     <section class="autoagora-seller-promotion-status autoagora-seller-promotion-status--<?php echo esc_attr($tier_class); ?>"
-             aria-label="Listing promotion status">
+             aria-label="<?php esc_attr_e('Listing promotion status', 'bricks-child'); ?>">
         <span class="autoagora-seller-promotion-icon" aria-hidden="true"><i class="fas fa-bolt"></i></span>
         <span class="autoagora-seller-promotion-copy">
             <span class="autoagora-seller-promotion-title">
-                <strong><?php echo esc_html($tier_label); ?></strong>
+                <strong><?php echo esc_html(__($tier_label, 'bricks-child')); ?></strong>
                 <span class="autoagora-seller-promotion-state <?php echo $active ? 'is-active' : ($awaiting_approval ? 'is-awaiting' : 'is-scheduled'); ?>">
-                    <?php echo $active ? 'Active' : ($awaiting_approval ? 'Waiting for approval' : 'Scheduled'); ?>
+                    <?php echo esc_html($active ? __('Active', 'bricks-child') : ($awaiting_approval ? __('Waiting for approval', 'bricks-child') : __('Scheduled', 'bricks-child'))); ?>
                 </span>
             </span>
             <?php if ($active) : ?>
                 <?php $end_timestamp = strtotime($active->ends_at . ' UTC'); ?>
                 <span class="autoagora-seller-promotion-timing">
                     <strong data-promotion-end-timestamp="<?php echo esc_attr($end_timestamp); ?>">
-                        <?php echo esc_html(autoagora_format_promotion_remaining($end_timestamp - time())); ?> left
+                        <?php echo esc_html(sprintf(__('%s left', 'bricks-child'), autoagora_format_promotion_remaining($end_timestamp - time()))); ?>
                     </strong>
-                    <span>Ends <?php echo esc_html(autoagora_promotion_local_datetime($active->ends_at)); ?></span>
+                    <span><?php echo esc_html(sprintf(__('Ends %s', 'bricks-child'), autoagora_promotion_local_datetime($active->ends_at))); ?></span>
                 </span>
             <?php elseif ($awaiting_approval) : ?>
                 <span class="autoagora-seller-promotion-timing">
-                    <strong>Paid and reserved</strong>
-                    <span>Full <?php echo esc_html(AutoAgora_Stripe_Gateway::duration_label($primary->duration_seconds)); ?> starts after initial approval</span>
+                    <strong><?php esc_html_e('Paid and reserved', 'bricks-child'); ?></strong>
+                    <span><?php echo esc_html(sprintf(__('Full %s starts after initial approval', 'bricks-child'), AutoAgora_Stripe_Gateway::duration_label($primary->duration_seconds))); ?></span>
                 </span>
             <?php else : ?>
                 <span class="autoagora-seller-promotion-timing">
-                    <strong>Starts <?php echo esc_html(autoagora_promotion_local_datetime($primary->starts_at)); ?></strong>
+                    <strong><?php echo esc_html(sprintf(__('Starts %s', 'bricks-child'), autoagora_promotion_local_datetime($primary->starts_at))); ?></strong>
                     <span><?php echo esc_html(AutoAgora_Stripe_Gateway::duration_label($primary->duration_seconds)); ?></span>
                 </span>
             <?php endif; ?>
         </span>
         <?php if ($secondary_count > 0) : ?>
             <span class="autoagora-seller-promotion-queued">
-                <?php echo esc_html($secondary_count . ' more ' . _n('promotion', 'promotions', $secondary_count, 'bricks-child')); ?>
+                <?php echo esc_html(sprintf(_n('%d more promotion', '%d more promotions', $secondary_count, 'bricks-child'), $secondary_count)); ?>
             </span>
         <?php endif; ?>
     </section>
@@ -157,9 +157,9 @@ function autoagora_render_seller_promotion_timeline(array $schedule)
         return;
     }
     ?>
-    <section class="autoagora-promotion-schedule" aria-label="Promotion schedule">
+    <section class="autoagora-promotion-schedule" aria-label="<?php esc_attr_e('Promotion schedule', 'bricks-child'); ?>">
         <div class="autoagora-promotion-schedule-heading">
-            <strong>Promotion schedule</strong>
+            <strong><?php esc_html_e('Promotion schedule', 'bricks-child'); ?></strong>
             <span><?php echo esc_html(count($schedule) . ' ' . _n('promotion', 'promotions', count($schedule), 'bricks-child')); ?></span>
         </div>
         <ol class="autoagora-promotion-timeline">
@@ -175,27 +175,27 @@ function autoagora_render_seller_promotion_timeline(array $schedule)
                     <span class="autoagora-promotion-timeline-marker" aria-hidden="true"></span>
                     <span class="autoagora-promotion-timeline-copy">
                         <span>
-                            <strong><?php echo esc_html($tier_label); ?></strong>
-                            <span class="autoagora-promotion-timeline-state"><?php echo $is_active ? 'Active' : ($is_awaiting ? 'Waiting for approval' : 'Scheduled'); ?></span>
+                            <strong><?php echo esc_html(__($tier_label, 'bricks-child')); ?></strong>
+                            <span class="autoagora-promotion-timeline-state"><?php echo esc_html($is_active ? __('Active', 'bricks-child') : ($is_awaiting ? __('Waiting for approval', 'bricks-child') : __('Scheduled', 'bricks-child'))); ?></span>
                         </span>
                         <?php if ($is_active) : ?>
                             <?php $end_timestamp = strtotime($record->ends_at . ' UTC'); ?>
                             <small>
                                 <strong data-promotion-end-timestamp="<?php echo esc_attr($end_timestamp); ?>">
-                                    <?php echo esc_html(autoagora_format_promotion_remaining($end_timestamp - time())); ?> left
+                                    <?php echo esc_html(sprintf(__('%s left', 'bricks-child'), autoagora_format_promotion_remaining($end_timestamp - time()))); ?>
                                 </strong>
-                                &middot; Ends <?php echo esc_html($end_local); ?>
+                                &middot; <?php echo esc_html(sprintf(__('Ends %s', 'bricks-child'), $end_local)); ?>
                             </small>
                         <?php elseif ($is_awaiting) : ?>
                             <small>
                                 <?php echo esc_html(AutoAgora_Stripe_Gateway::duration_label($record->duration_seconds)); ?>
-                                &middot; Starts automatically after initial approval
+                                &middot; <?php esc_html_e('Starts automatically after initial approval', 'bricks-child'); ?>
                             </small>
                         <?php else : ?>
                             <small>
                                 <?php echo esc_html(AutoAgora_Stripe_Gateway::duration_label($record->duration_seconds)); ?>
-                                &middot; Starts <?php echo esc_html($start_local); ?>
-                                &middot; Ends <?php echo esc_html($end_local); ?>
+                                &middot; <?php echo esc_html(sprintf(__('Starts %s', 'bricks-child'), $start_local)); ?>
+                                &middot; <?php echo esc_html(sprintf(__('Ends %s', 'bricks-child'), $end_local)); ?>
                             </small>
                         <?php endif; ?>
                     </span>
@@ -234,8 +234,8 @@ function autoagora_render_promotion_purchase_controls($listing_id)
                 'label' => $tier_config['label'],
                 'daily_amount_minor' => (int) $one_day['daily_amount_minor'],
                 'description' => $tier_key === AutoAgora_Promotion_Manager::TIER_SHOWCASE
-                    ? 'Maximum visibility above Lift and regular listings'
-                    : 'Stand out above regular listings',
+                    ? __('Maximum visibility above Lift and regular listings', 'bricks-child')
+                    : __('Stand out above regular listings', 'bricks-child'),
             );
         }
     }
@@ -259,7 +259,7 @@ function autoagora_render_promotion_purchase_controls($listing_id)
             <span class="autoagora-promotion-trigger-icon" aria-hidden="true">
                 <i class="fas fa-bolt"></i>
             </span>
-            <span><?php echo esc_html($schedule ? 'Manage promotion' : ($initial_approval_pending ? 'See promotion options' : 'Promote listing')); ?></span>
+            <span><?php echo esc_html($schedule ? __('Manage promotion', 'bricks-child') : ($initial_approval_pending ? __('See promotion options', 'bricks-child') : __('Promote listing', 'bricks-child'))); ?></span>
             <i class="fas fa-chevron-up autoagora-promotion-trigger-chevron" aria-hidden="true"></i>
         </summary>
 
@@ -273,9 +273,9 @@ function autoagora_render_promotion_purchase_controls($listing_id)
              data-preview-signature="">
             <div class="autoagora-promotion-panel-toolbar">
                 <?php if ($is_test) : ?>
-                    <strong class="autoagora-stripe-test-label">Stripe sandbox test</strong>
+                    <strong class="autoagora-stripe-test-label"><?php esc_html_e('Stripe sandbox test', 'bricks-child'); ?></strong>
                 <?php endif; ?>
-                <button type="button" class="autoagora-promotion-panel-close" aria-label="Close promotion options">
+                <button type="button" class="autoagora-promotion-panel-close" aria-label="<?php esc_attr_e('Close promotion options', 'bricks-child'); ?>">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
@@ -283,40 +283,40 @@ function autoagora_render_promotion_purchase_controls($listing_id)
             <?php autoagora_render_seller_promotion_timeline($schedule); ?>
 
             <div class="autoagora-promotion-panel-heading">
-                <strong id="<?php echo esc_attr($dialog_title_id); ?>"><?php echo $initial_approval_pending ? ($schedule ? 'Add another launch promotion' : 'Choose your launch promotion') : ($schedule ? 'Add another promotion' : 'Choose your promotion'); ?></strong>
+                <strong id="<?php echo esc_attr($dialog_title_id); ?>"><?php echo esc_html($initial_approval_pending ? ($schedule ? __('Add another launch promotion', 'bricks-child') : __('Choose your launch promotion', 'bricks-child')) : ($schedule ? __('Add another promotion', 'bricks-child') : __('Choose your promotion', 'bricks-child'))); ?></strong>
                 <span>
-                    <?php echo $initial_approval_pending
-                        ? 'Pay now and the full duration will start automatically when this listing is first approved and published.'
+                    <?php echo esc_html($initial_approval_pending
+                        ? __('Pay now and the full duration will start automatically when this listing is first approved and published.', 'bricks-child')
                         : ($schedule
-                            ? 'Select a visibility level and duration. New time is added after the current schedule.'
-                            : 'Select a visibility level and duration.'); ?>
+                            ? __('Select a visibility level and duration. New time is added after the current schedule.', 'bricks-child')
+                            : __('Select a visibility level and duration.', 'bricks-child'))); ?>
                 </span>
             </div>
 
-            <div class="autoagora-promotion-tier-options" role="group" aria-label="Promotion type">
+            <div class="autoagora-promotion-tier-options" role="group" aria-label="<?php esc_attr_e('Promotion type', 'bricks-child'); ?>">
                 <?php foreach ($tier_options as $tier_key => $option) : ?>
                     <?php $is_selected = $tier_key === $default_tier; ?>
                     <button type="button"
                             class="autoagora-promotion-tier-option<?php echo $is_selected ? ' is-selected' : ''; ?>"
                             data-tier="<?php echo esc_attr($tier_key); ?>"
-                            data-label="<?php echo esc_attr($option['label']); ?>"
+                            data-label="<?php echo esc_attr(__($option['label'], 'bricks-child')); ?>"
                             data-daily-amount="<?php echo esc_attr($option['daily_amount_minor']); ?>"
                             aria-pressed="<?php echo $is_selected ? 'true' : 'false'; ?>">
                         <span class="autoagora-promotion-option-check" aria-hidden="true"><i class="fas fa-check"></i></span>
-                        <strong><?php echo esc_html($option['label']); ?></strong>
+                        <strong><?php echo esc_html(__($option['label'], 'bricks-child')); ?></strong>
                         <small><?php echo esc_html($option['description']); ?></small>
                         <span class="autoagora-promotion-daily-price">
-                            &euro;<?php echo esc_html(number_format_i18n($option['daily_amount_minor'] / 100, 2)); ?> / day
+                            <?php echo esc_html(sprintf(__('€%s / day', 'bricks-child'), number_format_i18n($option['daily_amount_minor'] / 100, 2))); ?>
                         </span>
                     </button>
                 <?php endforeach; ?>
             </div>
 
             <div class="autoagora-promotion-duration-heading">
-                <strong>Select duration</strong>
-                <span>Each day is 24 hours</span>
+                <strong><?php esc_html_e('Select duration', 'bricks-child'); ?></strong>
+                <span><?php esc_html_e('Each day is 24 hours', 'bricks-child'); ?></span>
             </div>
-            <div class="autoagora-promotion-day-options" role="group" aria-label="Promotion duration">
+            <div class="autoagora-promotion-day-options" role="group" aria-label="<?php esc_attr_e('Promotion duration', 'bricks-child'); ?>">
                 <?php foreach (AutoAgora_Stripe_Gateway::allowed_days() as $days) : ?>
                     <button type="button"
                             class="autoagora-promotion-day-option"
@@ -330,8 +330,8 @@ function autoagora_render_promotion_purchase_controls($listing_id)
 
             <div class="autoagora-promotion-total">
                 <span>
-                    <small>Total</small>
-                    <strong class="autoagora-promotion-total-label">Select a duration</strong>
+                    <small><?php esc_html_e('Total', 'bricks-child'); ?></small>
+                    <strong class="autoagora-promotion-total-label"><?php esc_html_e('Select a duration', 'bricks-child'); ?></strong>
                 </span>
                 <strong class="autoagora-promotion-total-amount">&mdash;</strong>
             </div>
@@ -339,8 +339,8 @@ function autoagora_render_promotion_purchase_controls($listing_id)
             <div class="autoagora-promotion-queue-preview is-unselected" aria-live="polite">
                 <span class="autoagora-promotion-queue-icon" aria-hidden="true"><i class="fas fa-calendar-check"></i></span>
                 <span>
-                    <strong class="autoagora-promotion-preview-headline">Select a duration to continue</strong>
-                    <small class="autoagora-promotion-preview-detail">Your total and expected schedule will appear here.</small>
+                    <strong class="autoagora-promotion-preview-headline"><?php esc_html_e('Select a duration to continue', 'bricks-child'); ?></strong>
+                    <small class="autoagora-promotion-preview-detail"><?php esc_html_e('Your total and expected schedule will appear here.', 'bricks-child'); ?></small>
                 </span>
             </div>
 
@@ -349,7 +349,7 @@ function autoagora_render_promotion_purchase_controls($listing_id)
                     data-listing-id="<?php echo esc_attr($listing_id); ?>"
                     disabled>
                 <i class="fas fa-lock" aria-hidden="true"></i>
-                <span>Continue to secure checkout</span>
+                <span><?php esc_html_e('Continue to secure checkout', 'bricks-child'); ?></span>
             </button>
             <span class="autoagora-promotion-checkout-status" role="status" aria-live="polite"></span>
         </div>

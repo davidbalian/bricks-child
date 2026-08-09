@@ -19,12 +19,15 @@ add_shortcode('my_account', 'display_my_account');
 function display_my_account($atts) {
     // Check if user is logged in
     if (!is_user_logged_in()) {
-        return '<p>Please <a href="' . wp_login_url(get_permalink()) . '">log in</a> to view your account information.</p>';
+        return '<p>' . sprintf(
+            wp_kses_post(__('Please <a href="%s">log in</a> to view your account information.', 'bricks-child')),
+            esc_url(wp_login_url(get_permalink()))
+        ) . '</p>';
     }
 
     // Enqueue separated CSS and JS files
     wp_enqueue_style('my-account-display-css', get_stylesheet_directory_uri() . '/includes/user-account/my-account/my-account-display.css', array(), '1.0.0');
-    wp_enqueue_script('my-account-display-js', get_stylesheet_directory_uri() . '/includes/user-account/my-account/my-account-display.js', array(), '1.0.0', true);
+    wp_enqueue_script('my-account-display-js', get_stylesheet_directory_uri() . '/includes/user-account/my-account/my-account-display.js', array('autoagora-i18n'), '1.0.0', true);
     
     // Localize script with AJAX data
     wp_localize_script('my-account-display-js', 'MyAccountAjax', array(
@@ -49,7 +52,7 @@ function display_my_account($atts) {
     // Enqueue password reset files if in password reset flow
     if ($password_reset_step) {
         wp_enqueue_style('password-reset-css', get_stylesheet_directory_uri() . '/includes/user-account/my-account/password-reset.css', array(), '1.0.0');
-        wp_enqueue_script('password-reset-js', get_stylesheet_directory_uri() . '/includes/user-account/my-account/password-reset.js', array(), '1.0.0', true);
+        wp_enqueue_script('password-reset-js', get_stylesheet_directory_uri() . '/includes/user-account/my-account/password-reset.js', array('autoagora-i18n'), '1.0.0', true);
         
         // Localize password reset script with AJAX data
         wp_localize_script('password-reset-js', 'PasswordResetAjax', array(

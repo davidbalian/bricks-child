@@ -100,10 +100,10 @@ get_header(); ?>
                 <h2><?php esc_html_e( 'Your buyer request has been submitted successfully!', 'bricks-child' ); ?></h2>
                 <p><?php esc_html_e( 'Thank you for submitting your buyer request. It is now visible to all sellers.', 'bricks-child' ); ?></p>
                 <div class="buyer-request-success-buttons">
-                    <a href="<?php echo esc_url( home_url( '/buyer-requests' ) ); ?>" class="btn btn-primary">
+                    <a href="<?php echo esc_url( autoagora_localized_page_url( 'buyer-requests' ) ); ?>" class="btn btn-primary">
                         <?php esc_html_e( 'View All Requests', 'bricks-child' ); ?>
                     </a>
-                    <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="btn btn-secondary">
+                    <a href="<?php echo esc_url( autoagora_localized_page_url() ); ?>" class="btn btn-secondary">
                         <?php esc_html_e( 'Return to Home', 'bricks-child' ); ?>
                     </a>
                 </div>

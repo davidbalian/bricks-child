@@ -122,9 +122,9 @@ function render_car_card($post_id, $context = array()) {
     $days = floor($time_diff / (60 * 60 * 24));
 
     if ($days == 0) {
-        $relative_date = '<span class="post-date posted-today">Today</span>';
+            $relative_date = '<span class="post-date posted-today">' . esc_html__('Today', 'bricks-child') . '</span>';
     } elseif ($days == 1) {
-        $relative_date = '<span class="post-date">Yesterday</span>';
+            $relative_date = '<span class="post-date">' . esc_html__('Yesterday', 'bricks-child') . '</span>';
     } elseif ($days >= 2 && $days <= 6) {
         $relative_date = '<span class="post-date">' . $days . ' days ago</span>';
     } elseif ($days >= 7 && $days <= 13) {
@@ -194,10 +194,10 @@ function render_car_card($post_id, $context = array()) {
                         <span class="car-card-badge car-card-promotion-badge car-card-promotion-badge--<?php echo esc_attr($promotion_tier); ?>"><?php echo esc_html($promotion_label); ?></span>
                     <?php endif; ?>
                     <?php if ($show_full_badge) : ?>
-                        <span class="car-card-badge badge-full">Full Details</span>
+                    <span class="car-card-badge badge-full"><?php esc_html_e('Full Details', 'bricks-child'); ?></span>
                     <?php endif; ?>
                     <?php if ($show_extra_badge) : ?>
-                        <span class="car-card-badge badge-extra">Extra Details</span>
+                    <span class="car-card-badge badge-extra"><?php esc_html_e('Extra Details', 'bricks-child'); ?></span>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
@@ -215,7 +215,7 @@ function render_car_card($post_id, $context = array()) {
                             <?php echo $slide['html']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built by wp_get_attachment_image or escaped fallback. ?>
                             <?php if ($is_last) : ?>
                                 <div class="car-card-slide-overlay">
-                                    <a href="<?php echo esc_url($permalink); ?>" class="car-card-view-all-btn">View All Images</a>
+                    <a href="<?php echo esc_url($permalink); ?>" class="car-card-view-all-btn"><?php esc_html_e('View All Images', 'bricks-child'); ?></a>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -238,7 +238,7 @@ function render_car_card($post_id, $context = array()) {
 
                 <span class="car-card-counter">1/<?php echo esc_html($total_images); ?></span>
             <?php else : ?>
-                <div class="car-card-no-image">No Image</div>
+                <div class="car-card-no-image"><?php esc_html_e('No Image', 'bricks-child'); ?></div>
             <?php endif; ?>
         </div>
 
@@ -265,7 +265,7 @@ function render_car_card($post_id, $context = array()) {
             <div class="car-card-signal-badges">
                 <?php car_card_render_price_insight_badge($post_id); ?>
                 <?php if ($popular_badge === '1') : ?>
-                    <span class="car-card-signal-badge car-card-signal-badge--popular">Popular</span>
+                <span class="car-card-signal-badge car-card-signal-badge--popular"><?php esc_html_e('Popular', 'bricks-child'); ?></span>
                 <?php endif; ?>
             </div>
 
@@ -347,11 +347,15 @@ function car_card_render_price_insight_badge($post_id) {
     if (!isset($labels[$band])) {
         return;
     }
-    $label = $labels[$band];
+    $label = __($labels[$band], 'bricks-child');
     $price = (float) str_replace(',', '', (string) car_card_get_meta_value($post_id, 'price'));
     $median = (float) str_replace(',', '', (string) car_card_get_meta_value($post_id, 'price_insight_median'));
     if ($median > 0 && $price > 0 && $price < $median && in_array($band, array('great', 'good'), true)) {
-        $label .= ' - ' . (int) round((($median - $price) / $median) * 100) . '% below typical';
+        $label = sprintf(
+            __('%1$s - %2$d%% below typical', 'bricks-child'),
+            $label,
+            (int) round((($median - $price) / $median) * 100)
+        );
     }
     ?>
     <span class="car-card-price-insight car-card-price-insight--<?php echo esc_attr($band); ?>">
@@ -377,7 +381,7 @@ function car_card_render_favorite_button($post_id) {
     $heart_class = $is_favorite ? 'fas fa-heart' : 'far fa-heart';
     $button_class = 'favorite-btn favorite-btn-listing favorite-btn-small' . ($is_favorite ? ' active' : '');
     ?>
-    <button class="<?php echo esc_attr($button_class); ?>" data-car-id="<?php echo esc_attr($post_id); ?>" title="<?php echo $is_favorite ? 'Remove from favorites' : 'Add to favorites'; ?>">
+    <button class="<?php echo esc_attr($button_class); ?>" data-car-id="<?php echo esc_attr($post_id); ?>" title="<?php echo esc_attr($is_favorite ? __('Remove from favorites', 'bricks-child') : __('Add to favorites', 'bricks-child')); ?>">
         <i class="<?php echo esc_attr($heart_class); ?>"></i>
     </button>
     <?php

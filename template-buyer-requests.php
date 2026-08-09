@@ -16,7 +16,7 @@ get_header(); ?>
     <div class="bricks-content buyer-requests-page-wrapper">
         <div class="buyer-requests-header">
             <h1><?php esc_html_e( 'Buyer Requests', 'bricks-child' ); ?></h1>
-            <a href="<?php echo esc_url( home_url( '/create-buyer-request' ) ); ?>" class="btn btn-primary create-buyer-request-btn">
+            <a href="<?php echo esc_url( autoagora_localized_page_url( 'create-buyer-request' ) ); ?>" class="btn btn-primary create-buyer-request-btn">
                 <?php esc_html_e( 'Create your post', 'bricks-child' ); ?>
             </a>
         </div>
@@ -168,7 +168,7 @@ get_header(); ?>
             ?>
             <div class="buyer-requests-empty">
                 <p><?php esc_html_e( 'No buyer requests found. Be the first to create one!', 'bricks-child' ); ?></p>
-                <a href="<?php echo esc_url( home_url( '/create-buyer-request' ) ); ?>" class="btn btn-primary">
+                <a href="<?php echo esc_url( autoagora_localized_page_url( 'create-buyer-request' ) ); ?>" class="btn btn-primary">
                     <?php esc_html_e( 'Create your post', 'bricks-child' ); ?>
                 </a>
             </div>

@@ -318,6 +318,7 @@ function autoagora_enqueue_facebook_group_assets(): void
     wp_localize_script('autoagora-facebook-group', 'autoagoraFacebookGroup', array(
         'copiedMessage' => __('Copied. Paste the details into your Facebook post.', 'bricks-child'),
         'copyFailedMessage' => __('The group is open. Copy your listing link into a new Facebook post.', 'bricks-child'),
+        'relatedCarsLabel' => __('Related Cars', 'bricks-child'),
     ));
 }
 add_action('wp_enqueue_scripts', 'autoagora_enqueue_facebook_group_assets', 20);

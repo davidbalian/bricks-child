@@ -287,7 +287,7 @@ function seller_reviews_display_shortcode($atts) {
                                     <?php
                                     echo get_email_verification_banner_html($current_user->user_email, array(
                                         'id' => '',
-                                        'message_html' => '<a href="' . esc_url(home_url('/my-account')) . '" class="verify-email-link">' . esc_html__('Verify your email', 'bricks-child') . '</a> ' . esc_html__('to leave a review.', 'bricks-child'),
+                                        'message_html' => '<a href="' . esc_url(autoagora_localized_page_url('my-account')) . '" class="verify-email-link">' . esc_html__('Verify your email', 'bricks-child') . '</a> ' . esc_html__('to leave a review.', 'bricks-child'),
                                         'show_send_button' => false,
                                         'show_dismiss_button' => false,
                                         'wrapper_style' => 'margin-top: 10px; width: 100%;',

@@ -135,14 +135,14 @@ if (!defined('ABSPATH')) {
                                                 ),
                                             ));
                                             ?>
-                                            <button type="button" class="clear-location-btn" id="clear-location-btn" style="<?php echo !empty($location) ? '' : 'display: none;'; ?>" title="Clear location">
+                    <button type="button" class="clear-location-btn" id="clear-location-btn" style="<?php echo !empty($location) ? '' : 'display: none;'; ?>" title="<?php esc_attr_e('Clear location', 'bricks-child'); ?>">
                                                 <?php echo get_svg_icon('xmark'); ?>
                                             </button>
                                         </div>
 
-                                        <span class="location-or-separator">OR</span>
+                    <span class="location-or-separator"><?php esc_html_e('OR', 'bricks-child'); ?></span>
 
-                                        <button type="button" class="btn btn-secondary choose-location-btn">Choose Location <?php echo get_svg_icon('map-location-dot'); ?></button>
+                    <button type="button" class="btn btn-secondary choose-location-btn"><?php esc_html_e('Choose Location', 'bricks-child'); ?> <?php echo get_svg_icon('map-location-dot'); ?></button>
                                     </div>
 
                                     <!-- Hidden field to store location for form submission -->

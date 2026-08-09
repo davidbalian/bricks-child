@@ -24,7 +24,7 @@ function car_filter_get_default_atts() {
         'mode'        => 'ajax',      // ajax or redirect
         'target'      => '',          // target car_listings instance ID
         'redirect_url' => '',         // URL for redirect mode
-        'results_base_url' => '/cars/',
+        'results_base_url' => autoagora_localized_page_url('cars'),
         'landing_make_slug' => '',
         'landing_model_slug' => '',
         'city_landing'      => 'false',

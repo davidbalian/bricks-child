@@ -30,7 +30,7 @@ function autoagora_buyer_features_enqueue_assets(): void {
     wp_enqueue_style(
         'autoagora-buyer-features',
         $base_url . 'buyer-features.css',
-        array(),
+        array('autoagora-i18n'),
         file_exists($base_path . 'buyer-features.css') ? filemtime($base_path . 'buyer-features.css') : BRICKS_CHILD_THEME_VERSION
     );
 
@@ -162,7 +162,7 @@ function autoagora_get_similar_cars_query(int $post_id, int $limit): WP_Query {
 }
 
 function autoagora_price_history_shortcode($atts): string {
-    $atts = shortcode_atts(array('post_id' => 0, 'title' => 'Price history'), $atts, 'price_history');
+    $atts = shortcode_atts(array('post_id' => 0, 'title' => __('Price history', 'bricks-child')), $atts, 'price_history');
     $post_id = $atts['post_id'] ? absint($atts['post_id']) : get_the_ID();
     if (!$post_id || get_post_type($post_id) !== 'car') {
         return '';
@@ -184,13 +184,13 @@ function autoagora_price_history_shortcode($atts): string {
                 <?php $previous = isset($history[$index + 1]) ? (int) $history[$index + 1]['price'] : 0; ?>
                 <li class="autoagora-price-history__item">
                     <span>
-                        <span class="autoagora-price-history__price">EUR <?php echo esc_html(number_format((int) $row['price'])); ?></span>
+                        <span class="autoagora-price-history__price"><?php echo esc_html(sprintf(__('EUR %s', 'bricks-child'), number_format_i18n((int) $row['price']))); ?></span>
                         <?php if (!empty($row['date'])) : ?>
                             <small><?php echo esc_html(date_i18n(get_option('date_format'), strtotime((string) $row['date']))); ?></small>
                         <?php endif; ?>
                     </span>
                     <?php if ($previous > (int) $row['price']) : ?>
-                        <span class="autoagora-price-history__drop">Down EUR <?php echo esc_html(number_format($previous - (int) $row['price'])); ?></span>
+                        <span class="autoagora-price-history__drop"><?php echo esc_html(sprintf(__('Down EUR %s', 'bricks-child'), number_format_i18n($previous - (int) $row['price']))); ?></span>
                     <?php endif; ?>
                 </li>
             <?php endforeach; ?>
@@ -201,7 +201,7 @@ function autoagora_price_history_shortcode($atts): string {
 }
 
 function autoagora_price_drop_cars_shortcode($atts): string {
-    $atts = shortcode_atts(array('limit' => 12, 'title' => 'Recently reduced prices'), $atts, 'price_drop_cars');
+    $atts = shortcode_atts(array('limit' => 12, 'title' => __('Recently reduced prices', 'bricks-child')), $atts, 'price_drop_cars');
     autoagora_buyer_features_enqueue_assets();
 
     $args = array(
@@ -237,7 +237,7 @@ function autoagora_price_drop_cars_shortcode($atts): string {
                 ?>
             </div>
         <?php else : ?>
-            <p class="autoagora-empty-note">No recent price drops yet.</p>
+            <p class="autoagora-empty-note"><?php esc_html_e('No recent price drops yet.', 'bricks-child'); ?></p>
         <?php endif; ?>
     </section>
     <?php
@@ -245,7 +245,7 @@ function autoagora_price_drop_cars_shortcode($atts): string {
 }
 
 function autoagora_new_listings_since_last_visit_shortcode($atts): string {
-    $atts = shortcode_atts(array('link' => '/cars/'), $atts, 'new_listings_since_last_visit');
+    $atts = shortcode_atts(array('link' => ''), $atts, 'new_listings_since_last_visit');
     autoagora_buyer_features_enqueue_assets();
 
     $last = isset($_COOKIE['autoagora_last_cars_visit']) ? absint($_COOKIE['autoagora_last_cars_visit']) : 0;
@@ -271,9 +271,13 @@ function autoagora_new_listings_since_last_visit_shortcode($atts): string {
     }
 
     return sprintf(
-        '<div class="autoagora-new-since"><strong>%s new cars since your last visit</strong><a class="btn btn-primary" href="%s">View new cars</a></div>',
-        esc_html(number_format($count)),
-        esc_url(home_url($atts['link']))
+        '<div class="autoagora-new-since"><strong>%s</strong><a class="btn btn-primary" href="%s">%s</a></div>',
+        esc_html(sprintf(
+            _n('%s new car since your last visit', '%s new cars since your last visit', $count, 'bricks-child'),
+            number_format_i18n($count)
+        )),
+        esc_url($atts['link'] !== '' ? home_url($atts['link']) : autoagora_localized_page_url('cars')),
+        esc_html__('View new cars', 'bricks-child')
     );
 }
 
@@ -286,7 +290,7 @@ function autoagora_new_listings_since_last_visit_cookie_script(): void {
 }
 
 function autoagora_dealer_trust_indicators_shortcode($atts): string {
-    $atts = shortcode_atts(array('user_id' => 0, 'post_id' => 0, 'title' => 'Seller trust signals'), $atts, 'dealer_trust_indicators');
+    $atts = shortcode_atts(array('user_id' => 0, 'post_id' => 0, 'title' => __('Seller trust signals', 'bricks-child')), $atts, 'dealer_trust_indicators');
     $post_id = $atts['post_id'] ? absint($atts['post_id']) : get_the_ID();
     $user_id = $atts['user_id'] ? absint($atts['user_id']) : 0;
     if (!$user_id && $post_id) {
@@ -304,10 +308,10 @@ function autoagora_dealer_trust_indicators_shortcode($atts): string {
     <section class="autoagora-feature-section autoagora-dealer-trust">
         <h2 class="autoagora-feature-title"><?php echo esc_html($atts['title']); ?></h2>
         <div class="autoagora-trust-grid">
-            <div class="autoagora-trust-metric"><span class="autoagora-trust-metric__label">Listings active</span><span class="autoagora-trust-metric__value"><?php echo esc_html(number_format($metrics['active'])); ?></span></div>
-            <div class="autoagora-trust-metric"><span class="autoagora-trust-metric__label">Member since</span><span class="autoagora-trust-metric__value"><?php echo esc_html(date_i18n('Y', strtotime($user->user_registered))); ?></span></div>
-            <div class="autoagora-trust-metric"><span class="autoagora-trust-metric__label">Response signal</span><span class="autoagora-trust-metric__value"><?php echo esc_html($metrics['interest']); ?></span></div>
-            <div class="autoagora-trust-metric"><span class="autoagora-trust-metric__label">Average views/listing</span><span class="autoagora-trust-metric__value"><?php echo esc_html(number_format($metrics['avg_views'])); ?></span></div>
+            <div class="autoagora-trust-metric"><span class="autoagora-trust-metric__label"><?php esc_html_e('Listings active', 'bricks-child'); ?></span><span class="autoagora-trust-metric__value"><?php echo esc_html(number_format_i18n($metrics['active'])); ?></span></div>
+            <div class="autoagora-trust-metric"><span class="autoagora-trust-metric__label"><?php esc_html_e('Member since', 'bricks-child'); ?></span><span class="autoagora-trust-metric__value"><?php echo esc_html(date_i18n('Y', strtotime($user->user_registered))); ?></span></div>
+            <div class="autoagora-trust-metric"><span class="autoagora-trust-metric__label"><?php esc_html_e('Response signal', 'bricks-child'); ?></span><span class="autoagora-trust-metric__value"><?php echo esc_html($metrics['interest']); ?></span></div>
+            <div class="autoagora-trust-metric"><span class="autoagora-trust-metric__label"><?php esc_html_e('Average views/listing', 'bricks-child'); ?></span><span class="autoagora-trust-metric__value"><?php echo esc_html(number_format_i18n($metrics['avg_views'])); ?></span></div>
         </div>
     </section>
     <?php
@@ -322,7 +326,7 @@ function autoagora_compare_button_shortcode($atts): string {
 
 function autoagora_compare_cars_shortcode(): string {
     autoagora_buyer_features_enqueue_assets();
-    return '<button type="button" class="autoagora-compare-btn" onclick="window.autoagoraCompareRender && window.autoagoraCompareRender()">Open compare</button>';
+    return '<button type="button" class="autoagora-compare-btn" onclick="window.autoagoraCompareRender && window.autoagoraCompareRender()">' . esc_html__('Open compare', 'bricks-child') . '</button>';
 }
 
 function autoagora_render_compare_button(int $post_id, string $class = 'car-card-compare-btn'): string {
@@ -335,7 +339,7 @@ function autoagora_render_compare_button(int $post_id, string $class = 'car-card
     foreach ($data as $key => $value) {
         $attrs .= ' data-' . esc_attr($key) . '="' . esc_attr((string) $value) . '"';
     }
-    return '<button type="button" class="' . esc_attr($class) . '" data-autoagora-compare="1"' . $attrs . '>Compare</button>';
+    return '<button type="button" class="' . esc_attr($class) . '" data-autoagora-compare="1"' . $attrs . '>' . esc_html__('Compare', 'bricks-child') . '</button>';
 }
 
 function autoagora_get_compare_data(int $post_id): array {
@@ -407,7 +411,7 @@ function autoagora_get_seller_trust_metrics(int $user_id): array {
         $clicks += autoagora_buyer_features_parse_int(get_post_meta((int) $car_id, 'whatsapp_button_clicks', true));
     }
     $avg_views = $active > 0 ? (int) round($views / $active) : 0;
-    $interest = $clicks >= 20 ? 'High' : ($clicks >= 5 ? 'Medium' : 'New');
+    $interest = $clicks >= 20 ? __('High', 'bricks-child') : ($clicks >= 5 ? __('Medium', 'bricks-child') : __('New', 'bricks-child'));
     return array('active' => $active, 'avg_views' => $avg_views, 'interest' => $interest);
 }
 

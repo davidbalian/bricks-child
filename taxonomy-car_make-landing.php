@@ -62,29 +62,29 @@ get_header();
     <div class="tcp-filters-bar-inner">
         <button type="button" class="tcp-filters-btn" id="tcp-filters-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="1" fill="currentColor" stroke="none"/></svg>
-            Filters
+            <?php esc_html_e('Filters', 'bricks-child'); ?>
         </button>
         <button type="button" class="tcp-filters-btn" id="tcp-location-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.373 7-11a7 7 0 1 0-14 0c0 5.627 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-            Location
+            <?php esc_html_e('Location', 'bricks-child'); ?>
         </button>
         <div class="tcp-active-filters" id="tcp-active-filters"></div>
 
         <div class="tcp-sort" id="tcp-sort">
             <button type="button" class="tcp-sort-btn" id="tcp-sort-btn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
-                <span id="tcp-sort-label">Best Match</span>
+                <span id="tcp-sort-label"><?php esc_html_e('Best Match', 'bricks-child'); ?></span>
             </button>
             <div class="tcp-sort-menu" id="tcp-sort-menu">
-                <button type="button" class="tcp-sort-option selected" data-orderby="score" data-order="DESC">Best Match</button>
-                <button type="button" class="tcp-sort-option" data-orderby="date" data-order="DESC">Newest</button>
-                <button type="button" class="tcp-sort-option" data-orderby="date" data-order="ASC">Oldest</button>
-                <button type="button" class="tcp-sort-option" data-orderby="price" data-order="ASC">Price: Low to High</button>
-                <button type="button" class="tcp-sort-option" data-orderby="price" data-order="DESC">Price: High to Low</button>
-                <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="ASC">Mileage: Low to High</button>
-                <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="DESC">Mileage: High to Low</button>
-                <button type="button" class="tcp-sort-option" data-orderby="year" data-order="DESC">Year: Newest</button>
-                <button type="button" class="tcp-sort-option" data-orderby="year" data-order="ASC">Year: Oldest</button>
+                <button type="button" class="tcp-sort-option selected" data-orderby="score" data-order="DESC"><?php esc_html_e('Best Match', 'bricks-child'); ?></button>
+                <button type="button" class="tcp-sort-option" data-orderby="date" data-order="DESC"><?php esc_html_e('Newest', 'bricks-child'); ?></button>
+                <button type="button" class="tcp-sort-option" data-orderby="date" data-order="ASC"><?php esc_html_e('Oldest', 'bricks-child'); ?></button>
+                <button type="button" class="tcp-sort-option" data-orderby="price" data-order="ASC"><?php esc_html_e('Price: Low to High', 'bricks-child'); ?></button>
+                <button type="button" class="tcp-sort-option" data-orderby="price" data-order="DESC"><?php esc_html_e('Price: High to Low', 'bricks-child'); ?></button>
+                <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="ASC"><?php esc_html_e('Mileage: Low to High', 'bricks-child'); ?></button>
+                <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="DESC"><?php esc_html_e('Mileage: High to Low', 'bricks-child'); ?></button>
+                <button type="button" class="tcp-sort-option" data-orderby="year" data-order="DESC"><?php esc_html_e('Year: Newest', 'bricks-child'); ?></button>
+                <button type="button" class="tcp-sort-option" data-orderby="year" data-order="ASC"><?php esc_html_e('Year: Oldest', 'bricks-child'); ?></button>
             </div>
         </div>
     </div>
@@ -94,25 +94,26 @@ get_header();
 <div class="tcp-filters-modal-overlay" id="tcp-filters-modal-overlay">
     <div class="tcp-filters-modal">
         <div class="tcp-filters-modal-header">
-            <h2>Filters</h2>
-            <button type="button" class="tcp-filters-modal-close" id="tcp-filters-modal-close" aria-label="Close">
+            <h2><?php esc_html_e('Filters', 'bricks-child'); ?></h2>
+            <button type="button" class="tcp-filters-modal-close" id="tcp-filters-modal-close" aria-label="<?php esc_attr_e('Close', 'bricks-child'); ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
         <div class="tcp-filters-modal-body">
             <?php
             echo do_shortcode(sprintf(
-                '[car_filters filters="make,model,price,mileage,fuel,body,year" mode="ajax" target="%1$s" layout="vertical" show_button="false" group="%2$s" landing_make_slug="%3$s" landing_model_slug="%4$s" results_base_url="/cars/"]',
+                '[car_filters filters="make,model,price,mileage,fuel,body,year" mode="ajax" target="%1$s" layout="vertical" show_button="false" group="%2$s" landing_make_slug="%3$s" landing_model_slug="%4$s" results_base_url="%5$s"]',
                 esc_attr($listings_id),
                 esc_attr($group),
                 esc_attr($landing['make_slug']),
-                esc_attr($landing['model_slug'])
+                esc_attr($landing['model_slug']),
+                esc_url(autoagora_localized_page_url('cars'))
             ));
             ?>
         </div>
         <div class="tcp-filters-modal-footer">
-            <button type="button" class="tcp-modal-apply-btn" id="tcp-modal-apply-btn">Apply Filters</button>
-            <button type="button" class="tcp-modal-clear-btn" id="tcp-modal-clear-btn">Clear All</button>
+            <button type="button" class="tcp-modal-apply-btn" id="tcp-modal-apply-btn"><?php esc_html_e('Apply Filters', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-modal-clear-btn" id="tcp-modal-clear-btn"><?php esc_html_e('Clear All', 'bricks-child'); ?></button>
         </div>
     </div>
 </div>
@@ -121,14 +122,14 @@ get_header();
 <div class="tcp-filters-modal-overlay" id="tcp-location-modal-overlay">
     <div class="tcp-filters-modal tcp-location-modal">
         <div class="tcp-filters-modal-header">
-            <h2>Location Radius</h2>
-            <button type="button" class="tcp-filters-modal-close" id="tcp-location-modal-close" aria-label="Close">
+            <h2><?php esc_html_e('Location Radius', 'bricks-child'); ?></h2>
+            <button type="button" class="tcp-filters-modal-close" id="tcp-location-modal-close" aria-label="<?php esc_attr_e('Close', 'bricks-child'); ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
         <div class="tcp-filters-modal-body">
             <div class="tcp-location-search-wrap">
-                <input type="text" id="tcp-location-search" class="tcp-location-search" placeholder="Search location in Cyprus">
+                <input type="text" id="tcp-location-search" class="tcp-location-search" placeholder="<?php esc_attr_e('Search location in Cyprus', 'bricks-child'); ?>">
             </div>
             <div class="tcp-location-map-wrap">
                 <div class="tcp-location-map" id="tcp-location-map"></div>
@@ -146,8 +147,8 @@ get_header();
                     <button type="button" class="tcp-radius-preset" data-radius="200">200 km</button>
                 </div>
             </div>
-            <button type="button" class="tcp-modal-apply-btn" id="tcp-location-apply-btn">Apply Location</button>
-            <button type="button" class="tcp-modal-clear-btn" id="tcp-location-clear-btn">Clear Location</button>
+            <button type="button" class="tcp-modal-apply-btn" id="tcp-location-apply-btn"><?php esc_html_e('Apply Location', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-modal-clear-btn" id="tcp-location-clear-btn"><?php esc_html_e('Clear Location', 'bricks-child'); ?></button>
         </div>
     </div>
 </div>
@@ -157,12 +158,17 @@ get_header();
     <h1 class="tcp-heading"><?php echo esc_html($landing['h1']); ?></h1>
     <p class="tcp-heading-browse-all">
         <?php echo esc_html__( 'Looking for another model? ', 'bricks-child' ); ?>
-        <a class="tcp-heading-browse-all-link" href="<?php echo esc_url( trailingslashit( home_url( '/cars/' ) ) ); ?>">
+        <a class="tcp-heading-browse-all-link" href="<?php echo esc_url( autoagora_localized_page_url( 'cars' ) ); ?>">
             <?php esc_html_e( 'Browse all used cars in Cyprus here.', 'bricks-child' ); ?>
         </a>
     </p>
     <p class="tcp-results-count" id="tcp-results-count">
-        <?php echo esc_html( number_format_i18n( (int) $cars_query->found_posts ) . ' results found' ); ?>
+        <?php
+        echo esc_html(sprintf(
+            _n('%s result found', '%s results found', (int) $cars_query->found_posts, 'bricks-child'),
+            number_format_i18n((int) $cars_query->found_posts)
+        ));
+        ?>
     </p>
     <div class="car-listings-container"
          id="<?php echo esc_attr($listings_id); ?>"
@@ -198,8 +204,8 @@ get_header();
                 echo paginate_links(array(
                     'total'     => $cars_query->max_num_pages,
                     'current'   => $current_page,
-                    'prev_text' => 'Previous',
-                    'next_text' => 'Next',
+                    'prev_text' => __('Previous', 'bricks-child'),
+                    'next_text' => __('Next', 'bricks-child'),
                     'type'      => 'list',
                     'base'      => '#%#%',
                     'format'    => '%#%',
@@ -984,6 +990,8 @@ body {
 (function($) {
     'use strict';
 
+    var t = window.autoagoraTranslate || function(source) { return source; };
+
     var $container  = $('#<?php echo esc_js($listings_id); ?>');
     var $wrapper    = $container.find('.car-listings-wrapper');
     var $pagination = $container.find('.tcp-pagination');
@@ -1034,7 +1042,7 @@ body {
     function updateResultsCount(total) {
         var count = parseInt(total, 10);
         if (isNaN(count) || count < 0) count = 0;
-        $results.text(count.toLocaleString() + ' results found');
+        $results.text(t('%s results found', count.toLocaleString()));
         updateClearAllButton(count);
     }
 
@@ -1043,7 +1051,7 @@ body {
         if (count === 0) {
             var $noResults = $wrapper.find('.car-listings-no-results');
             if ($noResults.length) {
-                $noResults.after('<button type="button" class="tcp-clear-all-filters-btn" id="tcp-no-results-clear-btn">Clear all filters</button>');
+                $noResults.after('<button type="button" class="tcp-clear-all-filters-btn" id="tcp-no-results-clear-btn">' + escapeHtml(t('Clear all filters')) + '</button>');
             }
         }
     }
@@ -1052,7 +1060,7 @@ body {
         var $sort = $('#tcp-sort');
         $sort.find('.tcp-sort-option').removeClass('selected');
         $sort.find('.tcp-sort-option').first().addClass('selected');
-        $('#tcp-sort-label').text('Best Match');
+        $('#tcp-sort-label').text(t('Best Match'));
         var atts = $container.data('atts') || {};
         atts.orderby = 'score';
         atts.order = 'DESC';
@@ -1061,15 +1069,15 @@ body {
     }
 
     var filterLabels = {
-        price_min:       'Price min',
-        price_max:       'Price max',
-        mileage_min:     'Mileage min',
-        mileage_max:     'Mileage max',
-        year_min:        'Year min',
-        year_max:        'Year max',
-        fuel_type:       'Fuel',
-        body_type:       'Body',
-        location_radius: 'Location'
+        price_min:       t('Price min'),
+        price_max:       t('Price max'),
+        mileage_min:     t('Mileage min'),
+        mileage_max:     t('Mileage max'),
+        year_min:        t('Year min'),
+        year_max:        t('Year max'),
+        fuel_type:       t('Fuel'),
+        body_type:       t('Body'),
+        location_radius: t('Location')
     };
 
     /* ── Modal open/close ── */
@@ -1146,18 +1154,18 @@ body {
         });
         ['fuel_type', 'body_type'].forEach(function(key) {
             if (state[key]) {
-                html += chip(key, filterLabels[key] + ': ' + state[key]);
+                html += chip(key, filterLabels[key] + ': ' + t(state[key]));
                 hasAny = true;
             }
         });
         if (locationState.active && locationState.lat && locationState.lng && locationState.radiusKm > 0) {
-            var locationLabel = locationState.label || 'Selected area';
+            var locationLabel = locationState.label || t('Selected area');
             html += chip('location_radius', filterLabels.location_radius + ': ' + locationLabel);
             hasAny = true;
         }
 
         if (hasAny) {
-            html += '<button type="button" class="tcp-chip-clear" id="tcp-clear-all">Clear all</button>';
+            html += '<button type="button" class="tcp-chip-clear" id="tcp-clear-all">' + escapeHtml(t('Clear all')) + '</button>';
         }
 
         $chips.html(html);
@@ -1165,9 +1173,13 @@ body {
 
     function chip(key, label) {
         return '<span class="tcp-chip" data-filter="' + key + '">' +
-               label +
-               '<button type="button" class="tcp-chip-remove" data-filter="' + key + '" aria-label="Remove">&times;</button>' +
+               escapeHtml(label) +
+               '<button type="button" class="tcp-chip-remove" data-filter="' + key + '" aria-label="' + escapeHtml(t('Remove')) + '">&times;</button>' +
                '</span>';
+    }
+
+    function escapeHtml(value) {
+        return $('<div>').text(String(value)).html();
     }
 
     function formatNum(val, raw) {
@@ -1529,7 +1541,7 @@ body {
             return;
         }
         if (!locationState.label) {
-            locationState.label = $('#tcp-location-search').val() || 'Selected area';
+            locationState.label = $('#tcp-location-search').val() || t('Selected area');
         }
         locationState.active = true;
         closeLocationModal();

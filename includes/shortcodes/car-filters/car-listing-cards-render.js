@@ -4,11 +4,13 @@
 (function (window) {
     'use strict';
 
+    var t = window.autoagoraTranslate || function (source) { return source; };
+
     var PI_LABELS = {
-        great: 'Great Deal',
-        good: 'Good Deal',
-        fair: 'Fair Deal',
-        above: 'Above typical'
+        great: t('Great Deal'),
+        good: t('Good Deal'),
+        fair: t('Fair Deal'),
+        above: t('Above typical')
     };
 
     function escapeHtml(s) {
@@ -43,7 +45,7 @@
         var btn = document.createElement('button');
         btn.className = 'favorite-btn favorite-btn-listing favorite-btn-small' + (isFav ? ' active' : '');
         btn.setAttribute('data-car-id', String(postId));
-        btn.setAttribute('title', isFav ? 'Remove from favorites' : 'Add to favorites');
+        btn.setAttribute('title', isFav ? t('Remove from favorites') : t('Add to favorites'));
         var i = document.createElement('i');
         i.className = isFav ? 'fas fa-heart' : 'far fa-heart';
         btn.appendChild(i);
@@ -76,13 +78,13 @@
             if (c.bf) {
                 var b1 = document.createElement('span');
                 b1.className = 'car-card-badge badge-full';
-                b1.textContent = 'Full Details';
+                b1.textContent = t('Full Details');
                 badges.appendChild(b1);
             }
             if (c.be) {
                 var b2 = document.createElement('span');
                 b2.className = 'car-card-badge badge-extra';
-                b2.textContent = 'Extra Details';
+                b2.textContent = t('Extra Details');
                 badges.appendChild(b2);
             }
             slider.appendChild(badges);
@@ -125,7 +127,7 @@
                     var a = document.createElement('a');
                     a.href = c.u;
                     a.className = 'car-card-view-all-btn';
-                    a.textContent = 'View All Images';
+                    a.textContent = t('View All Images');
                     ov.appendChild(a);
                     slide.appendChild(ov);
                 }
@@ -136,13 +138,13 @@
             if (slides.length > 1) {
                 var left = document.createElement('button');
                 left.className = 'car-card-arrow car-card-arrow-left car-card-arrow-hidden';
-                left.setAttribute('aria-label', 'Previous image');
+                left.setAttribute('aria-label', t('Previous image'));
                 left.innerHTML = '<svg viewBox="0 0 12 12"><polyline points="8,2 4,6 8,10"/></svg>';
                 slider.appendChild(left);
 
                 var right = document.createElement('button');
                 right.className = 'car-card-arrow car-card-arrow-right';
-                right.setAttribute('aria-label', 'Next image');
+                right.setAttribute('aria-label', t('Next image'));
                 right.innerHTML = '<svg viewBox="0 0 12 12"><polyline points="4,2 8,6 4,10"/></svg>';
                 slider.appendChild(right);
 
@@ -163,7 +165,7 @@
         } else {
             var noImg = document.createElement('div');
             noImg.className = 'car-card-no-image';
-            noImg.textContent = 'No Image';
+            noImg.textContent = t('No Image');
             slider.appendChild(noImg);
         }
 
@@ -202,7 +204,7 @@
             if (c.pop) {
                 var pop = document.createElement('span');
                 pop.className = 'car-card-signal-badge car-card-signal-badge--popular';
-                pop.textContent = 'Popular';
+                pop.textContent = t('Popular');
                 signalWrap.appendChild(pop);
             }
             body.appendChild(signalWrap);
@@ -241,7 +243,7 @@
             Object.keys(c.cmp).forEach(function (key) {
                 compare.setAttribute('data-' + key, String(c.cmp[key] || ''));
             });
-            compare.textContent = 'Compare';
+            compare.textContent = t('Compare');
             article.appendChild(compare);
         }
 
@@ -256,7 +258,7 @@
         if (!cards || !cards.length) {
             var empty = document.createElement('p');
             empty.className = 'car-listings-no-results';
-            empty.textContent = 'No car listings found matching your criteria.';
+            empty.textContent = t('No car listings found matching your criteria.');
             container.appendChild(empty);
             return;
         }

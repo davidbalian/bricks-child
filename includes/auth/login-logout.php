@@ -19,7 +19,7 @@ function custom_login_redirect( $redirect_to, $request, $user ) {
             return admin_url();
         } else {
             // Redirect all other users to the homepage
-            return home_url();
+            return autoagora_localized_page_url();
         }
     } else {
         // If there's an issue with the user object, use the original redirect
@@ -32,7 +32,7 @@ add_filter( 'login_redirect', 'custom_login_redirect', 10, 3 );
  * Redirect users to the homepage after logout.
  */
 function custom_logout_redirect( $redirect_to, $requested_redirect_to, $logout_url, $blog_id ) {
-    return home_url();
+    return autoagora_localized_page_url();
 }
 add_filter( 'wp_logout_redirect', 'custom_logout_redirect', 10, 4 );
 
@@ -61,7 +61,7 @@ function redirect_login_page() {
                         (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], '/signin') !== false);
         
         if ($is_login_page) {
-            wp_redirect(home_url('/my-account'));
+            wp_redirect(autoagora_localized_page_url('my-account'));
             exit;
         }
     }

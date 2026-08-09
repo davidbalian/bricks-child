@@ -68,19 +68,19 @@ class SellerReviewsDatabase {
         $reviewer_email = sanitize_email($reviewer_email);
 
         if (!$seller_id || !$rating) {
-            return array('success' => false, 'message' => 'Missing required fields');
+            return array('success' => false, 'message' => __('Missing required fields', 'bricks-child'));
         }
 
         if ($reviewer_id > 0) {
             if ($seller_id === $reviewer_id) {
-                return array('success' => false, 'message' => 'Cannot review yourself');
+                return array('success' => false, 'message' => __('Cannot review yourself', 'bricks-child'));
             }
         } elseif (!is_email($reviewer_email)) {
-            return array('success' => false, 'message' => 'Valid email is required');
+            return array('success' => false, 'message' => __('Valid email is required', 'bricks-child'));
         }
 
         if ($rating < 1 || $rating > 5) {
-            return array('success' => false, 'message' => 'Rating must be between 1 and 5');
+            return array('success' => false, 'message' => __('Rating must be between 1 and 5', 'bricks-child'));
         }
 
         $existing_review = null;
@@ -102,8 +102,13 @@ class SellerReviewsDatabase {
 
         if ($existing_review) {
             if ($existing_review->status === 'approved' || $existing_review->status === 'pending') {
-                $status_text = $existing_review->status === 'approved' ? 'approved' : 'pending approval';
-                return array('success' => false, 'message' => "You have already reviewed this seller. Your review is {$status_text}.");
+                $status_text = $existing_review->status === 'approved'
+                    ? __('approved', 'bricks-child')
+                    : __('pending approval', 'bricks-child');
+                return array(
+                    'success' => false,
+                    'message' => sprintf(__('You have already reviewed this seller. Your review is %s.', 'bricks-child'), $status_text),
+                );
             }
 
             if ($existing_review->status === 'rejected') {
@@ -124,10 +129,10 @@ class SellerReviewsDatabase {
                 );
 
                 if ($result === false) {
-                    return array('success' => false, 'message' => 'Database error: ' . $wpdb->last_error);
+                    return array('success' => false, 'message' => sprintf(__('Database error: %s', 'bricks-child'), $wpdb->last_error));
                 }
 
-                return array('success' => true, 'message' => 'Review resubmitted successfully. It will be visible after admin approval.');
+                return array('success' => true, 'message' => __('Review resubmitted successfully. It will be visible after admin approval.', 'bricks-child'));
             }
         }
 
@@ -147,10 +152,10 @@ class SellerReviewsDatabase {
         );
 
         if ($result === false) {
-            return array('success' => false, 'message' => 'Database error: ' . $wpdb->last_error);
+            return array('success' => false, 'message' => sprintf(__('Database error: %s', 'bricks-child'), $wpdb->last_error));
         }
 
-        return array('success' => true, 'message' => 'Review submitted successfully. It will be visible after admin approval.');
+        return array('success' => true, 'message' => __('Review submitted successfully. It will be visible after admin approval.', 'bricks-child'));
     }
     
     /**
@@ -162,7 +167,7 @@ class SellerReviewsDatabase {
     private function get_user_display_info($user_id) {
         $user = get_userdata($user_id);
         if (!$user) {
-            return array('name' => 'Unknown', 'username' => 'unknown');
+            return array('name' => __('Unknown', 'bricks-child'), 'username' => 'unknown');
         }
         
         $first_name = get_user_meta($user_id, 'first_name', true);
@@ -631,4 +636,4 @@ class SellerReviewsDatabase {
 }
 
 // Initialize the database class
-new SellerReviewsDatabase(); 
+new SellerReviewsDatabase();

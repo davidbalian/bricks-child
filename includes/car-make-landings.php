@@ -17,6 +17,14 @@ function autoagora_get_car_make_landing_config() {
     }
 
     $build_url = static function ($slug) {
+        $term = get_term_by('slug', $slug, 'car_make');
+        if ($term instanceof WP_Term) {
+            $term_url = get_term_link($term);
+            if (!is_wp_error($term_url)) {
+                return trailingslashit($term_url);
+            }
+        }
+
         return trailingslashit(home_url('/car_make/' . $slug));
     };
 
@@ -331,7 +339,43 @@ function autoagora_get_car_make_landing_config() {
 function autoagora_get_car_make_landing($slug) {
     $config = autoagora_get_car_make_landing_config();
 
-    return isset($config[$slug]) ? $config[$slug] : null;
+    if (!isset($config[$slug])) {
+        return null;
+    }
+
+    $landing = $config[$slug];
+    if (is_admin() && !wp_doing_ajax()) {
+        return $landing;
+    }
+
+    foreach (array('title', 'meta_description', 'h1') as $copy_key) {
+        if (!empty($landing[$copy_key])) {
+            $landing[$copy_key] = __($landing[$copy_key], 'bricks-child');
+        }
+    }
+
+    if (!empty($landing['intro']) && is_array($landing['intro'])) {
+        $landing['intro'] = array_map(
+            static function ($paragraph) {
+                return __($paragraph, 'bricks-child');
+            },
+            $landing['intro']
+        );
+    }
+
+    if (!empty($landing['faqs']) && is_array($landing['faqs'])) {
+        foreach ($landing['faqs'] as &$faq) {
+            if (!empty($faq['question'])) {
+                $faq['question'] = __($faq['question'], 'bricks-child');
+            }
+            if (!empty($faq['answer'])) {
+                $faq['answer'] = __($faq['answer'], 'bricks-child');
+            }
+        }
+        unset($faq);
+    }
+
+    return $landing;
 }
 
 function autoagora_get_managed_car_make_landing_term($term) {
@@ -387,7 +431,10 @@ function autoagora_get_car_make_landing_view_context() {
 function autoagora_build_synthetic_car_make_landing_context($term) {
     $slug  = $term->slug;
     $name  = $term->name;
-    $canonical = trailingslashit(home_url('/car_make/' . $slug));
+    $term_url = get_term_link($term);
+    $canonical = is_wp_error($term_url)
+        ? trailingslashit(home_url('/car_make/' . $slug))
+        : trailingslashit($term_url);
 
     if ((int) $term->parent > 0) {
         $parent = get_term($term->parent, 'car_make');
@@ -548,7 +595,7 @@ function autoagora_redirect_empty_car_make_archive() {
         return;
     }
 
-    wp_safe_redirect(trailingslashit(home_url('/cars/')), 302);
+    wp_safe_redirect(autoagora_localized_page_url('cars'), 302);
     exit;
 }
 add_action('template_redirect', 'autoagora_redirect_empty_car_make_archive', 5);

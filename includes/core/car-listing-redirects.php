@@ -56,7 +56,7 @@ final class Autoagora_Deleted_Car_Redirect_Store {
 final class Autoagora_Car_Category_Redirect_Resolver {
 
     public static function resolve_target_url(int $post_id): string {
-        $cars_index = trailingslashit(home_url('/cars/'));
+        $cars_index = trailingslashit(autoagora_localized_page_url('cars'));
 
         $terms = wp_get_post_terms($post_id, 'car_make', array('fields' => 'all'));
         if (empty($terms) || is_wp_error($terms)) {
@@ -79,11 +79,11 @@ final class Autoagora_Car_Category_Redirect_Resolver {
         }
 
         if ($model_term instanceof WP_Term) {
-            return trailingslashit(home_url('/cars/filter/make:' . $model_term->slug . '/'));
+            return trailingslashit($cars_index . 'filter/make:' . $model_term->slug);
         }
 
         if ($make_term instanceof WP_Term) {
-            return trailingslashit(home_url('/cars/filter/make:' . $make_term->slug . '/'));
+            return trailingslashit($cars_index . 'filter/make:' . $make_term->slug);
         }
 
         return $cars_index;

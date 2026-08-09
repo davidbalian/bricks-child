@@ -159,37 +159,37 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 <!-- Filters bar -->
 <div class="tcp-filters-bar">
     <div class="tcp-filters-bar-inner">
-        <div class="tcp-quick-filters" aria-label="Quick car filters">
-            <button type="button" class="tcp-quick-filter" data-filter-target="make">Make &amp; model</button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="price">Price</button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="year">Year</button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="mileage">Mileage</button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="transmission">Transmission</button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="body">Body type</button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="fuel">Fuel type</button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="engine">Engine size</button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="location">Location</button>
+        <div class="tcp-quick-filters" aria-label="<?php esc_attr_e('Quick car filters', 'bricks-child'); ?>">
+            <button type="button" class="tcp-quick-filter" data-filter-target="make"><?php esc_html_e('Make & model', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="price"><?php esc_html_e('Price', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="year"><?php esc_html_e('Year', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="mileage"><?php esc_html_e('Mileage', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="transmission"><?php esc_html_e('Transmission', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="body"><?php esc_html_e('Body type', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="fuel"><?php esc_html_e('Fuel type', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="engine"><?php esc_html_e('Engine size', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="location"><?php esc_html_e('Location', 'bricks-child'); ?></button>
         </div>
         <div class="tcp-toolbar-actions">
             <button type="button" class="tcp-filters-btn" id="tcp-filters-btn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="1" fill="currentColor" stroke="none"/></svg>
-                All filters
+                <?php esc_html_e('All filters', 'bricks-child'); ?>
             </button>
             <div class="tcp-sort" id="tcp-sort">
                 <button type="button" class="tcp-sort-btn" id="tcp-sort-btn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
-                    <span id="tcp-sort-label">Newest</span>
+                    <span id="tcp-sort-label"><?php esc_html_e('Newest', 'bricks-child'); ?></span>
                 </button>
                 <div class="tcp-sort-menu" id="tcp-sort-menu">
-                    <button type="button" class="tcp-sort-option selected" data-orderby="date" data-order="DESC">Newest</button>
-                    <button type="button" class="tcp-sort-option" data-orderby="score" data-order="DESC">Best Match</button>
-                    <button type="button" class="tcp-sort-option" data-orderby="date" data-order="ASC">Oldest</button>
-                    <button type="button" class="tcp-sort-option" data-orderby="price" data-order="ASC">Price: Low to High</button>
-                    <button type="button" class="tcp-sort-option" data-orderby="price" data-order="DESC">Price: High to Low</button>
-                    <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="ASC">Mileage: Low to High</button>
-                    <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="DESC">Mileage: High to Low</button>
-                    <button type="button" class="tcp-sort-option" data-orderby="year" data-order="DESC">Year: Newest</button>
-                    <button type="button" class="tcp-sort-option" data-orderby="year" data-order="ASC">Year: Oldest</button>
+                    <button type="button" class="tcp-sort-option selected" data-orderby="date" data-order="DESC"><?php esc_html_e('Newest', 'bricks-child'); ?></button>
+                    <button type="button" class="tcp-sort-option" data-orderby="score" data-order="DESC"><?php esc_html_e('Best Match', 'bricks-child'); ?></button>
+                    <button type="button" class="tcp-sort-option" data-orderby="date" data-order="ASC"><?php esc_html_e('Oldest', 'bricks-child'); ?></button>
+                    <button type="button" class="tcp-sort-option" data-orderby="price" data-order="ASC"><?php esc_html_e('Price: Low to High', 'bricks-child'); ?></button>
+                    <button type="button" class="tcp-sort-option" data-orderby="price" data-order="DESC"><?php esc_html_e('Price: High to Low', 'bricks-child'); ?></button>
+                    <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="ASC"><?php esc_html_e('Mileage: Low to High', 'bricks-child'); ?></button>
+                    <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="DESC"><?php esc_html_e('Mileage: High to Low', 'bricks-child'); ?></button>
+                    <button type="button" class="tcp-sort-option" data-orderby="year" data-order="DESC"><?php esc_html_e('Year: Newest', 'bricks-child'); ?></button>
+                    <button type="button" class="tcp-sort-option" data-orderby="year" data-order="ASC"><?php esc_html_e('Year: Oldest', 'bricks-child'); ?></button>
                 </div>
             </div>
         </div>
@@ -203,22 +203,22 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 <div class="tcp-filters-modal-overlay" id="tcp-filters-modal-overlay">
     <div class="tcp-filters-modal">
         <div class="tcp-filters-modal-header">
-            <h2>Filters</h2>
-            <button type="button" class="tcp-filters-modal-close" id="tcp-filters-modal-close" aria-label="Close">
+            <h2><?php esc_html_e('Filters', 'bricks-child'); ?></h2>
+            <button type="button" class="tcp-filters-modal-close" id="tcp-filters-modal-close" aria-label="<?php esc_attr_e('Close', 'bricks-child'); ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
         <div class="tcp-filters-modal-body">
             <?php
             $tcp_modal_filter_sections = array(
-                'Search essentials' => array(
+                __('Search essentials', 'bricks-child') => array(
                     'make' => 'car_filter_make',
                     'model' => 'car_filter_model',
                     'price' => 'car_filter_price',
                     'year' => 'car_filter_year',
                     'mileage' => 'car_filter_mileage',
                 ),
-                'Vehicle details' => array(
+                __('Vehicle details', 'bricks-child') => array(
                     'transmission' => 'car_filter_transmission',
                     'body' => 'car_filter_body',
                     'fuel' => 'car_filter_fuel',
@@ -230,7 +230,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
                     'doors' => 'car_filter_doors',
                     'seats' => 'car_filter_seats',
                 ),
-                'More options' => array(
+                __('More options', 'bricks-child') => array(
                     'availability' => 'car_filter_availability',
                     'owners' => 'car_filter_owners',
                     'antique' => 'car_filter_antique',
@@ -267,8 +267,8 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
             </div>
         </div>
         <div class="tcp-filters-modal-footer">
-            <button type="button" class="tcp-modal-apply-btn" id="tcp-modal-apply-btn">Apply Filters</button>
-            <button type="button" class="tcp-modal-clear-btn" id="tcp-modal-clear-btn">Clear All</button>
+            <button type="button" class="tcp-modal-apply-btn" id="tcp-modal-apply-btn"><?php esc_html_e('Apply Filters', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-modal-clear-btn" id="tcp-modal-clear-btn"><?php esc_html_e('Clear All', 'bricks-child'); ?></button>
         </div>
     </div>
 </div>
@@ -277,14 +277,14 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 <div class="tcp-filters-modal-overlay" id="tcp-location-modal-overlay">
     <div class="tcp-filters-modal tcp-location-modal">
         <div class="tcp-filters-modal-header">
-            <h2>Location Radius</h2>
-            <button type="button" class="tcp-filters-modal-close" id="tcp-location-modal-close" aria-label="Close">
+            <h2><?php esc_html_e('Location Radius', 'bricks-child'); ?></h2>
+            <button type="button" class="tcp-filters-modal-close" id="tcp-location-modal-close" aria-label="<?php esc_attr_e('Close', 'bricks-child'); ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
         <div class="tcp-filters-modal-body">
             <div class="tcp-location-search-wrap">
-                <input type="text" id="tcp-location-search" class="tcp-location-search" placeholder="Search location in Cyprus">
+                <input type="text" id="tcp-location-search" class="tcp-location-search" placeholder="<?php esc_attr_e('Search location in Cyprus', 'bricks-child'); ?>">
             </div>
             <div class="tcp-location-map-wrap">
                 <div class="tcp-location-map" id="tcp-location-map"></div>
@@ -302,17 +302,22 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
                     <button type="button" class="tcp-radius-preset" data-radius="200">200 km</button>
                 </div>
             </div>
-            <button type="button" class="tcp-modal-apply-btn" id="tcp-location-apply-btn">Apply Location</button>
-            <button type="button" class="tcp-modal-clear-btn" id="tcp-location-clear-btn">Clear Location</button>
+            <button type="button" class="tcp-modal-apply-btn" id="tcp-location-apply-btn"><?php esc_html_e('Apply Location', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-modal-clear-btn" id="tcp-location-clear-btn"><?php esc_html_e('Clear Location', 'bricks-child'); ?></button>
         </div>
     </div>
 </div>
 
 <!-- Main content -->
 <div class="tcp-main">
-    <h1 class="tcp-heading">Used Cars for Sale in Cyprus</h1>
+    <h1 class="tcp-heading"><?php esc_html_e('Used Cars for Sale in Cyprus', 'bricks-child'); ?></h1>
     <p class="tcp-results-count" id="tcp-results-count">
-        <?php echo esc_html( number_format_i18n( (int) $cars_query->found_posts ) . ' results found' ); ?>
+        <?php
+        echo esc_html(sprintf(
+            _n('%s result found', '%s results found', (int) $cars_query->found_posts, 'bricks-child'),
+            number_format_i18n((int) $cars_query->found_posts)
+        ));
+        ?>
     </p>
     <div class="car-listings-container"
          id="test-cars-listings"
@@ -349,8 +354,8 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
                 echo paginate_links( array(
                     'total'     => $cars_query->max_num_pages,
                     'current'   => $current_page,
-                    'prev_text' => 'Previous',
-                    'next_text' => 'Next',
+                    'prev_text' => __('Previous', 'bricks-child'),
+                    'next_text' => __('Next', 'bricks-child'),
                     'type'      => 'list',
                     'base'      => '#%#%',
                     'format'    => '%#%',
@@ -364,85 +369,86 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
     <div class="cars-seo-content">
 
         <section class="cars-intro">
-            <h2 class="cars-intro-heading">Buying a Used Car in Cyprus on AutoAgora</h2>
-            <p>
-                Browse <strong>600+ used cars for sale in Cyprus</strong> from trusted dealerships and private sellers across Nicosia, Limassol, Larnaca, and Paphos. Whether you're looking for a fuel-efficient hatchback for city driving, a family SUV, or a luxury sedan, AutoAgora makes it easy to compare prices, specs, and photos - all in one place.
-            </p>
-            <p>
-                Use the filters above to narrow your search by make, model, price range, fuel type, mileage, and more. Every listing includes full vehicle details, high-quality photos, and direct contact with the seller.
-            </p>
+            <h2 class="cars-intro-heading"><?php esc_html_e('Buying a Used Car in Cyprus on AutoAgora', 'bricks-child'); ?></h2>
+            <p><?php echo wp_kses_post(__('Browse <strong>600+ used cars for sale in Cyprus</strong> from trusted dealerships and private sellers across Nicosia, Limassol, Larnaca, and Paphos. Whether you are looking for a fuel-efficient hatchback for city driving, a family SUV, or a luxury sedan, AutoAgora makes it easy to compare prices, specs, and photos - all in one place.', 'bricks-child')); ?></p>
+            <p><?php esc_html_e('Use the filters above to narrow your search by make, model, price range, fuel type, mileage, and more. Every listing includes full vehicle details, high-quality photos, and direct contact with the seller.', 'bricks-child'); ?></p>
         </section>
 
         <section class="cars-faq">
-            <h2 class="cars-faq-heading">Frequently Asked Questions About Buying a Used Car in Cyprus</h2>
+            <h2 class="cars-faq-heading"><?php esc_html_e('Frequently Asked Questions About Buying a Used Car in Cyprus', 'bricks-child'); ?></h2>
 
             <div class="faq-item">
                 <button class="faq-trigger" aria-expanded="false">
-                    How much does a used car cost in Cyprus?
+                    <?php esc_html_e('How much does a used car cost in Cyprus?', 'bricks-child'); ?>
                     <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="faq-answer">
-                    <p>Used car prices in Cyprus vary widely depending on the make, model, age, and mileage. Budget-friendly options like the Nissan Note or Toyota Yaris typically start around €8,000–€13,000, while popular SUVs like the Mazda CX-5 or Volkswagen Tiguan range from €15,000–€30,000. Luxury and performance vehicles can go well above €50,000. You can use the price filter above to browse cars within your budget.</p>
+                    <p><?php esc_html_e('Used car prices in Cyprus vary widely depending on the make, model, age, and mileage. Budget-friendly options like the Nissan Note or Toyota Yaris typically start around €8,000–€13,000, while popular SUVs like the Mazda CX-5 or Volkswagen Tiguan range from €15,000–€30,000. Luxury and performance vehicles can go well above €50,000. You can use the price filter above to browse cars within your budget.', 'bricks-child'); ?></p>
                 </div>
             </div>
 
             <div class="faq-item">
                 <button class="faq-trigger" aria-expanded="false">
-                    Where can I buy a used car in Cyprus?
+                    <?php esc_html_e('Where can I buy a used car in Cyprus?', 'bricks-child'); ?>
                     <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="faq-answer">
-                    <p>You can buy used cars from licensed dealerships or private sellers across all major cities in Cyprus, including Nicosia, Limassol, Larnaca, and Paphos. AutoAgora lists vehicles from verified dealers and individuals across the island, so you can compare options from multiple sources without visiting each one in person.</p>
+                    <p><?php esc_html_e('You can buy used cars from licensed dealerships or private sellers across all major cities in Cyprus, including Nicosia, Limassol, Larnaca, and Paphos. AutoAgora lists vehicles from verified dealers and individuals across the island, so you can compare options from multiple sources without visiting each one in person.', 'bricks-child'); ?></p>
                 </div>
             </div>
 
             <div class="faq-item">
                 <button class="faq-trigger" aria-expanded="false">
-                    What should I check before buying a used car in Cyprus?
+                    <?php esc_html_e('What should I check before buying a used car in Cyprus?', 'bricks-child'); ?>
                     <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="faq-answer">
-                    <p>Before purchasing, you should verify the vehicle's service history and mileage, check for any outstanding finance or liens, inspect the car for accident damage or rust (especially underbody), confirm the MOT (road worthiness) status, and make sure the registration documents match the seller's details. It's also a good idea to take the car for a test drive and have a trusted mechanic inspect it if possible.</p>
+                    <p><?php esc_html_e("Before purchasing, you should verify the vehicle's service history and mileage, check for any outstanding finance or liens, inspect the car for accident damage or rust (especially underbody), confirm the MOT (road worthiness) status, and make sure the registration documents match the seller's details. It's also a good idea to take the car for a test drive and have a trusted mechanic inspect it if possible.", 'bricks-child'); ?></p>
                 </div>
             </div>
 
             <div class="faq-item">
                 <button class="faq-trigger" aria-expanded="false">
-                    Can I finance a used car purchase in Cyprus?
+                    <?php esc_html_e('Can I finance a used car purchase in Cyprus?', 'bricks-child'); ?>
                     <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="faq-answer">
-                    <p>Yes, most banks in Cyprus offer car loans for used vehicles. Typical loan terms range from 1 to 7 years, and interest rates depend on the bank and your credit profile. Some dealerships on AutoAgora also offer in-house financing options. It's worth comparing offers from multiple lenders before committing.</p>
+                    <p><?php esc_html_e("Yes, most banks in Cyprus offer car loans for used vehicles. Typical loan terms range from 1 to 7 years, and interest rates depend on the bank and your credit profile. Some dealerships on AutoAgora also offer in-house financing options. It's worth comparing offers from multiple lenders before committing.", 'bricks-child'); ?></p>
                 </div>
             </div>
 
             <div class="faq-item">
                 <button class="faq-trigger" aria-expanded="false">
-                    Are used cars in Cyprus left-hand drive or right-hand drive?
+                    <?php esc_html_e('Are used cars in Cyprus left-hand drive or right-hand drive?', 'bricks-child'); ?>
                     <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="faq-answer">
-                    <p>Cyprus drives on the left side of the road, and the vast majority of cars on the island are right-hand drive (RHD) - meaning the steering wheel is on the right. A lot of vehicles are imported from the UK or Japan, where driving is also on the left. You'll find some left-hand drive cars imported from mainland Europe, but RHD is the standard in Cyprus.</p>
+                    <p><?php esc_html_e("Cyprus drives on the left side of the road, and the vast majority of cars on the island are right-hand drive (RHD) - meaning the steering wheel is on the right. A lot of vehicles are imported from the UK or Japan, where driving is also on the left. You'll find some left-hand drive cars imported from mainland Europe, but RHD is the standard in Cyprus.", 'bricks-child'); ?></p>
                 </div>
             </div>
 
             <div class="faq-item">
                 <button class="faq-trigger" aria-expanded="false">
-                    What are the most popular used cars in Cyprus?
+                    <?php esc_html_e('What are the most popular used cars in Cyprus?', 'bricks-child'); ?>
                     <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="faq-answer">
-                    <p>The most popular used cars in Cyprus include the Toyota Yaris, Nissan Note, Mazda CX-5, BMW 3 Series, Mercedes-Benz A-Class, Volkswagen Golf, and Nissan Qashqai. SUVs and compact hatchbacks tend to be the most in-demand body types, followed by saloons. Petrol hybrids have been growing in popularity in recent years.</p>
+                    <p><?php esc_html_e('The most popular used cars in Cyprus include the Toyota Yaris, Nissan Note, Mazda CX-5, BMW 3 Series, Mercedes-Benz A-Class, Volkswagen Golf, and Nissan Qashqai. SUVs and compact hatchbacks tend to be the most in-demand body types, followed by saloons. Petrol hybrids have been growing in popularity in recent years.', 'bricks-child'); ?></p>
                 </div>
             </div>
 
             <div class="faq-item">
                 <button class="faq-trigger" aria-expanded="false">
-                    How do I sell my car on AutoAgora?
+                    <?php esc_html_e('How do I sell my car on AutoAgora?', 'bricks-child'); ?>
                     <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                 </button>
                 <div class="faq-answer">
-                    <p>Selling your car on AutoAgora is free and straightforward. Simply create an account, click "Sell My Car," and fill in your vehicle's details including photos, price, mileage, and specifications. Your listing will be visible to buyers across Cyprus. For more details, visit our <a href="/how-to-sell-your-car/">guide on how to sell your car</a>.</p>
+                    <p><?php
+                    printf(
+                        wp_kses_post(__('Selling your car on AutoAgora is free and straightforward. Simply create an account, click "Sell My Car," and fill in your vehicle details including photos, price, mileage, and specifications. Your listing will be visible to buyers across Cyprus. For more details, visit our <a href="%s">guide on how to sell your car</a>.', 'bricks-child')),
+                        esc_url(autoagora_localized_page_url('how-to-sell-your-car'))
+                    );
+                    ?></p>
                 </div>
             </div>
         </section>
@@ -454,6 +460,8 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 <script>
 (function($) {
     'use strict';
+
+    var t = window.autoagoraTranslate || function(source) { return source; };
 
     var $container  = $('#test-cars-listings');
     var $wrapper    = $container.find('.car-listings-wrapper');
@@ -523,7 +531,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
         if (isNaN(count) || count < 0) {
             count = 0;
         }
-        $results.text(count.toLocaleString() + ' results found');
+        $results.text(t('%s results found', count.toLocaleString()));
         updateClearAllButton(count);
     }
 
@@ -532,7 +540,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
         if (count === 0) {
             var $noResults = $wrapper.find('.car-listings-no-results');
             if ($noResults.length) {
-                $noResults.after('<button type="button" class="tcp-clear-all-filters-btn" id="tcp-no-results-clear-btn">Clear all filters</button>');
+                $noResults.after('<button type="button" class="tcp-clear-all-filters-btn" id="tcp-no-results-clear-btn">' + escapeHtml(t('Clear all filters')) + '</button>');
             }
         }
     }
@@ -540,7 +548,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
     function resetSort() {
         $sort.find('.tcp-sort-option').removeClass('selected');
         $sort.find('.tcp-sort-option').first().addClass('selected');
-        $sortLabel.text('Newest');
+        $sortLabel.text(t('Newest'));
         var atts = $container.data('atts') || {};
         atts.orderby = 'date';
         atts.order = 'DESC';
@@ -550,33 +558,33 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 
     // Filter label map for chips
     var filterLabels = {
-        make: 'Brand',
-        model: 'Model',
-        price_min: 'Price min',
-        price_max: 'Price max',
-        mileage_min: 'Mileage min',
-        mileage_max: 'Mileage max',
-        year_min: 'Year min',
-        year_max: 'Year max',
-        fuel_type: 'Fuel',
-        body_type: 'Body',
-        engine_capacity_min: 'Engine min',
-        engine_capacity_max: 'Engine max',
-        hp_min: 'Power min',
-        hp_max: 'Power max',
-        numowners_min: 'Owners min',
-        numowners_max: 'Owners max',
-        transmission: 'Transmission',
-        drive_type: 'Drive',
-        exterior_color: 'Exterior',
-        interior_color: 'Interior',
-        number_of_doors: 'Doors',
-        number_of_seats: 'Seats',
-        availability: 'Availability',
-        isantique: 'Registration',
-        extras: 'Features',
-        vehiclehistory: 'History',
-        location_radius: 'Location'
+        make: t('Brand'),
+        model: t('Model'),
+        price_min: t('Price min'),
+        price_max: t('Price max'),
+        mileage_min: t('Mileage min'),
+        mileage_max: t('Mileage max'),
+        year_min: t('Year min'),
+        year_max: t('Year max'),
+        fuel_type: t('Fuel'),
+        body_type: t('Body'),
+        engine_capacity_min: t('Engine min'),
+        engine_capacity_max: t('Engine max'),
+        hp_min: t('Power min'),
+        hp_max: t('Power max'),
+        numowners_min: t('Owners min'),
+        numowners_max: t('Owners max'),
+        transmission: t('Transmission'),
+        drive_type: t('Drive'),
+        exterior_color: t('Exterior'),
+        interior_color: t('Interior'),
+        number_of_doors: t('Doors'),
+        number_of_seats: t('Seats'),
+        availability: t('Availability'),
+        isantique: t('Registration'),
+        extras: t('Features'),
+        vehiclehistory: t('History'),
+        location_radius: t('Location')
     };
 
     /* ── Modal open/close ── */
@@ -718,13 +726,13 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
             }
         });
         if (locationState.active && locationState.lat && locationState.lng && locationState.radiusKm > 0) {
-            var locationLabel = locationState.label || 'Selected area';
+            var locationLabel = locationState.label || t('Selected area');
             html += chip('location_radius', filterLabels.location_radius + ': ' + locationLabel);
             hasAny = true;
         }
 
         if (hasAny) {
-            html += '<button type="button" class="tcp-chip-clear" id="tcp-clear-all">Clear all</button>';
+            html += '<button type="button" class="tcp-chip-clear" id="tcp-clear-all">' + escapeHtml(t('Clear all')) + '</button>';
         }
 
         $chips.html(html);
@@ -735,7 +743,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
     function chip(key, label) {
         return '<span class="tcp-chip" data-filter="' + key + '">' +
                escapeHtml(label) +
-               '<button type="button" class="tcp-chip-remove" data-filter="' + key + '" aria-label="Remove">&times;</button>' +
+               '<button type="button" class="tcp-chip-remove" data-filter="' + key + '" aria-label="' + escapeHtml(t('Remove')) + '">&times;</button>' +
                '</span>';
     }
 
@@ -1129,7 +1137,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
             return;
         }
         if (!locationState.label) {
-            locationState.label = $('#tcp-location-search').val() || 'Selected area';
+            locationState.label = $('#tcp-location-search').val() || t('Selected area');
         }
         locationState.active = true;
         closeLocationModal();
@@ -1253,7 +1261,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
                         }
                     } catch (renderError) {
                         console.error('[AutoAgora cars template] render error', renderError);
-                        $wrapper.html('<p class="car-listings-no-results">Unable to render listings. Please refresh the page.</p>');
+                        $wrapper.html('<p class="car-listings-no-results">' + escapeHtml(t('Unable to render listings. Please refresh the page.')) + '</p>');
                     }
                     $pagination.html(response.data.pagination_html || '');
                     $container.data('page', response.data.current_page);
@@ -1273,7 +1281,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
                     error: error,
                     responseText: xhr && xhr.responseText ? xhr.responseText.slice(0, 800) : ''
                 });
-                $wrapper.html('<p class="car-listings-no-results">Unable to load listings. Please refresh the page.</p>');
+                $wrapper.html('<p class="car-listings-no-results">' + escapeHtml(t('Unable to load listings. Please refresh the page.')) + '</p>');
             },
             complete: function() {
                 window.clearTimeout(loadingWatchdog);
