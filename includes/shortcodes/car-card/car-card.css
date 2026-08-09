@@ -37,6 +37,13 @@
     border: 2px solid transparent;
     border-radius: 1rem;
     box-shadow: none;
+    transition: box-shadow 0.1s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .car-card-featured:hover {
+        box-shadow: 0 4px 12px rgba(42, 53, 70, 0.08);
+    }
 }
 
 .car-card-promotion-priority {
