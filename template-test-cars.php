@@ -472,12 +472,47 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
     var backLink = document.querySelector('[data-tcp-back]');
 
     if (backLink) {
-        backLink.addEventListener('click', function(event) {
-            if (window.history.length > 1) {
-                event.preventDefault();
-                window.history.back();
+        var fallbackUrl = backLink.href;
+        var previousUrl = '';
+
+        if (document.referrer) {
+            try {
+                previousUrl = new URL(document.referrer, window.location.href).href;
+            } catch (error) {
+                previousUrl = '';
             }
-        });
+        }
+
+        if (previousUrl === window.location.href) {
+            previousUrl = '';
+        }
+
+        if (previousUrl) {
+            backLink.href = previousUrl;
+        }
+
+        backLink.addEventListener('click', function(event) {
+            if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            // AJAX filtering adds pushState entries. Navigating to the original
+            // referrer avoids making users step through each filter state first.
+            if (previousUrl) {
+                window.location.assign(previousUrl);
+                return;
+            }
+
+            if (window.history.length > 1) {
+                window.history.back();
+                return;
+            }
+
+            window.location.assign(fallbackUrl);
+        }, true);
     }
 })();
 
