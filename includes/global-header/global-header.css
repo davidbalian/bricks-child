@@ -73,7 +73,6 @@
 
 .autoagora-code-header-active.aag-site-header-is-hidden .tcp-filters-bar {
     top: var(--aag-site-header-top);
-    transition: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
