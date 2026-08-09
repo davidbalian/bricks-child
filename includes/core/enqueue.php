@@ -63,8 +63,9 @@ function bricks_child_enqueue_styles() {
         }
     }
 
-    // Enqueue add listing page styles
-    if (is_page_template('template-add-listing.php')) {
+    // Enqueue add listing page styles. Translated pages do not always retain
+    // the custom template assignment when Polylang resolves the request.
+    if (is_page_template('template-add-listing.php') || is_page(array(68, 29644, 29818))) {
         wp_enqueue_style( 'bricks-child-add-listing-css', get_stylesheet_directory_uri() . '/includes/user-manage-listings/template-add-listing/add-listing.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/includes/user-manage-listings/template-add-listing/add-listing.css' ), 'all' );
     }
 
