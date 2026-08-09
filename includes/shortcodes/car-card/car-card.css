@@ -29,6 +29,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    border-radius: 1rem;
     transition: box-shadow 0.1s ease;
 }
 
