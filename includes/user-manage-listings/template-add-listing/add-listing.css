@@ -1,17 +1,20 @@
 .page-id-68 #content .ast-container,
-.page-id-29644 #content .ast-container {
+.page-id-29644 #content .ast-container,
+.page-id-29818 #content .ast-container {
   max-width: 1000px !important;
   padding-top: 2rem;
   padding-bottom: 2rem;
 }
 
 .page-id-68 .bricks-container,
-.page-id-29644 .bricks-container {
+.page-id-29644 .bricks-container,
+.page-id-29818 .bricks-container {
   width: 100%;
 }
 
 .page-id-68 > .bricks-container,
-.page-id-29644 > .bricks-container {
+.page-id-29644 > .bricks-container,
+.page-id-29818 > .bricks-container {
   max-width: 1300px;
   margin: 0 auto;
   padding: 2rem 1rem;
@@ -636,7 +639,9 @@
 .page-id-68 #add-car-listing-form h2 svg,
 .page-id-68 #add-car-listing-form label svg,
 .page-id-29644 #add-car-listing-form h2 svg,
-.page-id-29644 #add-car-listing-form label svg {
+.page-id-29644 #add-car-listing-form label svg,
+.page-id-29818 #add-car-listing-form h2 svg,
+.page-id-29818 #add-car-listing-form label svg {
   width: auto;
   height: 1em;
   vertical-align: -0.125em;
@@ -646,7 +651,9 @@
 .page-id-68 #add-car-listing-form h2,
 .page-id-68 #add-car-listing-form label,
 .page-id-29644 #add-car-listing-form h2,
-.page-id-29644 #add-car-listing-form label {
+.page-id-29644 #add-car-listing-form label,
+.page-id-29818 #add-car-listing-form h2,
+.page-id-29818 #add-car-listing-form label {
   display: flex;
   align-items: center;
   gap: 0.6rem;
