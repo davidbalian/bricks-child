@@ -112,13 +112,18 @@ body {
 }
 .tcp-quick-filter__clear {
     display: none;
+    width: 1rem;
+    height: 1rem;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 1rem;
     color: inherit;
-    font-size: 1.05rem;
+    font-size: 1.25rem;
     font-weight: 400;
     line-height: 1;
 }
 .tcp-quick-filter.is-active .tcp-quick-filter__clear {
-    display: inline-block;
+    display: inline-flex;
 }
 .tcp-quick-filter:hover {
     border-color: transparent;
