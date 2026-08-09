@@ -9,6 +9,7 @@ body {
     --tcp-filter-pill-bg: #f1f4f7;
     --tcp-filter-pill-text: #222831;
     --tcp-filter-pill-active: #357fca;
+    --tcp-favourite: #e44c5e;
     border-bottom: 1px solid #e5e7eb;
     background: #fff;
     position: sticky;
@@ -59,8 +60,11 @@ body {
 .tcp-page-nav__action:focus-visible {
     color: var(--light-blue);
 }
-.tcp-page-nav__saved {
+.tcp-page-nav__saved,
+.tcp-page-nav__saved:hover,
+.tcp-page-nav__saved:focus-visible {
     justify-self: end;
+    color: var(--tcp-favourite);
 }
 .tcp-page-nav__saved.is-active svg {
     fill: currentColor;
