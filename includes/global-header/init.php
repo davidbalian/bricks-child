@@ -296,26 +296,40 @@ function autoagora_render_code_header() {
 			<?php
 			$dock_items = array(
 				array( 'label' => __( 'Home', 'bricks-child' ), 'slug' => '', 'icon' => 'home' ),
-				array( 'label' => __( 'Used Cars', 'bricks-child' ), 'slug' => 'cars', 'icon' => 'car' ),
-				array( 'label' => __( 'Sell My Car', 'bricks-child' ), 'slug' => 'add-listing', 'icon' => 'add', 'primary' => true ),
+				array( 'label' => __( 'Cars', 'bricks-child' ), 'slug' => 'cars', 'icon' => 'car' ),
+				array( 'label' => __( 'Post', 'bricks-child' ), 'slug' => 'add-listing', 'icon' => 'add', 'primary' => true ),
 				array( 'label' => __( 'Blog', 'bricks-child' ), 'slug' => 'blog', 'icon' => 'blog' ),
 			);
 			?>
 			<?php foreach ( $dock_items as $item ) : ?>
-				<?php $url = autoagora_code_header_url( $item['slug'] ); ?>
-				<a class="aag-mobile-dock__item<?php echo ! empty( $item['primary'] ) ? ' aag-mobile-dock__item--primary' : ''; ?>" href="<?php echo esc_url( $url ); ?>" aria-label="<?php echo esc_attr( $item['label'] ); ?>"<?php echo autoagora_code_header_is_current_url( $url ) ? ' aria-current="page"' : ''; ?>>
-					<?php echo autoagora_code_header_icon( $item['icon'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php
+				$url        = autoagora_code_header_url( $item['slug'] );
+				$is_current = autoagora_code_header_is_current_url( $url );
+
+				if ( 'cars' === $item['slug'] && ( is_singular( 'car' ) || is_tax( 'car_make' ) ) ) {
+					$is_current = true;
+				} elseif ( 'blog' === $item['slug'] && is_singular( 'post' ) ) {
+					$is_current = true;
+				}
+				?>
+				<a class="aag-mobile-dock__item<?php echo ! empty( $item['primary'] ) ? ' aag-mobile-dock__item--primary' : ''; ?>" href="<?php echo esc_url( $url ); ?>" aria-label="<?php echo esc_attr( $item['label'] ); ?>"<?php echo $is_current ? ' aria-current="page"' : ''; ?>>
+					<span class="aag-mobile-dock__icon"><?php echo autoagora_code_header_icon( $item['icon'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+					<span class="aag-mobile-dock__label"><?php echo esc_html( $item['label'] ); ?></span>
 				</a>
 			<?php endforeach; ?>
 
 			<?php if ( is_user_logged_in() ) : ?>
 				<details class="aag-site-header__details aag-mobile-dock__account">
-					<summary aria-label="<?php esc_attr_e( 'My Account', 'bricks-child' ); ?>"><?php echo autoagora_code_header_icon( 'account' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></summary>
+					<summary aria-label="<?php esc_attr_e( 'Account', 'bricks-child' ); ?>"<?php echo autoagora_code_header_is_current_url( autoagora_code_header_url( 'my-account' ) ) ? ' aria-current="page"' : ''; ?>>
+						<span class="aag-mobile-dock__icon"><?php echo autoagora_code_header_icon( 'account' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+						<span class="aag-mobile-dock__label"><?php esc_html_e( 'Account', 'bricks-child' ); ?></span>
+					</summary>
 					<div class="aag-site-header__account-menu aag-mobile-dock__account-menu"><?php autoagora_code_header_account_links(); ?></div>
 				</details>
 			<?php else : ?>
 				<a class="aag-mobile-dock__item" href="<?php echo esc_url( autoagora_code_header_url( 'signin' ) ); ?>" aria-label="<?php esc_attr_e( 'Login', 'bricks-child' ); ?>">
-					<?php echo autoagora_code_header_icon( 'account' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<span class="aag-mobile-dock__icon"><?php echo autoagora_code_header_icon( 'account' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+					<span class="aag-mobile-dock__label"><?php esc_html_e( 'Account', 'bricks-child' ); ?></span>
 				</a>
 			<?php endif; ?>
 		</div>
