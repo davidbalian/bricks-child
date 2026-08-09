@@ -690,5 +690,5 @@ img.bricks-site-logo {
 /* Raise only CookieYes' closed revisit control; leave the consent panel unchanged. */
 .cky-btn-revisit-wrapper.cky-revisit-bottom-left,
 .cky-btn-revisit-wrapper.cky-revisit-bottom-right {
-  bottom: calc(15px + 4rem) !important;
+  bottom: calc(15px + 5rem) !important;
 }
