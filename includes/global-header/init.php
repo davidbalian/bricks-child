@@ -290,6 +290,7 @@ function autoagora_render_code_header() {
 			</div>
 		</div>
 	</header>
+	<div class="aag-site-header-spacer" aria-hidden="true"></div>
 
 	<nav class="aag-mobile-dock" aria-label="<?php esc_attr_e( 'Mobile shortcuts', 'bricks-child' ); ?>">
 		<div class="aag-mobile-dock__inner">

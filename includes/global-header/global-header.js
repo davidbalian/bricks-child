@@ -2,6 +2,7 @@
     'use strict';
 
     var root = document.documentElement;
+    var siteHeader = document.getElementById('autoagora-site-header');
     var drawer = document.getElementById('aag-site-header-drawer');
     var openButton = document.querySelector('.aag-site-header__menu-toggle');
     var closeButton = document.querySelector('.aag-site-header__drawer-close');
@@ -10,7 +11,51 @@
     var dockViewportWidth = window.innerWidth;
     var drawerCloseTimer;
     var mobileHeaderBreakpoint = 840;
+    var headerHideThreshold = 200;
+    var lastHeaderScrollY = Math.max(0, window.scrollY || window.pageYOffset);
+    var headerScrollTicking = false;
     var detailsElements = Array.prototype.slice.call(document.querySelectorAll('.aag-site-header__details'));
+
+    function setHeaderHidden(isHidden) {
+        if (!siteHeader) {
+            return;
+        }
+
+        siteHeader.classList.toggle('aag-site-header--hidden', isHidden);
+    }
+
+    function updateHeaderVisibility() {
+        var currentScrollY = Math.max(0, window.scrollY || window.pageYOffset);
+        var scrollDifference = currentScrollY - lastHeaderScrollY;
+        var drawerIsOpen = drawer && !drawer.hidden;
+        var headerHasOpenMenu = detailsElements.some(function (details) {
+            return details.open;
+        });
+
+        if (currentScrollY <= headerHideThreshold || drawerIsOpen || headerHasOpenMenu) {
+            setHeaderHidden(false);
+        } else if (scrollDifference > 3) {
+            setHeaderHidden(true);
+        } else if (scrollDifference < -3) {
+            setHeaderHidden(false);
+        }
+
+        lastHeaderScrollY = currentScrollY;
+        headerScrollTicking = false;
+    }
+
+    window.addEventListener('scroll', function () {
+        if (!headerScrollTicking) {
+            headerScrollTicking = true;
+            window.requestAnimationFrame(updateHeaderVisibility);
+        }
+    }, { passive: true });
+
+    if (siteHeader) {
+        siteHeader.addEventListener('focusin', function () {
+            setHeaderHidden(false);
+        });
+    }
 
     function closeDetails(except) {
         detailsElements.forEach(function (details) {
@@ -23,6 +68,7 @@
     detailsElements.forEach(function (details) {
         details.addEventListener('toggle', function () {
             if (details.open) {
+                setHeaderHidden(false);
                 closeDetails(details);
             }
         });
@@ -44,6 +90,7 @@
         root.classList.toggle('aag-site-header-menu-open', isOpen);
 
         if (isOpen) {
+            setHeaderHidden(false);
             drawer.hidden = false;
             window.requestAnimationFrame(function () {
                 window.requestAnimationFrame(function () {
