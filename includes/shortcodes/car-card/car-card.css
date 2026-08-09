@@ -34,17 +34,26 @@
 .car-card-featured {
     overflow: hidden;
     box-sizing: border-box;
-    border: 2px solid transparent;
     border-radius: 1rem;
     box-shadow: none;
 }
 
 .car-card-promotion-priority {
-    border-color: rgba(13, 134, 227, 0.65);
+    --car-card-promotion-border: rgba(13, 134, 227, 0.65);
 }
 
 .car-card-promotion-showcase {
-    border-color: rgba(124, 58, 237, 0.78);
+    --car-card-promotion-border: rgba(124, 58, 237, 0.78);
+}
+
+.car-card-featured::after {
+    content: '';
+    position: absolute;
+    z-index: 20;
+    inset: 1px;
+    border: 2px solid var(--car-card-promotion-border);
+    border-radius: calc(1rem - 1px);
+    pointer-events: none;
 }
 
 .car-card-featured .car-card-body {
