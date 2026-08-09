@@ -183,25 +183,6 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
             <button type="button" class="tcp-quick-filter" data-filter-target="engine" data-default-label="<?php esc_attr_e('Engine size', 'bricks-child'); ?>"><?php esc_html_e('Engine size', 'bricks-child'); ?></button>
             <button type="button" class="tcp-quick-filter" data-filter-target="location" data-default-label="<?php esc_attr_e('Location', 'bricks-child'); ?>"><?php esc_html_e('Location', 'bricks-child'); ?></button>
         </div>
-        <div class="tcp-toolbar-actions">
-            <div class="tcp-sort" id="tcp-sort">
-                <button type="button" class="tcp-sort-btn" id="tcp-sort-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
-                    <span id="tcp-sort-label"><?php esc_html_e('Newest', 'bricks-child'); ?></span>
-                </button>
-                <div class="tcp-sort-menu" id="tcp-sort-menu">
-                    <button type="button" class="tcp-sort-option selected" data-orderby="date" data-order="DESC"><?php esc_html_e('Newest', 'bricks-child'); ?></button>
-                    <button type="button" class="tcp-sort-option" data-orderby="score" data-order="DESC"><?php esc_html_e('Best Match', 'bricks-child'); ?></button>
-                    <button type="button" class="tcp-sort-option" data-orderby="date" data-order="ASC"><?php esc_html_e('Oldest', 'bricks-child'); ?></button>
-                    <button type="button" class="tcp-sort-option" data-orderby="price" data-order="ASC"><?php esc_html_e('Price: Low to High', 'bricks-child'); ?></button>
-                    <button type="button" class="tcp-sort-option" data-orderby="price" data-order="DESC"><?php esc_html_e('Price: High to Low', 'bricks-child'); ?></button>
-                    <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="ASC"><?php esc_html_e('Mileage: Low to High', 'bricks-child'); ?></button>
-                    <button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="DESC"><?php esc_html_e('Mileage: High to Low', 'bricks-child'); ?></button>
-                    <button type="button" class="tcp-sort-option" data-orderby="year" data-order="DESC"><?php esc_html_e('Year: Newest', 'bricks-child'); ?></button>
-                    <button type="button" class="tcp-sort-option" data-orderby="year" data-order="ASC"><?php esc_html_e('Year: Oldest', 'bricks-child'); ?></button>
-                </div>
-            </div>
-        </div>
     </div>
     <div class="tcp-active-filters-row">
         <div class="tcp-active-filters" id="tcp-active-filters"></div>
@@ -319,14 +300,34 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 
 <!-- Main content -->
 <div class="tcp-main">
-    <p class="tcp-results-count" id="tcp-results-count">
-        <?php
-        echo esc_html(sprintf(
-            _n('%s result found', '%s results found', (int) $cars_query->found_posts, 'bricks-child'),
-            number_format_i18n((int) $cars_query->found_posts)
-        ));
-        ?>
-    </p>
+	<div class="tcp-results-toolbar">
+		<p class="tcp-results-count" id="tcp-results-count">
+			<?php
+			echo esc_html(sprintf(
+				_n('%s result found', '%s results found', (int) $cars_query->found_posts, 'bricks-child'),
+				number_format_i18n((int) $cars_query->found_posts)
+			));
+			?>
+		</p>
+		<div class="tcp-sort" id="tcp-sort">
+			<button type="button" class="tcp-sort-btn" id="tcp-sort-btn" aria-expanded="false" aria-controls="tcp-sort-menu">
+				<span class="tcp-sort-prefix"><?php esc_html_e('Sort by:', 'bricks-child'); ?></span>
+				<strong id="tcp-sort-label"><?php esc_html_e('Newest', 'bricks-child'); ?></strong>
+				<svg class="tcp-sort-chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>
+			</button>
+			<div class="tcp-sort-menu" id="tcp-sort-menu">
+				<button type="button" class="tcp-sort-option selected" data-orderby="date" data-order="DESC"><?php esc_html_e('Newest', 'bricks-child'); ?></button>
+				<button type="button" class="tcp-sort-option" data-orderby="score" data-order="DESC"><?php esc_html_e('Best Match', 'bricks-child'); ?></button>
+				<button type="button" class="tcp-sort-option" data-orderby="date" data-order="ASC"><?php esc_html_e('Oldest', 'bricks-child'); ?></button>
+				<button type="button" class="tcp-sort-option" data-orderby="price" data-order="ASC"><?php esc_html_e('Price: Low to High', 'bricks-child'); ?></button>
+				<button type="button" class="tcp-sort-option" data-orderby="price" data-order="DESC"><?php esc_html_e('Price: High to Low', 'bricks-child'); ?></button>
+				<button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="ASC"><?php esc_html_e('Mileage: Low to High', 'bricks-child'); ?></button>
+				<button type="button" class="tcp-sort-option" data-orderby="mileage" data-order="DESC"><?php esc_html_e('Mileage: High to Low', 'bricks-child'); ?></button>
+				<button type="button" class="tcp-sort-option" data-orderby="year" data-order="DESC"><?php esc_html_e('Year: Newest', 'bricks-child'); ?></button>
+				<button type="button" class="tcp-sort-option" data-orderby="year" data-order="ASC"><?php esc_html_e('Year: Oldest', 'bricks-child'); ?></button>
+			</div>
+		</div>
+	</div>
     <div class="car-listings-container"
          id="test-cars-listings"
          data-atts="<?php echo esc_attr( wp_json_encode( $listing_atts ) ); ?>"
@@ -1235,10 +1236,12 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
     $sortBtn.on('click', function(e) {
         e.stopPropagation();
         $sort.toggleClass('open');
+        $sortBtn.attr('aria-expanded', $sort.hasClass('open') ? 'true' : 'false');
     });
     $(document).on('click', function(e) {
         if (!$(e.target).closest('#tcp-sort').length) {
             $sort.removeClass('open');
+            $sortBtn.attr('aria-expanded', 'false');
         }
     });
 
@@ -1252,6 +1255,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
         $opt.addClass('selected');
         $sortLabel.text($opt.text());
         $sort.removeClass('open');
+        $sortBtn.attr('aria-expanded', 'false');
 
         // Update listing_atts and reload page 1
         var atts = $container.data('atts') || {};

@@ -138,20 +138,34 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.5rem 1rem;
-    border: 2px solid #dfe2e6;
-    border-radius: 0.5rem;
-    background: #fff;
-    color: #2a3546;
-    font-size: 0.9375rem;
-    font-weight: 600;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #475569;
+    font-size: 0.95rem;
+    font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
-    transition: border-color 0.15s, background 0.15s;
 }
-.tcp-sort-btn:hover {
-    border-color: #bbb;
-    background: #f9fafb;
+.tcp-sort-btn strong,
+.tcp-sort-chevron {
+    color: var(--text-color);
+}
+.tcp-sort-btn strong {
+    font-weight: 500;
+}
+.tcp-sort-chevron {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.15s ease;
+}
+.tcp-sort.open .tcp-sort-chevron {
+    transform: rotate(180deg);
 }
 .tcp-sort-menu {
     display: none;
@@ -537,9 +551,6 @@ body {
 }
 
 @media (max-width: 768px) {
-    #tcp-sort-label {
-        display: none;
-    }
     .tcp-filters-bar-inner {
         align-items: center;
         flex-direction: row;
@@ -668,8 +679,15 @@ body {
     color: #2a3546;
     margin: 0 0 1.25rem;
 }
-.tcp-results-count {
+.tcp-results-toolbar {
     margin: 0 0 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+.tcp-results-count {
+    margin: 0;
     font-size: 0.95rem;
     font-weight: 500;
     color: #475569;
