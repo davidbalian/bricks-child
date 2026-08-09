@@ -497,7 +497,7 @@ html.aag-site-header-menu-open {
         text-decoration: none;
     }
 
-    .autoagora-code-header-active .aag-mobile-dock .aag-mobile-dock__item--primary {
+    .aag-mobile-dock .aag-mobile-dock__item.aag-mobile-dock__item--primary {
         position: relative;
         z-index: 2;
         width: 40px;
@@ -513,12 +513,12 @@ html.aag-site-header-menu-open {
         transition: background-color 0.1s ease;
     }
 
-    .autoagora-code-header-active .aag-mobile-dock .aag-mobile-dock__item--primary:hover,
-    .autoagora-code-header-active .aag-mobile-dock .aag-mobile-dock__item--primary:focus-visible {
+    .aag-mobile-dock .aag-mobile-dock__item.aag-mobile-dock__item--primary:hover,
+    .aag-mobile-dock .aag-mobile-dock__item.aag-mobile-dock__item--primary:focus-visible {
         background-color: color-mix(in srgb, #0d86e3 90%, #000) !important;
     }
 
-    .autoagora-code-header-active .aag-mobile-dock .aag-mobile-dock__item--primary svg {
+    .aag-mobile-dock .aag-mobile-dock__item.aag-mobile-dock__item--primary svg {
         width: 18px;
         height: 18px;
         display: block;
