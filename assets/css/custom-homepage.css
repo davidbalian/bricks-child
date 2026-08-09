@@ -26,7 +26,7 @@
     align-items: center;
     min-height: 650px;
     padding: 2rem;
-    border-radius: 3rem;
+    border-radius: 2rem;
     background-image:
         linear-gradient(rgba(18, 24, 38, 0.16), rgba(18, 24, 38, 0.16)),
         var(--custom-homepage-hero-image);
@@ -37,9 +37,15 @@
 .custom-homepage-search-card {
     width: 40%;
     padding: clamp(1.5rem, 4vw, 3rem);
-    border-radius: 2rem;
+    border-radius: 1.5rem;
     background: #fff;
     box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+}
+
+@media (min-width: 768px) and (max-width: 1100px) {
+    .custom-homepage-search-card {
+        width: 50%;
+    }
 }
 
 .custom-homepage-search-card h1 {
@@ -275,6 +281,7 @@
         right: 0;
         left: 0;
         height: 180px;
+        border-radius: 2rem;
         background-image:
             linear-gradient(rgba(18, 24, 38, 0.16), rgba(18, 24, 38, 0.16)),
             var(--custom-homepage-hero-image);
@@ -291,7 +298,7 @@
         min-height: 690px;
         padding: 6.25rem 0.625rem 1rem;
         align-items: flex-start;
-        border-radius: 0;
+        border-radius: 2rem;
         background-image: none;
     }
 
