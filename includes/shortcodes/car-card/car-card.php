@@ -241,10 +241,10 @@ function render_car_card($post_id, $context = array()) {
 
                 <?php if ($slide_count > 1) : ?>
                     <button class="car-card-arrow car-card-arrow-left car-card-arrow-hidden" aria-label="Previous image">
-                        <svg viewBox="0 0 12 12"><polyline points="8,2 4,6 8,10"/></svg>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
                     </button>
                     <button class="car-card-arrow car-card-arrow-right" aria-label="Next image">
-                        <svg viewBox="0 0 12 12"><polyline points="4,2 8,6 4,10"/></svg>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
                     </button>
                     <div class="car-card-dots">
                         <?php for ($i = 0; $i < $slide_count; $i++) : ?>

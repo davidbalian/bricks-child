@@ -140,13 +140,13 @@
                 var left = document.createElement('button');
                 left.className = 'car-card-arrow car-card-arrow-left car-card-arrow-hidden';
                 left.setAttribute('aria-label', t('Previous image'));
-                left.innerHTML = '<svg viewBox="0 0 12 12"><polyline points="8,2 4,6 8,10"/></svg>';
+                left.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>';
                 slider.appendChild(left);
 
                 var right = document.createElement('button');
                 right.className = 'car-card-arrow car-card-arrow-right';
                 right.setAttribute('aria-label', t('Next image'));
-                right.innerHTML = '<svg viewBox="0 0 12 12"><polyline points="4,2 8,6 4,10"/></svg>';
+                right.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
                 slider.appendChild(right);
 
                 var dots = document.createElement('div');
