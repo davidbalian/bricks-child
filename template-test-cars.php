@@ -169,8 +169,8 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
     </div>
     <div class="tcp-filters-bar-inner">
 		<button type="button" class="tcp-filters-btn" id="tcp-filters-btn">
-			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="1" fill="currentColor" stroke="none"/></svg>
-			<?php esc_html_e('All filters', 'bricks-child'); ?>
+			<svg class="lucide lucide-sliders-horizontal" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+			<?php esc_html_e('Filters', 'bricks-child'); ?>
 		</button>
         <div class="tcp-quick-filters" aria-label="<?php esc_attr_e('Quick car filters', 'bricks-child'); ?>">
             <button type="button" class="tcp-quick-filter tcp-quick-filter--favourites" data-filter-target="favorites" data-default-label="<?php esc_attr_e('Favourites', 'bricks-child'); ?>" hidden><span class="tcp-quick-filter__label"><?php esc_html_e('Favourites', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true">×</span></button>
