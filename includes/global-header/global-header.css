@@ -65,12 +65,15 @@
 }
 
 .autoagora-code-header-active .tcp-filters-bar {
+    position: sticky !important;
+    z-index: 100;
     top: calc(var(--aag-site-header-top) + var(--aag-site-header-height));
     transition: top 0.18s ease;
 }
 
 .autoagora-code-header-active.aag-site-header-is-hidden .tcp-filters-bar {
     top: var(--aag-site-header-top);
+    transition: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -518,18 +521,18 @@ html.aag-site-header-menu-open {
         box-sizing: border-box;
         position: fixed !important;
         z-index: 1000;
-        inset: auto 0 0 !important;
+        top: auto !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
         height: calc(60px + env(safe-area-inset-bottom));
         padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+        margin: 0 !important;
         display: block;
         background: #fff;
         border-top: 1px solid var(--aag-header-border);
-        transform: translate3d(0, 0, 0);
-        -webkit-transform: translate3d(0, 0, 0);
-        backface-visibility: hidden;
-        -webkit-backface-visibility: hidden;
-        will-change: transform;
-        contain: layout paint;
+        transform: none !important;
+        -webkit-transform: none !important;
         isolation: isolate;
         overscroll-behavior: none;
     }
