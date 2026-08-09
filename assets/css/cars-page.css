@@ -30,7 +30,7 @@ body {
 .tcp-page-heading {
     margin: 0;
     color: var(--text-color);
-    font-size: 14px;
+    font-size: var(--regular-font-size, 16px);
     font-weight: 500;
     line-height: 1.5;
 }
