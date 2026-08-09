@@ -11,6 +11,39 @@
 define('BRICKS_CHILD_THEME_VERSION', '1.0.0');
 
 require_once get_stylesheet_directory() . '/includes/i18n/init.php';
+
+// Keep page links available if production is temporarily running a stale i18n
+// bootstrap during an incremental deploy.
+if ( ! function_exists( 'autoagora_localized_page_url' ) ) {
+	function autoagora_localized_page_url( $english_slug = '' ) {
+		$english_slug = trim( (string) $english_slug, '/' );
+		$language     = function_exists( 'autoagora_current_language' )
+			? autoagora_current_language()
+			: ( function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : '' );
+
+		if ( $english_slug === '' ) {
+			if ( $language && function_exists( 'pll_home_url' ) ) {
+				$localized_home = pll_home_url( $language );
+				if ( is_string( $localized_home ) && $localized_home !== '' ) {
+					return $localized_home;
+				}
+			}
+
+			return home_url( '/' );
+		}
+
+		$source_page = get_page_by_path( $english_slug );
+		if ( $source_page instanceof WP_Post && $language && function_exists( 'pll_get_post' ) ) {
+			$translated_id = pll_get_post( $source_page->ID, $language );
+			if ( $translated_id ) {
+				return get_permalink( $translated_id );
+			}
+		}
+
+		return home_url( '/' . $english_slug . '/' );
+	}
+}
+
 require_once get_stylesheet_directory() . '/includes/global-header/init.php';
 
 // =========================================================================
