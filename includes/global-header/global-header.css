@@ -8,7 +8,7 @@
     --aag-header-blue: #0d86e3;
     --aag-header-text: #222831;
     --aag-header-navy: #222831;
-    --aag-header-border: #dddede;
+    --aag-header-border: #e1e4e8;
     font-family: Inter, sans-serif;
 }
 
@@ -22,12 +22,13 @@
     right: 0;
     left: 0;
     width: 100%;
+    border-bottom: 1px solid var(--aag-header-border);
     transition: top 0.18s ease;
     will-change: top;
 }
 
 .autoagora-code-header-active .aag-site-header.aag-site-header--hidden {
-    top: calc(0px - var(--aag-site-header-height));
+    top: calc(-1px - var(--aag-site-header-height));
 }
 
 .autoagora-code-header-active .aag-site-header-spacer {
@@ -506,7 +507,7 @@ html.aag-site-header-menu-open {
         padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
         display: block;
         background: #fff;
-        border-top: 1px solid #e1e4e8;
+        border-top: 1px solid var(--aag-header-border);
         transform: translate3d(0, 0, 0);
         -webkit-transform: translate3d(0, 0, 0);
         backface-visibility: hidden;
