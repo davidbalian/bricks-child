@@ -43,7 +43,7 @@
 }
 
 .car-card-promotion-showcase {
-    --car-card-promotion-border: rgba(124, 58, 237, 0.78);
+    --car-card-promotion-border: #d4af37;
 }
 
 .car-card-featured::after {
