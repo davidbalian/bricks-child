@@ -158,6 +158,15 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 
 <!-- Filters bar -->
 <div class="tcp-filters-bar">
+	<div class="tcp-page-nav">
+		<a class="tcp-page-nav__action tcp-page-nav__back" href="<?php echo esc_url( autoagora_localized_page_url() ); ?>" data-tcp-back aria-label="<?php esc_attr_e( 'Go back', 'bricks-child' ); ?>">
+			<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+		</a>
+		<h1 class="tcp-page-heading"><?php esc_html_e('Used Cars for Sale in Cyprus', 'bricks-child'); ?></h1>
+		<a class="tcp-page-nav__action tcp-page-nav__saved" href="<?php echo esc_url( autoagora_localized_page_url( 'favourite-listings' ) ); ?>" aria-label="<?php esc_attr_e( 'Saved cars', 'bricks-child' ); ?>">
+			<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>
+		</a>
+	</div>
     <div class="tcp-filters-bar-inner">
         <div class="tcp-quick-filters" aria-label="<?php esc_attr_e('Quick car filters', 'bricks-child'); ?>">
             <button type="button" class="tcp-quick-filter" data-filter-target="make"><?php esc_html_e('Make & model', 'bricks-child'); ?></button>
@@ -310,7 +319,6 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 
 <!-- Main content -->
 <div class="tcp-main">
-    <h1 class="tcp-heading"><?php esc_html_e('Used Cars for Sale in Cyprus', 'bricks-child'); ?></h1>
     <p class="tcp-results-count" id="tcp-results-count">
         <?php
         echo esc_html(sprintf(
@@ -458,6 +466,19 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 
 
 <script>
+(function() {
+    var backLink = document.querySelector('[data-tcp-back]');
+
+    if (backLink) {
+        backLink.addEventListener('click', function(event) {
+            if (window.history.length > 1) {
+                event.preventDefault();
+                window.history.back();
+            }
+        });
+    }
+})();
+
 (function($) {
     'use strict';
 

@@ -12,6 +12,50 @@ body {
     top: 0;
     z-index: 100;
 }
+.tcp-page-nav {
+    width: 100%;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0.75rem 1rem 0.25rem;
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 30px;
+    align-items: center;
+    gap: 0.75rem;
+    box-sizing: border-box;
+}
+.tcp-page-heading {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+.tcp-page-nav__action {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    color: var(--text-color);
+    text-decoration: none;
+}
+.tcp-page-nav__action svg {
+    width: 24px;
+    height: 24px;
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.tcp-page-nav__action:hover,
+.tcp-page-nav__action:focus-visible {
+    color: var(--light-blue);
+}
+.tcp-page-nav__saved {
+    justify-self: end;
+}
 .tcp-filters-bar-inner {
     max-width: var(--max-width);
     margin: 0 auto;
@@ -620,7 +664,7 @@ body {
     margin: 0 0 1.25rem;
 }
 .tcp-results-count {
-    margin: -0.5rem 0 1.25rem;
+    margin: 0 0 1.25rem;
     font-size: 0.95rem;
     font-weight: 500;
     color: #475569;
