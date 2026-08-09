@@ -166,24 +166,24 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 		<a class="tcp-page-nav__action tcp-page-nav__saved" href="<?php echo esc_url( autoagora_localized_page_url( 'favourite-listings' ) ); ?>" aria-label="<?php esc_attr_e( 'Saved cars', 'bricks-child' ); ?>">
 			<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>
 		</a>
-	</div>
+    </div>
     <div class="tcp-filters-bar-inner">
+		<button type="button" class="tcp-filters-btn" id="tcp-filters-btn">
+			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="1" fill="currentColor" stroke="none"/></svg>
+			<?php esc_html_e('All filters', 'bricks-child'); ?>
+		</button>
         <div class="tcp-quick-filters" aria-label="<?php esc_attr_e('Quick car filters', 'bricks-child'); ?>">
-            <button type="button" class="tcp-quick-filter" data-filter-target="make"><?php esc_html_e('Make & model', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="price"><?php esc_html_e('Price', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="year"><?php esc_html_e('Year', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="mileage"><?php esc_html_e('Mileage', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="transmission"><?php esc_html_e('Transmission', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="body"><?php esc_html_e('Body type', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="fuel"><?php esc_html_e('Fuel type', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="engine"><?php esc_html_e('Engine size', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="location"><?php esc_html_e('Location', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="make" data-default-label="<?php esc_attr_e('Brand and model', 'bricks-child'); ?>"><?php esc_html_e('Brand and model', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="price" data-default-label="<?php esc_attr_e('Price', 'bricks-child'); ?>"><?php esc_html_e('Price', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="year" data-default-label="<?php esc_attr_e('Year', 'bricks-child'); ?>"><?php esc_html_e('Year', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="mileage" data-default-label="<?php esc_attr_e('Mileage', 'bricks-child'); ?>"><?php esc_html_e('Mileage', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="transmission" data-default-label="<?php esc_attr_e('Transmission', 'bricks-child'); ?>"><?php esc_html_e('Transmission', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="body" data-default-label="<?php esc_attr_e('Body type', 'bricks-child'); ?>"><?php esc_html_e('Body type', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="fuel" data-default-label="<?php esc_attr_e('Fuel type', 'bricks-child'); ?>"><?php esc_html_e('Fuel type', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="engine" data-default-label="<?php esc_attr_e('Engine size', 'bricks-child'); ?>"><?php esc_html_e('Engine size', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="location" data-default-label="<?php esc_attr_e('Location', 'bricks-child'); ?>"><?php esc_html_e('Location', 'bricks-child'); ?></button>
         </div>
         <div class="tcp-toolbar-actions">
-            <button type="button" class="tcp-filters-btn" id="tcp-filters-btn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/><circle cx="4" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="1" fill="currentColor" stroke="none"/></svg>
-                <?php esc_html_e('All filters', 'bricks-child'); ?>
-            </button>
             <div class="tcp-sort" id="tcp-sort">
                 <button type="button" class="tcp-sort-btn" id="tcp-sort-btn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
@@ -528,6 +528,8 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
         vehiclehistory: 'history',
         isantique: 'antique'
     };
+    var quickRangeFilterKeys = ['price', 'mileage', 'year', 'engine_capacity'];
+    var quickSelectFilterKeys = ['fuel_type', 'body_type', 'transmission'];
 
     /**
      * Calculate posts_per_page as a multiple of current column count
@@ -712,20 +714,10 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
         var html = '';
         var hasAny = false;
 
-        // Make
-        if (state.make && state.make.value) {
-            var makeLabel = getMakeLabel(state.make.value);
-            html += chip('make', makeLabel);
-            hasAny = true;
-        }
-        // Model
-        if (state.model && state.model.value) {
-            var modelLabel = getModelLabel(state.model.value);
-            html += chip('model', modelLabel);
-            hasAny = true;
-        }
-        // Range filters
+        // Quick-filter values render inside their existing pills. Only advanced
+        // filters without a dedicated pill are rendered in this auxiliary row.
         rangeFilterKeys.forEach(function(key) {
+            if (quickRangeFilterKeys.indexOf(key) !== -1) return;
             var min = state[key + '_min'];
             var max = state[key + '_max'];
             var noComma = (key === 'year' || key === 'engine_capacity');
@@ -741,17 +733,12 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
         });
         // Simple selects
         selectFilterKeys.forEach(function(key) {
+            if (quickSelectFilterKeys.indexOf(key) !== -1) return;
             if (state[key]) {
                 html += chip(key, filterLabels[key] + ': ' + getFilterValueLabel(key, state[key]));
                 hasAny = true;
             }
         });
-        if (locationState.active && locationState.lat && locationState.lng && locationState.radiusKm > 0) {
-            var locationLabel = locationState.label || t('Selected area');
-            html += chip('location_radius', filterLabels.location_radius + ': ' + locationLabel);
-            hasAny = true;
-        }
-
         if (hasAny) {
             html += '<button type="button" class="tcp-chip-clear" id="tcp-clear-all">' + escapeHtml(t('Clear all')) + '</button>';
         }
@@ -792,20 +779,63 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 
     function updateQuickFilterStates(state) {
         $('.tcp-quick-filter').each(function() {
-            var target = String($(this).data('filter-target') || '');
+            var $button = $(this);
+            var target = String($button.data('filter-target') || '');
+            var defaultLabel = String($button.attr('data-default-label') || $button.text());
             var active = false;
+            var selectedLabel = '';
+
             if (target === 'make') {
                 active = !!((state.make && state.make.value) || (state.model && state.model.value));
+                if (active) {
+                    var makeLabel = state.make && state.make.value ? getMakeLabel(state.make.value) : '';
+                    var modelLabel = state.model && state.model.value ? getModelLabel(state.model.value) : '';
+                    selectedLabel = makeLabel && modelLabel && modelLabel.toLowerCase().indexOf(makeLabel.toLowerCase()) === 0
+                        ? modelLabel
+                        : [makeLabel, modelLabel].filter(Boolean).join(' ');
+                }
             } else if (target === 'location') {
                 active = locationState.active;
+                selectedLabel = locationState.label || t('Selected area');
+            } else if (target === 'price') {
+                selectedLabel = formatQuickRange(state.price_min, state.price_max, { prefix: '€' });
+                active = selectedLabel !== '';
+            } else if (target === 'year') {
+                selectedLabel = formatQuickRange(state.year_min, state.year_max, { raw: true });
+                active = selectedLabel !== '';
+            } else if (target === 'mileage') {
+                selectedLabel = formatQuickRange(state.mileage_min, state.mileage_max, { suffix: ' km' });
+                active = selectedLabel !== '';
+            } else if (target === 'engine') {
+                selectedLabel = formatQuickRange(state.engine_capacity_min, state.engine_capacity_max, { raw: true, suffix: 'L' });
+                active = selectedLabel !== '';
             } else {
                 var stateKey = Object.keys(filterClassMap).find(function(key) {
                     return filterClassMap[key] === target;
                 }) || target;
-                active = !!(state[stateKey] || state[stateKey + '_min'] || state[stateKey + '_max']);
+                active = !!state[stateKey];
+                selectedLabel = active ? getFilterValueLabel(stateKey, state[stateKey]) : '';
             }
-            $(this).toggleClass('is-active', active);
+
+            $button
+                .toggleClass('is-active', active)
+                .text(active && selectedLabel ? selectedLabel : defaultLabel)
+                .attr('aria-label', active && selectedLabel ? defaultLabel + ': ' + selectedLabel : defaultLabel);
         });
+    }
+
+    function formatQuickRange(min, max, options) {
+        options = options || {};
+        if (!min && !max) return '';
+
+        var formatValue = function(value) {
+            return (options.prefix || '') + formatNum(value, !!options.raw);
+        };
+        var suffix = options.suffix || '';
+
+        if (min && max) return formatValue(min) + ' – ' + formatValue(max) + suffix;
+        if (min) return formatValue(min) + '+' + suffix;
+        return '≤ ' + formatValue(max) + suffix;
     }
 
     function getMakeLabel(termId) {

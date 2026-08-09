@@ -148,6 +148,7 @@ return array(
 	'Bodywork repair' => 'Кузовной ремонт',
 	'Bodywork Repair' => 'Кузовной ремонт',
 	'Brand' => 'Бренд',
+	'Brand and model' => 'Марка и модель',
 	'Breadcrumb' => 'хлебные крошки',
 	'Bronze' => 'Бронза',
 	'Brown' => 'Браун',

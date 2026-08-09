@@ -103,6 +103,7 @@ return array(
 	'Body type' => 'Σωματότυπος',
 	'Bodywork repair' => 'Επισκευή αμαξώματος',
 	'Brand' => 'Μάρκα',
+	'Brand and model' => 'Μάρκα και μοντέλο',
 	'browse' => 'ξεφυλλίζω',
 	'Browse <strong>600+ used cars for sale in Cyprus</strong> from trusted dealerships and private sellers across Nicosia, Limassol, Larnaca, and Paphos. Whether you are looking for a fuel-efficient hatchback for city driving, a family SUV, or a luxury sedan, AutoAgora makes it easy to compare prices, specs, and photos - all in one place.' => 'Περιηγηθείτε σε μεταχειρισμένα αυτοκίνητα <strong>600+ προς πώληση στην Κύπρο</strong> από αξιόπιστες αντιπροσωπείες και ιδιώτες πωλητές σε όλη τη Λευκωσία, τη Λεμεσό, τη Λάρνακα και την Πάφο. Είτε αναζητάτε ένα χάτσμπακ οικονομίας καυσίμου για οδήγηση στην πόλη, ένα οικογενειακό SUV ή ένα πολυτελές σεντάν, το AutoAgora διευκολύνει τη σύγκριση τιμών, προδιαγραφών και φωτογραφιών - όλα σε ένα μέρος.',
 	'Browse all cars' => 'Περιηγηθείτε σε όλα τα αυτοκίνητα',
