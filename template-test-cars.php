@@ -305,7 +305,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 		<p class="tcp-results-count" id="tcp-results-count">
 			<?php
 			echo esc_html(sprintf(
-				_n('%s result found', '%s results found', (int) $cars_query->found_posts, 'bricks-child'),
+				_n('%s car found', '%s cars found', (int) $cars_query->found_posts, 'bricks-child'),
 				number_format_i18n((int) $cars_query->found_posts)
 			));
 			?>
@@ -557,7 +557,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
         if (isNaN(count) || count < 0) {
             count = 0;
         }
-        $results.text(t('%s results found', count.toLocaleString()));
+        $results.text(t(count === 1 ? '%s car found' : '%s cars found', count.toLocaleString()));
         updateClearAllButton(count);
     }
 

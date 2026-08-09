@@ -37,6 +37,8 @@ return array(
 	'%s owners' => '%s владельцев',
 	'%s result found' => '%s результат найден',
 	'%s results found' => '%s результаты найдены',
+	'%s car found' => 'Найден %s автомобиль',
+	'%s cars found' => 'Найдено автомобилей: %s',
 	'%s sent successfully!' => '%s успешно отправлен!',
 	'%s unique visitor' => '%s уникальный посетитель',
 	'%s unique visitors' => '%s уникальных посетителей',

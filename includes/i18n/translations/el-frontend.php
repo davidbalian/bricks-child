@@ -31,6 +31,8 @@ return array(
 	'%s new cars since your last visit' => '%s νέα αυτοκίνητα από την τελευταία σας επίσκεψη',
 	'%s result found' => 'Το αποτέλεσμα %s βρέθηκε',
 	'%s results found' => 'Βρέθηκαν αποτελέσματα %s',
+	'%s car found' => 'Βρέθηκε %s αυτοκίνητο',
+	'%s cars found' => 'Βρέθηκαν %s αυτοκίνητα',
 	'%s sent successfully!' => 'Το %s στάλθηκε με επιτυχία!',
 	'&laquo; Previous' => '«Προηγούμενο',
 	'360-degree camera' => 'κάμερα 360 μοιρών',
