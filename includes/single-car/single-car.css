@@ -9,7 +9,7 @@
     --single-car-primary: #357fca;
     --single-car-link: var(--single-car-primary);
     --single-car-font-note: 13px;
-    --single-car-font-meta: 14px;
+    --single-car-font-meta: var(--small-font-size, 14px);
     --single-car-font-body: 16px;
     --single-car-font-heading: 24px;
     --single-car-font-title: clamp(20px, 1.8vw, 27px);

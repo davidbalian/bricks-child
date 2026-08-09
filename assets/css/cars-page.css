@@ -176,7 +176,7 @@ body {
     border: 0;
     background: transparent;
     color: #475569;
-    font-size: 0.95rem;
+    font-size: var(--small-font-size, 14px);
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
@@ -498,7 +498,7 @@ body {
     border: 2px solid #dfe2e6;
     border-radius: 0.5rem;
     padding: 0.6rem 0.8rem;
-    font-size: 0.95rem;
+    font-size: var(--small-font-size, 14px);
 }
 .tcp-location-map {
     width: 100%;
