@@ -540,7 +540,7 @@ html.aag-site-header-menu-open {
         grid-template-rows: 30px auto;
         align-content: center;
         place-items: center;
-        gap: 0;
+        gap: 2px;
         color: #52606d;
         background: transparent;
         border: 0;
