@@ -37,6 +37,9 @@ body {
     display: grid;
     place-items: center;
     color: var(--text-color);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
     text-decoration: none;
 }
 .tcp-page-nav__action svg {
@@ -55,6 +58,9 @@ body {
 }
 .tcp-page-nav__saved {
     justify-self: end;
+}
+.tcp-page-nav__saved.is-active svg {
+    fill: currentColor;
 }
 .tcp-filters-bar-inner {
     max-width: var(--max-width);
@@ -84,12 +90,27 @@ body {
     border-radius: 999px;
     background: #fff;
     color: #075f9f;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
     font-size: 0.875rem;
     font-weight: 600;
     line-height: 1.2;
     white-space: nowrap;
     cursor: pointer;
     transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.tcp-quick-filter[hidden] {
+    display: none;
+}
+.tcp-quick-filter__clear {
+    display: none;
+    font-size: 1.05rem;
+    font-weight: 400;
+    line-height: 1;
+}
+.tcp-quick-filter.is-active .tcp-quick-filter__clear {
+    display: inline-block;
 }
 .tcp-quick-filter:hover {
     border-color: #0d86e3;

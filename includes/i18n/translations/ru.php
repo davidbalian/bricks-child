@@ -384,6 +384,7 @@ return array(
 	'Fake or fraudulent listing' => 'Поддельный или мошеннический листинг',
 	'Famagusta' => 'Фамагуста',
 	'Family SUVs' => 'Семейные внедорожники',
+	'Favourites' => 'Избранное',
 	'Features' => 'Функции',
 	'Features and extras' => 'Особенности и дополнительные возможности',
 	'File "{name}" is too large ({size}MB). Maximum allowed is {max}MB.' => 'Файл «{name}» слишком велик ({size} МБ). Максимально допустимый размер: {max} МБ.',

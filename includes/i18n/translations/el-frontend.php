@@ -273,6 +273,7 @@ return array(
 	'Failed to upload logo.' => 'Η μεταφόρτωση του λογότυπου απέτυχε.',
 	'Famagusta' => 'Αμμόχωστος',
 	'Family SUVs' => 'Οικογενειακά SUV',
+	'Favourites' => 'Αγαπημένα',
 	'Features' => 'Χαρακτηριστικά',
 	'Features and extras' => 'Χαρακτηριστικά και έξτρα',
 	'File %s is too large (max 12MB).' => 'Το αρχείο %s είναι πολύ μεγάλο (μέγιστο 12 MB).',

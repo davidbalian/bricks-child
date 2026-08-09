@@ -163,9 +163,9 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 			<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
 		</a>
 		<h1 class="tcp-page-heading"><?php esc_html_e('Used Cars for Sale in Cyprus', 'bricks-child'); ?></h1>
-		<a class="tcp-page-nav__action tcp-page-nav__saved" href="<?php echo esc_url( autoagora_localized_page_url( 'favourite-listings' ) ); ?>" aria-label="<?php esc_attr_e( 'Saved cars', 'bricks-child' ); ?>">
+		<button type="button" class="tcp-page-nav__action tcp-page-nav__saved" aria-label="<?php esc_attr_e( 'Favourites', 'bricks-child' ); ?>" aria-pressed="false">
 			<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>
-		</a>
+		</button>
     </div>
     <div class="tcp-filters-bar-inner">
 		<button type="button" class="tcp-filters-btn" id="tcp-filters-btn">
@@ -173,15 +173,16 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 			<?php esc_html_e('All filters', 'bricks-child'); ?>
 		</button>
         <div class="tcp-quick-filters" aria-label="<?php esc_attr_e('Quick car filters', 'bricks-child'); ?>">
-            <button type="button" class="tcp-quick-filter" data-filter-target="make" data-default-label="<?php esc_attr_e('Brand and model', 'bricks-child'); ?>"><?php esc_html_e('Brand and model', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="price" data-default-label="<?php esc_attr_e('Price', 'bricks-child'); ?>"><?php esc_html_e('Price', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="year" data-default-label="<?php esc_attr_e('Year', 'bricks-child'); ?>"><?php esc_html_e('Year', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="mileage" data-default-label="<?php esc_attr_e('Mileage', 'bricks-child'); ?>"><?php esc_html_e('Mileage', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="transmission" data-default-label="<?php esc_attr_e('Transmission', 'bricks-child'); ?>"><?php esc_html_e('Transmission', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="body" data-default-label="<?php esc_attr_e('Body type', 'bricks-child'); ?>"><?php esc_html_e('Body type', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="fuel" data-default-label="<?php esc_attr_e('Fuel type', 'bricks-child'); ?>"><?php esc_html_e('Fuel type', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="engine" data-default-label="<?php esc_attr_e('Engine size', 'bricks-child'); ?>"><?php esc_html_e('Engine size', 'bricks-child'); ?></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="location" data-default-label="<?php esc_attr_e('Location', 'bricks-child'); ?>"><?php esc_html_e('Location', 'bricks-child'); ?></button>
+            <button type="button" class="tcp-quick-filter tcp-quick-filter--favourites" data-filter-target="favorites" data-default-label="<?php esc_attr_e('Favourites', 'bricks-child'); ?>" hidden><span class="tcp-quick-filter__label"><?php esc_html_e('Favourites', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true">×</span></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="make" data-default-label="<?php esc_attr_e('Brand and model', 'bricks-child'); ?>"><span class="tcp-quick-filter__label"><?php esc_html_e('Brand and model', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true">×</span></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="price" data-default-label="<?php esc_attr_e('Price', 'bricks-child'); ?>"><span class="tcp-quick-filter__label"><?php esc_html_e('Price', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true">×</span></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="year" data-default-label="<?php esc_attr_e('Year', 'bricks-child'); ?>"><span class="tcp-quick-filter__label"><?php esc_html_e('Year', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true">×</span></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="mileage" data-default-label="<?php esc_attr_e('Mileage', 'bricks-child'); ?>"><span class="tcp-quick-filter__label"><?php esc_html_e('Mileage', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true">×</span></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="transmission" data-default-label="<?php esc_attr_e('Transmission', 'bricks-child'); ?>"><span class="tcp-quick-filter__label"><?php esc_html_e('Transmission', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true">×</span></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="body" data-default-label="<?php esc_attr_e('Body type', 'bricks-child'); ?>"><span class="tcp-quick-filter__label"><?php esc_html_e('Body type', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true">×</span></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="fuel" data-default-label="<?php esc_attr_e('Fuel type', 'bricks-child'); ?>"><span class="tcp-quick-filter__label"><?php esc_html_e('Fuel type', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true">×</span></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="engine" data-default-label="<?php esc_attr_e('Engine size', 'bricks-child'); ?>"><span class="tcp-quick-filter__label"><?php esc_html_e('Engine size', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true">×</span></button>
+            <button type="button" class="tcp-quick-filter" data-filter-target="location" data-default-label="<?php esc_attr_e('Location', 'bricks-child'); ?>"><span class="tcp-quick-filter__label"><?php esc_html_e('Location', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true">×</span></button>
         </div>
     </div>
     <div class="tcp-active-filters-row">
@@ -509,6 +510,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
     var locationAutocomplete = null;
     var locationGeocoder = null;
     var reverseGeocodeTimer = null;
+    var favoritesOnly = String(($container.data('atts') || {}).favorites) === 'true';
     var rangeFilterKeys = ['price', 'mileage', 'year', 'engine_capacity', 'hp', 'numowners'];
     var selectFilterKeys = ['fuel_type', 'body_type', 'transmission', 'drive_type', 'exterior_color', 'interior_color', 'number_of_doors', 'number_of_seats', 'availability', 'isantique', 'extras', 'vehiclehistory'];
     var allFilterKeys = ['make', 'model'];
@@ -690,14 +692,60 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
     }
 
     $('#tcp-location-btn').on('click', openLocationModal);
-    $('.tcp-quick-filter').on('click', function() {
+    $('.tcp-page-nav__saved').on('click', function() {
+        setFavoritesOnly(!favoritesOnly, true);
+    });
+
+    $('.tcp-quick-filter').on('click', function(e) {
         var target = String($(this).data('filter-target') || '');
+        if ($(e.target).closest('.tcp-quick-filter__clear').length || target === 'favorites') {
+            clearQuickFilter(target);
+            return;
+        }
         if (target === 'location') {
             openLocationModal();
             return;
         }
         openFilterModal(target);
     });
+
+    function setFavoritesOnly(isActive, reloadListings) {
+        favoritesOnly = !!isActive;
+        var atts = $container.data('atts') || {};
+        atts.favorites = favoritesOnly ? 'true' : 'false';
+        $container.data('atts', atts);
+        $container.attr('data-atts', JSON.stringify(atts));
+        buildChips();
+
+        if (reloadListings) {
+            loadPage(1, { scroll: false });
+        }
+    }
+
+    function clearQuickFilter(target) {
+        var targetKeys = {
+            make: ['model', 'make'],
+            price: ['price_min', 'price_max'],
+            year: ['year_min', 'year_max'],
+            mileage: ['mileage_min', 'mileage_max'],
+            transmission: ['transmission'],
+            body: ['body_type'],
+            fuel: ['fuel_type'],
+            engine: ['engine_capacity_min', 'engine_capacity_max'],
+            location: ['location_radius']
+        };
+
+        if (target === 'favorites') {
+            setFavoritesOnly(false, true);
+            return;
+        }
+
+        (targetKeys[target] || []).forEach(function(key) {
+            clearFilter(key);
+        });
+        buildChips();
+        CarFilters.triggerFilter(group);
+    }
     $('#tcp-location-modal-close').on('click', closeLocationModal);
     $locationOverlay.on('click', function(e) {
         if (e.target === this) closeLocationModal();
@@ -786,7 +834,10 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
             var active = false;
             var selectedLabel = '';
 
-            if (target === 'make') {
+            if (target === 'favorites') {
+                active = favoritesOnly;
+                selectedLabel = defaultLabel;
+            } else if (target === 'make') {
                 active = !!((state.make && state.make.value) || (state.model && state.model.value));
                 if (active) {
                     var makeLabel = state.make && state.make.value ? getMakeLabel(state.make.value) : '';
@@ -820,8 +871,15 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 
             $button
                 .toggleClass('is-active', active)
-                .text(active && selectedLabel ? selectedLabel : defaultLabel)
+                .prop('hidden', target === 'favorites' && !active)
                 .attr('aria-label', active && selectedLabel ? defaultLabel + ': ' + selectedLabel : defaultLabel);
+            $button.find('.tcp-quick-filter__label').text(active && selectedLabel ? selectedLabel : defaultLabel);
+
+            if (target === 'favorites') {
+                $('.tcp-page-nav__saved')
+                    .toggleClass('is-active', active)
+                    .attr('aria-pressed', active ? 'true' : 'false');
+            }
         });
     }
 
@@ -1105,6 +1163,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
         allFilterKeys.concat(['location_radius']).forEach(function(key) {
             clearFilter(key);
         });
+        setFavoritesOnly(false, false);
         resetSort();
         CarFilters.triggerFilter(group);
     });
@@ -1154,6 +1213,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
         allFilterKeys.concat(['location_radius']).forEach(function(key) {
             clearFilter(key);
         });
+        setFavoritesOnly(false, false);
         resetSort();
         CarFilters.triggerFilter(group);
     });
@@ -1166,6 +1226,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
         allFilterKeys.forEach(function(key) {
             clearFilter(key);
         });
+        setFavoritesOnly(false, false);
         resetSort();
         CarFilters.triggerFilter(group);
     });
