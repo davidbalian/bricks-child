@@ -686,3 +686,9 @@ img.bricks-site-logo {
   height: auto;
   aspect-ratio: 1024 / 213;
 }
+
+/* Raise only CookieYes' closed revisit control; leave the consent panel unchanged. */
+.cky-btn-revisit-wrapper.cky-revisit-bottom-left,
+.cky-btn-revisit-wrapper.cky-revisit-bottom-right {
+  bottom: calc(15px + 1rem) !important;
+}
