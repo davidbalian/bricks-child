@@ -156,7 +156,6 @@
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
     white-space: nowrap;
 }
 
@@ -177,7 +176,6 @@
     font-size: 0.75rem;
     color: #6b7280;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
     font-weight: 600;
 }
 
@@ -717,7 +715,6 @@
     font-size: 0.875rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
     margin-bottom: 1.5rem;
 }
 
@@ -746,7 +743,6 @@
     font-size: 0.875rem;
     color: #6b7280;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
     font-weight: 600;
 }
 
@@ -807,7 +803,6 @@
     font-size: 0.75rem;
     color: #6b7280;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
     font-weight: 600;
 }
 
@@ -898,7 +893,6 @@
     font-size: 0.75rem;
     color: #6b7280;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
     font-weight: 600;
 }
 
@@ -1065,4 +1059,3 @@
         gap: 1.5rem;
     }
 }
-

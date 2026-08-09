@@ -41,14 +41,12 @@
     color: var(--landing-accent);
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: 0.08em;
     padding: 8px 12px;
     text-transform: uppercase;
 }
 
 .autoagora-car-make-landing__title {
     font-size: clamp(32px, 5vw, 54px);
-    letter-spacing: -0.03em;
     line-height: 1;
     margin: 18px 0 14px;
 }
@@ -88,7 +86,6 @@
 
 .autoagora-car-make-landing__section-head h2 {
     font-size: clamp(24px, 3vw, 34px);
-    letter-spacing: -0.03em;
     line-height: 1.1;
     margin: 0;
 }

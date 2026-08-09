@@ -27,6 +27,12 @@
   --max-width: 1300px;
 }
 
+/* One site-wide typography tracking rule. */
+body,
+body * {
+  letter-spacing: -0.025em !important;
+}
+
 /* My Listings login link styling */
 .my-listings-login-link {
   color: var(--dark-blue);

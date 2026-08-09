@@ -67,7 +67,6 @@ $electric_url = esc_url(add_query_arg(array('fuel_type' => 'Electric'), $cars_ba
     font-weight: 600;
     font-size: 0.9rem;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
     color: #64748b;
     margin: 0 0 0.75rem;
 }

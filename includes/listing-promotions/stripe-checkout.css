@@ -21,7 +21,6 @@
     background: linear-gradient(135deg, #0878c9 0%, #0d86e3 58%, #1594ed 100%);
     box-shadow: 0 6px 16px rgba(13, 134, 227, 0.22);
     font-weight: 700 !important;
-    letter-spacing: -0.01em;
     transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease, opacity 160ms ease !important;
 }
 
@@ -142,7 +141,6 @@
     color: #15803d;
     font-size: 0.62rem;
     font-weight: 700;
-    letter-spacing: 0.04em;
     text-transform: uppercase;
 }
 
@@ -269,7 +267,6 @@
     color: #9a3412;
     font-size: 0.68rem;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
 }
 
 .autoagora-promotion-schedule {
@@ -368,7 +365,6 @@
     color: #64748b;
     font-size: 0.58rem;
     font-weight: 700;
-    letter-spacing: 0.04em;
     text-transform: uppercase;
 }
 
@@ -531,7 +527,6 @@
     color: #64748b;
     font-size: 0.68rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
 }
 
 .autoagora-promotion-total-label {
