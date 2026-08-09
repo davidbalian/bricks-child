@@ -394,12 +394,6 @@
     text-decoration: underline;
 }
 
-.dealer-profile-listings__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 16px;
-}
-
 @media (max-width: 782px) {
     .dealer-profile-archive,
     .dealer-profile-single {

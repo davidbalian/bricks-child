@@ -112,7 +112,7 @@ if (!function_exists('autoagora_custom_homepage_collection')) {
 
                 <?php if ($query->have_posts()) : ?>
                     <div class="custom-homepage-car-row-shell">
-                        <div id="<?php echo esc_attr($section_id); ?>" class="custom-homepage-car-row">
+                        <div id="<?php echo esc_attr($section_id); ?>" class="custom-homepage-car-row<?php echo $is_latest ? ' car-card-grid' : ''; ?>">
                             <?php
                             $listing_index = 0;
                             while ($query->have_posts()) :

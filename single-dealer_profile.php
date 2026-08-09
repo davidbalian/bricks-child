@@ -209,7 +209,7 @@ if (have_posts()) :
                 </div>
 
                 <?php if ($listings_query instanceof WP_Query && $listings_query->have_posts()) : ?>
-                    <div class="car-listings-wrapper dealer-profile-listings__grid">
+                    <div class="car-listings-wrapper dealer-profile-listings__grid car-card-grid">
                         <?php
                         $listing_post_ids = wp_list_pluck($listings_query->posts, 'ID');
                         update_postmeta_cache($listing_post_ids);

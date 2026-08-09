@@ -471,7 +471,7 @@ get_header();
         <section class="autoagora-single-car__related" aria-labelledby="single-car-related-heading">
             <div class="autoagora-single-car__container">
                 <h2 id="single-car-related-heading"><?php esc_html_e('Related Cars', 'bricks-child'); ?></h2>
-                <div class="autoagora-single-car__related-grid">
+                <div class="autoagora-single-car__related-grid car-card-grid">
                     <?php
                     $related_index = 0;
                     while ($related_query->have_posts()) :

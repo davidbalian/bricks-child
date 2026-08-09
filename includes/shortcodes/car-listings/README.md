@@ -24,7 +24,7 @@ This displays a grid of the 12 most recent car listings.
 
 **Layout Details:**
 
-- **grid** - Responsive CSS grid using `repeat(auto-fill, minmax(300px, 1fr))`. Cards automatically adjust to fill available width.
+- **grid** - Shared car cards use the global `.car-card-grid` contract: `repeat(auto-fill, minmax(280px, 1fr))`, a 24px desktop gap, a 16px mobile gap, and one column below 480px.
 - **carousel** - Horizontal scrolling slider with scroll-snap. Cards are 300px wide.
 - **vertical** - Single column layout, cards stacked one below another.
 

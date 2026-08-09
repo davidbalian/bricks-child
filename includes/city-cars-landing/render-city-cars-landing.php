@@ -176,7 +176,7 @@ function autoagora_render_city_cars_landing($slug) {
          data-max-pages="<?php echo esc_attr($cars_query->max_num_pages); ?>"
          data-server-filtered="true">
 
-        <div class="car-listings-wrapper tcp-grid">
+        <div class="car-listings-wrapper tcp-grid car-card-grid">
             <?php
             if ($cars_query->have_posts()) :
                 $post_ids = wp_list_pluck($cars_query->posts, 'ID');

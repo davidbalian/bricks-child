@@ -177,7 +177,7 @@ get_header();
          data-max-pages="<?php echo esc_attr($cars_query->max_num_pages); ?>"
          data-server-filtered="true">
 
-        <div class="car-listings-wrapper tcp-grid">
+        <div class="car-listings-wrapper tcp-grid car-card-grid">
             <?php
             if ($cars_query->have_posts()) :
                 $post_ids = wp_list_pluck($cars_query->posts, 'ID');
@@ -811,7 +811,7 @@ body {
     font-weight: 500;
     color: #475569;
 }
-.tcp-grid {
+.tcp-grid:not(.car-card-grid) {
     display: grid;
     justify-content: start;
     justify-items: stretch;
@@ -819,12 +819,12 @@ body {
     gap: 1.5rem;
 }
 @media (max-width: 767px) {
-    .tcp-grid {
+    .tcp-grid:not(.car-card-grid) {
         gap: 1rem;
     }
 }
 @media (max-width: 479px) {
-    .tcp-grid {
+    .tcp-grid:not(.car-card-grid) {
         grid-template-columns: 1fr;
     }
 }

@@ -336,7 +336,7 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
          data-max-pages="<?php echo esc_attr( $cars_query->max_num_pages ); ?>"
          data-server-filtered="<?php echo $has_server_filters ? 'true' : 'false'; ?>">
 
-        <div class="car-listings-wrapper tcp-grid">
+        <div class="car-listings-wrapper tcp-grid car-card-grid">
             <?php
             if ( $cars_query->have_posts() ) :
                 $post_ids = wp_list_pluck( $cars_query->posts, 'ID' );

@@ -100,7 +100,7 @@ function autoagora_similar_cars_shortcode($atts): string {
     ?>
     <section class="autoagora-feature-section autoagora-similar-cars">
         <h2 class="autoagora-feature-title"><?php echo esc_html($atts['title']); ?></h2>
-        <div class="autoagora-card-grid">
+        <div class="autoagora-card-grid car-card-grid">
             <?php
             $index = 0;
             while ($query->have_posts()) :
@@ -225,7 +225,7 @@ function autoagora_price_drop_cars_shortcode($atts): string {
     <section class="autoagora-feature-section autoagora-price-drops">
         <h2 class="autoagora-feature-title"><?php echo esc_html($atts['title']); ?></h2>
         <?php if ($query->have_posts()) : ?>
-            <div class="autoagora-card-grid">
+            <div class="autoagora-card-grid car-card-grid">
                 <?php
                 $index = 0;
                 while ($query->have_posts()) :

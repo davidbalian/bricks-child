@@ -610,7 +610,7 @@ function car_listings_render_output($car_query, $atts) {
          <?php if (!empty($filter_group)) : ?>data-filter-group="<?php echo esc_attr($filter_group); ?>"<?php endif; ?>>
 
         <?php if ($car_query->have_posts()) : ?>
-            <div class="car-listings-wrapper">
+            <div class="car-listings-wrapper<?php echo $use_car_card && $layout === 'grid' ? ' car-card-grid' : ''; ?>">
                 <?php
                 $listing_card_index = 0;
                 while ($car_query->have_posts()) :

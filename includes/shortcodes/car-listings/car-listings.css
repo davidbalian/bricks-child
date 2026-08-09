@@ -9,7 +9,7 @@
 }
 
 /* === Grid Layout === */
-.car-listings-grid .car-listings-wrapper {
+.car-listings-grid .car-listings-wrapper:not(.car-card-grid) {
     display: grid;
     justify-content: start;
     justify-items: stretch;
@@ -222,7 +222,7 @@
 
 /* === Responsive === */
 @media (max-width: 768px) {
-    .car-listings-grid .car-listings-wrapper {
+    .car-listings-grid .car-listings-wrapper:not(.car-card-grid) {
         gap: 16px;
     }
 
@@ -232,7 +232,7 @@
 }
 
 @media (max-width: 480px) {
-    .car-listings-grid .car-listings-wrapper {
+    .car-listings-grid .car-listings-wrapper:not(.car-card-grid) {
         grid-template-columns: 1fr;
     }
 }

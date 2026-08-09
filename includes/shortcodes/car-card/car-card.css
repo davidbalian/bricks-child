@@ -2,6 +2,28 @@
    Car Card Component
    ============================================ */
 
+/* One grid contract for every non-carousel collection of shared car cards. */
+.car-card-grid {
+    display: grid;
+    justify-content: start;
+    justify-items: stretch;
+    align-items: stretch;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+@media (max-width: 767px) {
+    .car-card-grid {
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 479px) {
+    .car-card-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* ── Card container ── */
 .car-card {
     position: relative;
