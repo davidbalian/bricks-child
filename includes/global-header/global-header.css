@@ -593,6 +593,7 @@ html.aag-site-header-menu-open {
         max-height: 40px;
         background-color: #0d86e3 !important;
         border-radius: 999px;
+        transform: translateY(-3px);
         transition: background-color 0.1s ease;
     }
 
