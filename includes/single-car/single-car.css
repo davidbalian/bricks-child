@@ -23,6 +23,7 @@
     --single-car-leading-copy: 1.65;
     --single-car-radius-panel: 10px;
     --single-car-radius-card: 13px;
+    --single-car-radius-action: .5rem;
     --single-car-radius-pill: 999px;
     background: var(--single-car-page);
     color: var(--single-car-text);
@@ -288,7 +289,7 @@ body.admin-bar .autoagora-single-car__gallery {
     width: 100%;
     min-height: 3.1rem;
     justify-content: center !important;
-    border-radius: var(--single-car-radius-pill) !important;
+    border-radius: var(--single-car-radius-action) !important;
     font-size: var(--single-car-font-meta);
     font-weight: var(--single-car-weight-strong);
     line-height: 1;
