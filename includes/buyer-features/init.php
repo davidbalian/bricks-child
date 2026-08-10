@@ -346,7 +346,7 @@ function autoagora_get_compare_data(int $post_id): array {
     return array(
         'car-id' => $post_id,
         'title' => get_the_title($post_id),
-        'url' => get_permalink($post_id),
+        'url' => autoagora_localized_content_url($post_id),
         'price' => autoagora_format_eur(get_post_meta($post_id, 'price', true)),
         'mileage' => autoagora_format_km(get_post_meta($post_id, 'mileage', true)),
         'year' => (string) get_post_meta($post_id, 'year', true),

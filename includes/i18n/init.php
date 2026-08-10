@@ -13,6 +13,63 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Return the active frontend language slug.
  */
 function autoagora_current_language() {
+	$available_languages = function_exists( 'pll_languages_list' )
+		? pll_languages_list( array( 'fields' => 'slug' ) )
+		: array( 'en', 'el', 'ru' );
+	$available_languages = is_array( $available_languages ) ? $available_languages : array( 'en', 'el', 'ru' );
+
+	$explicit_language = isset( $_REQUEST['lang'] ) && is_string( $_REQUEST['lang'] )
+		? sanitize_key( wp_unslash( $_REQUEST['lang'] ) )
+		: '';
+	if ( $explicit_language !== '' && in_array( $explicit_language, $available_languages, true ) ) {
+		return $explicit_language;
+	}
+
+	$request_path = isset( $_SERVER['REQUEST_URI'] )
+		? wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH )
+		: '';
+	if ( is_string( $request_path ) ) {
+		$request_segments = explode( '/', trim( $request_path, '/' ) );
+		if ( ! empty( $request_segments[0] ) && in_array( $request_segments[0], $available_languages, true ) ) {
+			return $request_segments[0];
+		}
+	}
+
+	$cookie_language = isset( $_COOKIE['pll_language'] ) && is_string( $_COOKIE['pll_language'] )
+		? sanitize_key( wp_unslash( $_COOKIE['pll_language'] ) )
+		: '';
+	$is_neutral_singular = ! is_admin()
+		&& function_exists( 'is_singular' )
+		&& is_singular( array( 'car', 'buyer_request', 'dealer_profile' ) );
+
+	if ( $is_neutral_singular && $cookie_language !== '' && in_array( $cookie_language, $available_languages, true ) ) {
+		return $cookie_language;
+	}
+
+	$script_name          = isset( $_SERVER['SCRIPT_NAME'] ) ? basename( wp_unslash( $_SERVER['SCRIPT_NAME'] ) ) : '';
+	$is_transport_request = wp_doing_ajax() || $script_name === 'admin-post.php';
+	$referer              = wp_get_referer();
+	if ( $referer && ( $is_transport_request || $is_neutral_singular ) ) {
+		$referer_query = wp_parse_url( $referer, PHP_URL_QUERY );
+		if ( is_string( $referer_query ) ) {
+			parse_str( $referer_query, $referer_args );
+			$referer_language = isset( $referer_args['lang'] ) && is_string( $referer_args['lang'] )
+				? sanitize_key( $referer_args['lang'] )
+				: '';
+			if ( $referer_language !== '' && in_array( $referer_language, $available_languages, true ) ) {
+				return $referer_language;
+			}
+		}
+
+		$referer_path = wp_parse_url( $referer, PHP_URL_PATH );
+		if ( is_string( $referer_path ) ) {
+			$referer_segments = explode( '/', trim( $referer_path, '/' ) );
+			if ( ! empty( $referer_segments[0] ) && in_array( $referer_segments[0], $available_languages, true ) ) {
+				return $referer_segments[0];
+			}
+		}
+	}
+
 	if ( function_exists( 'pll_current_language' ) ) {
 		$language = pll_current_language( 'slug' );
 		if ( is_string( $language ) && $language !== '' ) {
@@ -20,31 +77,12 @@ function autoagora_current_language() {
 		}
 	}
 
-	$available_languages = function_exists( 'pll_languages_list' )
-		? pll_languages_list( array( 'fields' => 'slug' ) )
-		: array( 'en', 'el', 'ru' );
-	$available_languages = is_array( $available_languages ) ? $available_languages : array( 'en', 'el', 'ru' );
-
-	$candidates = array(
-		isset( $_REQUEST['lang'] ) ? sanitize_key( wp_unslash( $_REQUEST['lang'] ) ) : '',
-		isset( $_COOKIE['pll_language'] ) ? sanitize_key( wp_unslash( $_COOKIE['pll_language'] ) ) : '',
-	);
-	foreach ( $candidates as $candidate ) {
-		if ( $candidate !== '' && in_array( $candidate, $available_languages, true ) ) {
-			return $candidate;
-		}
+	if ( $cookie_language !== '' && in_array( $cookie_language, $available_languages, true ) ) {
+		return $cookie_language;
 	}
 
-	$referer      = wp_get_referer();
-	$referer_path = $referer ? wp_parse_url( $referer, PHP_URL_PATH ) : '';
-	if ( is_string( $referer_path ) ) {
-		$segments = explode( '/', trim( $referer_path, '/' ) );
-		if ( ! empty( $segments[0] ) && in_array( $segments[0], $available_languages, true ) ) {
-			return $segments[0];
-		}
-	}
-
-	return substr( determine_locale(), 0, 2 );
+	$locale_language = substr( determine_locale(), 0, 2 );
+	return in_array( $locale_language, $available_languages, true ) ? $locale_language : 'en';
 }
 
 /**
@@ -205,4 +243,59 @@ function autoagora_localized_page_url( $english_slug = '' ) {
 	}
 
 	return home_url( '/' . $english_slug . '/' );
+}
+
+/**
+ * Return a frontend URL for language-neutral marketplace content.
+ *
+ * Cars, buyer requests, and dealer profiles are user-generated records rather
+ * than separately translated posts. Keep their canonical permalink intact for
+ * SEO, but carry the selected interface language while the visitor browses.
+ * If a post does have a real Polylang translation, prefer that permalink.
+ *
+ * @param int         $post_id  Post ID.
+ * @param string|null $language Optional language slug. Defaults to the current language.
+ * @return string
+ */
+function autoagora_localized_content_url( $post_id, $language = null ) {
+	$post_id = absint( $post_id );
+	if ( ! $post_id ) {
+		return '';
+	}
+
+	$canonical_url = get_permalink( $post_id );
+	if ( ! is_string( $canonical_url ) || $canonical_url === '' ) {
+		return '';
+	}
+
+	$language = sanitize_key( $language ?: autoagora_current_language() );
+	$default_language = function_exists( 'pll_default_language' )
+		? pll_default_language( 'slug' )
+		: 'en';
+	$default_language = is_string( $default_language ) && $default_language !== '' ? $default_language : 'en';
+
+	if ( $language === '' || $language === $default_language ) {
+		return $canonical_url;
+	}
+
+	if ( function_exists( 'pll_get_post' ) ) {
+		$translated_id = pll_get_post( $post_id, $language );
+		if ( $translated_id && (int) $translated_id !== $post_id ) {
+			$translated_url = get_permalink( $translated_id );
+			if ( is_string( $translated_url ) && $translated_url !== '' ) {
+				return $translated_url;
+			}
+		}
+	}
+
+	$neutral_post_types = (array) apply_filters(
+		'autoagora_language_neutral_post_types',
+		array( 'car', 'buyer_request', 'dealer_profile' )
+	);
+
+	if ( ! in_array( get_post_type( $post_id ), $neutral_post_types, true ) ) {
+		return $canonical_url;
+	}
+
+	return add_query_arg( 'lang', $language, $canonical_url );
 }

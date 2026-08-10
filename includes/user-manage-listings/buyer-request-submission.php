@@ -150,13 +150,10 @@ function handle_add_buyer_request() {
         update_field('buyer_description', $description, $post_id);
     }
     
-    // Redirect to success page (buyer requests listing page)
-    $buyer_requests_page = get_page_by_path('buyer-requests');
-    if ($buyer_requests_page) {
-        wp_redirect(add_query_arg('request_submitted', 'success', get_permalink($buyer_requests_page->ID)));
-    } else {
-        wp_redirect(add_query_arg('request_submitted', 'success', autoagora_localized_page_url('buyer-requests')));
-    }
+    // Redirect to the buyer requests index in the submitted language.
+    wp_safe_redirect(
+        add_query_arg('request_submitted', 'success', autoagora_localized_page_url('buyer-requests'))
+    );
     exit;
 }
 
@@ -208,14 +205,11 @@ function handle_delete_buyer_request() {
     wp_trash_post( $post_id );
 
     // Redirect to buyer requests index with a success flag
-    $buyer_requests_page = get_page_by_path( 'buyer-requests' );
-    if ( $buyer_requests_page ) {
-        $redirect_url = get_permalink( $buyer_requests_page->ID );
-    } else {
-        $redirect_url = autoagora_localized_page_url( 'buyer-requests' );
-    }
-
-    $redirect_url = add_query_arg( 'buyer_request_deleted', 'success', $redirect_url );
+    $redirect_url = add_query_arg(
+        'buyer_request_deleted',
+        'success',
+        autoagora_localized_page_url( 'buyer-requests' )
+    );
 
     wp_safe_redirect( $redirect_url );
     exit;

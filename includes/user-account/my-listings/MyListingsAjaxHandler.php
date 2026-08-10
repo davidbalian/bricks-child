@@ -310,7 +310,7 @@ class MyListingsAjaxHandler {
                 if (!empty($all_images)) {
                     $main_image_url = wp_get_attachment_image_url($all_images[0], 'large');
                     ?>
-                    <a href="<?php echo esc_url(get_permalink($post_id)); ?>" class="listing-image-link">
+                    <a href="<?php echo esc_url(autoagora_localized_content_url($post_id)); ?>" class="listing-image-link">
                         <img src="<?php echo esc_url($main_image_url); ?>" alt="<?php echo esc_attr(get_the_title($post_id)); ?>" class="listing-image">
                         <div class="image-count">
                             <i class="fas fa-camera"></i>
@@ -323,7 +323,7 @@ class MyListingsAjaxHandler {
             </div>
             <div class="listing-details">
                 <div class="title-and-price">
-                    <a href="<?php echo esc_url(get_permalink($post_id)); ?>" class="listing-title-link">
+                    <a href="<?php echo esc_url(autoagora_localized_content_url($post_id)); ?>" class="listing-title-link">
                         <h3 class="listing-title"><?php echo esc_html(get_the_title($post_id)); ?></h3>
                     </a>
                     <h4 class="listing-price">

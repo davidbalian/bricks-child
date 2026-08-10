@@ -75,7 +75,7 @@ get_header(); ?>
                     }
                     
                     $date = get_the_date();
-                    $permalink = get_permalink( $post_id );
+					$permalink = autoagora_localized_content_url( $post_id );
                     
                     // Truncate description for card view
                     $description_preview = '';

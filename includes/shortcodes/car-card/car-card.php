@@ -109,7 +109,7 @@ function render_car_card($post_id, $context = array()) {
     $transmission = car_card_get_meta_value($post_id, 'transmission');
     $car_district = car_card_get_meta_value($post_id, 'car_district');
     $car_city = car_card_get_meta_value($post_id, 'car_city');
-    $permalink = get_permalink($post_id);
+    $permalink = autoagora_localized_content_url($post_id);
 
     // Relative date
     $publication_date = get_post_meta($post_id, 'publication_date', true);

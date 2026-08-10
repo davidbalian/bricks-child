@@ -80,17 +80,15 @@ get_header(); ?>
 								<p class="login-submit">
 									<input type="submit" name="wp-submit" id="wp-submit" class="btn btn-primary" value="<?php esc_attr_e( 'Log In', 'bricks-child' ); ?>" />
 									<input type="hidden" name="redirect_to" value="<?php echo esc_url( autoagora_localized_page_url() ); ?>" />
+									<input type="hidden" name="lang" value="<?php echo esc_attr( autoagora_current_language() ); ?>" />
 									<!-- Add custom redirect for failed login -->
-									<input type="hidden" name="login_failed_redirect" value="<?php echo esc_url( get_permalink() ); ?>?login=failed" />
+									<input type="hidden" name="login_failed_redirect" value="<?php echo esc_url( autoagora_localized_page_url( 'signin' ) ); ?>" />
 								</p>
 							</form>
 
 							<p class="register-link">
 								<?php
-								$registration_page = get_page_by_path( 'register' ); // Adjust slug if needed
-								if ( $registration_page ) {
-									echo '<a href="' . esc_url( get_permalink( $registration_page->ID ) ) . '">' . esc_html__( 'Don’t have an account? Register ', 'bricks-child' ) . '</a>';
-								}
+								echo '<a href="' . esc_url( autoagora_localized_page_url( 'register' ) ) . '">' . esc_html__( 'Don’t have an account? Register ', 'bricks-child' ) . '</a>';
 								?>
 							</p>
 							<p class="lost-password">

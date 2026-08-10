@@ -61,7 +61,7 @@ function car_card_listing_relative_date_markup($post_id) {
  * @return array<string, mixed>
  */
 function car_card_build_listing_json_payload($post_id, $listing_index, $is_favorite) {
-    $permalink = get_permalink($post_id);
+    $permalink = autoagora_localized_content_url($post_id);
     $title = get_post_field('post_title', $post_id);
 
     $mileage = car_card_get_meta_value($post_id, 'mileage');

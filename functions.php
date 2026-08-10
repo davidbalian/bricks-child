@@ -277,12 +277,12 @@ function get_main_post_permalink_from_data_attribute() {
         while ( $element ) {
             if ( isset( $element->attributes['data-main-post-id'] ) && ! empty( $element->attributes['data-main-post-id'] ) ) {
                 $main_post_id = $element->attributes['data-main-post-id'];
-                return get_permalink( (int) $main_post_id );
+                return autoagora_localized_content_url( (int) $main_post_id );
             }
             $element = $element->parent;
         }
     } else {
-        return get_permalink( get_the_ID() );
+        return autoagora_localized_content_url( get_the_ID() );
     }
     return '#'; // Fallback
 }

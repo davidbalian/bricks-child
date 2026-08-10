@@ -81,6 +81,7 @@ get_header(); ?>
                                 <?php wp_nonce_field( 'delete_buyer_request_nonce', 'delete_buyer_request_nonce' ); ?>
                                 <input type="hidden" name="action" value="delete_buyer_request">
                                 <input type="hidden" name="buyer_request_id" value="<?php echo esc_attr( $post_id ); ?>">
+                                <input type="hidden" name="lang" value="<?php echo esc_attr( autoagora_current_language() ); ?>">
                                 <button type="submit" class="buyer-request-delete-button">
                                     <?php echo get_svg_icon( 'trash' ); ?>
                                     <span><?php esc_html_e( 'Delete this request', 'bricks-child' ); ?></span>

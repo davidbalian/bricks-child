@@ -677,7 +677,7 @@ function car_listings_render_card($post_id) {
     ?>
 
     <article class="car-listings-card<?php echo $is_sold ? ' is-sold' : ''; ?>" data-post-id="<?php echo esc_attr($post_id); ?>">
-        <a href="<?php echo esc_url(get_permalink($post_id)); ?>" class="car-listings-card-link">
+        <a href="<?php echo esc_url(autoagora_localized_content_url($post_id)); ?>" class="car-listings-card-link">
             <div class="car-listings-card-image">
                 <?php if ($image_url) : ?>
                     <img src="<?php echo esc_url($image_url); ?>"

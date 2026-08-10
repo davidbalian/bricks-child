@@ -131,7 +131,7 @@ function custom_handle_registration() {
             // Store errors to display on the same page (will require modification in registration-form.php to show)
             set_transient( 'registration_errors_' . md5($phone), $errors, 30 ); // Use a specific key
             // Redirect back to the registration page (which should ideally retain form values)
-            wp_safe_redirect( get_permalink( get_the_ID() ) ); // Consider adding query args if needed
+            wp_safe_redirect( autoagora_localized_page_url( 'register' ) );
             exit;
         }
 
@@ -148,7 +148,7 @@ function custom_handle_registration() {
         if ( is_wp_error( $user_id ) ) {
             $errors->add( 'registration_failed', $user_id->get_error_message() );
             set_transient( 'registration_errors_' . md5($phone), $errors, 30 );
-            wp_safe_redirect( get_permalink( get_the_ID() ) );
+            wp_safe_redirect( autoagora_localized_page_url( 'register' ) );
             exit;
         } else {
             // Update user meta

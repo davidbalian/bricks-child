@@ -80,7 +80,7 @@ add_action( 'wp_enqueue_scripts', 'autoagora_code_header_enqueue_assets', 30 );
  * Main navigation items copied from the active Bricks header.
  */
 function autoagora_code_header_menu_items() {
-	return array(
+	$items = array(
 		array( 'label' => __( 'Used Cars', 'bricks-child' ), 'slug' => 'cars' ),
 		array( 'label' => __( 'Sell my Car', 'bricks-child' ), 'slug' => 'add-listing' ),
 		array( 'label' => __( 'Blog', 'bricks-child' ), 'slug' => 'blog' ),
@@ -90,6 +90,23 @@ function autoagora_code_header_menu_items() {
 		array( 'label' => __( 'Contact', 'bricks-child' ), 'slug' => 'contact' ),
 		array( 'label' => __( 'Become a Dealer', 'bricks-child' ), 'slug' => 'become-a-dealer' ),
 	);
+
+	$language = function_exists( 'autoagora_current_language' )
+		? autoagora_current_language()
+		: 'en';
+
+	if ( 'en' !== $language ) {
+		$items = array_values(
+			array_filter(
+				$items,
+				static function( $item ) {
+					return ! in_array( $item['slug'], array( 'blog', 'autoportal-blog' ), true );
+				}
+			)
+		);
+	}
+
+	return $items;
 }
 
 /**

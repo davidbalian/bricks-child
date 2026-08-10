@@ -153,7 +153,7 @@ $car_query = new WP_Query($args);
                                 echo '<div class="car-listing-image' . ($index === 0 ? ' active' : '') . '" data-index="' . $index . '">';
                                 echo '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($year . ' ' . $make . ' ' . $model) . '">';
                                 if ($index === count($all_images) - 1 && count($all_images) > 1) {
-                            echo '<a href="' . esc_url(get_permalink()) . '" class="see-all-images" style="display: none;">' . esc_html__('See All Images', 'bricks-child') . '</a>';
+                            echo '<a href="' . esc_url(autoagora_localized_content_url(get_the_ID())) . '" class="see-all-images" style="display: none;">' . esc_html__('See All Images', 'bricks-child') . '</a>';
                                 }
                                 echo '</div>';
                             }
@@ -168,7 +168,7 @@ $car_query = new WP_Query($args);
                     }
                     ?>
                     
-                    <a href="<?php echo esc_url(get_permalink()); ?>" class="car-listing-link">
+                    <a href="<?php echo esc_url(autoagora_localized_content_url(get_the_ID())); ?>" class="car-listing-link">
                         <div class="car-listing-details">
                             <h2 class="car-title"><?php echo esc_html($make . ' ' . $model); ?></h2>
                             <div class="car-specs">

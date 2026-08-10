@@ -154,6 +154,7 @@ get_header(); ?>
             <form id="create-buyer-request-form" class="buyer-request-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
                 <?php wp_nonce_field( 'add_buyer_request_nonce', 'add_buyer_request_nonce' ); ?>
                 <input type="hidden" name="action" value="add_new_buyer_request">
+                <input type="hidden" name="lang" value="<?php echo esc_attr( autoagora_current_language() ); ?>">
                 
                 <div class="form-section basic-details-section input-wrapper">
                     <h2><?php echo get_svg_icon('circle-info'); ?> <?php esc_html_e( 'Car Details', 'bricks-child' ); ?></h2>

@@ -1010,7 +1010,7 @@ function autoagora_render_dealer_profile_card(int $post_id): void
     <article class="dealer-profile-card">
         <div class="dealer-profile-card__body">
             <div class="dealer-profile-card__heading">
-                <h2><a href="<?php echo esc_url(get_permalink($post_id)); ?>"><?php echo esc_html(get_the_title($post_id)); ?></a></h2>
+                <h2><a href="<?php echo esc_url(autoagora_localized_content_url($post_id)); ?>"><?php echo esc_html(get_the_title($post_id)); ?></a></h2>
                 <span class="dealer-profile-badge <?php echo $is_claimed ? 'is-claimed' : 'is-unclaimed'; ?>">
                     <?php echo esc_html($is_claimed ? __('Claimed', 'bricks-child') : __('Unclaimed', 'bricks-child')); ?>
                 </span>
@@ -1041,7 +1041,7 @@ function autoagora_render_dealer_profile_card(int $post_id): void
                 </div>
             <?php endif; ?>
         </div>
-        <a class="btn btn-primary dealer-profile-card__action" href="<?php echo esc_url(get_permalink($post_id)); ?>">
+        <a class="btn btn-primary dealer-profile-card__action" href="<?php echo esc_url(autoagora_localized_content_url($post_id)); ?>">
             <?php esc_html_e('View profile', 'bricks-child'); ?>
         </a>
     </article>

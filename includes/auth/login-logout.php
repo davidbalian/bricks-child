@@ -40,10 +40,16 @@ add_filter( 'wp_logout_redirect', 'custom_logout_redirect', 10, 4 );
  * Replace the default login URL.
  */
 function custom_login_page_url( $login_url, $redirect, $force_reauth ) {
-    $custom_login_page_id = get_page_by_path( 'signin' )->ID;
-    if ( $custom_login_page_id ) {
-        $login_url = get_permalink( $custom_login_page_id );
+    $login_url = autoagora_localized_page_url( 'signin' );
+
+    if ( $redirect !== '' ) {
+        $login_url = add_query_arg( 'redirect_to', $redirect, $login_url );
     }
+
+    if ( $force_reauth ) {
+        $login_url = add_query_arg( 'reauth', '1', $login_url );
+    }
+
     return $login_url;
 }
 add_filter( 'login_url', 'custom_login_page_url', 10, 3 );
@@ -78,11 +84,8 @@ function redirect_login_page() {
         
         // Only allow access if admin_access=true is present
         if ( !isset($_GET['admin_access']) || $_GET['admin_access'] !== 'true' ) {
-            $custom_login_page_id = get_page_by_path( 'signin' )->ID;
-            if ( $custom_login_page_id ) {
-                wp_redirect( get_permalink( $custom_login_page_id ) );
-                exit;
-            }
+            wp_redirect( autoagora_localized_page_url( 'signin' ) );
+            exit;
         }
     }
 }
@@ -144,26 +147,13 @@ add_filter( 'authenticate', 'allow_phone_number_login', 30, 3 );
  * Handle failed login attempts and redirect to custom login page
  */
 function custom_login_failed( $username ) {
-    // Get the referrer URL to determine where the login attempt came from
-    $referrer = wp_get_referer();
-    
-    // Check if the login attempt came from our custom login page
-    $custom_login_page = get_page_by_path( 'signin' );
-    
-    if ( $custom_login_page && $referrer && strpos( $referrer, get_permalink( $custom_login_page->ID ) ) !== false ) {
-        // Redirect back to our custom login page with error parameter
-        $redirect_url = add_query_arg( 'login', 'failed', get_permalink( $custom_login_page->ID ) );
-        wp_redirect( $redirect_url );
-        exit;
-    }
-    
-    // If the login attempt didn't come from our custom page, fall back to default behavior
-    // This covers cases where someone tries to login directly via wp-login.php
-    if ( $custom_login_page ) {
-        $redirect_url = add_query_arg( 'login', 'failed', get_permalink( $custom_login_page->ID ) );
-        wp_redirect( $redirect_url );
-        exit;
-    }
+    $posted_redirect = isset( $_POST['login_failed_redirect'] )
+        ? wp_validate_redirect( wp_unslash( $_POST['login_failed_redirect'] ), '' )
+        : '';
+    $redirect_url = $posted_redirect ?: autoagora_localized_page_url( 'signin' );
+
+    wp_safe_redirect( add_query_arg( 'login', 'failed', $redirect_url ) );
+    exit;
 }
 add_action( 'wp_login_failed', 'custom_login_failed' );
 
@@ -173,12 +163,8 @@ add_action( 'wp_login_failed', 'custom_login_failed' );
 function custom_login_empty_credentials() {
     // Check if this is a login attempt with empty credentials
     if ( isset( $_POST['wp-submit'] ) && ( empty( $_POST['log'] ) || empty( $_POST['pwd'] ) ) ) {
-        $custom_login_page = get_page_by_path( 'signin' );
-        
-        if ( $custom_login_page ) {
-            wp_redirect( add_query_arg( 'login', 'failed', get_permalink( $custom_login_page->ID ) ) );
-            exit;
-        }
+        wp_safe_redirect( add_query_arg( 'login', 'failed', autoagora_localized_page_url( 'signin' ) ) );
+        exit;
     }
 }
 add_action( 'init', 'custom_login_empty_credentials' );
@@ -191,11 +177,8 @@ function redirect_wp_login_errors() {
     
     // If someone somehow ends up on wp-login.php with errors, redirect to custom page
     if ( $pagenow === 'wp-login.php' && isset( $_GET['action'] ) && $_GET['action'] === 'login' ) {
-        $custom_login_page = get_page_by_path( 'signin' );
-        if ( $custom_login_page ) {
-            wp_redirect( add_query_arg( 'login', 'failed', get_permalink( $custom_login_page->ID ) ) );
-            exit;
-        }
+        wp_safe_redirect( add_query_arg( 'login', 'failed', autoagora_localized_page_url( 'signin' ) ) );
+        exit;
     }
 }
 add_action( 'admin_init', 'redirect_wp_login_errors' );
@@ -204,31 +187,24 @@ add_action( 'admin_init', 'redirect_wp_login_errors' );
  * Override the "Lost your password?" link in login form
  */
 function redirect_lost_password_to_custom_page() {
-    // Get the forgot password page URL
-    $forgot_password_page = get_page_by_path('forgot-password');
-    
-    if ($forgot_password_page) {
-        $custom_url = get_permalink($forgot_password_page->ID);
-        
-        // Use JavaScript to replace the lost password link
-        ?>
-        <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            // Find the lost password link and update it
-            const lostPasswordLinks = document.querySelectorAll('a[href*="wp-login.php?action=lostpassword"]');
-            lostPasswordLinks.forEach(function(link) {
-                link.href = '<?php echo esc_url($custom_url); ?>';
-            });
-            
-            // Also check for other common selectors
-            const navLinks = document.querySelectorAll('a[href*="action=lostpassword"]');
-            navLinks.forEach(function(link) {
-                link.href = '<?php echo esc_url($custom_url); ?>';
-            });
+    $custom_url = autoagora_localized_page_url( 'forgot-password' );
+    ?>
+    <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Find the lost password link and update it
+        const lostPasswordLinks = document.querySelectorAll('a[href*="wp-login.php?action=lostpassword"]');
+        lostPasswordLinks.forEach(function(link) {
+            link.href = '<?php echo esc_url($custom_url); ?>';
         });
-        </script>
-        <?php
-    }
+
+        // Also check for other common selectors
+        const navLinks = document.querySelectorAll('a[href*="action=lostpassword"]');
+        navLinks.forEach(function(link) {
+            link.href = '<?php echo esc_url($custom_url); ?>';
+        });
+    });
+    </script>
+    <?php
 }
 
 // Hook into login page and any page that might show login forms
@@ -239,13 +215,7 @@ add_action('wp_footer', 'redirect_lost_password_to_custom_page');
  * Filter the lost password URL to use our custom page
  */
 function custom_lost_password_url($url) {
-    $forgot_password_page = get_page_by_path('forgot-password');
-    
-    if ($forgot_password_page) {
-        return get_permalink($forgot_password_page->ID);
-    }
-    
-    return $url; // Fallback to default if page not found
+    return autoagora_localized_page_url( 'forgot-password' );
 }
 add_filter('lostpassword_url', 'custom_lost_password_url', 10, 1); 
 
