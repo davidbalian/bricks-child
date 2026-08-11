@@ -100,6 +100,7 @@ function autoagora_translation_catalog( $language = null ) {
 		'el' => array(
 			get_stylesheet_directory() . '/includes/i18n/translations/el.php',
 			get_stylesheet_directory() . '/includes/i18n/translations/el-frontend.php',
+			get_stylesheet_directory() . '/includes/i18n/translations/el-overrides.php',
 		),
 		'ru' => array(
 			get_stylesheet_directory() . '/includes/i18n/translations/ru.php',

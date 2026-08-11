@@ -110,7 +110,7 @@ function autoagora_code_header_menu_items() {
 }
 
 /**
- * Render a compact Polylang language switcher.
+ * Render a compact Polylang language switcher for every visitor.
  *
  * Polylang supplies the translated URL for the current page. When a page has
  * no translation, fall back to that language's homepage rather than outputting
@@ -119,7 +119,7 @@ function autoagora_code_header_menu_items() {
  * @param string $modifier_class Optional presentation modifier.
  */
 function autoagora_code_header_render_language_switcher( $modifier_class = '' ) {
-	if ( ! current_user_can( 'manage_options' ) || ! function_exists( 'pll_the_languages' ) ) {
+	if ( ! function_exists( 'pll_the_languages' ) ) {
 		return;
 	}
 
