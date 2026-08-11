@@ -128,7 +128,7 @@ wp_localize_script('astra-child-add-listing-js', 'addListingData', array(
 		'optimizationErrorSummary' => __('{count} image(s) were not optimized. Please check the images and try again.', 'bricks-child'),
 		'original' => __('Original', 'bricks-child'),
 		'optimized' => __('Optimized', 'bricks-child'),
-		'saved' => __('Saved', 'bricks-child'),
+		'saved' => __('Space saved', 'bricks-child'),
     )
 ));
 

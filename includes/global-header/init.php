@@ -219,7 +219,7 @@ function autoagora_code_header_account_links() {
 	<a href="<?php echo esc_url( autoagora_code_header_url( 'my-listings' ) ); ?>"><?php esc_html_e( 'My listings', 'bricks-child' ); ?></a>
 	<a href="<?php echo esc_url( autoagora_code_header_url( 'favourite-listings' ) ); ?>" class="aag-site-header__saved-link">
 		<span class="aag-site-header__saved-icon"><?php echo autoagora_code_header_icon( 'heart' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-		<?php esc_html_e( 'Saved', 'bricks-child' ); ?>
+		<?php esc_html_e( 'Saved cars', 'bricks-child' ); ?>
 	</a>
 	<a href="<?php echo esc_url( wp_logout_url( autoagora_code_header_url() ) ); ?>"><?php esc_html_e( 'Log out', 'bricks-child' ); ?></a>
 	<?php

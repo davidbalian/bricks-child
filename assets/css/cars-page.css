@@ -152,6 +152,26 @@ body {
     background: var(--tcp-filter-pill-active);
     color: #fff;
 }
+.tcp-location-filter {
+    border-color: #b8d7f1;
+    background: #eef7ff;
+    color: #0b72c1;
+    font-weight: 600;
+}
+.tcp-location-filter:hover {
+    border-color: #86bce8;
+    background: #e3f2ff;
+    color: #095f9f;
+}
+.tcp-location-filter__icon {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
 .tcp-toolbar-actions {
     display: flex;
     align-items: center;

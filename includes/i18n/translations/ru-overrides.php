@@ -20,6 +20,8 @@ return array(
 	'My listings' => 'Мои объявления',
 	'My Listings' => 'Мои объявления',
 	'Saved' => 'Избранное',
+	'Saved cars' => 'Избранные автомобили',
+	'Space saved' => 'Сэкономлено места',
 	'Log out' => 'Выйти',
 	'Login' => 'Войти',
 	'Register' => 'Регистрация',

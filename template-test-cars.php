@@ -163,14 +163,19 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
 			<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
 		</a>
 		<h1 class="tcp-page-heading"><?php esc_html_e('Used Cars for Sale in Cyprus', 'bricks-child'); ?></h1>
-		<button type="button" class="tcp-page-nav__action tcp-page-nav__saved" aria-label="<?php esc_attr_e( 'Favourites', 'bricks-child' ); ?>" aria-pressed="false">
+		<a class="tcp-page-nav__action tcp-page-nav__saved" href="<?php echo esc_url( autoagora_localized_page_url( 'favourite-listings' ) ); ?>" aria-label="<?php esc_attr_e( 'Favourites', 'bricks-child' ); ?>">
 			<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>
-		</button>
+		</a>
     </div>
     <div class="tcp-filters-bar-inner">
 		<button type="button" class="tcp-filters-btn" id="tcp-filters-btn">
 			<svg class="lucide lucide-sliders-horizontal" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
 			<?php esc_html_e('Filters', 'bricks-child'); ?>
+        </button>
+        <button type="button" class="tcp-quick-filter tcp-location-filter" data-filter-target="location" data-default-label="<?php esc_attr_e('Location', 'bricks-child'); ?>">
+            <svg class="tcp-location-filter__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            <span class="tcp-quick-filter__label"><?php esc_html_e('Location', 'bricks-child'); ?></span>
+            <span class="tcp-quick-filter__clear" aria-hidden="true"><?php echo autoagora_code_header_icon( 'close' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
         </button>
         <div class="tcp-quick-filters" aria-label="<?php esc_attr_e('Quick car filters', 'bricks-child'); ?>">
             <button type="button" class="tcp-quick-filter tcp-quick-filter--favourites" data-filter-target="favorites" data-default-label="<?php esc_attr_e('Favourites', 'bricks-child'); ?>" hidden><span class="tcp-quick-filter__label"><?php esc_html_e('Favourites', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true"><?php echo autoagora_code_header_icon( 'close' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span></button>
@@ -182,7 +187,6 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
             <button type="button" class="tcp-quick-filter" data-filter-target="body" data-default-label="<?php esc_attr_e('Body type', 'bricks-child'); ?>"><span class="tcp-quick-filter__label"><?php esc_html_e('Body type', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true"><?php echo autoagora_code_header_icon( 'close' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span></button>
             <button type="button" class="tcp-quick-filter" data-filter-target="fuel" data-default-label="<?php esc_attr_e('Fuel type', 'bricks-child'); ?>"><span class="tcp-quick-filter__label"><?php esc_html_e('Fuel type', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true"><?php echo autoagora_code_header_icon( 'close' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span></button>
             <button type="button" class="tcp-quick-filter" data-filter-target="engine" data-default-label="<?php esc_attr_e('Engine size', 'bricks-child'); ?>"><span class="tcp-quick-filter__label"><?php esc_html_e('Engine size', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true"><?php echo autoagora_code_header_icon( 'close' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span></button>
-            <button type="button" class="tcp-quick-filter" data-filter-target="location" data-default-label="<?php esc_attr_e('Location', 'bricks-child'); ?>"><span class="tcp-quick-filter__label"><?php esc_html_e('Location', 'bricks-child'); ?></span><span class="tcp-quick-filter__clear" aria-hidden="true"><?php echo autoagora_code_header_icon( 'close' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span></button>
         </div>
     </div>
     <div class="tcp-active-filters-row">
@@ -727,10 +731,6 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
     }
 
     $('#tcp-location-btn').on('click', openLocationModal);
-    $('.tcp-page-nav__saved').on('click', function() {
-        setFavoritesOnly(!favoritesOnly, true);
-    });
-
     $('.tcp-quick-filter').on('click', function(e) {
         var target = String($(this).data('filter-target') || '');
         if ($(e.target).closest('.tcp-quick-filter__clear').length || target === 'favorites') {
@@ -910,11 +910,6 @@ if ( isset( $listing_atts['card_type'] ) && $listing_atts['card_type'] === 'car_
                 .attr('aria-label', active && selectedLabel ? defaultLabel + ': ' + selectedLabel : defaultLabel);
             $button.find('.tcp-quick-filter__label').text(active && selectedLabel ? selectedLabel : defaultLabel);
 
-            if (target === 'favorites') {
-                $('.tcp-page-nav__saved')
-                    .toggleClass('is-active', active)
-                    .attr('aria-pressed', active ? 'true' : 'false');
-            }
         });
     }
 
