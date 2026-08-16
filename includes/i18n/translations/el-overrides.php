@@ -6,6 +6,10 @@
  */
 
 return array(
+	'Buying or selling a car in Cyprus?' => 'Αγοράζετε ή πουλάτε αυτοκίνητο στην Κύπρο;',
+	'Dismiss Facebook group invitation' => 'Κλείσιμο της πρόσκλησης στην ομάδα Facebook',
+	'Join the group' => 'Μπείτε στην ομάδα',
+	'See new listings, price drops and buyer requests in our Facebook community.' => 'Δείτε νέες αγγελίες, μειώσεις τιμών και αιτήματα αγοραστών στην κοινότητά μας στο Facebook.',
 	'%1$s - %2$d%% below typical' => '%1$s - %2$d%% κάτω από τη συνήθη τιμή',
 	'Adjust filters to match your needs; when you apply changes, you will move to the island-wide browse experience with the same filters.' => 'Προσαρμόστε τα φίλτρα στις ανάγκες σας. Με την εφαρμογή τους θα μεταφερθείτε στην αναζήτηση για όλη την Κύπρο, με τις ίδιες επιλογές.',
 	'Allow up to 5 minutes for delivery. Check your spam folder if needed.' => 'Η αποστολή μπορεί να χρειαστεί έως 5 λεπτά. Ελέγξτε και τον φάκελο ανεπιθύμητης αλληλογραφίας.',

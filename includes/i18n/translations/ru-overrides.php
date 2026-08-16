@@ -7,6 +7,10 @@
  */
 
 return array(
+	'Buying or selling a car in Cyprus?' => 'Покупаете или продаёте автомобиль на Кипре?',
+	'Dismiss Facebook group invitation' => 'Закрыть приглашение в группу Facebook',
+	'Join the group' => 'Вступить в группу',
+	'See new listings, price drops and buyer requests in our Facebook community.' => 'Смотрите новые объявления, снижения цен и запросы покупателей в нашем сообществе Facebook.',
 	// Global navigation and accounts.
 	'Used Cars' => 'Подержанные автомобили',
 	'Sell my Car' => 'Продать автомобиль',

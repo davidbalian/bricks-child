@@ -209,6 +209,148 @@ function autoagora_facebook_group_join_card(string $placement, string $context =
 }
 
 /**
+ * Check whether the current page is an English page or one of its Polylang translations.
+ */
+function autoagora_facebook_group_is_localized_page(string $english_slug): bool
+{
+    if (!is_page()) {
+        return false;
+    }
+
+    $source_page = get_page_by_path($english_slug);
+    if (!$source_page instanceof WP_Post) {
+        return false;
+    }
+
+    $current_id = get_queried_object_id();
+    if ($current_id === (int) $source_page->ID) {
+        return true;
+    }
+
+    if (!function_exists('pll_get_post')) {
+        return false;
+    }
+
+    $language = function_exists('autoagora_current_language') ? autoagora_current_language() : '';
+    $translated_id = $language !== ''
+        ? pll_get_post($source_page->ID, $language)
+        : pll_get_post($source_page->ID);
+
+    return $translated_id && $current_id === (int) $translated_id;
+}
+
+/**
+ * Return the campaign page type, or an empty string outside relevant browse journeys.
+ */
+function autoagora_facebook_group_campaign_page_type(): string
+{
+    if (is_front_page() || is_page_template('template-custom-homepage.php')) {
+        return 'homepage';
+    }
+
+    if (is_singular('car')) {
+        return 'single_car';
+    }
+
+    if (is_singular('buyer_request')) {
+        return 'single_buyer_request';
+    }
+
+    if (
+        is_page_template('template-buyer-requests.php')
+        || autoagora_facebook_group_is_localized_page('buyer-requests')
+    ) {
+        return 'buyer_requests';
+    }
+
+    $city_templates = array(
+        'template-cars-city-nicosia.php',
+        'template-cars-city-limassol.php',
+        'template-cars-city-larnaca.php',
+        'template-cars-city-paphos.php',
+    );
+    if (
+        is_page_template('template-test-cars.php')
+        || is_page_template($city_templates)
+        || is_post_type_archive('car')
+        || is_tax('car_make')
+        || autoagora_facebook_group_is_localized_page('cars')
+    ) {
+        return 'cars_browse';
+    }
+
+    return '';
+}
+
+/**
+ * Avoid stacking the campaign with the more important email-verification notice.
+ */
+function autoagora_facebook_group_email_notice_is_expected(): bool
+{
+    if (!is_user_logged_in()) {
+        return false;
+    }
+
+    $user_id = get_current_user_id();
+    if (get_user_meta($user_id, 'email_verified', true) === '1') {
+        return false;
+    }
+
+    if (!empty($_SESSION['email_notification_dismissed'])) {
+        return false;
+    }
+
+    $user = wp_get_current_user();
+    return strpos((string) $user->user_email, 'phone_user_') !== 0;
+}
+
+/**
+ * Render the benefit-led, measured banner below the code-owned header.
+ */
+function autoagora_render_facebook_group_campaign_banner(): void
+{
+    $page_type = autoagora_facebook_group_campaign_page_type();
+    if (
+        (function_exists('autoagora_code_header_is_enabled') && !autoagora_code_header_is_enabled())
+        || $page_type === ''
+        || autoagora_facebook_group_email_notice_is_expected()
+        || (autoagora_facebook_group_url() === '' && !autoagora_facebook_group_admin_preview())
+    ) {
+        return;
+    }
+
+    $heading_id = 'autoagora-facebook-campaign-heading';
+    ?>
+    <aside
+        class="autoagora-facebook-campaign-banner"
+        data-autoagora-facebook-campaign-banner
+        data-autoagora-facebook-page-type="<?php echo esc_attr($page_type); ?>"
+        data-autoagora-facebook-campaign="sticky_benefit_v1"
+        aria-labelledby="<?php echo esc_attr($heading_id); ?>"
+        hidden
+    >
+        <div class="autoagora-facebook-campaign-banner__inner">
+            <span class="autoagora-facebook-campaign-banner__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false"><path d="M13.5 22v-9h3l.45-3.5H13.5V7.27c0-1.01.28-1.7 1.73-1.7H17V2.44c-.76-.1-1.52-.15-2.28-.14-2.26 0-3.81 1.38-3.81 3.91V9.5H8v3.5h2.91v9h2.59Z"/></svg>
+            </span>
+            <div class="autoagora-facebook-campaign-banner__copy">
+                <strong id="<?php echo esc_attr($heading_id); ?>"><?php esc_html_e('Buying or selling a car in Cyprus?', 'bricks-child'); ?></strong>
+                <span><?php esc_html_e('See new listings, price drops and buyer requests in our Facebook community.', 'bricks-child'); ?></span>
+            </div>
+            <?php echo autoagora_facebook_group_link(__('Join the group', 'bricks-child'), 'browse_banner', 'autoagora-facebook-campaign-banner__cta'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+            <button
+                type="button"
+                class="autoagora-facebook-campaign-banner__dismiss"
+                data-autoagora-facebook-banner-dismiss
+                aria-label="<?php esc_attr_e('Dismiss Facebook group invitation', 'bricks-child'); ?>"
+            >&times;</button>
+        </div>
+    </aside>
+    <?php
+}
+add_action('wp_body_open', 'autoagora_render_facebook_group_campaign_banner', 6);
+
+/**
  * Add attribution parameters to seller-shared listing links.
  */
 function autoagora_facebook_group_listing_share_url(int $listing_id): string
@@ -318,13 +460,13 @@ function autoagora_enqueue_facebook_group_assets(): void
     wp_localize_script('autoagora-facebook-group', 'autoagoraFacebookGroup', array(
         'copiedMessage' => __('Copied. Paste the details into your Facebook post.', 'bricks-child'),
         'copyFailedMessage' => __('The group is open. Copy your listing link into a new Facebook post.', 'bricks-child'),
-        'relatedCarsLabel' => __('Related Cars', 'bricks-child'),
+        'language' => function_exists('autoagora_current_language') ? autoagora_current_language() : 'en',
     ));
 }
 add_action('wp_enqueue_scripts', 'autoagora_enqueue_facebook_group_assets', 20);
 
 /**
- * Output movable placements for the Bricks-owned single listing and footer.
+ * Output the movable footer placement.
  */
 function autoagora_render_facebook_group_movable_placements(): void
 {
@@ -332,17 +474,6 @@ function autoagora_render_facebook_group_movable_placements(): void
     $preview = autoagora_facebook_group_admin_preview();
     if ($url === '' && !$preview) {
         return;
-    }
-
-    if (is_singular('car') && get_post_status(get_queried_object_id()) === 'publish') {
-        $listing_id = get_queried_object_id();
-        $is_active = !class_exists('ListingStateManager')
-            || ListingStateManager::resolve_state($listing_id) === ListingStateManager::STATE_ACTIVE;
-        if ($is_active) {
-            echo '<div hidden data-autoagora-facebook-single-placement>';
-            echo autoagora_facebook_group_join_card('single_listing', 'single'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-            echo '</div>';
-        }
     }
 
     $footer_href = $url !== '' ? $url : admin_url('options-general.php#' . AUTOAGORA_FACEBOOK_GROUP_OPTION);

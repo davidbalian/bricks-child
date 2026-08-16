@@ -193,17 +193,6 @@ get_header();
         array(),
         true
     );
-    $facebook_homepage_card = autoagora_facebook_group_join_card('homepage', 'homepage');
-    if ($facebook_homepage_card !== '') :
-    ?>
-    <section class="custom-homepage-section autoagora-facebook-homepage-section">
-        <div class="custom-homepage-container">
-            <?php echo $facebook_homepage_card; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-        </div>
-    </section>
-    <?php
-    endif;
-
     autoagora_custom_homepage_cta(
         __('Find Used Cars for Sale in Cyprus', 'bricks-child'),
         array(
