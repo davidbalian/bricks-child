@@ -240,7 +240,7 @@ function autoagora_facebook_group_is_localized_page(string $english_slug): bool
 }
 
 /**
- * Return the campaign page type, or an empty string outside relevant browse journeys.
+ * Return the campaign page type used for analytics on every frontend page.
  */
 function autoagora_facebook_group_campaign_page_type(): string
 {
@@ -279,29 +279,7 @@ function autoagora_facebook_group_campaign_page_type(): string
         return 'cars_browse';
     }
 
-    return '';
-}
-
-/**
- * Avoid stacking the campaign with the more important email-verification notice.
- */
-function autoagora_facebook_group_email_notice_is_expected(): bool
-{
-    if (!is_user_logged_in()) {
-        return false;
-    }
-
-    $user_id = get_current_user_id();
-    if (get_user_meta($user_id, 'email_verified', true) === '1') {
-        return false;
-    }
-
-    if (!empty($_SESSION['email_notification_dismissed'])) {
-        return false;
-    }
-
-    $user = wp_get_current_user();
-    return strpos((string) $user->user_email, 'phone_user_') !== 0;
+    return 'other';
 }
 
 /**
@@ -312,8 +290,6 @@ function autoagora_render_facebook_group_campaign_banner(): void
     $page_type = autoagora_facebook_group_campaign_page_type();
     if (
         (function_exists('autoagora_code_header_is_enabled') && !autoagora_code_header_is_enabled())
-        || $page_type === ''
-        || autoagora_facebook_group_email_notice_is_expected()
         || (autoagora_facebook_group_url() === '' && !autoagora_facebook_group_admin_preview())
     ) {
         return;

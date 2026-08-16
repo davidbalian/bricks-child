@@ -1,8 +1,7 @@
 (function () {
   "use strict";
 
-  var bannerDismissalKey = "autoagora_fb_group_banner_dismissed_until";
-  var bannerDismissalDays = 14;
+  var bannerDismissalKey = "autoagora_fb_group_banner_dismissed_session";
 
   function getTrackingContext(element) {
     var banner = element ? element.closest("[data-autoagora-facebook-campaign-banner]") : null;
@@ -38,11 +37,10 @@
     );
   }
 
-  function getBannerDismissedUntil() {
+  function isBannerDismissedForSession() {
     try {
-      var storedValue = parseInt(window.localStorage.getItem(bannerDismissalKey), 10) || 0;
-      if (storedValue) {
-        return storedValue;
+      if (window.sessionStorage.getItem(bannerDismissalKey) === "1") {
+        return true;
       }
     } catch (error) {
       // Fall through to the cookie used when storage is unavailable.
@@ -58,26 +56,19 @@
         return part.indexOf(cookiePrefix) === 0;
       });
 
-    return cookieValue ? parseInt(cookieValue.slice(cookiePrefix.length), 10) || 0 : 0;
+    return Boolean(cookieValue && cookieValue.slice(cookiePrefix.length) === "1");
   }
 
   function rememberBannerDismissal() {
-    var expiresAt = Date.now() + bannerDismissalDays * 24 * 60 * 60 * 1000;
-    var maxAge = bannerDismissalDays * 24 * 60 * 60;
-
     try {
-      window.localStorage.setItem(bannerDismissalKey, String(expiresAt));
+      window.sessionStorage.setItem(bannerDismissalKey, "1");
     } catch (error) {
       // The cookie below remains as a fallback when storage is unavailable.
     }
 
     document.cookie =
       bannerDismissalKey +
-      "=" +
-      expiresAt +
-      "; Max-Age=" +
-      maxAge +
-      "; Path=/; SameSite=Lax" +
+      "=1; Path=/; SameSite=Lax" +
       (window.location.protocol === "https:" ? "; Secure" : "");
   }
 
@@ -117,26 +108,12 @@
       return;
     }
 
-    if (document.querySelector("#email-verification-notification, .email-verification-notice")) {
+    if (isBannerDismissedForSession()) {
       banner.remove();
       return;
     }
 
-    if (getBannerDismissedUntil() > Date.now()) {
-      banner.remove();
-      return;
-    }
-
-    var reveal = function () {
-      window.removeEventListener("scroll", reveal);
-      revealCampaignBanner(banner);
-    };
-
-    if (window.scrollY > 24) {
-      reveal();
-    } else {
-      window.addEventListener("scroll", reveal, { passive: true, once: true });
-    }
+    revealCampaignBanner(banner);
 
     banner.addEventListener("click", function (event) {
       var dismissButton = event.target.closest("[data-autoagora-facebook-banner-dismiss]");
@@ -144,14 +121,6 @@
         pushTrackingEvent("autoagora_facebook_group_dismiss", banner, "dismiss");
         rememberBannerDismissal();
         hideCampaignBanner(banner);
-        return;
-      }
-
-      if (event.target.closest("[data-autoagora-facebook-placement='browse_banner']")) {
-        rememberBannerDismissal();
-        window.setTimeout(function () {
-          hideCampaignBanner(banner);
-        }, 0);
       }
     });
   }
