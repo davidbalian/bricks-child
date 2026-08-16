@@ -79,14 +79,22 @@ function bricks_child_enqueue_styles() {
         wp_enqueue_style( 'bricks-child-buyer-request-css', get_stylesheet_directory_uri() . '/includes/user-manage-listings/buyer-request-form.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/includes/user-manage-listings/buyer-request-form.css' ), 'all' );
     }
 
-    // Enqueue my-listings styles conditionally
+    // Enqueue My Listings styles for the English page and its Polylang translations.
+    // Bricks stores shortcode elements in post meta, so post_content detection alone
+    // cannot identify translated Bricks pages.
     global $post;
-    if (is_page('my-listings') || (is_singular() && is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'my_listings'))) {
+    $is_my_listings_page = function_exists('autoagora_is_localized_page')
+        ? autoagora_is_localized_page('my-listings')
+        : is_page('my-listings');
+    if ($is_my_listings_page || (is_singular() && is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'my_listings'))) {
         wp_enqueue_style( 'bricks-child-my-listings-css', get_stylesheet_directory_uri() . '/includes/user-account/my-listings/my-listings.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/includes/user-account/my-listings/my-listings.css' ), 'all' );
     }
 
-    // Enqueue my-account styles only on my-account page
-    if (is_page('my-account')) {
+    // Keep the account base styles consistent on translated Bricks pages too.
+    $is_my_account_page = function_exists('autoagora_is_localized_page')
+        ? autoagora_is_localized_page('my-account')
+        : is_page('my-account');
+    if ($is_my_account_page) {
         wp_enqueue_style( 'bricks-child-my-account-css', get_stylesheet_directory_uri() . '/includes/user-account/my-account/my-account.css', array('bricks-child-theme-css'), filemtime( get_stylesheet_directory() . '/includes/user-account/my-account/my-account.css' ), 'all' );
     }
 

@@ -247,6 +247,40 @@ function autoagora_localized_page_url( $english_slug = '' ) {
 }
 
 /**
+ * Check whether the current request is an English page or its Polylang translation.
+ *
+ * This is more reliable than checking a hardcoded English slug because translated
+ * Bricks pages store their shortcode elements outside post_content.
+ *
+ * @param string $english_slug Source page slug in the default language.
+ * @return bool
+ */
+function autoagora_is_localized_page( $english_slug ) {
+	if ( ! is_page() ) {
+		return false;
+	}
+
+	$source_page = get_page_by_path( trim( (string) $english_slug, '/' ) );
+	if ( ! $source_page instanceof WP_Post ) {
+		return false;
+	}
+
+	$current_id = get_queried_object_id();
+	if ( $current_id === (int) $source_page->ID ) {
+		return true;
+	}
+
+	if ( ! function_exists( 'pll_get_post' ) ) {
+		return false;
+	}
+
+	$language     = autoagora_current_language();
+	$translated_id = $language ? pll_get_post( $source_page->ID, $language ) : 0;
+
+	return $translated_id && $current_id === (int) $translated_id;
+}
+
+/**
  * Return a frontend URL for language-neutral marketplace content.
  *
  * Cars, buyer requests, and dealer profiles are user-generated records rather
