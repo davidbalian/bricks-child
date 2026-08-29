@@ -408,6 +408,7 @@ Important admin files:
 - CSV car import: `includes/admin/csv-car-import.php`
 - dealership account creation: `includes/admin/dealership-accounts.php`
 - dealership import/export: `includes/admin/dealership-import/*`, `includes/admin/dealership-export/*`
+- car JSON + images import: `includes/admin/car-json-import/*` (Tools → Import Cars (JSON), validates ZIP packages and creates pending cars in one-row batches)
 - dealer profile XLSX import: `includes/dealer-profiles/import/*`
 - daily deals/social image export: `includes/admin/cars-daily-deals-*`
 - seller review moderation: `includes/admin/seller-reviews-admin.php`
