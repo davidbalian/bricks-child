@@ -280,13 +280,28 @@ final class AutoAgora_Car_Json_Import_Admin
         }
 
         $session['position'] = $position;
+        $just_completed = false;
         if ($position >= count($rows)) {
             $session['state'] = 'complete';
             $session['completed_at'] = time();
+            $session['summary_notification'] = array(
+                'status'       => 'queued',
+                'attempted_at' => null,
+                'sent'         => 0,
+                'failed'       => 0,
+            );
+            $just_completed = true;
         }
         $saved = self::saveSession($token, $session);
         if (is_wp_error($saved)) {
             self::redirectWithError($saved->get_error_message(), $token);
+        }
+        if ($just_completed) {
+            $session['summary_notification'] = self::sendCompletionSummary($session);
+            $saved = self::saveSession($token, $session);
+            if (is_wp_error($saved)) {
+                self::redirectWithError($saved->get_error_message(), $token);
+            }
         }
         if (($session['state'] ?? '') === 'complete') {
             $directory = self::sessionDirectory($token, false);
@@ -380,16 +395,23 @@ final class AutoAgora_Car_Json_Import_Admin
     private static function renderComplete(array $session): void
     {
         $results = (array) ($session['results'] ?? array());
-        $counts = array('imported' => 0, 'skipped' => 0, 'invalid' => 0, 'failed' => 0);
-        foreach ($results as $result) {
-            $status = (string) ($result['status'] ?? 'failed');
-            $counts[$status] = isset($counts[$status]) ? $counts[$status] + 1 : 1;
-        }
+        $counts = self::resultCounts($results);
         echo '<h1>' . esc_html__('Car JSON import complete', 'bricks-child') . '</h1>';
         echo '<p><strong>' . esc_html(sprintf(
             __('Imported: %1$d. Duplicates skipped: %2$d. Invalid: %3$d. Failed: %4$d.', 'bricks-child'),
             $counts['imported'], $counts['skipped'], $counts['invalid'], $counts['failed']
         )) . '</strong></p>';
+        $summary = isset($session['summary_notification']) && is_array($session['summary_notification'])
+            ? $session['summary_notification']
+            : array();
+        if (($summary['status'] ?? '') === 'sent') {
+            echo '<p>' . esc_html(sprintf(
+                _n('A completion summary was sent to %d administrator.', 'A completion summary was sent to %d administrators.', (int) ($summary['sent'] ?? 0), 'bricks-child'),
+                (int) ($summary['sent'] ?? 0)
+            )) . '</p>';
+        } elseif (in_array(($summary['status'] ?? ''), array('partial', 'failed'), true)) {
+            echo '<p style="color:#b32d2e">' . esc_html__('The import completed, but one or more administrator summary emails could not be sent.', 'bricks-child') . '</p>';
+        }
         echo '<table class="widefat striped"><thead><tr><th>' . esc_html__('Source ID', 'bricks-child') . '</th>';
         echo '<th>' . esc_html__('Status', 'bricks-child') . '</th><th>' . esc_html__('Result', 'bricks-child') . '</th></tr></thead><tbody>';
         foreach ($results as $result) {
@@ -406,6 +428,94 @@ final class AutoAgora_Car_Json_Import_Admin
         echo esc_html__('Review pending cars', 'bricks-child') . '</a></p>';
         echo '<p><a class="button" href="' . esc_url(add_query_arg('page', self::PAGE_SLUG, admin_url('tools.php'))) . '">';
         echo esc_html__('Start another import', 'bricks-child') . '</a></p>';
+    }
+
+    /** @param array<int,array<string,mixed>> $results @return array<string,int> */
+    private static function resultCounts(array $results): array
+    {
+        $counts = array('imported' => 0, 'skipped' => 0, 'invalid' => 0, 'failed' => 0);
+        foreach ($results as $result) {
+            $status = (string) ($result['status'] ?? 'failed');
+            $counts[$status] = isset($counts[$status]) ? $counts[$status] + 1 : 1;
+        }
+        return $counts;
+    }
+
+    /** @param array<string,mixed> $session @return array<string,mixed> */
+    private static function sendCompletionSummary(array $session): array
+    {
+        $results = (array) ($session['results'] ?? array());
+        $counts = self::resultCounts($results);
+        $recipients = self::administratorEmails();
+        $attempted_at = time();
+        if (empty($recipients)) {
+            return array('status' => 'failed', 'attempted_at' => $attempted_at, 'sent' => 0, 'failed' => 0);
+        }
+
+        $site_name = wp_specialchars_decode((string) get_bloginfo('name'), ENT_QUOTES);
+        $subject = sprintf(
+            __('[%1$s] Car import complete: %2$d imported, %3$d failed', 'bricks-child'),
+            $site_name,
+            $counts['imported'],
+            $counts['failed']
+        );
+        $author = get_userdata((int) ($session['author_id'] ?? 0));
+        $author_name = $author ? (string) $author->display_name : __('Unknown user', 'bricks-child');
+        $review_url = admin_url('edit.php?post_type=car&post_status=pending');
+        $html = '<h2>' . esc_html__('Car import complete', 'bricks-child') . '</h2>';
+        $html .= '<p>' . esc_html(sprintf(
+            __('Total rows: %1$d. Successful imports: %2$d. Duplicates skipped: %3$d. Invalid: %4$d. Failed: %5$d.', 'bricks-child'),
+            count($results), $counts['imported'], $counts['skipped'], $counts['invalid'], $counts['failed']
+        )) . '</p>';
+        $html .= '<p>' . esc_html(sprintf(__('Listing owner: %s.', 'bricks-child'), $author_name)) . '</p>';
+        $html .= '<p><a href="' . esc_url($review_url) . '">' . esc_html__('Review pending cars', 'bricks-child') . '</a></p>';
+        $text = sprintf(
+            "Car import complete\nTotal rows: %1\$d\nSuccessful imports: %2\$d\nDuplicates skipped: %3\$d\nInvalid: %4\$d\nFailed: %5\$d\nListing owner: %6\$s\nReview: %7\$s",
+            count($results),
+            $counts['imported'],
+            $counts['skipped'],
+            $counts['invalid'],
+            $counts['failed'],
+            $author_name,
+            $review_url
+        );
+
+        $sent = 0;
+        $failed = 0;
+        foreach ($recipients as $recipient) {
+            $delivered = function_exists('send_app_email')
+                ? send_app_email($recipient, $subject, $html, $text)
+                : wp_mail($recipient, $subject, $text);
+            if ($delivered) {
+                $sent++;
+            } else {
+                $failed++;
+            }
+        }
+
+        return array(
+            'status'       => $failed === 0 ? 'sent' : ($sent > 0 ? 'partial' : 'failed'),
+            'attempted_at' => $attempted_at,
+            'sent'         => $sent,
+            'failed'       => $failed,
+        );
+    }
+
+    /** @return array<int,string> */
+    private static function administratorEmails(): array
+    {
+        $emails = array();
+        $site_admin = sanitize_email((string) get_option('admin_email'));
+        if ($site_admin !== '') {
+            $emails[strtolower($site_admin)] = $site_admin;
+        }
+        foreach (get_users(array('role' => 'administrator')) as $admin) {
+            $email = sanitize_email((string) ($admin->user_email ?? ''));
+            if ($email !== '') {
+                $emails[strtolower($email)] = $email;
+            }
+        }
+        return array_values($emails);
     }
 
     /** @return array<string,mixed>|WP_Error */

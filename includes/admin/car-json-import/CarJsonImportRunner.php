@@ -10,6 +10,9 @@ if (!defined('ABSPATH')) {
 final class AutoAgora_Car_Json_Import_Runner
 {
     private const VERTICAL_CROP_PERCENT = 0.10;
+    private static bool $suppress_admin_notifications = false;
+    /** @var array<string,bool> */
+    private static array $admin_email_lookup = array();
 
     /**
      * @param array<string,mixed> $row
@@ -39,54 +42,149 @@ final class AutoAgora_Car_Json_Import_Runner
             );
         }
 
-        $title = sprintf('%d %s %s', (int) $listing['year'], $listing['make'], $listing['model']);
-        $post_id = wp_insert_post(array(
-            'post_type'    => 'car',
-            'post_status'  => 'pending',
-            'post_author'  => $author_id,
-            'post_title'   => sanitize_text_field($title),
-            'post_content' => wp_kses_post((string) $listing['description']),
-        ), true);
-        if (is_wp_error($post_id)) {
-            return $post_id;
-        }
-
-        $attachment_ids = array();
+        self::beginAdminNotificationSuppression();
         try {
-            self::storeFields((int) $post_id, $listing);
-            self::assignTaxonomy((int) $post_id, (string) $listing['make'], (string) $listing['model']);
-            $attachment_ids = self::importImages((int) $post_id, $zip_path, (array) $listing['car_images']);
-            self::updateField('car_images', $attachment_ids, (int) $post_id);
-
-            update_post_meta($post_id, '_autoagora_import_source', sanitize_key((string) $listing['source_platform']));
-            update_post_meta($post_id, '_autoagora_import_source_id', sanitize_text_field((string) $listing['source_id']));
-            update_post_meta($post_id, '_autoagora_import_source_url', esc_url_raw((string) $listing['source_url']));
-            update_post_meta($post_id, '_autoagora_imported_at', current_time('mysql', true));
-
-            if (class_exists('ListingStateManager')) {
-                ListingStateManager::assign_state((int) $post_id, ListingStateManager::STATE_ACTIVE);
-            } else {
-                self::updateField('listing_state', 'active', (int) $post_id);
+            $title = sprintf('%d %s %s', (int) $listing['year'], $listing['make'], $listing['model']);
+            $post_id = wp_insert_post(array(
+                'post_type'    => 'car',
+                'post_status'  => 'pending',
+                'post_author'  => $author_id,
+                'post_title'   => sanitize_text_field($title),
+                'post_content' => wp_kses_post((string) $listing['description']),
+                'meta_input'   => array(
+                    '_autoagora_import_source'             => sanitize_key((string) $listing['source_platform']),
+                    '_autoagora_import_source_id'          => sanitize_text_field((string) $listing['source_id']),
+                    '_autoagora_import_source_url'         => esc_url_raw((string) $listing['source_url']),
+                    '_autoagora_imported_at'       => current_time('mysql', true),
+                ),
+            ), true);
+            if (is_wp_error($post_id)) {
+                return $post_id;
             }
 
-            do_action('acf/save_post', (int) $post_id);
-            if (class_exists('Listing_Details_Badge_Manager')) {
-                Listing_Details_Badge_Manager::update_badges_for_listing((int) $post_id);
-            }
+            $attachment_ids = array();
+            try {
+                self::storeFields((int) $post_id, $listing);
+                self::assignTaxonomy((int) $post_id, (string) $listing['make'], (string) $listing['model']);
+                $attachment_ids = self::importImages((int) $post_id, $zip_path, (array) $listing['car_images']);
+                self::updateField('car_images', $attachment_ids, (int) $post_id);
 
-            return array(
-                'status'      => 'imported',
-                'post_id'     => (int) $post_id,
-                'attachments' => count($attachment_ids),
-                'message'     => __('Imported as a pending car listing.', 'bricks-child'),
-            );
-        } catch (Throwable $error) {
-            foreach ($attachment_ids as $attachment_id) {
-                wp_delete_attachment((int) $attachment_id, true);
+                if (class_exists('ListingStateManager')) {
+                    ListingStateManager::assign_state((int) $post_id, ListingStateManager::STATE_ACTIVE);
+                } else {
+                    self::updateField('listing_state', 'active', (int) $post_id);
+                }
+
+                do_action('acf/save_post', (int) $post_id);
+                if (class_exists('Listing_Details_Badge_Manager')) {
+                    Listing_Details_Badge_Manager::update_badges_for_listing((int) $post_id);
+                }
+
+                return array(
+                    'status'      => 'imported',
+                    'post_id'     => (int) $post_id,
+                    'attachments' => count($attachment_ids),
+                    'message'     => __('Imported as a pending car listing.', 'bricks-child'),
+                );
+            } catch (Throwable $error) {
+                foreach ($attachment_ids as $attachment_id) {
+                    wp_delete_attachment((int) $attachment_id, true);
+                }
+                wp_delete_post((int) $post_id, true);
+                return new WP_Error('car_json_import_row_failed', $error->getMessage());
             }
-            wp_delete_post((int) $post_id, true);
-            return new WP_Error('car_json_import_row_failed', $error->getMessage());
+        } finally {
+            self::endAdminNotificationSuppression();
         }
+    }
+
+    private static function beginAdminNotificationSuppression(): void
+    {
+        self::$suppress_admin_notifications = true;
+        self::$admin_email_lookup = array();
+
+        $admin_email = sanitize_email((string) get_option('admin_email'));
+        if ($admin_email !== '') {
+            self::$admin_email_lookup[strtolower($admin_email)] = true;
+        }
+        foreach (get_users(array('role' => 'administrator')) as $admin) {
+            $email = sanitize_email((string) ($admin->user_email ?? ''));
+            if ($email !== '') {
+                self::$admin_email_lookup[strtolower($email)] = true;
+            }
+        }
+
+        add_filter('pre_wp_mail', array(__CLASS__, 'suppressImportedCarAdminWpMail'), PHP_INT_MAX, 2);
+        add_filter('autoagora_pre_send_app_email', array(__CLASS__, 'suppressImportedCarAdminAppEmail'), PHP_INT_MAX, 5);
+    }
+
+    private static function endAdminNotificationSuppression(): void
+    {
+        remove_filter('pre_wp_mail', array(__CLASS__, 'suppressImportedCarAdminWpMail'), PHP_INT_MAX);
+        remove_filter('autoagora_pre_send_app_email', array(__CLASS__, 'suppressImportedCarAdminAppEmail'), PHP_INT_MAX);
+        self::$suppress_admin_notifications = false;
+        self::$admin_email_lookup = array();
+    }
+
+    /**
+     * Treat importer-generated admin mail as successfully handled so external
+     * new-listing notification hooks do not send one message per imported car.
+     *
+     * @param null|bool $return
+     * @param array<string,mixed> $atts
+     * @return null|bool
+     */
+    public static function suppressImportedCarAdminWpMail($return, array $atts)
+    {
+        if ($return !== null || !self::$suppress_admin_notifications) {
+            return $return;
+        }
+
+        $recipients = self::mailRecipients($atts['to'] ?? array());
+        return self::recipientsAreOnlyAdmins($recipients) ? true : $return;
+    }
+
+    /** @return null|bool */
+    public static function suppressImportedCarAdminAppEmail($return, $to_email, $subject, $html_content, $text_content)
+    {
+        unset($subject, $html_content, $text_content);
+        if ($return !== null || !self::$suppress_admin_notifications) {
+            return $return;
+        }
+
+        return self::recipientsAreOnlyAdmins(self::mailRecipients($to_email)) ? true : $return;
+    }
+
+    /** @param string|array<int,string> $raw @return array<int,string> */
+    private static function mailRecipients($raw): array
+    {
+        $values = is_array($raw) ? $raw : explode(',', (string) $raw);
+        $emails = array();
+        foreach ($values as $value) {
+            $value = trim((string) $value);
+            if (preg_match('/<([^>]+)>/', $value, $matches)) {
+                $value = $matches[1];
+            }
+            $email = sanitize_email($value);
+            if ($email !== '') {
+                $emails[] = strtolower($email);
+            }
+        }
+        return array_values(array_unique($emails));
+    }
+
+    /** @param array<int,string> $recipients */
+    private static function recipientsAreOnlyAdmins(array $recipients): bool
+    {
+        if (empty($recipients)) {
+            return false;
+        }
+        foreach ($recipients as $recipient) {
+            if (empty(self::$admin_email_lookup[$recipient])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** @param array<string,mixed> $listing */

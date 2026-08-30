@@ -51,6 +51,18 @@ function get_email_sender_config() {
  * @return bool
  */
 function send_app_email($to_email, $subject, $html_content, $text_content = '') {
+    $pre_send = apply_filters(
+        'autoagora_pre_send_app_email',
+        null,
+        $to_email,
+        $subject,
+        $html_content,
+        $text_content
+    );
+    if ($pre_send !== null) {
+        return (bool) $pre_send;
+    }
+
     $config = get_email_sender_config();
 
     if (!$config) {
