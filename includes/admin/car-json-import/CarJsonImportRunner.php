@@ -9,6 +9,8 @@ if (!defined('ABSPATH')) {
 
 final class AutoAgora_Car_Json_Import_Runner
 {
+    private const VERTICAL_CROP_PERCENT = 0.10;
+
     /**
      * @param array<string,mixed> $row
      * @param string $zip_path
@@ -225,6 +227,19 @@ final class AutoAgora_Car_Json_Import_Runner
                     throw new RuntimeException(sprintf(__('File is not a supported image: %s.', 'bricks-child'), $archive_path));
                 }
 
+                self::cropImageVertically($temporary);
+                $size = (int) filesize($temporary);
+                $mime = function_exists('wp_get_image_mime') ? wp_get_image_mime($temporary) : '';
+                if (
+                    $size <= 0 ||
+                    $size > AutoAgora_Car_Json_Import_Validator::MAX_IMAGE_BYTES ||
+                    !$mime ||
+                    !in_array($mime, $allowed_mimes, true)
+                ) {
+                    @unlink($temporary);
+                    throw new RuntimeException(sprintf(__('The cropped image could not be validated: %s.', 'bricks-child'), $archive_path));
+                }
+
                 $file_array = array(
                     'name'     => sprintf('%s-%02d-%s', $post_id, $position + 1, $filename),
                     'type'     => $mime,
@@ -252,5 +267,36 @@ final class AutoAgora_Car_Json_Import_Runner
             throw new RuntimeException(__('No images were imported for the car.', 'bricks-child'));
         }
         return $attachment_ids;
+    }
+
+    /**
+     * Remove 10% of the original height from both the top and bottom.
+     */
+    private static function cropImageVertically(string $path): void
+    {
+        $editor = wp_get_image_editor($path);
+        if (is_wp_error($editor)) {
+            throw new RuntimeException($editor->get_error_message());
+        }
+
+        $dimensions = $editor->get_size();
+        $width = isset($dimensions['width']) ? (int) $dimensions['width'] : 0;
+        $height = isset($dimensions['height']) ? (int) $dimensions['height'] : 0;
+        $trim = (int) round($height * self::VERTICAL_CROP_PERCENT);
+        $cropped_height = $height - (2 * $trim);
+        if ($width <= 0 || $height <= 0 || $trim <= 0 || $cropped_height <= 0) {
+            throw new RuntimeException(__('The image dimensions are too small to apply the required crop.', 'bricks-child'));
+        }
+
+        $cropped = $editor->crop(0, $trim, $width, $cropped_height, $width, $cropped_height, false);
+        if (is_wp_error($cropped)) {
+            throw new RuntimeException($cropped->get_error_message());
+        }
+
+        $saved = $editor->save($path);
+        if (is_wp_error($saved)) {
+            throw new RuntimeException($saved->get_error_message());
+        }
+        clearstatcache(true, $path);
     }
 }

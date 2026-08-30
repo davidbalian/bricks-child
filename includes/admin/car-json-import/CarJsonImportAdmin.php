@@ -16,6 +16,23 @@ final class AutoAgora_Car_Json_Import_Admin
     public static function register(): void
     {
         add_action('admin_menu', array(__CLASS__, 'addMenu'));
+        add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueueAssets'));
+    }
+
+    public static function enqueueAssets(string $hook_suffix): void
+    {
+        if ($hook_suffix !== 'tools_page_' . self::PAGE_SLUG) {
+            return;
+        }
+
+        $script_path = __DIR__ . '/car-json-import-admin.js';
+        wp_enqueue_script(
+            'autoagora-car-json-import-admin',
+            get_stylesheet_directory_uri() . '/includes/admin/car-json-import/car-json-import-admin.js',
+            array(),
+            is_file($script_path) ? (string) filemtime($script_path) : null,
+            true
+        );
     }
 
     public static function addMenu(): void
@@ -355,9 +372,8 @@ final class AutoAgora_Car_Json_Import_Admin
         wp_nonce_field('car_json_import_process_' . $token, 'car_json_import_nonce');
         echo '<input type="hidden" name="car_json_import_action" value="process">';
         echo '<input type="hidden" name="import_token" value="' . esc_attr($token) . '">';
-        submit_button(__('Continue import', 'bricks-child'), 'primary', 'submit', false);
+        submit_button(__('Continue import', 'bricks-child'), 'primary', 'car_json_import_continue', false);
         echo '</form>';
-        echo '<script>window.setTimeout(function(){var f=document.getElementById("car-json-import-continue");if(f){f.submit();}},800);</script>';
     }
 
     /** @param array<string,mixed> $session */
