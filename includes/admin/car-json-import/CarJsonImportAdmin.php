@@ -20,32 +20,60 @@ final class AutoAgora_Car_Json_Import_Admin
 
     public static function addMenu(): void
     {
-        add_management_page(
+        $hook_suffix = add_management_page(
             __('Car JSON Import', 'bricks-child'),
             __('Import Cars (JSON)', 'bricks-child'),
             'manage_options',
             self::PAGE_SLUG,
             array(__CLASS__, 'render')
         );
+
+        if (is_string($hook_suffix) && $hook_suffix !== '') {
+            add_action('load-' . $hook_suffix, array(__CLASS__, 'handleRequest'));
+        }
+    }
+
+    /**
+     * Process POST requests before WordPress renders the admin header so that
+     * redirects and validation errors can be returned reliably.
+     */
+    public static function handleRequest(): void
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            return;
+        }
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('You do not have permission to import cars.', 'bricks-child'));
+        }
+
+        $action = isset($_POST['car_json_import_action'])
+            ? sanitize_key(wp_unslash($_POST['car_json_import_action']))
+            : '';
+
+        if ($action === 'upload') {
+            self::handleUpload();
+        } elseif ($action === 'confirm') {
+            self::handleConfirm();
+        } elseif ($action === 'process') {
+            self::handleProcess();
+        }
+
+        $content_length = isset($_SERVER['CONTENT_LENGTH']) ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
+        if (empty($_POST) && empty($_FILES) && $content_length > 0) {
+            self::redirectWithError(sprintf(
+                __('The server rejected the upload before WordPress could read it. The request was %1$s; the current PHP/WordPress limit is %2$s. Increase upload_max_filesize and post_max_size, then try again.', 'bricks-child'),
+                size_format($content_length),
+                size_format(self::maximumUploadBytes())
+            ));
+        }
+
+        self::redirectWithError(__('The import request was empty or invalid. Please try again.', 'bricks-child'));
     }
 
     public static function render(): void
     {
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('You do not have permission to import cars.', 'bricks-child'));
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $action = isset($_POST['car_json_import_action'])
-                ? sanitize_key(wp_unslash($_POST['car_json_import_action']))
-                : '';
-            if ($action === 'upload') {
-                self::handleUpload();
-            } elseif ($action === 'confirm') {
-                self::handleConfirm();
-            } elseif ($action === 'process') {
-                self::handleProcess();
-            }
         }
 
         $token = self::requestToken();
