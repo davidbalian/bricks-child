@@ -45,8 +45,8 @@ website source code.
   `car_images`.
 - Automatically advances through the validated rows without requiring the
   administrator to press Continue for each car.
-- Suppresses per-listing administrator emails only while importer-created cars
-  are being saved, without changing notifications for normal user submissions.
+- Suppresses outbound notification mail only while each importer-created car is
+  being saved, without changing notifications for normal user submissions.
 - Sends one completion summary to the site administrators with imported,
   duplicate, invalid, and failed counts plus a link to review pending cars.
 - Crops every imported image by 10% from the top and 10% from the bottom before

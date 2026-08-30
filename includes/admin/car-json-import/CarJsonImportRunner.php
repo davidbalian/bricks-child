@@ -10,9 +10,7 @@ if (!defined('ABSPATH')) {
 final class AutoAgora_Car_Json_Import_Runner
 {
     private const VERTICAL_CROP_PERCENT = 0.10;
-    private static bool $suppress_admin_notifications = false;
-    /** @var array<string,bool> */
-    private static array $admin_email_lookup = array();
+    private static bool $suppress_import_notifications = false;
 
     /**
      * @param array<string,mixed> $row
@@ -52,9 +50,9 @@ final class AutoAgora_Car_Json_Import_Runner
                 'post_title'   => sanitize_text_field($title),
                 'post_content' => wp_kses_post((string) $listing['description']),
                 'meta_input'   => array(
-                    '_autoagora_import_source'             => sanitize_key((string) $listing['source_platform']),
-                    '_autoagora_import_source_id'          => sanitize_text_field((string) $listing['source_id']),
-                    '_autoagora_import_source_url'         => esc_url_raw((string) $listing['source_url']),
+                    '_autoagora_import_source'     => sanitize_key((string) $listing['source_platform']),
+                    '_autoagora_import_source_id'  => sanitize_text_field((string) $listing['source_id']),
+                    '_autoagora_import_source_url' => esc_url_raw((string) $listing['source_url']),
                     '_autoagora_imported_at'       => current_time('mysql', true),
                 ),
             ), true);
@@ -100,30 +98,16 @@ final class AutoAgora_Car_Json_Import_Runner
 
     private static function beginAdminNotificationSuppression(): void
     {
-        self::$suppress_admin_notifications = true;
-        self::$admin_email_lookup = array();
-
-        $admin_email = sanitize_email((string) get_option('admin_email'));
-        if ($admin_email !== '') {
-            self::$admin_email_lookup[strtolower($admin_email)] = true;
-        }
-        foreach (get_users(array('role' => 'administrator')) as $admin) {
-            $email = sanitize_email((string) ($admin->user_email ?? ''));
-            if ($email !== '') {
-                self::$admin_email_lookup[strtolower($email)] = true;
-            }
-        }
-
-        add_filter('pre_wp_mail', array(__CLASS__, 'suppressImportedCarAdminWpMail'), PHP_INT_MAX, 2);
-        add_filter('autoagora_pre_send_app_email', array(__CLASS__, 'suppressImportedCarAdminAppEmail'), PHP_INT_MAX, 5);
+        self::$suppress_import_notifications = true;
+        add_filter('pre_wp_mail', array(__CLASS__, 'suppressImportedCarWpMail'), PHP_INT_MAX, 2);
+        add_filter('autoagora_pre_send_app_email', array(__CLASS__, 'suppressImportedCarAppEmail'), PHP_INT_MAX, 5);
     }
 
     private static function endAdminNotificationSuppression(): void
     {
-        remove_filter('pre_wp_mail', array(__CLASS__, 'suppressImportedCarAdminWpMail'), PHP_INT_MAX);
-        remove_filter('autoagora_pre_send_app_email', array(__CLASS__, 'suppressImportedCarAdminAppEmail'), PHP_INT_MAX);
-        self::$suppress_admin_notifications = false;
-        self::$admin_email_lookup = array();
+        remove_filter('pre_wp_mail', array(__CLASS__, 'suppressImportedCarWpMail'), PHP_INT_MAX);
+        remove_filter('autoagora_pre_send_app_email', array(__CLASS__, 'suppressImportedCarAppEmail'), PHP_INT_MAX);
+        self::$suppress_import_notifications = false;
     }
 
     /**
@@ -134,57 +118,17 @@ final class AutoAgora_Car_Json_Import_Runner
      * @param array<string,mixed> $atts
      * @return null|bool
      */
-    public static function suppressImportedCarAdminWpMail($return, array $atts)
+    public static function suppressImportedCarWpMail($return, array $atts)
     {
-        if ($return !== null || !self::$suppress_admin_notifications) {
-            return $return;
-        }
-
-        $recipients = self::mailRecipients($atts['to'] ?? array());
-        return self::recipientsAreOnlyAdmins($recipients) ? true : $return;
+        unset($atts);
+        return $return === null && self::$suppress_import_notifications ? true : $return;
     }
 
     /** @return null|bool */
-    public static function suppressImportedCarAdminAppEmail($return, $to_email, $subject, $html_content, $text_content)
+    public static function suppressImportedCarAppEmail($return, $to_email, $subject, $html_content, $text_content)
     {
-        unset($subject, $html_content, $text_content);
-        if ($return !== null || !self::$suppress_admin_notifications) {
-            return $return;
-        }
-
-        return self::recipientsAreOnlyAdmins(self::mailRecipients($to_email)) ? true : $return;
-    }
-
-    /** @param string|array<int,string> $raw @return array<int,string> */
-    private static function mailRecipients($raw): array
-    {
-        $values = is_array($raw) ? $raw : explode(',', (string) $raw);
-        $emails = array();
-        foreach ($values as $value) {
-            $value = trim((string) $value);
-            if (preg_match('/<([^>]+)>/', $value, $matches)) {
-                $value = $matches[1];
-            }
-            $email = sanitize_email($value);
-            if ($email !== '') {
-                $emails[] = strtolower($email);
-            }
-        }
-        return array_values(array_unique($emails));
-    }
-
-    /** @param array<int,string> $recipients */
-    private static function recipientsAreOnlyAdmins(array $recipients): bool
-    {
-        if (empty($recipients)) {
-            return false;
-        }
-        foreach ($recipients as $recipient) {
-            if (empty(self::$admin_email_lookup[$recipient])) {
-                return false;
-            }
-        }
-        return true;
+        unset($to_email, $subject, $html_content, $text_content);
+        return $return === null && self::$suppress_import_notifications ? true : $return;
     }
 
     /** @param array<string,mixed> $listing */
