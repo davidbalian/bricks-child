@@ -61,15 +61,16 @@ final class AutoAgora_Car_Json_Import_Validator
                 );
             }
 
+            $source = isset($manifest['source']) && is_array($manifest['source']) ? $manifest['source'] : array();
             $rows = array();
             $seen_source_ids = array();
             foreach (array_values($manifest['listings']) as $index => $raw_listing) {
-                $rows[] = self::validateListing($raw_listing, $index, $defaults, $zip, $seen_source_ids);
+                $rows[] = self::validateListing($raw_listing, $index, $defaults, $zip, $seen_source_ids, $source);
             }
 
             return array(
                 'schema_version' => isset($manifest['schema_version']) ? (int) $manifest['schema_version'] : 1,
-                'source'         => isset($manifest['source']) && is_array($manifest['source']) ? $manifest['source'] : array(),
+                'source'         => $source,
                 'rows'           => $rows,
                 'valid_count'    => count(array_filter($rows, static function ($row) {
                     return !empty($row['valid']);
@@ -89,9 +90,10 @@ final class AutoAgora_Car_Json_Import_Validator
      * @param array<string,mixed> $defaults
      * @param ZipArchive $zip
      * @param array<string,int> $seen_source_ids
+     * @param array<string,mixed> $source
      * @return array<string,mixed>
      */
-    private static function validateListing($raw_listing, int $index, array $defaults, ZipArchive $zip, array &$seen_source_ids): array
+    private static function validateListing($raw_listing, int $index, array $defaults, ZipArchive $zip, array &$seen_source_ids, array $source): array
     {
         $errors = array();
         $warnings = array();
@@ -185,7 +187,10 @@ final class AutoAgora_Car_Json_Import_Validator
             'valid'    => empty($errors),
             'listing'  => $listing,
             'errors'   => array_values(array_unique($errors)),
-            'warnings' => array_values(array_unique(array_merge($warnings, (array) ($raw_listing['warnings'] ?? array())))),
+            'warnings' => array_values(array_unique(array_merge(
+                $warnings,
+                self::sanitizeWarnings((array) ($raw_listing['warnings'] ?? array()), $listing, $source)
+            ))),
         );
     }
 
@@ -218,12 +223,15 @@ final class AutoAgora_Car_Json_Import_Validator
         $listing['exterior_color'] = self::normalizeColor($listing['exterior_color']);
         $listing['availability'] = self::normalizeAvailability($listing['availability']);
 
-        $integer_fields = array('year', 'mileage', 'price', 'hp', 'number_of_doors', 'number_of_seats', 'numowners');
+        $integer_fields = array('year', 'mileage', 'price', 'hp', 'number_of_seats', 'numowners');
         foreach ($integer_fields as $field) {
             $listing[$field] = isset($raw[$field]) && $raw[$field] !== '' && $raw[$field] !== null
                 ? (int) $raw[$field]
                 : null;
         }
+        $source_fields = isset($raw['source_fields']) && is_array($raw['source_fields']) ? $raw['source_fields'] : array();
+        $raw_doors = $raw['number_of_doors'] ?? ($source_fields['doors'] ?? null);
+        $listing['number_of_doors'] = self::normalizeDoorCount($raw_doors, $listing['body_type']);
         $listing['engine_capacity'] = isset($raw['engine_capacity']) && $raw['engine_capacity'] !== '' && $raw['engine_capacity'] !== null
             ? round((float) $raw['engine_capacity'], 1)
             : null;
@@ -421,6 +429,79 @@ final class AutoAgora_Car_Json_Import_Validator
             return 'In Transit';
         }
         return trim($value);
+    }
+
+    private static function normalizeDoorCount($value, string $body_type): ?int
+    {
+        if (is_int($value) || (is_string($value) && preg_match('/^\s*[0-7]\s*$/', $value))) {
+            return (int) $value;
+        }
+        if (!is_string($value) || !preg_match('/\b([0-7])\s*[-–—]\s*([0-7])\b/u', $value, $matches)) {
+            return null;
+        }
+
+        $lower = (int) $matches[1];
+        $upper = (int) $matches[2];
+        $tailgate_counts_as_door = array('Hatchback', 'Estate', 'SUV', 'MPV');
+        $conventional_door_count = array('Saloon', 'Coupe', 'Convertible', 'Pickup', 'Limousine');
+        if (in_array($body_type, $tailgate_counts_as_door, true)) {
+            return $upper;
+        }
+        if (in_array($body_type, $conventional_door_count, true)) {
+            return $lower;
+        }
+        return null;
+    }
+
+    /** @return array<int,string> */
+    private static function sanitizeWarnings(array $warnings, array $listing, array $source): array
+    {
+        $output = array();
+        foreach ($warnings as $warning) {
+            if (!is_scalar($warning)) {
+                continue;
+            }
+            $warning = sanitize_text_field((string) $warning);
+            if ($warning === '') {
+                continue;
+            }
+            if (
+                !empty($listing['number_of_doors']) &&
+                str_starts_with($warning, 'Ambiguous door count preserved in source_fields:')
+            ) {
+                continue;
+            }
+            if (
+                str_starts_with($warning, 'Dealer coordinates were ') &&
+                self::trustedDealerLocationMatches($listing, $source)
+            ) {
+                continue;
+            }
+            $output[] = $warning;
+        }
+        return array_values(array_unique($output));
+    }
+
+    private static function trustedDealerLocationMatches(array $listing, array $source): bool
+    {
+        if (empty($source['permission_confirmed_by_operator']) || empty($source['dealer_location']) || !is_array($source['dealer_location'])) {
+            return false;
+        }
+        $location = $source['dealer_location'];
+        foreach (array('car_city', 'car_address', 'car_latitude', 'car_longitude') as $field) {
+            if (!array_key_exists($field, $location) || !array_key_exists($field, $listing)) {
+                return false;
+            }
+        }
+        if (
+            self::fold((string) $location['car_city']) !== self::fold((string) $listing['car_city']) ||
+            self::fold((string) $location['car_address']) !== self::fold((string) $listing['car_address'])
+        ) {
+            return false;
+        }
+        return
+            abs((float) $location['car_latitude'] - (float) $listing['car_latitude']) < 0.000001 &&
+            abs((float) $location['car_longitude'] - (float) $listing['car_longitude']) < 0.000001;
     }
 
     private static function fold(string $value): string
