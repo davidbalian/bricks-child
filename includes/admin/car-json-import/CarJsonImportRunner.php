@@ -227,7 +227,12 @@ final class AutoAgora_Car_Json_Import_Runner
                     throw new RuntimeException(sprintf(__('File is not a supported image: %s.', 'bricks-child'), $archive_path));
                 }
 
-                self::cropImageVertically($temporary);
+                try {
+                    $temporary = self::cropImageVertically($temporary, $mime);
+                } catch (Throwable $error) {
+                    @unlink($temporary);
+                    throw $error;
+                }
                 $size = (int) filesize($temporary);
                 $mime = function_exists('wp_get_image_mime') ? wp_get_image_mime($temporary) : '';
                 if (
@@ -272,7 +277,7 @@ final class AutoAgora_Car_Json_Import_Runner
     /**
      * Remove 10% of the original height from both the top and bottom.
      */
-    private static function cropImageVertically(string $path): void
+    private static function cropImageVertically(string $path, string $mime): string
     {
         $editor = wp_get_image_editor($path);
         if (is_wp_error($editor)) {
@@ -293,10 +298,33 @@ final class AutoAgora_Car_Json_Import_Runner
             throw new RuntimeException($cropped->get_error_message());
         }
 
-        $saved = $editor->save($path);
+        $saved = $editor->save($path, $mime);
         if (is_wp_error($saved)) {
             throw new RuntimeException($saved->get_error_message());
         }
-        clearstatcache(true, $path);
+        $saved_path = isset($saved['path']) ? (string) $saved['path'] : '';
+        if ($saved_path === '' || !is_file($saved_path)) {
+            throw new RuntimeException(__('The cropped image editor did not return a readable output file.', 'bricks-child'));
+        }
+
+        $actual_dimensions = function_exists('wp_getimagesize')
+            ? wp_getimagesize($saved_path)
+            : @getimagesize($saved_path);
+        if (
+            !is_array($actual_dimensions) ||
+            (int) ($actual_dimensions[0] ?? 0) !== $width ||
+            (int) ($actual_dimensions[1] ?? 0) !== $cropped_height
+        ) {
+            if ($saved_path !== $path) {
+                @unlink($saved_path);
+            }
+            throw new RuntimeException(__('The saved image does not have the required cropped dimensions.', 'bricks-child'));
+        }
+
+        if ($saved_path !== $path && is_file($path)) {
+            @unlink($path);
+        }
+        clearstatcache(true, $saved_path);
+        return $saved_path;
     }
 }
