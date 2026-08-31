@@ -52,6 +52,9 @@ ordered source URLs and SHA-256 content hashes; HTTP validators are used when
 the image host supplies them. AutoAgora replaces a gallery only after every new
 image has imported successfully, then removes old attachments owned by that
 car. The importer crop (10% top and 10% bottom) applies to synced images too.
+Large dealer baselines are split into bounded signed packages. Only the final
+package performs the complete presence/missing check and sends the run summary,
+so chunking cannot multiply missing confirmations or notification emails.
 
 A missing advert is marked for review first and expires only after the configured
 number of consecutive complete snapshots (three by default). Sync never changes

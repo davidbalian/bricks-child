@@ -81,7 +81,8 @@ final class AutoAgora_Bazaraki_Sync_REST_Controller
         global $wpdb;
         $wpdb->query('START TRANSACTION');
         $created = AutoAgora_Bazaraki_Sync_Queue::createRun(
-            $run_id, $profile_id, $package_path, (array) $prepared['counts'], count($prepared['present_source_ids']), !empty($profile['dry_run'])
+            $run_id, $profile_id, $package_path, (array) $prepared['counts'], count($prepared['present_source_ids']),
+            !empty($profile['dry_run']), !empty($prepared['suppress_summary'])
         );
         if (is_wp_error($created)) {
             $wpdb->query('ROLLBACK');
@@ -243,6 +244,8 @@ final class AutoAgora_Bazaraki_Sync_REST_Controller
 
         $jobs = array();
         $changed_ids = array();
+        $chunked = !empty($changes['chunked']);
+        $final_chunk = !$chunked || !empty($changes['final_chunk']);
         foreach (array('created', 'updated') as $bucket) {
             foreach ((array) ($changes[$bucket] ?? array()) as $change) {
                 if (!is_array($change)) {
@@ -272,27 +275,30 @@ final class AutoAgora_Bazaraki_Sync_REST_Controller
                 $changed_ids[$source_id] = true;
             }
         }
-        foreach ($present as $source_id) {
-            if (!isset($changed_ids[$source_id])) {
-                $jobs[] = array('source_id' => $source_id, 'action' => 'seen', 'payload' => array());
+        if ($final_chunk) {
+            foreach ($present as $source_id) {
+                if (!isset($changed_ids[$source_id])) {
+                    $jobs[] = array('source_id' => $source_id, 'action' => 'seen', 'payload' => array());
+                }
             }
-        }
 
-        $profile_posts = get_posts(array(
-            'post_type' => 'car', 'post_status' => 'any', 'posts_per_page' => -1, 'fields' => 'ids',
-            'no_found_rows' => true, 'suppress_filters' => true,
-            'meta_key' => '_autoagora_sync_profile_id', 'meta_value' => $profile_id,
-        ));
-        foreach ($profile_posts as $post_id) {
-            $source_id = (string) get_post_meta((int) $post_id, '_autoagora_import_source_id', true);
-            if ($source_id !== '' && !in_array($source_id, $present, true)) {
-                $jobs[] = array('source_id' => $source_id, 'action' => 'missing', 'payload' => array());
+            $profile_posts = get_posts(array(
+                'post_type' => 'car', 'post_status' => 'any', 'posts_per_page' => -1, 'fields' => 'ids',
+                'no_found_rows' => true, 'suppress_filters' => true,
+                'meta_key' => '_autoagora_sync_profile_id', 'meta_value' => $profile_id,
+            ));
+            foreach ($profile_posts as $post_id) {
+                $source_id = (string) get_post_meta((int) $post_id, '_autoagora_import_source_id', true);
+                if ($source_id !== '' && !in_array($source_id, $present, true)) {
+                    $jobs[] = array('source_id' => $source_id, 'action' => 'missing', 'payload' => array());
+                }
             }
         }
         return array(
             'jobs' => $jobs,
             'present_source_ids' => $present,
             'counts' => is_array($changes['counts'] ?? null) ? $changes['counts'] : array(),
+            'suppress_summary' => $chunked && !$final_chunk,
         );
     }
 }

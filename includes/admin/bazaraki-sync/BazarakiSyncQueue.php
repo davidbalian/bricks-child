@@ -8,17 +8,18 @@ if (!defined('ABSPATH')) {
 final class AutoAgora_Bazaraki_Sync_Queue
 {
     /** @param array<string,int> $counts */
-    public static function createRun(string $run_id, string $profile_id, string $package_path, array $counts, int $source_count, bool $dry_run)
+    public static function createRun(string $run_id, string $profile_id, string $package_path, array $counts, int $source_count, bool $dry_run, bool $suppress_summary = false)
     {
         global $wpdb;
         $now = current_time('mysql', true);
         $inserted = $wpdb->query($wpdb->prepare(
             'INSERT INTO ' . AutoAgora_Bazaraki_Sync_Schema::runsTable() . '
-             (run_id,profile_id,status,dry_run,package_path,source_count,created_count,updated_count,missing_count,unchanged_count,created_at,updated_at)
-             VALUES (%s,%s,%s,%d,%s,%d,%d,%d,%d,%d,%s,%s)',
+             (run_id,profile_id,status,dry_run,package_path,source_count,created_count,updated_count,missing_count,unchanged_count,summary_sent,created_at,updated_at)
+             VALUES (%s,%s,%s,%d,%s,%d,%d,%d,%d,%d,%d,%s,%s)',
             $run_id, $profile_id, 'queued', $dry_run ? 1 : 0, $package_path, $source_count,
             (int) ($counts['created'] ?? 0), (int) ($counts['updated'] ?? 0),
-            (int) ($counts['removed'] ?? 0), (int) ($counts['unchanged'] ?? 0), $now, $now
+            (int) ($counts['removed'] ?? 0), (int) ($counts['unchanged'] ?? 0),
+            $suppress_summary ? 1 : 0, $now, $now
         ));
         if ($inserted === false) {
             return new WP_Error('bazaraki_sync_run_store', $wpdb->last_error ?: __('Could not store the sync run.', 'bricks-child'));
