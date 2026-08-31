@@ -29,9 +29,10 @@ Profiles are managed centrally in WordPress. Add any number of dealer profiles
 under **Tools > Bazaraki Sync** and enable the ones that should run. Before each
 `--all` run, the worker downloads the signed profile list and processes enabled
 dealers sequentially. Each profile has its own source URL, AutoAgora owner,
-safety settings, state, queue, and completion result. Bazaraki's location values
-are kept. If a changed listing omits one, validation fills that value from the
-selected owner's most recently used complete listing location.
+safety settings, state, queue, and completion result. Each profile has one
+default location selected through the same map-based picker used for car
+listings. Bazaraki's location values are kept; validation fills only missing
+values from that profile's saved default location.
 
 Generate a suitable shared secret on a machine with PHP using:
 

@@ -12,8 +12,62 @@ final class AutoAgora_Bazaraki_Sync_Admin
     public static function register(): void
     {
         add_action('admin_menu', array(__CLASS__, 'menu'));
+        add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueue'));
         add_action('admin_post_autoagora_save_bazaraki_sync_profile', array(__CLASS__, 'save'));
         add_action('admin_post_autoagora_delete_bazaraki_sync_profile', array(__CLASS__, 'delete'));
+    }
+
+    public static function enqueue(string $hook_suffix): void
+    {
+        if ($hook_suffix !== 'tools_page_' . self::PAGE) {
+            return;
+        }
+
+        $directory = get_stylesheet_directory();
+        $uri = get_stylesheet_directory_uri();
+        $script_dependencies = array();
+        if (defined('GOOGLE_MAPS_API_KEY') && (string) GOOGLE_MAPS_API_KEY !== '') {
+            wp_enqueue_script(
+                'google-maps',
+                'https://maps.googleapis.com/maps/api/js?key=' . rawurlencode((string) GOOGLE_MAPS_API_KEY) . '&libraries=places&language=en',
+                array(),
+                null,
+                true
+            );
+            $script_dependencies[] = 'google-maps';
+        }
+        wp_enqueue_style(
+            'autoagora-location-picker',
+            $uri . '/assets/css/location-picker.css',
+            array(),
+            (string) filemtime($directory . '/assets/css/location-picker.css')
+        );
+        wp_enqueue_style(
+            'autoagora-bazaraki-sync-admin',
+            $uri . '/includes/admin/bazaraki-sync/bazaraki-sync-admin.css',
+            array('autoagora-location-picker'),
+            (string) filemtime($directory . '/includes/admin/bazaraki-sync/bazaraki-sync-admin.css')
+        );
+        wp_enqueue_script(
+            'autoagora-bazaraki-sync-admin',
+            $uri . '/includes/admin/bazaraki-sync/bazaraki-sync-admin.js',
+            $script_dependencies,
+            (string) filemtime($directory . '/includes/admin/bazaraki-sync/bazaraki-sync-admin.js'),
+            true
+        );
+        wp_localize_script('autoagora-bazaraki-sync-admin', 'autoagoraSyncLocation', array(
+            'defaultLat' => 35.1856,
+            'defaultLng' => 33.3823,
+            'defaultZoom' => 8,
+            'chooseLocation' => __('Choose location', 'bricks-child'),
+            'changeLocation' => __('Change location', 'bricks-child'),
+            'clearLocation' => __('Clear location', 'bricks-child'),
+            'noLocation' => __('No default location selected.', 'bricks-child'),
+            'searchLocation' => __('Search for a location in Cyprus...', 'bricks-child'),
+            'applyLocation' => __('Use this location', 'bricks-child'),
+            'close' => __('Close', 'bricks-child'),
+            'mapsUnavailable' => __('Google Maps could not be loaded. Check the site API key configuration.', 'bricks-child'),
+        ));
     }
 
     public static function menu(): void
@@ -92,6 +146,8 @@ final class AutoAgora_Bazaraki_Sync_Admin
             'id' => '', 'name' => '', 'dealer_url' => '', 'author_id' => get_current_user_id(),
             'enabled' => false, 'dry_run' => true, 'missing_confirmations' => 3,
             'delay_ms' => 3500, 'max_images' => 40, 'max_missing_ratio' => 0.35,
+            'car_city' => '', 'car_district' => '', 'car_address' => '',
+            'car_latitude' => null, 'car_longitude' => null,
         );
         if (empty($profiles)) {
             $new_defaults = array_merge($new_defaults, array(
@@ -117,16 +173,8 @@ final class AutoAgora_Bazaraki_Sync_Admin
         self::input($prefix, 'dealer_url', __('Bazaraki dealer URL', 'bricks-child'), $profile['dealer_url'], 'url');
         echo '<tr><th><label for="' . esc_attr($prefix . '-author') . '">' . esc_html__('Car owner', 'bricks-child') . '</label></th><td>';
         wp_dropdown_users(array('name' => 'profile[author_id]', 'id' => $prefix . '-author', 'selected' => (int) $profile['author_id']));
-        $location_defaults = AutoAgora_Bazaraki_Sync_Profiles::defaults($profile);
-        if (!empty($location_defaults)) {
-            echo '<p class="description">' . esc_html(sprintf(
-                __('If Bazaraki omits a location value, it is filled automatically from this owner\'s recent listings or dealer profile: %s', 'bricks-child'),
-                (string) $location_defaults['car_address']
-            )) . '</p>';
-        } else {
-            echo '<p class="description">' . esc_html__('If Bazaraki omits a location value, it is filled from this owner\'s recent listings or claimed dealer profile. Neither currently provides a complete mapped location, so an affected row will fail safely.', 'bricks-child') . '</p>';
-        }
         echo '</td></tr>';
+        self::locationPicker($prefix, $profile);
         self::input($prefix, 'missing_confirmations', __('Missing runs before expiry', 'bricks-child'), $profile['missing_confirmations'], 'number');
         self::input($prefix, 'max_missing_ratio', __('Maximum one-run missing ratio', 'bricks-child'), $profile['max_missing_ratio'], 'number');
         self::input($prefix, 'delay_ms', __('Delay between listings (ms)', 'bricks-child'), $profile['delay_ms'], 'number');
@@ -153,6 +201,30 @@ final class AutoAgora_Bazaraki_Sync_Admin
         if ($description !== '') {
             echo '<p class="description">' . esc_html($description) . '</p>';
         }
+        echo '</td></tr>';
+    }
+
+    /** @param array<string,mixed> $profile */
+    private static function locationPicker(string $prefix, array $profile): void
+    {
+        $defaults = AutoAgora_Bazaraki_Sync_Profiles::defaults($profile);
+        $has_location = !empty($defaults);
+        $summary_id = $prefix . '-location-summary';
+        echo '<tr><th>' . esc_html__('Default location', 'bricks-child') . '</th><td>';
+        echo '<div class="autoagora-sync-location-picker" data-location-picker>';
+        echo '<p id="' . esc_attr($summary_id) . '" class="autoagora-sync-location-summary' . ($has_location ? ' has-location' : '') . '">';
+        echo esc_html($has_location ? (string) $defaults['car_address'] : __('No default location selected.', 'bricks-child'));
+        echo '</p><div class="autoagora-sync-location-actions">';
+        echo '<button type="button" class="button button-secondary" data-choose-location aria-describedby="' . esc_attr($summary_id) . '">';
+        echo esc_html($has_location ? __('Change location', 'bricks-child') : __('Choose location', 'bricks-child'));
+        echo '</button> ';
+        echo '<button type="button" class="button button-link-delete" data-clear-location' . ($has_location ? '' : ' hidden') . '>' . esc_html__('Clear location', 'bricks-child') . '</button>';
+        echo '</div>';
+        foreach (array('car_city', 'car_district', 'car_address', 'car_latitude', 'car_longitude') as $key) {
+            $value = $profile[$key] ?? '';
+            echo '<input type="hidden" name="profile[' . esc_attr($key) . ']" value="' . esc_attr((string) $value) . '" data-location-field="' . esc_attr($key) . '">';
+        }
+        echo '</div><p class="description">' . esc_html__('Used only when a Bazaraki listing omits location data. Choose the point on the map; the address and coordinates are saved automatically.', 'bricks-child') . '</p>';
         echo '</td></tr>';
     }
 
