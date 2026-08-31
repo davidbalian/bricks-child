@@ -969,25 +969,19 @@ add_action('wp_ajax_get_models_for_make_by_term_id', 'get_models_for_make_by_ter
 add_action('wp_ajax_nopriv_get_models_for_make_by_term_id', 'get_models_for_make_by_term_id');
 
 /**
- * AJAX handler to get user's saved locations from past listings
- * Returns unique locations from the user's last 10 car listings
+ * Return unique locations from a user's newest car listings.
+ *
+ * @param int $user_id WordPress user ID.
+ * @param int $limit Maximum number of unique locations to return.
+ * @return array<int,array<string,mixed>>
  */
-function get_user_saved_locations() {
-    // Verify nonce
-    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'add_car_listing_nonce')) {
-        wp_send_json_error('Invalid nonce');
-        return;
+function autoagora_get_user_saved_locations($user_id, $limit = 10) {
+    $user_id = absint($user_id);
+    $limit = max(1, min(10, absint($limit)));
+    if (!$user_id) {
+        return array();
     }
 
-    // Check if user is logged in
-    if (!is_user_logged_in()) {
-        wp_send_json_error('User not logged in');
-        return;
-    }
-
-    $user_id = get_current_user_id();
-
-    // Get user's car listings with location data
     $args = array(
         'post_type'      => 'car',
         'post_status'    => array('publish', 'pending', 'draft'),
@@ -1007,8 +1001,7 @@ function get_user_saved_locations() {
     $listings = get_posts($args);
 
     if (empty($listings)) {
-        wp_send_json_success(array());
-        return;
+        return array();
     }
 
     $locations = array();
@@ -1032,13 +1025,29 @@ function get_user_saved_locations() {
             'longitude' => get_field('car_longitude', $listing->ID) ?: 0,
         );
 
-        // Limit to 10 unique locations
-        if (count($locations) >= 10) {
+        if (count($locations) >= $limit) {
             break;
         }
     }
 
-    wp_send_json_success($locations);
+    return $locations;
+}
+
+/**
+ * AJAX handler to get the current user's saved locations from past listings.
+ */
+function get_user_saved_locations() {
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'add_car_listing_nonce')) {
+        wp_send_json_error('Invalid nonce');
+        return;
+    }
+
+    if (!is_user_logged_in()) {
+        wp_send_json_error('User not logged in');
+        return;
+    }
+
+    wp_send_json_success(autoagora_get_user_saved_locations(get_current_user_id()));
 }
 
 add_action('wp_ajax_get_user_saved_locations', 'get_user_saved_locations');

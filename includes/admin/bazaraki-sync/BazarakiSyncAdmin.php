@@ -91,16 +91,12 @@ final class AutoAgora_Bazaraki_Sync_Admin
         $new_defaults = array(
             'id' => '', 'name' => '', 'dealer_url' => '', 'author_id' => get_current_user_id(),
             'enabled' => false, 'dry_run' => true, 'missing_confirmations' => 3,
-            'delay_ms' => 3500, 'max_images' => 40, 'minimum_expected_listings' => 1,
-            'max_missing_ratio' => 0.35,
+            'delay_ms' => 3500, 'max_images' => 40, 'max_missing_ratio' => 0.35,
         );
         if (empty($profiles)) {
             $new_defaults = array_merge($new_defaults, array(
                 'id' => 'auto-cyprus-8598735', 'name' => 'Auto.Cyprus',
                 'dealer_url' => 'https://www.bazaraki.com/items/author/8598735/?lat=34.6657927&lng=33.0034017&radius=5000',
-                'minimum_expected_listings' => 20,
-                'car_city' => 'Limassol', 'car_district' => 'Limassol district',
-                'car_address' => 'Auto.Cyprus, Limassol', 'car_latitude' => 34.6657927, 'car_longitude' => 33.0034017,
             ));
         }
         $new_profile = AutoAgora_Bazaraki_Sync_Profiles::sanitize($new_defaults);
@@ -121,15 +117,20 @@ final class AutoAgora_Bazaraki_Sync_Admin
         self::input($prefix, 'dealer_url', __('Bazaraki dealer URL', 'bricks-child'), $profile['dealer_url'], 'url');
         echo '<tr><th><label for="' . esc_attr($prefix . '-author') . '">' . esc_html__('Car owner', 'bricks-child') . '</label></th><td>';
         wp_dropdown_users(array('name' => 'profile[author_id]', 'id' => $prefix . '-author', 'selected' => (int) $profile['author_id']));
+        $location_defaults = AutoAgora_Bazaraki_Sync_Profiles::defaults($profile);
+        if (!empty($location_defaults)) {
+            echo '<p class="description">' . esc_html(sprintf(
+                __('If Bazaraki omits a location value, it is filled from this owner\'s most recently used complete location: %s', 'bricks-child'),
+                (string) $location_defaults['car_address']
+            )) . '</p>';
+        } else {
+            echo '<p class="description">' . esc_html__('If Bazaraki omits a location value, it is filled from this owner\'s most recently used complete listing location. This owner does not currently have one, so an affected row will fail safely.', 'bricks-child') . '</p>';
+        }
         echo '</td></tr>';
         self::input($prefix, 'missing_confirmations', __('Missing runs before expiry', 'bricks-child'), $profile['missing_confirmations'], 'number');
-        self::input($prefix, 'minimum_expected_listings', __('Minimum expected listings', 'bricks-child'), $profile['minimum_expected_listings'], 'number', false, __('The run fails safely if fewer listings are discovered.', 'bricks-child'));
         self::input($prefix, 'max_missing_ratio', __('Maximum one-run missing ratio', 'bricks-child'), $profile['max_missing_ratio'], 'number');
         self::input($prefix, 'delay_ms', __('Delay between listings (ms)', 'bricks-child'), $profile['delay_ms'], 'number');
         self::input($prefix, 'max_images', __('Maximum images per car', 'bricks-child'), $profile['max_images'], 'number');
-        foreach (array('car_city' => 'City', 'car_district' => 'District', 'car_address' => 'Address', 'car_latitude' => 'Latitude', 'car_longitude' => 'Longitude') as $key => $label) {
-            self::input($prefix, $key, __($label, 'bricks-child'), $profile[$key] ?? '', str_contains($key, 'latitude') || str_contains($key, 'longitude') ? 'number' : 'text');
-        }
         echo '<tr><th>' . esc_html__('Mode', 'bricks-child') . '</th><td>';
         echo '<label><input type="checkbox" name="profile[enabled]" value="1" ' . checked(!empty($profile['enabled']), true, false) . '> ' . esc_html__('Enabled', 'bricks-child') . '</label><br>';
         echo '<label><input type="checkbox" name="profile[dry_run]" value="1" ' . checked(!empty($profile['dry_run']), true, false) . '> ' . esc_html__('Dry run (validate and report without changing cars)', 'bricks-child') . '</label>';

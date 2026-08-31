@@ -54,13 +54,7 @@ final class AutoAgora_Bazaraki_Sync_Profiles
             'missing_confirmations' => max(2, min(10, absint($profile['missing_confirmations'] ?? 3))),
             'delay_ms'               => max(1000, min(30000, absint($profile['delay_ms'] ?? 3500))),
             'max_images'             => max(1, min(40, absint($profile['max_images'] ?? 40))),
-            'minimum_expected_listings' => max(1, min(500, absint($profile['minimum_expected_listings'] ?? 1))),
             'max_missing_ratio'      => max(0.05, min(0.90, (float) ($profile['max_missing_ratio'] ?? 0.35))),
-            'car_city'              => sanitize_text_field((string) ($profile['car_city'] ?? '')),
-            'car_district'          => sanitize_text_field((string) ($profile['car_district'] ?? '')),
-            'car_address'           => sanitize_text_field((string) ($profile['car_address'] ?? '')),
-            'car_latitude'          => is_numeric($profile['car_latitude'] ?? null) ? (float) $profile['car_latitude'] : null,
-            'car_longitude'         => is_numeric($profile['car_longitude'] ?? null) ? (float) $profile['car_longitude'] : null,
         );
     }
 
@@ -83,9 +77,28 @@ final class AutoAgora_Bazaraki_Sync_Profiles
     /** @return array<string,mixed> */
     public static function defaults(array $profile): array
     {
-        return array_intersect_key($profile, array_flip(array(
-            'car_city', 'car_district', 'car_address', 'car_latitude', 'car_longitude',
-        )));
+        if (!function_exists('autoagora_get_user_saved_locations')) {
+            return array();
+        }
+
+        foreach (autoagora_get_user_saved_locations(absint($profile['author_id'] ?? 0)) as $location) {
+            $city = sanitize_text_field((string) ($location['city'] ?? ''));
+            $address = sanitize_text_field((string) ($location['address'] ?? ''));
+            $latitude = is_numeric($location['latitude'] ?? null) ? (float) $location['latitude'] : 0.0;
+            $longitude = is_numeric($location['longitude'] ?? null) ? (float) $location['longitude'] : 0.0;
+            if ($city === '' || $address === '' || $latitude === 0.0 || $longitude === 0.0) {
+                continue;
+            }
+            return array(
+                'car_city' => $city,
+                'car_district' => sanitize_text_field((string) ($location['district'] ?? '')),
+                'car_address' => $address,
+                'car_latitude' => $latitude,
+                'car_longitude' => $longitude,
+            );
+        }
+
+        return array();
     }
 
     /** @return array<int,array<string,mixed>> */
@@ -104,15 +117,7 @@ final class AutoAgora_Bazaraki_Sync_Profiles
                 'browser' => 'chrome',
                 'delay_ms' => $profile['delay_ms'],
                 'max_images' => $profile['max_images'],
-                'minimum_expected_listings' => $profile['minimum_expected_listings'],
                 'max_missing_ratio' => $profile['max_missing_ratio'],
-                'location' => array(
-                    'car_city' => $profile['car_city'],
-                    'car_district' => $profile['car_district'],
-                    'car_address' => $profile['car_address'],
-                    'car_latitude' => $profile['car_latitude'],
-                    'car_longitude' => $profile['car_longitude'],
-                ),
             );
         }
         return $output;
