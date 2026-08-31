@@ -11,6 +11,7 @@ final class AutoAgora_Car_Json_Import_Runner
 {
     private const VERTICAL_CROP_PERCENT = 0.10;
     private static bool $suppress_import_notifications = false;
+    private static int $notification_suppression_depth = 0;
 
     /**
      * @param array<string,mixed> $row
@@ -96,15 +97,23 @@ final class AutoAgora_Car_Json_Import_Runner
         }
     }
 
-    private static function beginAdminNotificationSuppression(): void
+    public static function beginAdminNotificationSuppression(): void
     {
+        self::$notification_suppression_depth++;
+        if (self::$notification_suppression_depth > 1) {
+            return;
+        }
         self::$suppress_import_notifications = true;
         add_filter('pre_wp_mail', array(__CLASS__, 'suppressImportedCarWpMail'), PHP_INT_MAX, 2);
         add_filter('autoagora_pre_send_app_email', array(__CLASS__, 'suppressImportedCarAppEmail'), PHP_INT_MAX, 5);
     }
 
-    private static function endAdminNotificationSuppression(): void
+    public static function endAdminNotificationSuppression(): void
     {
+        self::$notification_suppression_depth = max(0, self::$notification_suppression_depth - 1);
+        if (self::$notification_suppression_depth > 0) {
+            return;
+        }
         remove_filter('pre_wp_mail', array(__CLASS__, 'suppressImportedCarWpMail'), PHP_INT_MAX);
         remove_filter('autoagora_pre_send_app_email', array(__CLASS__, 'suppressImportedCarAppEmail'), PHP_INT_MAX);
         self::$suppress_import_notifications = false;
@@ -132,7 +141,7 @@ final class AutoAgora_Car_Json_Import_Runner
     }
 
     /** @param array<string,mixed> $listing */
-    private static function storeFields(int $post_id, array $listing): void
+    public static function storeFields(int $post_id, array $listing): void
     {
         $fields = array(
             'make', 'model', 'year', 'mileage', 'price', 'engine_capacity',
@@ -150,7 +159,7 @@ final class AutoAgora_Car_Json_Import_Runner
         }
     }
 
-    private static function updateField(string $field, $value, int $post_id): void
+    public static function updateField(string $field, $value, int $post_id): void
     {
         if (function_exists('update_field')) {
             update_field($field, $value, $post_id);
@@ -159,7 +168,7 @@ final class AutoAgora_Car_Json_Import_Runner
         }
     }
 
-    private static function assignTaxonomy(int $post_id, string $make, string $model): void
+    public static function assignTaxonomy(int $post_id, string $make, string $model): void
     {
         if (!taxonomy_exists('car_make')) {
             throw new RuntimeException(__('The car_make taxonomy is not registered.', 'bricks-child'));
@@ -215,7 +224,7 @@ final class AutoAgora_Car_Json_Import_Runner
      * @param array<int,array<string,mixed>> $images
      * @return array<int,int>
      */
-    private static function importImages(int $post_id, string $zip_path, array $images): array
+    public static function importImages(int $post_id, string $zip_path, array $images): array
     {
         if (!class_exists('ZipArchive')) {
             throw new RuntimeException(__('The PHP ZIP extension is required.', 'bricks-child'));
