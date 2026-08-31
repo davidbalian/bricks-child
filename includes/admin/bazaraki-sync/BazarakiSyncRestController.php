@@ -27,6 +27,11 @@ final class AutoAgora_Bazaraki_Sync_REST_Controller
                 'callback' => array(__CLASS__, 'report'),
                 'permission_callback' => '__return_true',
             ));
+            register_rest_route('autoagora/v1', '/bazaraki-sync/profiles', array(
+                'methods' => WP_REST_Server::CREATABLE,
+                'callback' => array(__CLASS__, 'profiles'),
+                'permission_callback' => '__return_true',
+            ));
         });
     }
 
@@ -151,6 +156,19 @@ final class AutoAgora_Bazaraki_Sync_REST_Controller
                 : wp_mail($recipient, $subject, $text);
         }
         return rest_ensure_response(array('recorded' => true));
+    }
+
+    public static function profiles(WP_REST_Request $request)
+    {
+        $body = (string) $request->get_body();
+        $auth = AutoAgora_Bazaraki_Sync_Auth::verify($request, $body);
+        if (is_wp_error($auth)) {
+            return $auth;
+        }
+        return rest_ensure_response(array(
+            'schema_version' => 1,
+            'profiles' => AutoAgora_Bazaraki_Sync_Profiles::enabledForWorker(),
+        ));
     }
 
     /** @return string|WP_Error */

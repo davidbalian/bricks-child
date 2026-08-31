@@ -15,7 +15,23 @@ final class AutoAgora_Bazaraki_Sync_Profiles
         $stored = get_option(self::OPTION, array());
         $profiles = is_array($stored) ? $stored : array();
         $filtered = apply_filters('autoagora_bazaraki_sync_profiles', $profiles);
-        return is_array($filtered) ? $filtered : array();
+        if (!is_array($filtered)) {
+            return array();
+        }
+        $clean = array();
+        foreach ($filtered as $key => $profile) {
+            if (!is_array($profile)) {
+                continue;
+            }
+            if (empty($profile['id']) && is_string($key)) {
+                $profile['id'] = $key;
+            }
+            $profile = self::sanitize($profile);
+            if ($profile['id'] !== '') {
+                $clean[$profile['id']] = $profile;
+            }
+        }
+        return $clean;
     }
 
     /** @return array<string,mixed>|null */
@@ -36,6 +52,10 @@ final class AutoAgora_Bazaraki_Sync_Profiles
             'enabled'               => !empty($profile['enabled']),
             'dry_run'               => !empty($profile['dry_run']),
             'missing_confirmations' => max(2, min(10, absint($profile['missing_confirmations'] ?? 3))),
+            'delay_ms'               => max(1000, min(30000, absint($profile['delay_ms'] ?? 3500))),
+            'max_images'             => max(1, min(40, absint($profile['max_images'] ?? 40))),
+            'minimum_expected_listings' => max(1, min(500, absint($profile['minimum_expected_listings'] ?? 1))),
+            'max_missing_ratio'      => max(0.05, min(0.90, (float) ($profile['max_missing_ratio'] ?? 0.35))),
             'car_city'              => sanitize_text_field((string) ($profile['car_city'] ?? '')),
             'car_district'          => sanitize_text_field((string) ($profile['car_district'] ?? '')),
             'car_address'           => sanitize_text_field((string) ($profile['car_address'] ?? '')),
@@ -66,5 +86,35 @@ final class AutoAgora_Bazaraki_Sync_Profiles
         return array_intersect_key($profile, array_flip(array(
             'car_city', 'car_district', 'car_address', 'car_latitude', 'car_longitude',
         )));
+    }
+
+    /** @return array<int,array<string,mixed>> */
+    public static function enabledForWorker(): array
+    {
+        $output = array();
+        foreach (self::all() as $profile) {
+            if (!is_array($profile) || empty($profile['enabled'])) {
+                continue;
+            }
+            $profile = self::sanitize($profile);
+            $output[] = array(
+                'id' => $profile['id'],
+                'dealer_url' => $profile['dealer_url'],
+                'headless' => true,
+                'browser' => 'chrome',
+                'delay_ms' => $profile['delay_ms'],
+                'max_images' => $profile['max_images'],
+                'minimum_expected_listings' => $profile['minimum_expected_listings'],
+                'max_missing_ratio' => $profile['max_missing_ratio'],
+                'location' => array(
+                    'car_city' => $profile['car_city'],
+                    'car_district' => $profile['car_district'],
+                    'car_address' => $profile['car_address'],
+                    'car_latitude' => $profile['car_latitude'],
+                    'car_longitude' => $profile['car_longitude'],
+                ),
+            );
+        }
+        return $output;
     }
 }

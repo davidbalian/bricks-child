@@ -25,6 +25,21 @@ request body. Requests expire after five minutes and nonces cannot be replayed.
 Packages are stored in a protected uploads directory and removed after the run
 finishes.
 
+Profiles are managed centrally in WordPress. Add any number of dealer profiles
+under **Tools > Bazaraki Sync** and enable the ones that should run. Before each
+`--all` run, the worker downloads the signed profile list and processes enabled
+dealers sequentially. Each profile has its own source URL, AutoAgora owner,
+location, safety thresholds, state, queue, and completion result.
+
+Generate a suitable shared secret on a machine with PHP using:
+
+```bash
+php -r 'echo bin2hex(random_bytes(32)), PHP_EOL;'
+```
+
+Use the exact output in `wp-config.php` and the worker environment. Never place
+it in the repository or `sync-config.json`.
+
 Changed rows pass through the existing JSON importer validator, so AutoAgora's
 field enums and make/model taxonomy are authoritative. New cars are pending.
 Existing cars are matched by `_autoagora_import_source` and
