@@ -120,11 +120,11 @@ final class AutoAgora_Bazaraki_Sync_Admin
         $location_defaults = AutoAgora_Bazaraki_Sync_Profiles::defaults($profile);
         if (!empty($location_defaults)) {
             echo '<p class="description">' . esc_html(sprintf(
-                __('If Bazaraki omits a location value, it is filled from this owner\'s most recently used complete location: %s', 'bricks-child'),
+                __('If Bazaraki omits a location value, it is filled automatically from this owner\'s recent listings or dealer profile: %s', 'bricks-child'),
                 (string) $location_defaults['car_address']
             )) . '</p>';
         } else {
-            echo '<p class="description">' . esc_html__('If Bazaraki omits a location value, it is filled from this owner\'s most recently used complete listing location. This owner does not currently have one, so an affected row will fail safely.', 'bricks-child') . '</p>';
+            echo '<p class="description">' . esc_html__('If Bazaraki omits a location value, it is filled from this owner\'s recent listings or claimed dealer profile. Neither currently provides a complete mapped location, so an affected row will fail safely.', 'bricks-child') . '</p>';
         }
         echo '</td></tr>';
         self::input($prefix, 'missing_confirmations', __('Missing runs before expiry', 'bricks-child'), $profile['missing_confirmations'], 'number');
