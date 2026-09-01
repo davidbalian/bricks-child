@@ -13,6 +13,13 @@ final class AutoAgora_Car_Json_Import_Runner
     private static bool $suppress_import_notifications = false;
     private static int $notification_suppression_depth = 0;
 
+    /** Keep a narrow safety net active for notification jobs sent later. */
+    public static function registerNotificationSuppression(): void
+    {
+        add_filter('pre_wp_mail', array(__CLASS__, 'suppressDelayedImportedCarAdminWpMail'), PHP_INT_MAX, 2);
+        add_filter('autoagora_pre_send_app_email', array(__CLASS__, 'suppressDelayedImportedCarAdminAppEmail'), PHP_INT_MAX, 5);
+    }
+
     /**
      * @param array<string,mixed> $row
      * @param string $zip_path
@@ -44,9 +51,15 @@ final class AutoAgora_Car_Json_Import_Runner
         self::beginAdminNotificationSuppression();
         try {
             $title = sprintf('%d %s %s', (int) $listing['year'], $listing['make'], $listing['model']);
+            // Build automated imports as drafts first. Some notification
+            // integrations queue their mail from the pending-status transition
+            // and deliver it after this request, when the temporary mail filters
+            // below are no longer active. The completed post is moved to pending
+            // without firing that submission transition; normal frontend uploads
+            // still use their existing wp_insert_post('pending') workflow.
             $post_id = wp_insert_post(array(
                 'post_type'    => 'car',
-                'post_status'  => 'pending',
+                'post_status'  => 'draft',
                 'post_author'  => $author_id,
                 'post_title'   => sanitize_text_field($title),
                 'post_content' => wp_kses_post((string) $listing['description']),
@@ -79,6 +92,8 @@ final class AutoAgora_Car_Json_Import_Runner
                     Listing_Details_Badge_Manager::update_badges_for_listing((int) $post_id);
                 }
 
+                self::finalizeImportedPostAsPending((int) $post_id);
+
                 return array(
                     'status'      => 'imported',
                     'post_id'     => (int) $post_id,
@@ -95,6 +110,36 @@ final class AutoAgora_Car_Json_Import_Runner
         } finally {
             self::endAdminNotificationSuppression();
         }
+    }
+
+    /**
+     * Complete an automated import as pending without emitting a new-submission
+     * status transition. This is deliberately importer-only: manual submissions
+     * continue through WordPress normally and retain their individual emails.
+     */
+    private static function finalizeImportedPostAsPending(int $post_id): void
+    {
+        global $wpdb;
+
+        $updated = $wpdb->update(
+            $wpdb->posts,
+            array(
+                'post_status'       => 'pending',
+                'post_modified'     => current_time('mysql'),
+                'post_modified_gmt' => current_time('mysql', true),
+            ),
+            array(
+                'ID'        => $post_id,
+                'post_type' => 'car',
+            ),
+            array('%s', '%s', '%s'),
+            array('%d', '%s')
+        );
+        if ($updated !== 1) {
+            throw new RuntimeException(__('The imported car could not be moved to pending review.', 'bricks-child'));
+        }
+
+        clean_post_cache($post_id);
     }
 
     public static function beginAdminNotificationSuppression(): void
@@ -138,6 +183,119 @@ final class AutoAgora_Car_Json_Import_Runner
     {
         unset($to_email, $subject, $html_content, $text_content);
         return $return === null && self::$suppress_import_notifications ? true : $return;
+    }
+
+    /**
+     * Suppress a delayed new-submission email only when it names a specific car
+     * carrying importer source metadata and every recipient is an administrator.
+     * Manual cars do not carry that metadata and therefore remain unaffected.
+     *
+     * @param null|bool $return
+     * @param array<string,mixed> $atts
+     * @return null|bool
+     */
+    public static function suppressDelayedImportedCarAdminWpMail($return, array $atts)
+    {
+        if ($return !== null) {
+            return $return;
+        }
+        return self::isDelayedImportedCarAdminNotification(
+            $atts['to'] ?? array(),
+            (string) ($atts['subject'] ?? ''),
+            (string) ($atts['message'] ?? '')
+        ) ? true : $return;
+    }
+
+    /** @return null|bool */
+    public static function suppressDelayedImportedCarAdminAppEmail($return, $to_email, $subject, $html_content, $text_content)
+    {
+        if ($return !== null) {
+            return $return;
+        }
+        return self::isDelayedImportedCarAdminNotification(
+            $to_email,
+            (string) $subject,
+            (string) $html_content . "\n" . (string) $text_content
+        ) ? true : $return;
+    }
+
+    /** @param string|array<int,string> $recipients */
+    private static function isDelayedImportedCarAdminNotification($recipients, string $subject, string $message): bool
+    {
+        if (!self::recipientsAreOnlyAdministrators(self::mailRecipients($recipients))) {
+            return false;
+        }
+
+        $text = strtolower(wp_strip_all_tags(html_entity_decode($subject . "\n" . $message, ENT_QUOTES, 'UTF-8')));
+        $mentions_listing = preg_match('/\b(car|listing|vehicle|post)\b/', $text) === 1;
+        $mentions_submission = preg_match('/\b(new|pending|review|submitted|submission|uploaded|approval)\b/', $text) === 1;
+        if (!$mentions_listing || !$mentions_submission) {
+            return false;
+        }
+
+        $post_ids = array();
+        $patterns = array(
+            '/[?&](?:post|post_id|car_id)=(\d+)/i',
+            '/(?:%3f|%26)(?:post|post_id|car_id)(?:=|%3d)(\d+)/i',
+            '/\b(?:post|listing|car)\s*(?:id|#)\s*:?\s*(\d+)\b/i',
+        );
+        foreach ($patterns as $pattern) {
+            if (preg_match_all($pattern, $subject . "\n" . $message, $matches)) {
+                $post_ids = array_merge($post_ids, array_map('absint', $matches[1]));
+            }
+        }
+        foreach (array_unique(array_filter($post_ids)) as $post_id) {
+            if (
+                get_post_type($post_id) === 'car' &&
+                (string) get_post_meta($post_id, '_autoagora_import_source', true) !== ''
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** @param string|array<int,string> $raw @return array<int,string> */
+    private static function mailRecipients($raw): array
+    {
+        $values = is_array($raw) ? $raw : explode(',', (string) $raw);
+        $emails = array();
+        foreach ($values as $value) {
+            $value = trim((string) $value);
+            if (preg_match('/<([^>]+)>/', $value, $matches)) {
+                $value = $matches[1];
+            }
+            $email = sanitize_email($value);
+            if ($email !== '') {
+                $emails[] = strtolower($email);
+            }
+        }
+        return array_values(array_unique($emails));
+    }
+
+    /** @param array<int,string> $recipients */
+    private static function recipientsAreOnlyAdministrators(array $recipients): bool
+    {
+        if (empty($recipients)) {
+            return false;
+        }
+        $administrators = array();
+        $site_admin = sanitize_email((string) get_option('admin_email'));
+        if ($site_admin !== '') {
+            $administrators[strtolower($site_admin)] = true;
+        }
+        foreach (get_users(array('role' => 'administrator', 'fields' => array('user_email'))) as $admin) {
+            $email = sanitize_email((string) ($admin->user_email ?? ''));
+            if ($email !== '') {
+                $administrators[strtolower($email)] = true;
+            }
+        }
+        foreach ($recipients as $recipient) {
+            if (empty($administrators[$recipient])) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** @param array<string,mixed> $listing */
