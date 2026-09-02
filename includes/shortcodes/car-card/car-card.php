@@ -15,6 +15,26 @@ if (!defined('ABSPATH')) {
 add_shortcode('car_card', 'car_card_shortcode');
 
 /**
+ * Return the compact promotion label used on marketplace car cards.
+ *
+ * Longer product names remain available in checkout and admin interfaces.
+ *
+ * @param string $tier Promotion tier key.
+ * @return string
+ */
+function car_card_promotion_badge_label($tier) {
+    if ($tier === 'priority') {
+        return __('Lift', 'bricks-child');
+    }
+
+    if ($tier === 'showcase') {
+        return __('Showcase', 'bricks-child');
+    }
+
+    return '';
+}
+
+/**
  * Prefer smaller card-focused sizes to reduce listing payload.
  *
  * @param int $attachment_id Attachment ID.
@@ -146,7 +166,7 @@ function render_car_card($post_id, $context = array()) {
     $show_extra_badge = car_card_get_meta_value($post_id, 'extradetailsbadge');
     $popular_badge = car_card_get_meta_value($post_id, 'popular_badge');
     $promotion_tier = function_exists('autoagora_get_listing_promotion_tier') ? autoagora_get_listing_promotion_tier($post_id) : 'none';
-    $promotion_label = function_exists('autoagora_listing_promotion_label') ? autoagora_listing_promotion_label($promotion_tier) : '';
+    $promotion_label = car_card_promotion_badge_label($promotion_tier);
 
     $preview = isset($context['preview']) && is_array($context['preview']) ? $context['preview'] : array();
     if (array_key_exists('full_badge', $preview)) {
@@ -160,7 +180,7 @@ function render_car_card($post_id, $context = array()) {
     }
     if (isset($preview['promotion_tier']) && in_array($preview['promotion_tier'], array('none', 'priority', 'showcase'), true)) {
         $promotion_tier = $preview['promotion_tier'];
-        $promotion_label = function_exists('autoagora_listing_promotion_label') ? autoagora_listing_promotion_label($promotion_tier) : '';
+        $promotion_label = car_card_promotion_badge_label($promotion_tier);
     }
     $is_featured = $promotion_tier !== 'none';
 
@@ -204,12 +224,11 @@ function render_car_card($post_id, $context = array()) {
         <div class="car-card-slider" data-total="<?php echo esc_attr($total_images); ?>" data-slides="<?php echo esc_attr($slide_count); ?>">
 
             <!-- Badges (top-left) -->
-            <?php if ($show_full_badge || $show_extra_badge) : ?>
+            <?php if ($promotion_label || $show_full_badge || $show_extra_badge) : ?>
                 <div class="car-card-badges">
-                    <?php /* Promotion pills intentionally hidden; tier outlines remain visible.
-                    if ($promotion_label) : ?>
+                    <?php if ($promotion_label) : ?>
                         <span class="car-card-badge car-card-promotion-badge car-card-promotion-badge--<?php echo esc_attr($promotion_tier); ?>"><?php echo esc_html($promotion_label); ?></span>
-                    <?php endif; */ ?>
+                    <?php endif; ?>
                     <?php if ($show_full_badge) : ?>
                     <span class="car-card-badge badge-full"><?php esc_html_e('Full Details', 'bricks-child'); ?></span>
                     <?php endif; ?>

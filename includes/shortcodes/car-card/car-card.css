@@ -36,7 +36,7 @@
 .car-card-featured {
     overflow: hidden;
     box-sizing: border-box;
-    border: 2px solid transparent;
+    border: 3px solid transparent;
     border-radius: 1rem;
     box-shadow: none;
 }
@@ -52,16 +52,16 @@
 }
 
 .car-card-promotion-showcase {
-    border-color: rgba(255, 215, 0, 0.65);
+    border-color: rgba(124, 58, 237, 0.78);
 }
 
 .car-card-featured .car-card-body {
     border: 0;
-    border-radius: 0 0 calc(1rem - 2px) calc(1rem - 2px);
+    border-radius: 0 0 calc(1rem - 3px) calc(1rem - 3px);
 }
 
 .car-card-featured .car-card-slider {
-    border-radius: calc(1rem - 2px) calc(1rem - 2px) 0 0;
+    border-radius: calc(1rem - 3px) calc(1rem - 3px) 0 0;
 }
 
 /* ── Slider container ── */

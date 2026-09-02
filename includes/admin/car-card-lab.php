@@ -162,7 +162,7 @@ final class AutoAgora_Car_Card_Lab {
                 </form>
 
                 <div class="autoagora-card-lab__toolbar" aria-label="<?php esc_attr_e('Preview filters', 'bricks-child'); ?>">
-                    <?php $this->render_filter('promotion', __('Promotion outline', 'bricks-child'), $promotion_states); ?>
+                    <?php $this->render_filter('promotion', __('Promotion style', 'bricks-child'), $promotion_states); ?>
                     <?php $this->render_filter('details', __('Top details pill', 'bricks-child'), wp_list_pluck($detail_states, 'label')); ?>
                     <?php $this->render_filter('signal', __('Signal pills', 'bricks-child'), wp_list_pluck($signal_states, 'label')); ?>
                     <p class="autoagora-card-lab__visible" aria-live="polite"></p>

@@ -76,7 +76,7 @@ function car_card_build_listing_json_payload($post_id, $listing_index, $is_favor
     $show_extra_badge = car_card_get_meta_value($post_id, 'extradetailsbadge');
     $popular_badge = car_card_get_meta_value($post_id, 'popular_badge');
     $promotion_tier = function_exists('autoagora_get_listing_promotion_tier') ? autoagora_get_listing_promotion_tier($post_id) : 'none';
-    $promotion_label = function_exists('autoagora_listing_promotion_label') ? autoagora_listing_promotion_label($promotion_tier) : '';
+    $promotion_label = car_card_promotion_badge_label($promotion_tier);
 
     $raw_images = get_post_meta($post_id, 'car_images', true);
     $image_ids = array();
