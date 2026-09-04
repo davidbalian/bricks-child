@@ -8,15 +8,51 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Create a dealership account - EXACT same process as normal registration
+ * Normalize a Cyprus mobile or fixed-line number to E.164 for account login.
+ *
+ * Accepts local eight-digit numbers and numbers prefixed with +357, 357, or
+ * 00357. Dealership accounts are created by an administrator and do not use
+ * the public SMS verification flow, so valid fixed-line numbers are allowed.
+ *
+ * @param string $phone_number Submitted phone number.
+ * @return string|WP_Error
+ */
+function autoagora_normalize_dealership_phone($phone_number) {
+    $digits = preg_replace('/\D+/', '', (string) $phone_number);
+
+    if (strpos($digits, '00357') === 0) {
+        $digits = substr($digits, 2);
+    }
+
+    if (preg_match('/^\d{8}$/', $digits)) {
+        $digits = '357' . $digits;
+    }
+
+    if (!preg_match('/^357\d{8}$/', $digits)) {
+        return new WP_Error(
+            'invalid_phone',
+            'Enter a valid Cyprus mobile or landline number, for example +357 22 123456.'
+        );
+    }
+
+    return '+' . $digits;
+}
+
+/**
+ * Create an administrator-managed dealership account.
  */
 function create_dealership_account($phone_number, $dealership_name, $password) {
     // Validate required fields
     if (empty($phone_number) || empty($dealership_name) || empty($password)) {
         return new WP_Error('missing_fields', 'Phone number, dealership name, and password are required.');
     }
+
+    $phone_number = autoagora_normalize_dealership_phone($phone_number);
+    if (is_wp_error($phone_number)) {
+        return $phone_number;
+    }
     
-    // Check if phone exists (EXACT same check as normal registration)
+    // Check if the normalized login phone already exists.
     $user_by_phone = get_users(array(
         'meta_key' => 'phone_number',
         'meta_value' => $phone_number,
@@ -120,12 +156,15 @@ function dealership_admin_page() {
                 <table class="form-table">
                     <tr>
                         <th scope="row"><label for="phone_number">Phone Number *</label></th>
-                        <td><input type="tel" id="phone_number" name="phone_number" class="regular-text" placeholder="+353871234567" required></td>
+                        <td>
+                            <input type="tel" id="phone_number" name="phone_number" class="regular-text" placeholder="+357 22 123456" required>
+                            <p class="description">Cyprus mobile or landline. It will be stored in +357 format and used to sign in. Landlines cannot receive SMS password-reset codes, so an administrator must reset a forgotten password.</p>
+                        </td>
                     </tr>
                     <tr>
                         <th scope="row"><label for="dealership_name">Dealership Name *</label></th>
                         <td>
-                            <input type="text" id="dealership_name" name="dealership_name" class="regular-text" placeholder="Dublin Auto Sales" required>
+                            <input type="text" id="dealership_name" name="dealership_name" class="regular-text" placeholder="Nicosia Auto Sales" required>
                             <p class="description">Business name that will be used as the account name.</p>
                         </td>
                     </tr>

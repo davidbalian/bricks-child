@@ -33,7 +33,20 @@ function car_single_whatsapp_button_shortcode($atts) {
 
     if ($user_object) {
         $author_username = $user_object->user_login;
-        $tel_link_number = preg_replace('/[^0-9+]/', '', $author_username);
+        $tel_link_number = preg_replace('/\D+/', '', $author_username);
+        $national_number = $tel_link_number;
+
+        if (strpos($national_number, '00357') === 0) {
+            $national_number = substr($national_number, 5);
+        } elseif (strpos($national_number, '357') === 0) {
+            $national_number = substr($national_number, 3);
+        }
+
+        // Cyprus fixed-line numbers have eight local digits beginning with 2.
+        if (preg_match('/^2\d{7}$/', $national_number)) {
+            return ob_get_clean();
+        }
+
         $car_year = get_field('year', $post_id); // Assumes ACF fields for car details
         $car_make = get_field('make', $post_id);
         $car_model = get_field('model', $post_id);
