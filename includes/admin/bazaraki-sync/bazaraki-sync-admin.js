@@ -216,6 +216,7 @@
             field(activePicker, name).value = values[name];
         });
         refreshPicker(activePicker);
+        markFormDirty(activePicker.closest('form'));
         closeModal();
     }
 
@@ -224,6 +225,96 @@
             field(picker, name).value = '';
         });
         refreshPicker(picker);
+        markFormDirty(picker.closest('form'));
+    }
+
+    function markFormDirty(form) {
+        if (!form || !form.matches('[data-profiles-form]')) {
+            return;
+        }
+        const indicator = form.querySelector('[data-unsaved-indicator]');
+        if (indicator) {
+            indicator.hidden = false;
+        }
+        form.dataset.dirty = 'true';
+    }
+
+    function updateIncludedCount(form) {
+        const checkboxes = Array.from(form.querySelectorAll('[data-include-profile]'));
+        const included = checkboxes.filter(function (checkbox) {
+            return checkbox.checked;
+        }).length;
+        const counter = form.querySelector('[data-included-count]');
+        if (!counter) {
+            return;
+        }
+        const template = counter.dataset.template || '%1$d of %2$d profiles included';
+        counter.textContent = template.replace('%1$d', String(included)).replace('%2$d', String(checkboxes.length));
+    }
+
+    function filterProfiles(form) {
+        const search = form.querySelector('[data-profile-search]');
+        const query = search ? search.value.trim().toLowerCase() : '';
+        let visible = 0;
+        form.querySelectorAll('[data-sync-profile]').forEach(function (profile) {
+            const summary = profile.querySelector('summary');
+            const matches = !query || (summary && summary.textContent.toLowerCase().indexOf(query) !== -1);
+            profile.hidden = !matches;
+            if (matches) {
+                visible += 1;
+            }
+        });
+        const empty = form.querySelector('[data-profile-no-results]');
+        if (empty) {
+            empty.hidden = visible !== 0;
+        }
+    }
+
+    function initializeProfilesForm(form) {
+        form.querySelectorAll('[data-include-control]').forEach(function (control) {
+            control.addEventListener('click', function (event) {
+                event.stopPropagation();
+            });
+        });
+
+        form.querySelectorAll('[data-include-profile]').forEach(function (checkbox) {
+            checkbox.addEventListener('change', function () {
+                updateIncludedCount(form);
+            });
+        });
+
+        form.querySelectorAll('[data-select-profiles]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const checked = button.dataset.selectProfiles === 'all';
+                form.querySelectorAll('[data-include-profile]').forEach(function (checkbox) {
+                    checkbox.checked = checked;
+                });
+                updateIncludedCount(form);
+                markFormDirty(form);
+            });
+        });
+
+        const search = form.querySelector('[data-profile-search]');
+        if (search) {
+            search.addEventListener('input', function () {
+                filterProfiles(form);
+            });
+        }
+
+        form.addEventListener('change', function (event) {
+            if (!event.target.matches('[data-profile-search]')) {
+                markFormDirty(form);
+            }
+        });
+        form.addEventListener('input', function (event) {
+            if (!event.target.matches('[data-profile-search]')) {
+                markFormDirty(form);
+            }
+        });
+        form.addEventListener('submit', function () {
+            form.dataset.dirty = 'false';
+        });
+        updateIncludedCount(form);
     }
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -235,6 +326,16 @@
                 clearLocation(picker);
             });
             refreshPicker(picker);
+        });
+
+        document.querySelectorAll('[data-profiles-form]').forEach(initializeProfilesForm);
+        document.querySelectorAll('[data-submit-external-form]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const target = document.getElementById(button.dataset.submitExternalForm);
+                if (target) {
+                    target.requestSubmit();
+                }
+            });
         });
     });
 }());

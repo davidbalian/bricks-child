@@ -59,6 +59,8 @@ final class AutoAgora_Bazaraki_Sync_Profiles
             'dealer_url'            => esc_url_raw((string) ($profile['dealer_url'] ?? '')),
             'author_id'             => absint($profile['author_id'] ?? 0),
             'enabled'               => !empty($profile['enabled']),
+            // Profiles created before this setting existed remain included.
+            'include_in_run'        => array_key_exists('include_in_run', $profile) ? !empty($profile['include_in_run']) : true,
             'dry_run'               => !empty($profile['dry_run']),
             'missing_confirmations' => max(2, min(10, absint($profile['missing_confirmations'] ?? 3))),
             'delay_ms'               => max(1000, min(30000, absint($profile['delay_ms'] ?? 3500))),
@@ -110,7 +112,7 @@ final class AutoAgora_Bazaraki_Sync_Profiles
     {
         $output = array();
         foreach (self::all() as $profile) {
-            if (!is_array($profile) || empty($profile['enabled'])) {
+            if (!is_array($profile) || empty($profile['enabled']) || empty($profile['include_in_run'])) {
                 continue;
             }
             $profile = self::sanitize($profile);

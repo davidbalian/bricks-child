@@ -26,9 +26,11 @@ Packages are stored in a protected uploads directory and removed after the run
 finishes.
 
 Profiles are managed centrally in WordPress. Add any number of dealer profiles
-under **Tools > Bazaraki Sync** and enable the ones that should run. Before each
-`--all` run, the worker downloads the signed profile list and processes enabled
-dealers sequentially. Each profile has its own source URL, AutoAgora owner,
+under **Tools > Bazaraki Sync**, choose **Include in run** for the dealers wanted
+in the next batch, and save all profile changes together. The choice stays saved
+until an administrator changes it. Before each `--all` run, the worker downloads
+the signed profile list and processes profiles that are both enabled and included
+sequentially. Each profile has its own source URL, AutoAgora owner,
 safety settings, state, queue, and completion result. Each profile has one
 default location selected through the same map-based picker used for car
 listings. Bazaraki's location values are kept; validation fills only missing
