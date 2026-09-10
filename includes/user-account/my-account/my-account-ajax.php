@@ -48,6 +48,35 @@ function my_account_user_can_manage_dealership_fields($user_id) {
     return in_array('dealership', $roles, true) || in_array('administrator', $roles, true);
 }
 
+/**
+ * Keep claimed dealer-profile contact settings aligned with their user account.
+ *
+ * @param int   $user_id Dealership user ID.
+ * @param array $values  Dealer-profile meta values to update.
+ * @return void
+ */
+function my_account_sync_claimed_dealer_profile_contact_meta($user_id, array $values) {
+    if (!defined('AUTOAGORA_DEALER_PROFILE_POST_TYPE')) {
+        return;
+    }
+
+    $profile_ids = get_posts(array(
+        'post_type'      => AUTOAGORA_DEALER_PROFILE_POST_TYPE,
+        'post_status'    => 'any',
+        'posts_per_page' => -1,
+        'fields'         => 'ids',
+        'no_found_rows'  => true,
+        'meta_key'       => 'dealer_claimed_user_id',
+        'meta_value'     => absint($user_id),
+    ));
+
+    foreach ($profile_ids as $profile_id) {
+        foreach ($values as $key => $value) {
+            update_post_meta((int) $profile_id, $key, $value);
+        }
+    }
+}
+
 // Add AJAX handler for updating user name
 add_action('wp_ajax_update_user_name', 'handle_update_user_name');
 function handle_update_user_name() {
@@ -119,6 +148,9 @@ function handle_update_secondary_phone() {
     }
 
     update_user_meta($user_id, 'secondary_phone', $secondary_phone_digits);
+    my_account_sync_claimed_dealer_profile_contact_meta($user_id, array(
+        'secondary_phone' => $secondary_phone_digits,
+    ));
 
     wp_send_json_success(array(
         'secondary_phone' => $secondary_phone_digits,
@@ -157,6 +189,9 @@ function handle_update_secondary_contact_preference() {
     } else {
         delete_user_meta($user_id, 'use_secondary_phone_for_contact');
     }
+    my_account_sync_claimed_dealer_profile_contact_meta($user_id, array(
+        'use_secondary_phone_for_contact' => $enabled ? '1' : '0',
+    ));
 
     wp_send_json_success(array('enabled' => $enabled));
 }

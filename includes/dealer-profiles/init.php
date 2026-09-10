@@ -177,6 +177,7 @@ function autoagora_register_dealer_profile_meta(): void
         'dealer_facebook'        => array('type' => 'string', 'sanitize_callback' => 'autoagora_sanitize_dealer_profile_url'),
         'dealer_phone'           => array('type' => 'string', 'sanitize_callback' => 'sanitize_text_field'),
         'secondary_phone'        => array('type' => 'string', 'sanitize_callback' => 'sanitize_text_field'),
+        'use_secondary_phone_for_contact' => array('type' => 'boolean', 'sanitize_callback' => 'autoagora_sanitize_dealer_profile_bool'),
         'dealer_whatsapp'        => array('type' => 'string', 'sanitize_callback' => 'sanitize_text_field'),
         'dealer_email'           => array('type' => 'string', 'sanitize_callback' => 'autoagora_sanitize_dealer_profile_email'),
         'dealer_logo_url'        => array('type' => 'string', 'sanitize_callback' => 'autoagora_sanitize_dealer_profile_url'),
@@ -713,6 +714,13 @@ function autoagora_render_dealer_profile_details_meta_box(WP_Post $post): void
 {
     wp_nonce_field('autoagora_save_dealer_profile', 'autoagora_dealer_profile_nonce');
 
+    $claimed_user_id = autoagora_dealer_profile_get_claimed_user_id($post->ID);
+    $use_secondary_raw = get_post_meta($post->ID, 'use_secondary_phone_for_contact', true);
+    $use_secondary_phone = autoagora_sanitize_dealer_profile_bool($use_secondary_raw);
+    if ($use_secondary_raw === '' && $claimed_user_id > 0) {
+        $use_secondary_phone = get_user_meta($claimed_user_id, 'use_secondary_phone_for_contact', true) === '1';
+    }
+
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_city', __('City', 'bricks-child'), 'text', 'Nicosia');
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_district', __('District', 'bricks-child'), 'text', 'Nicosia');
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_address', __('Public address', 'bricks-child'), 'text', 'Full public address');
@@ -723,6 +731,19 @@ function autoagora_render_dealer_profile_details_meta_box(WP_Post $post): void
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_facebook', __('Facebook URL', 'bricks-child'), 'url', 'https://facebook.com/...');
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_phone', __('Primary phone number', 'bricks-child'), 'tel', '+357...');
     autoagora_render_dealer_profile_text_input($post->ID, 'secondary_phone', __('Secondary phone number', 'bricks-child'), 'tel', '+357...');
+    ?>
+    <p class="autoagora-dealer-profile-admin-field autoagora-dealer-profile-admin-field--checkbox">
+        <label>
+            <input
+                type="checkbox"
+                name="autoagora_dealer_profile[use_secondary_phone_for_contact]"
+                value="1"
+                <?php checked($use_secondary_phone); ?>
+            />
+            <strong><?php esc_html_e('Use the secondary phone number for calls and WhatsApp', 'bricks-child'); ?></strong>
+        </label>
+    </p>
+    <?php
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_whatsapp', __('WhatsApp number', 'bricks-child'), 'tel', '+357...');
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_email', __('Public email', 'bricks-child'), 'email', 'sales@example.com');
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_logo_url', __('Imported logo URL', 'bricks-child'), 'url', 'https://example.com/logo.png');
@@ -736,7 +757,6 @@ function autoagora_render_dealer_profile_details_meta_box(WP_Post $post): void
     autoagora_render_dealer_profile_text_input($post->ID, 'dealer_last_verified_at', __('Last verified date', 'bricks-child'), 'date', '2026-07-24');
 
     $claim_status = autoagora_dealer_profile_get_claim_status($post->ID);
-    $claimed_user_id = autoagora_dealer_profile_get_claimed_user_id($post->ID);
     $indexable = autoagora_sanitize_dealer_profile_bool(get_post_meta($post->ID, 'dealer_indexable', true));
     ?>
     <p class="autoagora-dealer-profile-admin-field">
@@ -804,6 +824,7 @@ function autoagora_save_dealer_profile_meta(int $post_id): void
         return;
     }
 
+    $previous_claimed_user_id = autoagora_dealer_profile_get_claimed_user_id($post_id);
     $raw = isset($_POST['autoagora_dealer_profile']) ? wp_unslash($_POST['autoagora_dealer_profile']) : array();
     if (!is_array($raw)) {
         $raw = array();
@@ -851,6 +872,29 @@ function autoagora_save_dealer_profile_meta(int $post_id): void
     $claimed_user_id > 0
         ? update_post_meta($post_id, 'dealer_claimed_user_id', $claimed_user_id)
         : delete_post_meta($post_id, 'dealer_claimed_user_id');
+
+    $secondary_phone = isset($raw['secondary_phone'])
+        ? sanitize_text_field((string) $raw['secondary_phone'])
+        : '';
+    $use_secondary_phone = !empty($raw['use_secondary_phone_for_contact'])
+        && $secondary_phone !== '';
+    update_post_meta($post_id, 'use_secondary_phone_for_contact', $use_secondary_phone ? '1' : '0');
+
+    if ($previous_claimed_user_id > 0 && $previous_claimed_user_id !== $claimed_user_id) {
+        delete_user_meta($previous_claimed_user_id, 'use_secondary_phone_for_contact');
+    }
+    if ($claimed_user_id > 0) {
+        if ($secondary_phone !== '') {
+            update_user_meta($claimed_user_id, 'secondary_phone', $secondary_phone);
+        } else {
+            delete_user_meta($claimed_user_id, 'secondary_phone');
+        }
+        if ($use_secondary_phone) {
+            update_user_meta($claimed_user_id, 'use_secondary_phone_for_contact', '1');
+        } else {
+            delete_user_meta($claimed_user_id, 'use_secondary_phone_for_contact');
+        }
+    }
 
     update_post_meta($post_id, 'dealer_indexable', !empty($raw['dealer_indexable']) ? '1' : '0');
 
