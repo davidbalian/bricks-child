@@ -128,6 +128,8 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
         var editSecondaryPhoneBtn = document.querySelector('.edit-secondary-phone-btn');
         var saveSecondaryPhoneBtn = document.querySelector('.save-secondary-phone-btn');
         var cancelSecondaryPhoneBtn = document.querySelector('.cancel-secondary-phone-btn');
+        var secondaryContactPreference = document.getElementById('use-secondary-contact-phone');
+        var secondaryContactPreferenceStatus = document.querySelector('.secondary-contact-preference-status');
         var COUNTRY_CODE = '357';
 
         if (!secondaryPhoneDisplay || !secondaryPhoneRow || !secondaryPhoneInput || !editSecondaryPhoneBtn || !saveSecondaryPhoneBtn || !cancelSecondaryPhoneBtn) {
@@ -209,6 +211,10 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                         originalSecondaryPhone = newFullPhone;
                         originalSecondaryPhoneLocal = localPart;
 
+                        if (secondaryContactPreference) {
+                            secondaryContactPreference.disabled = false;
+                        }
+
                         // Once a valid secondary phone is saved, the action becomes "Edit"
                         if (editSecondaryPhoneBtn) {
                     editSecondaryPhoneBtn.textContent = t('Edit');
@@ -235,6 +241,49 @@ window.isDevelopment = window.isDevelopment || (window.location.hostname === 'lo
                 saveSecondaryPhoneBtn.click();
             }
         });
+
+        if (secondaryContactPreference) {
+            secondaryContactPreference.addEventListener('change', function () {
+                var requestedState = secondaryContactPreference.checked;
+                secondaryContactPreference.disabled = true;
+                if (secondaryContactPreferenceStatus) {
+                    secondaryContactPreferenceStatus.textContent = t('Saving...');
+                }
+
+                var formData = new FormData();
+                formData.append('action', 'update_secondary_contact_preference');
+                formData.append('enabled', requestedState ? '1' : '0');
+                formData.append('nonce', MyAccountAjax.update_secondary_contact_nonce);
+
+                fetch(MyAccountAjax.ajax_url, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                })
+                    .then(function (response) { return response.json(); })
+                    .then(function (data) {
+                        if (!data || !data.success) {
+                            secondaryContactPreference.checked = !requestedState;
+                            throw new Error(data && data.data ? data.data : t('Could not update contact number preference.'));
+                        }
+                        if (secondaryContactPreferenceStatus) {
+                            secondaryContactPreferenceStatus.textContent = t('Saved');
+                            window.setTimeout(function () {
+                                secondaryContactPreferenceStatus.textContent = '';
+                            }, 1800);
+                        }
+                    })
+                    .catch(function (error) {
+                        secondaryContactPreference.checked = !requestedState;
+                        if (secondaryContactPreferenceStatus) {
+                            secondaryContactPreferenceStatus.textContent = error.message;
+                        }
+                    })
+                    .finally(function () {
+                        secondaryContactPreference.disabled = originalSecondaryPhone === '';
+                    });
+            });
+        }
     })();
 
     // Password reset functionality

@@ -13,6 +13,38 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Resolve the number used by listing call and WhatsApp buttons.
+ *
+ * Dealerships may explicitly opt into their secondary number. Everyone else,
+ * and dealerships without the preference, continue to use the primary number.
+ *
+ * @param int $user_id Listing author ID.
+ * @return string Digits-only international phone number.
+ */
+function autoagora_get_user_contact_phone_number($user_id) {
+    $user_id = absint($user_id);
+    if (!$user_id) {
+        return '';
+    }
+
+    $primary_phone = preg_replace('/\D+/', '', (string) get_user_meta($user_id, 'phone_number', true));
+    if ($primary_phone === '') {
+        $user = get_user_by('ID', $user_id);
+        $primary_phone = $user instanceof WP_User ? preg_replace('/\D+/', '', (string) $user->user_login) : '';
+    }
+
+    $use_secondary = get_user_meta($user_id, 'use_secondary_phone_for_contact', true) === '1';
+    if ($use_secondary) {
+        $secondary_phone = preg_replace('/\D+/', '', (string) get_user_meta($user_id, 'secondary_phone', true));
+        if ($secondary_phone !== '') {
+            return $secondary_phone;
+        }
+    }
+
+    return $primary_phone;
+}
+
+/**
  * Car Single Call Button Shortcode Handler
  * 
  * Usage: [car_single_call_button]
@@ -34,21 +66,10 @@ function car_single_call_button_shortcode($atts) {
     $post_id = get_the_ID(); // Get current post ID for tracking
 
     if ($user_object) {
-        $author_username = $user_object->user_login;
-        $tel_link_number = $author_username;
-        $tel_link_number_secondary = '';
-        if (function_exists('get_field')) {
-            $tel_link_number_secondary = (string) get_field('secondary_phone', 'user_' . $post_author_id);
-        }
-        if(!empty($tel_link_number_secondary)) {
-            $raw_phone = $tel_link_number_secondary;
-            $display_phone = preg_replace('/[^0-9+]/', '', $tel_link_number_secondary);
-            $display_phone = preg_replace('/^(.{3})(.+)/', '$1 $2', $display_phone);
-        }
-        else {
-            $raw_phone = $tel_link_number;
-            $display_phone = preg_replace('/[^0-9+]/', '', $tel_link_number);
-            $display_phone = preg_replace('/^(.{3})(.+)/', '$1 $2', $display_phone);
+        $raw_phone = autoagora_get_user_contact_phone_number($post_author_id);
+        $display_phone = preg_replace('/^(.{3})(.+)/', '$1 $2', $raw_phone);
+        if ($raw_phone === '') {
+            return ob_get_clean();
         }
         $tel_link = 'tel:+' . $raw_phone;
         $button_display_text = '+' . $display_phone;

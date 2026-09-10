@@ -26,14 +26,16 @@ function display_my_account($atts) {
     }
 
     // Enqueue separated CSS and JS files
-    wp_enqueue_style('my-account-display-css', get_stylesheet_directory_uri() . '/includes/user-account/my-account/my-account-display.css', array(), '1.0.0');
-    wp_enqueue_script('my-account-display-js', get_stylesheet_directory_uri() . '/includes/user-account/my-account/my-account-display.js', array('autoagora-i18n'), '1.0.0', true);
+    $account_asset_path = get_stylesheet_directory() . '/includes/user-account/my-account/';
+    wp_enqueue_style('my-account-display-css', get_stylesheet_directory_uri() . '/includes/user-account/my-account/my-account-display.css', array(), filemtime($account_asset_path . 'my-account-display.css'));
+    wp_enqueue_script('my-account-display-js', get_stylesheet_directory_uri() . '/includes/user-account/my-account/my-account-display.js', array('autoagora-i18n'), filemtime($account_asset_path . 'my-account-display.js'), true);
     
     // Localize script with AJAX data
     wp_localize_script('my-account-display-js', 'MyAccountAjax', array(
         'ajax_url'                       => admin_url('admin-ajax.php'),
         'update_user_name_nonce'         => wp_create_nonce('update_user_name'),
         'update_secondary_phone_nonce'   => wp_create_nonce('update_secondary_phone'),
+        'update_secondary_contact_nonce' => wp_create_nonce('update_secondary_contact_preference'),
         'password_reset_nonce'           => wp_create_nonce('password_reset_nonce'),
         'email_verification_nonce'       => wp_create_nonce('email_verification_nonce'),
         'notification_preferences_nonce' => wp_create_nonce('notification_preferences_nonce'),

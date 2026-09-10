@@ -142,6 +142,19 @@ function display_my_account_main($current_user) {
                             <?php echo esc_html($has_secondary_phone ? __('Edit', 'bricks-child') : __('Add', 'bricks-child')); ?>
                         </button>
                     </div>
+                    <div class="info-row secondary-contact-preference-row">
+                        <span class="label"></span>
+                        <label class="secondary-contact-preference">
+                            <input
+                                type="checkbox"
+                                id="use-secondary-contact-phone"
+                                <?php checked(get_user_meta($current_user->ID, 'use_secondary_phone_for_contact', true), '1'); ?>
+                                <?php disabled(!$has_secondary_phone); ?>
+                            >
+                            <span><?php esc_html_e('Use the secondary phone number for calls and WhatsApp', 'bricks-child'); ?></span>
+                        </label>
+                        <span class="secondary-contact-preference-status" role="status" aria-live="polite"></span>
+                    </div>
                     <div class="info-row secondary-phone-edit-row" style="display: none;">
                         <span class="label"><?php esc_html_e('Secondary Phone Number:', 'bricks-child'); ?></span>
                         <div class="secondary-phone-input-wrapper">

@@ -125,6 +125,42 @@ function handle_update_secondary_phone() {
     ));
 }
 
+// Add AJAX handler for selecting which dealership number contact buttons use.
+add_action('wp_ajax_update_secondary_contact_preference', 'handle_update_secondary_contact_preference');
+function handle_update_secondary_contact_preference() {
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'update_secondary_contact_preference')) {
+        wp_send_json_error(__('Invalid nonce', 'bricks-child'));
+        return;
+    }
+
+    if (!is_user_logged_in()) {
+        wp_send_json_error(__('User not logged in', 'bricks-child'));
+        return;
+    }
+
+    $user_id = get_current_user_id();
+    if (!my_account_user_can_manage_dealership_fields($user_id)) {
+        wp_send_json_error(__('Not allowed', 'bricks-child'));
+        return;
+    }
+
+    $enabled = isset($_POST['enabled']) && (string) wp_unslash($_POST['enabled']) === '1';
+    $secondary_phone = preg_replace('/\D+/', '', (string) get_user_meta($user_id, 'secondary_phone', true));
+
+    if ($enabled && !preg_match('/^357\d{8}$/', $secondary_phone)) {
+        wp_send_json_error(__('Add a valid secondary phone number before enabling this option.', 'bricks-child'));
+        return;
+    }
+
+    if ($enabled) {
+        update_user_meta($user_id, 'use_secondary_phone_for_contact', '1');
+    } else {
+        delete_user_meta($user_id, 'use_secondary_phone_for_contact');
+    }
+
+    wp_send_json_success(array('enabled' => $enabled));
+}
+
 // Add AJAX handler for initiating password reset
 add_action('wp_ajax_initiate_password_reset', 'handle_initiate_password_reset');
 function handle_initiate_password_reset() {

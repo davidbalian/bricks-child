@@ -32,8 +32,12 @@ function car_single_whatsapp_button_shortcode($atts) {
     $post_id = get_the_ID(); // Get current post ID for tracking
 
     if ($user_object) {
-        $author_username = $user_object->user_login;
-        $tel_link_number = preg_replace('/\D+/', '', $author_username);
+        $tel_link_number = function_exists('autoagora_get_user_contact_phone_number')
+            ? autoagora_get_user_contact_phone_number($post_author_id)
+            : preg_replace('/\D+/', '', $user_object->user_login);
+        if ($tel_link_number === '') {
+            return ob_get_clean();
+        }
         $national_number = $tel_link_number;
 
         if (strpos($national_number, '00357') === 0) {

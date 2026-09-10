@@ -134,21 +134,10 @@ final class DealershipPageCallButtonShortcode
      */
     private static function build_phone_display_for_user(int $user_id, WP_User $user_object): ?array
     {
-        $tel_link_number = $user_object->user_login;
-        $tel_link_number_secondary = '';
-        if (function_exists('get_field')) {
-            $tel_link_number_secondary = (string) get_field('secondary_phone', 'user_' . $user_id);
-        }
-
-        if ($tel_link_number_secondary !== '') {
-            $raw_phone = $tel_link_number_secondary;
-            $display_phone = preg_replace('/[^0-9+]/', '', $tel_link_number_secondary);
-            $display_phone = preg_replace('/^(.{3})(.+)/', '$1 $2', $display_phone);
-        } else {
-            $raw_phone = $tel_link_number;
-            $display_phone = preg_replace('/[^0-9+]/', '', $tel_link_number);
-            $display_phone = preg_replace('/^(.{3})(.+)/', '$1 $2', $display_phone);
-        }
+        $raw_phone = function_exists('autoagora_get_user_contact_phone_number')
+            ? autoagora_get_user_contact_phone_number($user_id)
+            : preg_replace('/\D+/', '', (string) $user_object->user_login);
+        $display_phone = preg_replace('/^(.{3})(.+)/', '$1 $2', $raw_phone);
 
         if ($raw_phone === '' || $display_phone === '') {
             return null;
