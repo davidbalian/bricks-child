@@ -120,6 +120,103 @@ function add_dealership_admin_menu() {
 add_action('admin_menu', 'add_dealership_admin_menu');
 
 /**
+ * Show the preferred contact-number checkbox on the WordPress user editor.
+ * JavaScript moves the row directly below ACF's Secondary Phone row because
+ * ACF owns that field's markup and field key outside this repository.
+ *
+ * @param WP_User $user User being edited.
+ * @return void
+ */
+function autoagora_render_dealership_contact_phone_preference($user) {
+    if (!$user instanceof WP_User || !in_array('dealership', (array) $user->roles, true)) {
+        return;
+    }
+
+    $enabled = get_user_meta($user->ID, 'use_secondary_phone_for_contact', true) === '1';
+    ?>
+    <table class="form-table" id="autoagora-secondary-contact-preference-table" role="presentation">
+        <tbody>
+            <tr id="autoagora-secondary-contact-preference-row">
+                <th scope="row"><?php esc_html_e('Default contact number', 'bricks-child'); ?></th>
+                <td>
+                    <label for="autoagora-use-secondary-phone-for-contact">
+                        <input
+                            type="checkbox"
+                            id="autoagora-use-secondary-phone-for-contact"
+                            name="autoagora_use_secondary_phone_for_contact"
+                            value="1"
+                            <?php checked($enabled); ?>
+                        >
+                        <?php esc_html_e('Use the secondary phone number for calls and WhatsApp', 'bricks-child'); ?>
+                    </label>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var preferenceRow = document.getElementById('autoagora-secondary-contact-preference-row');
+        var preferenceTable = document.getElementById('autoagora-secondary-contact-preference-table');
+        if (!preferenceRow || !preferenceTable) {
+            return;
+        }
+
+        var labels = document.querySelectorAll('th label, .acf-label label');
+        var secondaryRow = null;
+        labels.forEach(function (label) {
+            var labelText = label.textContent.trim().toLowerCase().replace(/:$/, '');
+            if (!secondaryRow && labelText.indexOf('secondary phone') === 0) {
+                secondaryRow = label.closest('tr');
+            }
+        });
+
+        if (secondaryRow && secondaryRow.parentNode) {
+            secondaryRow.parentNode.insertBefore(preferenceRow, secondaryRow.nextSibling);
+            preferenceTable.remove();
+        }
+    });
+    </script>
+    <?php
+}
+add_action('show_user_profile', 'autoagora_render_dealership_contact_phone_preference', 100);
+add_action('edit_user_profile', 'autoagora_render_dealership_contact_phone_preference', 100);
+
+/**
+ * Save the preferred contact-number selection from the WordPress user editor.
+ *
+ * @param int $user_id User being edited.
+ * @return void
+ */
+function autoagora_save_dealership_contact_phone_preference($user_id) {
+    $user_id = absint($user_id);
+    if (!$user_id || !current_user_can('edit_user', $user_id)) {
+        return;
+    }
+
+    $user = get_user_by('ID', $user_id);
+    if (!$user instanceof WP_User || !in_array('dealership', (array) $user->roles, true)) {
+        return;
+    }
+
+    $enabled = isset($_POST['autoagora_use_secondary_phone_for_contact'])
+        && (string) wp_unslash($_POST['autoagora_use_secondary_phone_for_contact']) === '1';
+
+    if ($enabled) {
+        update_user_meta($user_id, 'use_secondary_phone_for_contact', '1');
+    } else {
+        delete_user_meta($user_id, 'use_secondary_phone_for_contact');
+    }
+
+    if (function_exists('my_account_sync_claimed_dealer_profile_contact_meta')) {
+        my_account_sync_claimed_dealer_profile_contact_meta($user_id, array(
+            'use_secondary_phone_for_contact' => $enabled ? '1' : '0',
+        ));
+    }
+}
+add_action('personal_options_update', 'autoagora_save_dealership_contact_phone_preference');
+add_action('edit_user_profile_update', 'autoagora_save_dealership_contact_phone_preference');
+
+/**
  * Dealership admin page
  */
 function dealership_admin_page() {
