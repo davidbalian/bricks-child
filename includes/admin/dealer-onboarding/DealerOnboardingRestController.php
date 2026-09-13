@@ -25,17 +25,10 @@ final class AutoAgora_Dealer_Onboarding_REST_Controller
         });
     }
 
-    public static function permission()
+    public static function permission(WP_REST_Request $request)
     {
-        if (!is_user_logged_in() || !current_user_can('manage_options')) {
-            return new WP_Error(
-                'autoagora_dealer_onboarding_forbidden',
-                __('Administrator authentication is required.', 'bricks-child'),
-                array('status' => rest_authorization_required_code())
-            );
-        }
-
-        return true;
+        $authenticated = AutoAgora_Dealer_Onboarding_Token::authenticate($request);
+        return is_wp_error($authenticated) ? $authenticated : true;
     }
 
     public static function state(): WP_REST_Response

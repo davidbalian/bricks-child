@@ -7,15 +7,19 @@ local PowerShell runner in `scripts/autoagora-onboard-dealers.ps1`.
 ## One-time setup
 
 1. Deploy this theme version.
-2. In WordPress, create an Application Password for an administrator account.
-3. From the theme directory, run:
+2. In WordPress, open **Tools > Dealer Onboarding API** and generate the
+   dedicated token. Copy it immediately because WordPress shows it only once.
+3. From the theme directory, run the command below and paste the token when
+   prompted:
 
    ```powershell
    .\scripts\autoagora-onboard-dealers.ps1 -Configure
    ```
 
-The Application Password is stored with Windows DPAPI and can be decrypted only
-by the same Windows user on the same computer. It is not stored in the repo.
+The dedicated token can access only the two dealership-onboarding REST routes;
+it is not a general WordPress login. It is stored with Windows DPAPI and can be
+decrypted only by the same Windows user on the same computer. It is not stored
+in the repo. The token can be replaced or revoked from the same Tools page.
 
 List existing dealership accounts and their sync profile IDs without opening
 WordPress:

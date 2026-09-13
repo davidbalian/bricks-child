@@ -41,9 +41,10 @@ if ($PSCmdlet.ParameterSetName -eq 'Configure') {
     if (-not (Test-Path -LiteralPath $authDirectory)) {
         New-Item -ItemType Directory -Path $authDirectory -Force | Out-Null
     }
-    $credential = Get-Credential -Message 'Enter the WordPress administrator username and its Application Password'
+    $secureToken = Read-Host 'Paste the dedicated AutoAgora dealer-onboarding token' -AsSecureString
+    $credential = [Management.Automation.PSCredential]::new('autoagora-dealer-onboarding', $secureToken)
     $credential | Export-Clixml -LiteralPath $AuthFile -Force
-    Write-Host "Saved Windows-user-encrypted API credentials to $AuthFile"
+    Write-Host "Saved the Windows-user-encrypted onboarding token to $AuthFile"
     exit 0
 }
 
@@ -71,16 +72,18 @@ if ($credential -isnot [Management.Automation.PSCredential]) {
 }
 
 if ($PSCmdlet.ParameterSetName -eq 'State') {
-    $applicationPassword = ConvertFrom-DealerSecureString $credential.Password
+    $apiToken = ConvertFrom-DealerSecureString $credential.Password
     try {
-        $basicValue = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("$($credential.UserName):$applicationPassword"))
-        $headers = @{ Authorization = "Basic $basicValue"; 'Cache-Control' = 'no-store' }
-        $endpoint = $SiteUrl.TrimEnd('/') + '/wp-json/autoagora/v1/dealers/onboarding-state'
+        $headers = @{
+            'X-AutoAgora-Onboarding-Token' = $apiToken
+            'Cache-Control' = 'no-store'
+            'User-Agent' = 'AutoAgoraDealerOnboarding/1.0'
+        }
+        $endpoint = $SiteUrl.TrimEnd('/') + '/index.php?rest_route=/autoagora/v1/dealers/onboarding-state'
         $state = Invoke-RestMethod -Method Get -Uri $endpoint -Headers $headers
     }
     finally {
-        $applicationPassword = $null
-        $basicValue = $null
+        $apiToken = $null
     }
 
     $state.accounts | ForEach-Object {
@@ -111,19 +114,18 @@ $requestBody = @{
     client_request_id = [guid]::NewGuid().ToString()
 } | ConvertTo-Json -Depth 10
 
-$applicationPassword = ConvertFrom-DealerSecureString $credential.Password
+$apiToken = ConvertFrom-DealerSecureString $credential.Password
 try {
-    $basicValue = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("$($credential.UserName):$applicationPassword"))
     $headers = @{
-        Authorization = "Basic $basicValue"
+        'X-AutoAgora-Onboarding-Token' = $apiToken
         'Cache-Control' = 'no-store'
+        'User-Agent' = 'AutoAgoraDealerOnboarding/1.0'
     }
-    $endpoint = $SiteUrl.TrimEnd('/') + '/wp-json/autoagora/v1/dealers/onboard'
+    $endpoint = $SiteUrl.TrimEnd('/') + '/index.php?rest_route=/autoagora/v1/dealers/onboard'
     $response = Invoke-RestMethod -Method Post -Uri $endpoint -Headers $headers -ContentType 'application/json; charset=utf-8' -Body $requestBody
 }
 finally {
-    $applicationPassword = $null
-    $basicValue = $null
+    $apiToken = $null
 }
 
 if (-not $Commit) {
