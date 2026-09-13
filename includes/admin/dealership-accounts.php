@@ -72,7 +72,7 @@ function create_dealership_account($phone_number, $dealership_name, $password) {
     if (username_exists($username)) {
         $username = sanitize_user('user_' . $phone_number . '_' . wp_rand(100, 999));
     }
-    $email = 'phone_user_' . time() . '@example.com'; // Placeholder email
+    $email = 'phone_user_' . wp_generate_uuid4() . '@example.com'; // Unique placeholder email
     
     $user_id = wp_create_user($username, $password, $email);
     
@@ -95,7 +95,6 @@ function create_dealership_account($phone_number, $dealership_name, $password) {
     return array(
         'user_id' => $user_id,
         'username' => $username,
-        'password' => $password,
         'phone_number' => $phone_number,
         'dealership_name' => $dealership_name
     );
@@ -221,7 +220,11 @@ add_action('edit_user_profile_update', 'autoagora_save_dealership_contact_phone_
  */
 function dealership_admin_page() {
     // Handle form submission
-    if (isset($_POST['action']) && $_POST['action'] === 'create_dealership' && wp_verify_nonce($_POST['dealership_nonce'], 'create_dealership')) {
+    if (
+        isset($_POST['action'], $_POST['dealership_nonce'])
+        && $_POST['action'] === 'create_dealership'
+        && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['dealership_nonce'])), 'create_dealership')
+    ) {
         handle_create_dealership_form();
     }
     
@@ -232,9 +235,9 @@ function dealership_admin_page() {
     <div class="wrap">
         <h1>Dealership Management</h1>
         
-        <?php if (isset($_GET['message'])): ?>
+        <?php if (isset($_GET['dealership_created'])): ?>
             <div class="notice notice-success is-dismissible">
-                <p><?php echo esc_html(urldecode($_GET['message'])); ?></p>
+                <p><?php esc_html_e('Dealership account created successfully.', 'bricks-child'); ?></p>
             </div>
         <?php endif; ?>
         
@@ -268,7 +271,7 @@ function dealership_admin_page() {
                     <tr>
                         <th scope="row"><label for="password">Password *</label></th>
                         <td>
-                            <input type="text" id="password" name="password" class="regular-text" required>
+                            <input type="password" id="password" name="password" class="regular-text" autocomplete="new-password" required>
                             <p class="description">Create a password for the dealership account.</p>
                         </td>
                     </tr>
@@ -317,19 +320,21 @@ function dealership_admin_page() {
  * Handle create dealership form submission
  */
 function handle_create_dealership_form() {
-    $phone_number = sanitize_text_field($_POST['phone_number']);
-    $dealership_name = sanitize_text_field($_POST['dealership_name']);
-    $password = sanitize_text_field($_POST['password']);
+    if (!current_user_can('manage_options')) {
+        wp_die(esc_html__('You are not allowed to create dealership accounts.', 'bricks-child'));
+    }
+
+    $phone_number = isset($_POST['phone_number']) ? sanitize_text_field(wp_unslash($_POST['phone_number'])) : '';
+    $dealership_name = isset($_POST['dealership_name']) ? sanitize_text_field(wp_unslash($_POST['dealership_name'])) : '';
+    $password = isset($_POST['password']) && is_string($_POST['password']) ? wp_unslash($_POST['password']) : '';
     
     $result = create_dealership_account($phone_number, $dealership_name, $password);
     
     if (is_wp_error($result)) {
-        $error = urlencode($result->get_error_message());
-        wp_redirect(admin_url("admin.php?page=dealerships&error=$error"));
+        $error = rawurlencode($result->get_error_message());
+        wp_safe_redirect(admin_url("admin.php?page=dealerships&error=$error"));
     } else {
-        $message = "Dealership account created! Username: {$result['username']}, Password: {$result['password']}, Phone: {$result['phone_number']}";
-        $message = urlencode($message);
-        wp_redirect(admin_url("admin.php?page=dealerships&message=$message"));
+        wp_safe_redirect(admin_url('admin.php?page=dealerships&dealership_created=1'));
     }
     exit;
 }
