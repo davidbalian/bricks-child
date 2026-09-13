@@ -1,0 +1,21 @@
+{
+  "dealers": [
+    {
+      "name": "Example Motors",
+      "phone": "+357 22 123456",
+      "phone_source_url": "https://examplemotors.cy/contact/",
+      "phone_source_label": "Dealership website",
+      "allow_bazaraki_phone_fallback": false,
+      "phone_search_notes": "",
+      "bazaraki_url": "https://www.bazaraki.com/c/examplemotors/",
+      "profile_id": "example-motors",
+      "location": {
+        "city": "Nicosia",
+        "district": "Nicosia",
+        "address": "Example address, Nicosia, Cyprus",
+        "latitude": 35.1856,
+        "longitude": 33.3823
+      }
+    }
+  ]
+}

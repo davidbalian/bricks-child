@@ -859,6 +859,7 @@ add_action('wp_ajax_car_taxonomy_sync', function() {
 require_once get_stylesheet_directory() . '/includes/admin/csv-car-import.php';
 require_once get_stylesheet_directory() . '/includes/admin/car-json-import/init.php';
 require_once get_stylesheet_directory() . '/includes/admin/bazaraki-sync/init.php';
+require_once get_stylesheet_directory() . '/includes/admin/dealer-onboarding/init.php';
 
 // =========================================================================
 // AJAX Handlers for Add Listing Form

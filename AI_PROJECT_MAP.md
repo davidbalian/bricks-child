@@ -407,6 +407,7 @@ Important admin files:
 - click metrics: `includes/admin/listing-click-metrics.php`
 - CSV car import: `includes/admin/csv-car-import.php`
 - dealership account creation: `includes/admin/dealership-accounts.php`
+- browser-free bulk dealership onboarding: `includes/admin/dealer-onboarding/*` plus `scripts/autoagora-onboard-dealers.ps1` (administrator Application Password, phone-source provenance enforcement, DPAPI credential storage, disabled/dry-run sync profiles)
 - dealership import/export: `includes/admin/dealership-import/*`, `includes/admin/dealership-export/*`
 - car JSON + images import: `includes/admin/car-json-import/*` (Tools → Import Cars (JSON), validates ZIP packages and creates pending cars in one-row batches)
 - authorized Bazaraki dealer sync: `includes/admin/bazaraki-sync/*` (Tools → Bazaraki Sync; signed ZIP ingestion, durable small-batch queue, existing-car adoption/update, image replacement, and consecutive-missing safeguards; browser worker remains outside the theme)

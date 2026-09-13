@@ -1,3 +1,6 @@
 dealerships_export/
 ignore.txt
 .codex-tmp/
+*Dealer Credentials*.clixml
+dealer-onboarding-auth.clixml
+dealer-onboarding.local.json
