@@ -47,6 +47,11 @@ Generated passwords are never printed during creation. They are saved as a
 Windows-user-encrypted CliXml file in Documents. Use the script's
 `-RevealCredentialsFile` mode only when the passwords need to be viewed.
 
+The runner uses the Windows-provided `curl.exe` transport because the production
+hosting firewall blocks PowerShell's built-in HTTP client. The scoped token is
+passed to curl through a temporary process environment variable rather than a
+command-line argument, then removed immediately after each request.
+
 ## Phone-source rule
 
 `phone_source_url` is mandatory and should point to the dealership's own site,

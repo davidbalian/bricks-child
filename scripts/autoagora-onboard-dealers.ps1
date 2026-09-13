@@ -36,6 +36,70 @@ function ConvertFrom-DealerSecureString {
     }
 }
 
+function Invoke-AutoAgoraOnboardingApi {
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('GET', 'POST')]
+        [string] $Method,
+
+        [Parameter(Mandatory = $true)]
+        [string] $Uri,
+
+        [Parameter(Mandatory = $true)]
+        [string] $Token,
+
+        [string] $Body = ''
+    )
+
+    $curl = Get-Command 'curl.exe' -ErrorAction SilentlyContinue
+    if (-not $curl) {
+        throw "Windows curl.exe is required because the hosting firewall blocks PowerShell's built-in HTTP client."
+    }
+
+    $arguments = @(
+        '--silent',
+        '--show-error',
+        '--fail-with-body',
+        '--connect-timeout', '15',
+        '--max-time', '120',
+        '--request', $Method,
+        '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AutoAgoraDealerOnboarding/1.0',
+        '--referer', 'https://autoagora.cy/',
+        '--variable', '%AUTOAGORA_ONBOARDING_TOKEN_PROCESS',
+        '--expand-header', 'X-AutoAgora-Onboarding-Token: {{AUTOAGORA_ONBOARDING_TOKEN_PROCESS}}',
+        '--header', 'Accept: application/json'
+    )
+    if ($Method -eq 'POST') {
+        $arguments += @('--header', 'Content-Type: application/json; charset=utf-8', '--data-binary', '@-')
+    }
+    $arguments += $Uri
+
+    $transportDirectory = Join-Path $env:LOCALAPPDATA 'AutoAgora\curl-runtime'
+    if (-not (Test-Path -LiteralPath $transportDirectory)) {
+        New-Item -ItemType Directory -Path $transportDirectory -Force | Out-Null
+    }
+
+    [Environment]::SetEnvironmentVariable('AUTOAGORA_ONBOARDING_TOKEN_PROCESS', $Token, 'Process')
+    Push-Location -LiteralPath $transportDirectory
+    try {
+        $raw = if ($Method -eq 'POST') {
+            $Body | & $curl.Source @arguments
+        }
+        else {
+            & $curl.Source @arguments
+        }
+    }
+    finally {
+        Pop-Location
+        [Environment]::SetEnvironmentVariable('AUTOAGORA_ONBOARDING_TOKEN_PROCESS', $null, 'Process')
+    }
+    if ($LASTEXITCODE -ne 0) {
+        throw "AutoAgora API request failed with curl exit code $LASTEXITCODE. $raw"
+    }
+
+    return $raw | ConvertFrom-Json
+}
+
 if ($PSCmdlet.ParameterSetName -eq 'Configure') {
     $authDirectory = Split-Path -Parent $AuthFile
     if (-not (Test-Path -LiteralPath $authDirectory)) {
@@ -74,13 +138,8 @@ if ($credential -isnot [Management.Automation.PSCredential]) {
 if ($PSCmdlet.ParameterSetName -eq 'State') {
     $apiToken = ConvertFrom-DealerSecureString $credential.Password
     try {
-        $headers = @{
-            'X-AutoAgora-Onboarding-Token' = $apiToken
-            'Cache-Control' = 'no-store'
-            'User-Agent' = 'AutoAgoraDealerOnboarding/1.0'
-        }
-        $endpoint = $SiteUrl.TrimEnd('/') + '/index.php?rest_route=/autoagora/v1/dealers/onboarding-state'
-        $state = Invoke-RestMethod -Method Get -Uri $endpoint -Headers $headers
+        $endpoint = $SiteUrl.TrimEnd('/') + '/wp-json/autoagora/v1/dealers/onboarding-state'
+        $state = Invoke-AutoAgoraOnboardingApi -Method GET -Uri $endpoint -Token $apiToken
     }
     finally {
         $apiToken = $null
@@ -116,13 +175,8 @@ $requestBody = @{
 
 $apiToken = ConvertFrom-DealerSecureString $credential.Password
 try {
-    $headers = @{
-        'X-AutoAgora-Onboarding-Token' = $apiToken
-        'Cache-Control' = 'no-store'
-        'User-Agent' = 'AutoAgoraDealerOnboarding/1.0'
-    }
-    $endpoint = $SiteUrl.TrimEnd('/') + '/index.php?rest_route=/autoagora/v1/dealers/onboard'
-    $response = Invoke-RestMethod -Method Post -Uri $endpoint -Headers $headers -ContentType 'application/json; charset=utf-8' -Body $requestBody
+    $endpoint = $SiteUrl.TrimEnd('/') + '/wp-json/autoagora/v1/dealers/onboard'
+    $response = Invoke-AutoAgoraOnboardingApi -Method POST -Uri $endpoint -Token $apiToken -Body $requestBody
 }
 finally {
     $apiToken = $null
