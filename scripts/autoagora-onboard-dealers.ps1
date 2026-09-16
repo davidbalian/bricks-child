@@ -6,6 +6,9 @@ param(
     [Parameter(ParameterSetName = 'Run')]
     [switch] $Commit,
 
+    [Parameter(ParameterSetName = 'Run')]
+    [switch] $UpdateLocations,
+
     [Parameter(ParameterSetName = 'Configure', Mandatory = $true)]
     [switch] $Configure,
 
@@ -176,10 +179,19 @@ $requestBody = @{
 $apiToken = ConvertFrom-DealerSecureString $credential.Password
 try {
     $endpoint = $SiteUrl.TrimEnd('/') + '/wp-json/autoagora/v1/dealers/onboard'
+    if ($UpdateLocations) {
+        $endpoint = $SiteUrl.TrimEnd('/') + '/wp-json/autoagora/v1/dealers/locations'
+    }
     $response = Invoke-AutoAgoraOnboardingApi -Method POST -Uri $endpoint -Token $apiToken -Body $requestBody
 }
 finally {
     $apiToken = $null
+}
+
+if ($UpdateLocations) {
+    Write-Host "Location $mode succeeded for $(@($response.dealers).Count) dealer(s)."
+    $response.dealers | Select-Object user_id, name, profile_id, location | Format-Table -AutoSize
+    exit 0
 }
 
 if (-not $Commit) {

@@ -12,6 +12,11 @@ final class AutoAgora_Dealer_Onboarding_REST_Controller
     public static function register(): void
     {
         add_action('rest_api_init', static function (): void {
+            register_rest_route('autoagora/v1', '/dealers/locations', array(
+                'methods' => WP_REST_Server::CREATABLE,
+                'callback' => array(__CLASS__, 'locations'),
+                'permission_callback' => array(__CLASS__, 'permission'),
+            ));
             register_rest_route('autoagora/v1', '/dealers/onboard', array(
                 'methods' => WP_REST_Server::CREATABLE,
                 'callback' => array(__CLASS__, 'onboard'),
@@ -48,6 +53,7 @@ final class AutoAgora_Dealer_Onboarding_REST_Controller
                     'enabled' => !empty($profile['enabled']),
                     'include_in_run' => !empty($profile['include_in_run']),
                     'dry_run' => !empty($profile['dry_run']),
+                    'location' => AutoAgora_Bazaraki_Sync_Profiles::defaults($profile),
                 );
             }
         }
@@ -71,6 +77,61 @@ final class AutoAgora_Dealer_Onboarding_REST_Controller
                 return $author_id < 1 || !isset($dealership_ids[$author_id]);
             })),
         ));
+    }
+
+    /** Update existing dealer locations without recreating accounts or changing sync flags. */
+    public static function locations(WP_REST_Request $request)
+    {
+        $input = $request->get_json_params();
+        $mode = is_array($input) ? ($input['mode'] ?? 'validate') : '';
+        $rows = is_array($input) ? ($input['dealers'] ?? null) : null;
+        if (!in_array($mode, array('validate', 'commit'), true) || !is_array($rows) || !$rows || count($rows) > 50) {
+            return self::error('invalid_locations', 'Send 1-50 dealers with mode validate or commit.', 400);
+        }
+        $profiles = AutoAgora_Bazaraki_Sync_Profiles::all();
+        $prepared = array();
+        $seen = array();
+        foreach ($rows as $row) {
+            if (!is_array($row)) {
+                return self::error('invalid_location_row', 'Each dealer must be an object.', 400);
+            }
+            $id = sanitize_key((string) ($row['profile_id'] ?? ''));
+            $user_id = absint($row['user_id'] ?? 0);
+            $profile = $profiles[$id] ?? null;
+            $user = get_userdata($user_id);
+            if (!$profile || !$user || !in_array('dealership', $user->roles, true)
+                || (int) $profile['author_id'] !== $user_id || isset($seen[$user_id])) {
+                return self::error('location_owner_mismatch', 'Each profile must match a unique existing dealership user.', 400);
+            }
+            $source = self::validatedHttpUrl((string) ($row['location_source_url'] ?? ''));
+            $location = $row['location'] ?? null;
+            if ($source === '' || !is_array($location)) {
+                return self::error('location_source_required', 'A source URL and complete location are required.', 400);
+            }
+            $updated = $profile;
+            foreach (array('city', 'district', 'address', 'latitude', 'longitude') as $key) {
+                $updated['car_' . $key] = $location[$key] ?? null;
+            }
+            $updated = AutoAgora_Bazaraki_Sync_Profiles::sanitize($updated);
+            $defaults = AutoAgora_Bazaraki_Sync_Profiles::defaults($updated);
+            if (!$defaults || !is_finite($defaults['car_latitude']) || !is_finite($defaults['car_longitude'])) {
+                return self::error('incomplete_location', 'City, address, valid latitude and longitude are required.', 400);
+            }
+            $seen[$user_id] = true;
+            $profiles[$id] = $updated;
+            $prepared[] = array('user_id' => $user_id, 'profile_id' => $id, 'name' => $profile['name'],
+                'location' => $defaults, 'location_source_url' => $source);
+        }
+        if ($mode === 'commit') {
+            AutoAgora_Bazaraki_Sync_Profiles::save(array_values($profiles));
+            foreach ($prepared as $item) {
+                $saved = AutoAgora_Bazaraki_Sync_Profiles::get($item['profile_id']);
+                if (!$saved || AutoAgora_Bazaraki_Sync_Profiles::defaults($saved) !== $item['location']) {
+                    return self::error('location_save_failed', 'Location verification failed; inspect state before retrying.', 500);
+                }
+            }
+        }
+        return self::response(array('ok' => true, 'mode' => $mode, 'changes_made' => $mode === 'commit', 'dealers' => $prepared));
     }
 
     public static function onboard(WP_REST_Request $request)
