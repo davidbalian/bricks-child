@@ -4,15 +4,13 @@ The global search is a reusable marketplace search system rather than the defaul
 
 ## Surfaces
 
-- Desktop code-owned header
+- Compact desktop-header trigger
 - Mobile header button and bottom-dock Search action
-- Homepage hero with the existing structured filters under **Advanced filters**
 - Cars browse strip
 - Shared full-screen mobile/keyboard overlay
 - 404 recovery search
-- Virtual `/search/?q=...` complete results page (localized home prefix when Polylang is active)
 
-Use `[autoagora_global_search]` for another inline instance. Supported `context` values are `default`, `header`, `hero`, `overlay`, `browse`, and `404`.
+Use `[autoagora_global_search]` for another inline instance. Supported `context` values are `default`, `overlay`, `browse`, and `404`.
 
 ## Search sources
 
@@ -34,4 +32,4 @@ The schema is installed through `after_setup_theme`. The initial index rebuild r
 
 Unstructured vehicle text is sent as `car_search`; `car_listings_build_query_args()` resolves it to indexed car IDs and then applies the normal active-state and Best Match pipeline. Search result combinations are `noindex,follow`.
 
-The public AJAX action is `autoagora_global_search` and requires the localized search nonce. Responses are cached for five minutes and invalidated by an index revision. Pressing Enter opens the grouped global results route; the leading **Search cars** suggestion opens the parsed marketplace filter URL.
+The public AJAX action is `autoagora_global_search` and requires the localized search nonce. Indexed responses are cached for five minutes and invalidated by an index revision, while make/model suggestions are read directly from the taxonomy. Pressing Enter and the leading **Search cars** suggestion both open the parsed marketplace filter URL.

@@ -35,7 +35,7 @@
 }
 
 .custom-homepage-search-card {
-    width: min(58%, 720px);
+    width: 40%;
     padding: clamp(1.5rem, 4vw, 3rem);
     border-radius: 1.5rem;
     background: #fff;
@@ -44,7 +44,7 @@
 
 @media (min-width: 768px) and (max-width: 1100px) {
     .custom-homepage-search-card {
-        width: 68%;
+        width: 50%;
     }
 }
 
@@ -57,25 +57,6 @@
 
 .custom-homepage-search-card .car-filters-container {
     width: 100%;
-}
-
-.custom-homepage-advanced-search {
-    margin-top: 14px;
-}
-
-.custom-homepage-advanced-search > summary {
-    width: fit-content;
-    color: #075f9f;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 650;
-    list-style-position: outside;
-}
-
-.custom-homepage-advanced-search__content {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid #e5eaf0;
 }
 
 .custom-homepage-section-heading {
@@ -271,7 +252,7 @@
     }
 
     .custom-homepage-search-card {
-        width: 72%;
+        width: 50%;
     }
 
     .custom-homepage-car-row {

@@ -258,13 +258,14 @@ function autoagora_render_code_header() {
 				<a class="aag-site-header__logo" href="<?php echo esc_url( autoagora_code_header_url() ); ?>" aria-label="<?php esc_attr_e( 'Autoagora home', 'bricks-child' ); ?>">
 					<img src="<?php echo esc_url( $logo_url ); ?>" width="1024" height="213" alt="Autoagora" decoding="async" fetchpriority="high">
 				</a>
-				<div class="aag-site-header__search">
-					<?php echo do_shortcode( '[autoagora_global_search context="header" placeholder="' . esc_attr__( 'Search cars, dealers and more', 'bricks-child' ) . '"]' ); ?>
-				</div>
 				<nav class="aag-site-header__main-nav" aria-label="<?php esc_attr_e( 'Primary navigation', 'bricks-child' ); ?>">
 					<?php autoagora_code_header_render_menu( 'aag-site-header__menu' ); ?>
 				</nav>
 				<div class="aag-site-header__desktop-account">
+					<button type="button" class="aag-site-header__desktop-search" data-aag-search-open aria-label="<?php esc_attr_e( 'Open search', 'bricks-child' ); ?>">
+						<?php echo autoagora_code_header_icon( 'search' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<span><?php esc_html_e( 'Search', 'bricks-child' ); ?></span>
+					</button>
 					<?php autoagora_code_header_render_language_switcher(); ?>
 					<?php if ( is_user_logged_in() ) : ?>
 						<details class="aag-site-header__details">

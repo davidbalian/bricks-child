@@ -181,9 +181,9 @@ Files:
 
 Shortcode: `[autoagora_global_search]`
 
-- persistent desktop-header search plus mobile overlay/dock entry point
-- homepage, browse-page, and 404 search surfaces
-- virtual noindex `/search/?q=...` results route with grouped full-site results
+- compact desktop-header trigger plus mobile overlay/dock entry point
+- browse-page and 404 search surfaces; the homepage retains its dedicated structured filters
+- direct noindex marketplace results under `/cars/`
 - grouped suggestions for active cars, make/model terms, dealerships, buyer requests, articles, and pages
 - deterministic natural-language parsing into the existing `/cars/` filter query contract
 - compact custom search-index table maintained by save/meta/taxonomy hooks and an initial batched WP-Cron rebuild

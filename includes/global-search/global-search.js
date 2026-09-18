@@ -334,16 +334,16 @@
             }
             if (latestPayload && latestPayload.query === query && latestPayload.search_url) {
                 event.preventDefault();
-                var destination = latestPayload.global_url || latestPayload.search_url;
+                var destination = latestPayload.search_url;
                 saveRecent(query, destination);
                 window.location.assign(destination);
                 return;
             }
             event.preventDefault();
             fetchResults(query).then(function (payload) {
-                var url = payload && (payload.global_url || payload.search_url)
-                    ? (payload.global_url || payload.search_url)
-                    : form.action + '?q=' + encodeURIComponent(query);
+                var fallback = new URL(form.action, window.location.origin);
+                fallback.searchParams.set(input.name || 'car_search', query);
+                var url = payload && payload.search_url ? payload.search_url : fallback.toString();
                 saveRecent(query, url);
                 window.location.assign(url);
             });

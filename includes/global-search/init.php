@@ -15,13 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 const AUTOAGORA_GLOBAL_SEARCH_DB_VERSION = '1.0.0';
 const AUTOAGORA_GLOBAL_SEARCH_REBUILD_HOOK = 'autoagora_global_search_rebuild_batch';
-const AUTOAGORA_GLOBAL_SEARCH_REWRITE_VERSION = '1.0.0';
-
-function autoagora_global_search_results_url( $query = '' ) {
-	$home = function_exists( 'autoagora_localized_page_url' ) ? autoagora_localized_page_url() : home_url( '/' );
-	$url  = trailingslashit( $home ) . 'search/';
-	return '' !== (string) $query ? add_query_arg( 'q', sanitize_text_field( $query ), $url ) : $url;
-}
+const AUTOAGORA_GLOBAL_SEARCH_REWRITE_VERSION = '1.0.1';
 
 function autoagora_global_search_register_route() {
 	add_rewrite_rule( '^search/?$', 'index.php?autoagora_global_search_page=1', 'top' );
@@ -60,32 +54,35 @@ function autoagora_global_search_prepare_route() {
 	if ( ! autoagora_global_search_is_page() ) {
 		return;
 	}
-	global $wp_query;
-	$wp_query->is_404 = false;
-	status_header( 200 );
+	$query  = isset( $_GET['q'] ) && is_scalar( $_GET['q'] ) ? sanitize_text_field( wp_unslash( $_GET['q'] ) ) : '';
+	$parsed = $query ? autoagora_global_search_parse_query( $query ) : array();
+	$target = ! empty( $parsed['search_url'] )
+		? $parsed['search_url']
+		: ( function_exists( 'autoagora_localized_page_url' ) ? autoagora_localized_page_url( 'cars' ) : home_url( '/cars/' ) );
+	wp_safe_redirect( $target, 302, 'AutoAgora Global Search' );
+	exit;
 }
 add_action( 'template_redirect', 'autoagora_global_search_prepare_route', 0 );
 
-function autoagora_global_search_template( $template ) {
-	if ( ! autoagora_global_search_is_page() ) {
-		return $template;
+/** Convert a direct, non-JavaScript submission into the same parsed cars URL. */
+function autoagora_global_search_redirect_raw_car_search() {
+	if ( ! function_exists( 'autoagora_is_cars_browse_light_context' ) || ! autoagora_is_cars_browse_light_context() ) {
+		return;
 	}
-	global $wp_query;
-	$wp_query->is_404 = false;
-	status_header( 200 );
-	$search_template = __DIR__ . '/template-global-search.php';
-	return file_exists( $search_template ) ? $search_template : $template;
-}
-add_filter( 'template_include', 'autoagora_global_search_template', 99 );
-
-function autoagora_global_search_document_title( array $parts ) {
-	if ( autoagora_global_search_is_page() ) {
-		$query = isset( $_GET['q'] ) && is_scalar( $_GET['q'] ) ? sanitize_text_field( wp_unslash( $_GET['q'] ) ) : '';
-		$parts['title'] = $query ? sprintf( __( 'Search results for “%s”', 'bricks-child' ), $query ) : __( 'Search AutoAgora', 'bricks-child' );
+	if ( isset( $_GET['search_query'] ) || ! isset( $_GET['car_search'] ) || ! is_scalar( $_GET['car_search'] ) ) {
+		return;
 	}
-	return $parts;
+	$query = sanitize_text_field( wp_unslash( $_GET['car_search'] ) );
+	if ( '' === $query ) {
+		return;
+	}
+	$parsed = autoagora_global_search_parse_query( $query );
+	if ( ! empty( $parsed['search_url'] ) ) {
+		wp_safe_redirect( $parsed['search_url'], 302, 'AutoAgora Global Search' );
+		exit;
+	}
 }
-add_filter( 'document_title_parts', 'autoagora_global_search_document_title', 40 );
+add_action( 'template_redirect', 'autoagora_global_search_redirect_raw_car_search', 1 );
 
 function autoagora_global_search_table_name() {
 	global $wpdb;
@@ -814,6 +811,69 @@ function autoagora_global_search_matching_car_ids( $query, $limit = 500 ) {
 	return array_map( 'absint', $fallback->posts );
 }
 
+/**
+ * Read make/model suggestions from the taxonomy itself.
+ *
+ * The custom index is intentionally not a dependency here: taxonomy matches
+ * must be available immediately, including before the background rebuild has
+ * reached the car_make batch.
+ */
+function autoagora_global_search_taxonomy_results( $query, array $parsed, $limit = 5 ) {
+	$results = array();
+	$seen    = array();
+	$add     = static function ( $term ) use ( &$results, &$seen, $limit ) {
+		if ( ! $term || is_wp_error( $term ) || isset( $seen[ $term->term_id ] ) || count( $results ) >= $limit ) {
+			return;
+		}
+		$parent_name = '';
+		if ( $term->parent ) {
+			$parent = get_term( $term->parent, 'car_make' );
+			$parent_name = $parent && ! is_wp_error( $parent ) ? $parent->name : '';
+		}
+		$seen[ $term->term_id ] = true;
+		$results[] = array(
+			'type'     => $term->parent ? 'model' : 'make',
+			'title'    => $term->name,
+			'subtitle' => $term->parent
+				? ( $parent_name ? sprintf( __( '%s model', 'bricks-child' ), $parent_name ) : __( 'Car model', 'bricks-child' ) )
+				: __( 'Car make', 'bricks-child' ),
+			'url'      => esc_url_raw( autoagora_global_search_term_url( $term ) ),
+			'image'    => '',
+		);
+	};
+
+	// Parsed exact matches are highest priority, with a model before its make.
+	foreach ( array( 'model', 'make' ) as $key ) {
+		if ( empty( $parsed['params'][ $key ] ) ) {
+			continue;
+		}
+		$add( get_term_by( 'slug', $parsed['params'][ $key ], 'car_make' ) );
+	}
+
+	$searches = array_merge( array( $query ), autoagora_global_search_query_tokens( $query ) );
+	foreach ( array_unique( array_filter( $searches ) ) as $search ) {
+		if ( count( $results ) >= $limit ) {
+			break;
+		}
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'car_make',
+				'hide_empty' => false,
+				'search'     => $search,
+				'number'     => $limit,
+			)
+		);
+		if ( is_wp_error( $terms ) ) {
+			continue;
+		}
+		foreach ( $terms as $term ) {
+			$add( $term );
+		}
+	}
+
+	return $results;
+}
+
 function autoagora_global_search_ajax() {
 	check_ajax_referer( 'autoagora_global_search', 'nonce' );
 	$query = isset( $_GET['q'] ) && is_scalar( $_GET['q'] ) ? sanitize_text_field( wp_unslash( $_GET['q'] ) ) : '';
@@ -838,7 +898,14 @@ function autoagora_global_search_ajax() {
 		'page' => __( 'Articles and pages', 'bricks-child' ),
 	);
 	$groups = array();
+	$taxonomy_results = autoagora_global_search_taxonomy_results( $query, $parsed );
+	if ( $taxonomy_results ) {
+		$groups[ __( 'Makes and models', 'bricks-child' ) ] = $taxonomy_results;
+	}
 	foreach ( $rows as $row ) {
+		if ( in_array( $row['object_type'], array( 'make', 'model' ), true ) ) {
+			continue;
+		}
 		$group = isset( $labels[ $row['object_type'] ] ) ? $labels[ $row['object_type'] ] : __( 'Other', 'bricks-child' );
 		if ( ! isset( $groups[ $group ] ) ) {
 			$groups[ $group ] = array();
@@ -854,7 +921,7 @@ function autoagora_global_search_ajax() {
 	wp_send_json_success(
 		array(
 			'query' => $query, 'groups' => $groups, 'chips' => $parsed['chips'],
-			'search_url' => $parsed['search_url'], 'global_url' => autoagora_global_search_results_url( $query ),
+			'search_url' => $parsed['search_url'],
 		)
 	);
 }
@@ -863,11 +930,9 @@ add_action( 'wp_ajax_nopriv_autoagora_global_search', 'autoagora_global_search_a
 
 /** Search/filter result combinations are useful UX, but not indexable landing pages. */
 function autoagora_global_search_is_results_request() {
-	$has_query = autoagora_global_search_is_page()
-		|| ( isset( $_GET['search_query'] ) && is_scalar( $_GET['search_query'] ) && '' !== wp_unslash( $_GET['search_query'] ) )
+	$has_query = ( isset( $_GET['search_query'] ) && is_scalar( $_GET['search_query'] ) && '' !== wp_unslash( $_GET['search_query'] ) )
 		|| ( isset( $_GET['car_search'] ) && is_scalar( $_GET['car_search'] ) && '' !== wp_unslash( $_GET['car_search'] ) );
-	return autoagora_global_search_is_page()
-		|| ( $has_query && function_exists( 'autoagora_is_cars_browse_light_context' ) && autoagora_is_cars_browse_light_context() );
+	return $has_query && function_exists( 'autoagora_is_cars_browse_light_context' ) && autoagora_is_cars_browse_light_context();
 }
 
 function autoagora_global_search_wp_robots( array $robots ) {
@@ -935,14 +1000,14 @@ function autoagora_global_search_shortcode( $atts ) {
 		: ( isset( $_GET['search_query'] ) && is_scalar( $_GET['search_query'] )
 		? sanitize_text_field( wp_unslash( $_GET['search_query'] ) )
 		: ( isset( $_GET['car_search'] ) && is_scalar( $_GET['car_search'] ) ? sanitize_text_field( wp_unslash( $_GET['car_search'] ) ) : '' ) );
-	$action  = autoagora_global_search_results_url();
+	$action  = function_exists( 'autoagora_localized_page_url' ) ? autoagora_localized_page_url( 'cars' ) : home_url( '/cars/' );
 	ob_start();
 	?>
 	<form class="aag-global-search aag-global-search--<?php echo esc_attr( $context ); ?>" role="search" method="get" action="<?php echo esc_url( $action ); ?>" data-aag-global-search>
 		<label class="screen-reader-text" for="<?php echo esc_attr( $id ); ?>"><?php esc_html_e( 'Search AutoAgora', 'bricks-child' ); ?></label>
 		<div class="aag-global-search__control">
 			<span class="aag-global-search__icon"><?php echo autoagora_global_search_icon( 'search' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-			<input id="<?php echo esc_attr( $id ); ?>" class="aag-global-search__input" type="search" name="q" value="<?php echo esc_attr( $value ); ?>" placeholder="<?php echo esc_attr( $atts['placeholder'] ); ?>" autocomplete="off" spellcheck="false" aria-autocomplete="list" aria-expanded="false" aria-controls="<?php echo esc_attr( $id ); ?>-results">
+			<input id="<?php echo esc_attr( $id ); ?>" class="aag-global-search__input" type="search" name="car_search" value="<?php echo esc_attr( $value ); ?>" placeholder="<?php echo esc_attr( $atts['placeholder'] ); ?>" autocomplete="off" spellcheck="false" aria-autocomplete="list" aria-expanded="false" aria-controls="<?php echo esc_attr( $id ); ?>-results">
 			<button class="aag-global-search__clear" type="button" aria-label="<?php esc_attr_e( 'Clear search', 'bricks-child' ); ?>"<?php echo $value ? '' : ' hidden'; ?>><?php echo autoagora_global_search_icon( 'close' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></button>
 			<button class="aag-global-search__submit btn btn-primary" type="submit"><span><?php esc_html_e( 'Search', 'bricks-child' ); ?></span><?php echo autoagora_global_search_icon( 'search' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></button>
 		</div>

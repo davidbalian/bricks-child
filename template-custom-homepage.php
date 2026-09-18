@@ -180,13 +180,7 @@ get_header();
         <div class="custom-homepage-container custom-homepage-hero-inner">
             <div class="custom-homepage-search-card">
                 <h1 id="custom-homepage-title"><?php esc_html_e('Find your next car in Cyprus', 'bricks-child'); ?></h1>
-                <?php echo do_shortcode('[autoagora_global_search context="hero"]'); ?>
-                <details class="custom-homepage-advanced-search">
-                    <summary><?php esc_html_e('Advanced filters', 'bricks-child'); ?></summary>
-                    <div class="custom-homepage-advanced-search__content">
-                        <?php echo do_shortcode('[homepage_filters]'); ?>
-                    </div>
-                </details>
+                <?php echo do_shortcode('[homepage_filters]'); ?>
             </div>
         </div>
     </section>

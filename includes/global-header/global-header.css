@@ -13,7 +13,7 @@
 }
 
 .autoagora-code-header-active {
-    --aag-site-header-height: 108px;
+    --aag-site-header-height: 65px;
     --aag-site-header-top: 0px;
 }
 
@@ -36,7 +36,7 @@
 
 .autoagora-code-header-active .aag-site-header-spacer {
     display: block;
-    height: 108px;
+    height: 65px;
 }
 
 .autoagora-code-header-active.admin-bar {
@@ -83,45 +83,27 @@
 }
 
 .aag-site-header__desktop {
-    min-height: 108px;
+    min-height: 65px;
     background: #fff;
 }
 
 .aag-site-header__desktop-inner {
     width: 100%;
     max-width: 1440px;
-    min-height: 108px;
+    min-height: 65px;
     margin: 0 auto;
     padding: 0 16px;
     display: grid;
-    grid-template-columns: 125px minmax(280px, 640px) auto;
-    grid-template-areas:
-        "logo search account"
-        "nav nav nav";
+    grid-template-columns: 125px minmax(0, 1fr) auto;
     align-items: center;
-    column-gap: clamp(20px, 2vw, 32px);
-    row-gap: 5px;
-    padding-top: 9px;
-    padding-bottom: 7px;
+    gap: clamp(24px, 2vw, 32px);
 }
 
 .aag-site-header__logo {
-    grid-area: logo;
     display: block;
     width: 125px;
     height: 26px;
     flex: 0 0 125px;
-}
-
-.aag-site-header__search {
-    grid-area: search;
-    width: 100%;
-    max-width: 640px;
-    justify-self: center;
-}
-
-.aag-site-header__main-nav {
-    grid-area: nav;
 }
 
 .aag-site-header__logo img {
@@ -172,11 +154,44 @@ html[lang^="el"] .aag-site-header__menu a {
 }
 
 .aag-site-header__desktop-account {
-    grid-area: account;
     min-width: max-content;
     display: flex;
     align-items: center;
     gap: 16px;
+}
+
+.aag-site-header__desktop-search {
+    min-height: 36px;
+    padding: 6px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--aag-header-text);
+    background: #f4f7f9;
+    border: 1px solid #dce2e8;
+    border-radius: 9px;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.aag-site-header__desktop-search:hover,
+.aag-site-header__desktop-search:focus-visible {
+    color: var(--aag-header-blue);
+    background: #eef7fd;
+    border-color: #9acdf1;
+}
+
+.aag-site-header__desktop-search svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .aag-site-header__language-switcher ul {
@@ -439,28 +454,40 @@ html.aag-site-header-menu-open {
 
 @media (min-width: 841px) and (max-width: 1200px) {
     .autoagora-code-header-active {
-        --aag-site-header-height: 108px;
+        --aag-site-header-height: 104px;
     }
 
     .autoagora-code-header-active .aag-site-header-spacer {
-        height: 108px;
+        height: 104px;
     }
 
     .aag-site-header__desktop-inner {
-        min-height: 108px;
-        padding-top: 9px;
-        padding-bottom: 7px;
-        grid-template-columns: 125px minmax(240px, 1fr) auto;
+        min-height: 104px;
+        padding-top: 14px;
+        padding-bottom: 14px;
+        grid-template-columns: 1fr auto;
         grid-template-areas:
-            "logo search account"
-            "nav nav nav";
-        gap: 5px 20px;
+            "logo account"
+            "nav nav";
+        gap: 12px 24px;
+    }
+
+    .aag-site-header__logo {
+        grid-area: logo;
+    }
+
+    .aag-site-header__main-nav {
+        grid-area: nav;
+    }
+
+    .aag-site-header__desktop-account {
+        grid-area: account;
     }
 
     .aag-site-header__menu {
         flex-wrap: nowrap;
         justify-content: flex-start;
-        gap: clamp(0.85rem, 2vw, 1.5rem);
+        gap: 1.5rem;
     }
 }
 
