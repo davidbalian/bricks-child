@@ -302,6 +302,18 @@ function car_listings_build_query_args($atts) {
         $args['car_listing_state_active_only'] = true;
     }
 
+    // Free-text global search uses the compact search index, then lets the
+    // normal listing-state, filter, and ranking pipeline operate on matches.
+    if (isset($_GET['car_search']) && is_scalar($_GET['car_search']) && $_GET['car_search'] !== '' && function_exists('autoagora_global_search_matching_car_ids')) {
+        $car_search = sanitize_text_field(wp_unslash($_GET['car_search']));
+        $car_search = function_exists('mb_substr') ? mb_substr($car_search, 0, 100) : substr($car_search, 0, 100);
+        $matching_ids = autoagora_global_search_matching_car_ids($car_search, 500);
+        if (isset($args['post__in'])) {
+            $matching_ids = array_values(array_intersect($args['post__in'], $matching_ids));
+        }
+        $args['post__in'] = !empty($matching_ids) ? $matching_ids : array(0);
+    }
+
     // === URL PARAMETER FILTERS (for filter integration) ===
     $tax_query = array();
 

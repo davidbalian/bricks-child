@@ -142,7 +142,7 @@ $request_ctx = function_exists( 'autoagora_get_active_car_filter_context' )
     : array();
 $has_server_filters = !empty( $request_ctx['make_slug'] ) || !empty( $request_ctx['model_slug'] );
 if ( ! $has_server_filters ) {
-    foreach ( array( 'make', 'model', 'price_min', 'price_max', 'mileage_min', 'mileage_max', 'year_min', 'year_max', 'fuel_type', 'body_type', 'engine_capacity_min', 'engine_capacity_max', 'hp_min', 'hp_max', 'numowners_min', 'numowners_max', 'transmission', 'drive_type', 'exterior_color', 'interior_color', 'number_of_doors', 'number_of_seats', 'availability', 'isantique', 'extras', 'vehiclehistory', 'car_city', 'loc_lat', 'loc_lng', 'loc_radius' ) as $k ) {
+    foreach ( array( 'make', 'model', 'car_search', 'price_min', 'price_max', 'mileage_min', 'mileage_max', 'year_min', 'year_max', 'fuel_type', 'body_type', 'engine_capacity_min', 'engine_capacity_max', 'hp_min', 'hp_max', 'numowners_min', 'numowners_max', 'transmission', 'drive_type', 'exterior_color', 'interior_color', 'number_of_doors', 'number_of_seats', 'availability', 'isantique', 'extras', 'vehiclehistory', 'car_city', 'loc_lat', 'loc_lng', 'loc_radius' ) as $k ) {
         if ( isset( $_GET[ $k ] ) && wp_unslash( $_GET[ $k ] ) !== '' ) {
             $has_server_filters = true;
             break;

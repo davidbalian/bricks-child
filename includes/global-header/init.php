@@ -196,6 +196,7 @@ function autoagora_code_header_icon( $name ) {
 		'chevron' => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>',
 		'menu'    => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>',
 		'close'   => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>',
+		'search'  => '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>',
 		'home'    => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.9999H15M3 14.5999V12.1301C3 10.9814 3 10.407 3.14805 9.87807C3.2792 9.40953 3.49473 8.96886 3.78405 8.57768C4.11067 8.13608 4.56404 7.78346 5.47078 7.07822L8.07078 5.056C9.47608 3.96298 10.1787 3.41648 10.9546 3.2064C11.6392 3.02104 12.3608 3.02104 13.0454 3.2064C13.8213 3.41648 14.5239 3.96299 15.9292 5.056L18.5292 7.07822C19.436 7.78346 19.8893 8.13608 20.2159 8.57768C20.5053 8.96886 20.7208 9.40953 20.8519 9.87807C21 10.407 21 10.9814 21 12.1301V14.5999C21 16.8401 21 17.9603 20.564 18.8159C20.1805 19.5685 19.5686 20.1805 18.816 20.564C17.9603 20.9999 16.8402 20.9999 14.6 20.9999H9.4C7.15979 20.9999 6.03969 20.9999 5.18404 20.564C4.43139 20.1805 3.81947 19.5685 3.43597 18.8159C3 17.9603 3 16.8401 3 14.5999Z"/></svg>',
 		'car'     => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8L5.72187 10.2682C5.90158 10.418 6.12811 10.5 6.36205 10.5H17.6379C17.8719 10.5 18.0984 10.418 18.2781 10.2682L21 8M6.5 14H6.51M17.5 14H17.51M8.16065 4.5H15.8394C16.5571 4.5 17.2198 4.88457 17.5758 5.50772L20.473 10.5777C20.8183 11.1821 21 11.8661 21 12.5623V18.5C21 19.0523 20.5523 19.5 20 19.5H19C18.4477 19.5 18 19.0523 18 18.5V17.5H6V18.5C6 19.0523 5.55228 19.5 5 19.5H4C3.44772 19.5 3 19.0523 3 18.5V12.5623C3 11.8661 3.18166 11.1821 3.52703 10.5777L6.42416 5.50772C6.78024 4.88457 7.44293 4.5 8.16065 4.5Z"/></svg>',
 		'add'     => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>',
@@ -257,6 +258,9 @@ function autoagora_render_code_header() {
 				<a class="aag-site-header__logo" href="<?php echo esc_url( autoagora_code_header_url() ); ?>" aria-label="<?php esc_attr_e( 'Autoagora home', 'bricks-child' ); ?>">
 					<img src="<?php echo esc_url( $logo_url ); ?>" width="1024" height="213" alt="Autoagora" decoding="async" fetchpriority="high">
 				</a>
+				<div class="aag-site-header__search">
+					<?php echo do_shortcode( '[autoagora_global_search context="header" placeholder="' . esc_attr__( 'Search cars, dealers and more', 'bricks-child' ) . '"]' ); ?>
+				</div>
 				<nav class="aag-site-header__main-nav" aria-label="<?php esc_attr_e( 'Primary navigation', 'bricks-child' ); ?>">
 					<?php autoagora_code_header_render_menu( 'aag-site-header__menu' ); ?>
 				</nav>
@@ -287,7 +291,9 @@ function autoagora_render_code_header() {
 				<img src="<?php echo esc_url( $logo_url ); ?>" width="1024" height="213" alt="Autoagora" decoding="async" fetchpriority="high">
 			</a>
 			<div class="aag-site-header__mobile-shortcuts">
-				<a href="<?php echo esc_url( autoagora_code_header_url( 'cars' ) ); ?>"><?php esc_html_e( 'Used Cars', 'bricks-child' ); ?></a>
+				<button type="button" class="aag-site-header__mobile-search" data-aag-search-open aria-label="<?php esc_attr_e( 'Open search', 'bricks-child' ); ?>">
+					<?php echo autoagora_code_header_icon( 'search' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				</button>
 				<a href="<?php echo esc_url( autoagora_code_header_url( 'add-listing' ) ); ?>"><?php esc_html_e( 'Sell My Car', 'bricks-child' ); ?></a>
 			</div>
 			<button type="button" class="aag-site-header__menu-toggle" aria-expanded="false" aria-controls="aag-site-header-drawer" aria-label="<?php esc_attr_e( 'Open menu', 'bricks-child' ); ?>">
@@ -316,7 +322,7 @@ function autoagora_render_code_header() {
 				array( 'label' => __( 'Home', 'bricks-child' ), 'slug' => '', 'icon' => 'home' ),
 				array( 'label' => __( 'Cars', 'bricks-child' ), 'slug' => 'cars', 'icon' => 'car' ),
 				array( 'label' => __( 'Post', 'bricks-child' ), 'slug' => 'add-listing', 'icon' => 'add', 'primary' => true ),
-				array( 'label' => __( 'Blog', 'bricks-child' ), 'slug' => 'blog', 'icon' => 'blog' ),
+				array( 'label' => __( 'Search', 'bricks-child' ), 'slug' => '', 'icon' => 'search', 'search' => true ),
 			);
 			?>
 			<?php foreach ( $dock_items as $item ) : ?>
@@ -330,12 +336,19 @@ function autoagora_render_code_header() {
 					$is_current = true;
 				}
 				?>
+				<?php if ( ! empty( $item['search'] ) ) : ?>
+				<button type="button" class="aag-mobile-dock__item" data-aag-search-open aria-label="<?php echo esc_attr( $item['label'] ); ?>">
+					<span class="aag-mobile-dock__icon"><?php echo autoagora_code_header_icon( $item['icon'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+					<span class="aag-mobile-dock__label"><?php echo esc_html( $item['label'] ); ?></span>
+				</button>
+				<?php else : ?>
 				<a class="aag-mobile-dock__item<?php echo ! empty( $item['primary'] ) ? ' aag-mobile-dock__item--primary' : ''; ?>" href="<?php echo esc_url( $url ); ?>" aria-label="<?php echo esc_attr( $item['label'] ); ?>"<?php echo $is_current ? ' aria-current="page"' : ''; ?>>
 					<span class="aag-mobile-dock__icon"><?php echo autoagora_code_header_icon( $item['icon'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 					<?php if ( empty( $item['primary'] ) ) : ?>
 						<span class="aag-mobile-dock__label"><?php echo esc_html( $item['label'] ); ?></span>
 					<?php endif; ?>
 				</a>
+				<?php endif; ?>
 			<?php endforeach; ?>
 
 			<?php if ( is_user_logged_in() ) : ?>

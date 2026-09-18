@@ -25,7 +25,7 @@ $electric_url = esc_url(add_query_arg(array('fuel_type' => 'Electric'), $cars_ba
         <p class="autoagora-404-lede"><?php esc_html_e('Let’s find you something else — search below or jump into a popular category.', 'bricks-child'); ?></p>
 
         <div class="autoagora-404-search">
-            <?php echo do_shortcode('[homepage_filters]'); ?>
+            <?php echo do_shortcode('[autoagora_global_search context="404"]'); ?>
         </div>
 
         <p class="autoagora-404-cats-label"><?php esc_html_e('Browse by category', 'bricks-child'); ?></p>

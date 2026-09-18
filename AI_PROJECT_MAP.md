@@ -170,6 +170,26 @@ Query rules:
 - card rendering primes meta cache when possible
 - AJAX JSON card payload exists for faster client rendering
 
+### Global Search
+
+Files:
+
+- `includes/global-search/init.php`
+- `includes/global-search/global-search.js`
+- `includes/global-search/global-search.css`
+- `includes/global-search/README.md`
+
+Shortcode: `[autoagora_global_search]`
+
+- persistent desktop-header search plus mobile overlay/dock entry point
+- homepage, browse-page, and 404 search surfaces
+- virtual noindex `/search/?q=...` results route with grouped full-site results
+- grouped suggestions for active cars, make/model terms, dealerships, buyer requests, articles, and pages
+- deterministic natural-language parsing into the existing `/cars/` filter query contract
+- compact custom search-index table maintained by save/meta/taxonomy hooks and an initial batched WP-Cron rebuild
+- unstructured `car_search` queries resolve to indexed car IDs, then use the normal active-state and Best Match listing pipeline
+- search-result combinations are `noindex,follow`
+
 ### Filters
 
 Files:

@@ -13,7 +13,7 @@
 }
 
 .autoagora-code-header-active {
-    --aag-site-header-height: 65px;
+    --aag-site-header-height: 108px;
     --aag-site-header-top: 0px;
 }
 
@@ -36,7 +36,7 @@
 
 .autoagora-code-header-active .aag-site-header-spacer {
     display: block;
-    height: 65px;
+    height: 108px;
 }
 
 .autoagora-code-header-active.admin-bar {
@@ -83,27 +83,45 @@
 }
 
 .aag-site-header__desktop {
-    min-height: 65px;
+    min-height: 108px;
     background: #fff;
 }
 
 .aag-site-header__desktop-inner {
     width: 100%;
     max-width: 1440px;
-    min-height: 65px;
+    min-height: 108px;
     margin: 0 auto;
     padding: 0 16px;
     display: grid;
-    grid-template-columns: 125px minmax(0, 1fr) auto;
+    grid-template-columns: 125px minmax(280px, 640px) auto;
+    grid-template-areas:
+        "logo search account"
+        "nav nav nav";
     align-items: center;
-    gap: clamp(24px, 2vw, 32px);
+    column-gap: clamp(20px, 2vw, 32px);
+    row-gap: 5px;
+    padding-top: 9px;
+    padding-bottom: 7px;
 }
 
 .aag-site-header__logo {
+    grid-area: logo;
     display: block;
     width: 125px;
     height: 26px;
     flex: 0 0 125px;
+}
+
+.aag-site-header__search {
+    grid-area: search;
+    width: 100%;
+    max-width: 640px;
+    justify-self: center;
+}
+
+.aag-site-header__main-nav {
+    grid-area: nav;
 }
 
 .aag-site-header__logo img {
@@ -154,6 +172,7 @@ html[lang^="el"] .aag-site-header__menu a {
 }
 
 .aag-site-header__desktop-account {
+    grid-area: account;
     min-width: max-content;
     display: flex;
     align-items: center;
@@ -420,40 +439,28 @@ html.aag-site-header-menu-open {
 
 @media (min-width: 841px) and (max-width: 1200px) {
     .autoagora-code-header-active {
-        --aag-site-header-height: 104px;
+        --aag-site-header-height: 108px;
     }
 
     .autoagora-code-header-active .aag-site-header-spacer {
-        height: 104px;
+        height: 108px;
     }
 
     .aag-site-header__desktop-inner {
-        min-height: 104px;
-        padding-top: 14px;
-        padding-bottom: 14px;
-        grid-template-columns: 1fr auto;
+        min-height: 108px;
+        padding-top: 9px;
+        padding-bottom: 7px;
+        grid-template-columns: 125px minmax(240px, 1fr) auto;
         grid-template-areas:
-            "logo account"
-            "nav nav";
-        gap: 12px 24px;
-    }
-
-    .aag-site-header__logo {
-        grid-area: logo;
-    }
-
-    .aag-site-header__main-nav {
-        grid-area: nav;
-    }
-
-    .aag-site-header__desktop-account {
-        grid-area: account;
+            "logo search account"
+            "nav nav nav";
+        gap: 5px 20px;
     }
 
     .aag-site-header__menu {
         flex-wrap: nowrap;
         justify-content: flex-start;
-        gap: 1.5rem;
+        gap: clamp(0.85rem, 2vw, 1.5rem);
     }
 }
 
@@ -503,6 +510,28 @@ html.aag-site-header-menu-open {
         line-height: 1.7;
         text-decoration: none;
         white-space: nowrap;
+    }
+
+    .aag-site-header__mobile-search {
+        width: 24px;
+        height: 24px;
+        flex: 0 0 24px;
+        padding: 2px;
+        color: var(--aag-header-navy);
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+    }
+
+    .aag-site-header__mobile-search svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.9;
+        stroke-linecap: round;
+        stroke-linejoin: round;
     }
 
     .aag-site-header__menu-toggle {
