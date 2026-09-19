@@ -12,6 +12,11 @@ final class AutoAgora_Bazaraki_Sync_REST_Controller
     public static function register(): void
     {
         add_action('rest_api_init', static function (): void {
+            register_rest_route('autoagora/v1', '/bazaraki-sync/inventory', array(
+                'methods' => WP_REST_Server::CREATABLE,
+                'callback' => array(__CLASS__, 'inventory'),
+                'permission_callback' => '__return_true',
+            ));
             register_rest_route('autoagora/v1', '/bazaraki-sync/ingest', array(
                 'methods' => WP_REST_Server::CREATABLE,
                 'callback' => array(__CLASS__, 'ingest'),
@@ -172,6 +177,46 @@ final class AutoAgora_Bazaraki_Sync_REST_Controller
         ));
     }
 
+    /** Authenticated, owner-scoped inventory; includes pending/manual imports. */
+    public static function inventory(WP_REST_Request $request)
+    {
+        $body = (string) $request->get_body();
+        $auth = AutoAgora_Bazaraki_Sync_Auth::verify($request, $body);
+        if (is_wp_error($auth)) {
+            return $auth;
+        }
+        $input = json_decode($body, true);
+        $profile = AutoAgora_Bazaraki_Sync_Profiles::get(sanitize_key((string) ($input['profile_id'] ?? '')));
+        if (!$profile || empty($profile['enabled']) || !get_userdata((int) $profile['author_id'])) {
+            return new WP_Error('bazaraki_sync_profile', 'Invalid or disabled dealer profile.', array('status' => 409));
+        }
+        global $wpdb;
+        $ids = $wpdb->get_col($wpdb->prepare(
+            "SELECT p.ID FROM {$wpdb->posts} p WHERE p.post_type='car'
+             AND p.post_status IN ('publish','pending','draft','private','future')
+             AND p.post_author=%d AND p.ID>%d
+             AND EXISTS (SELECT 1 FROM {$wpdb->postmeta} m WHERE m.post_id=p.ID AND m.meta_key='_autoagora_import_source' AND m.meta_value='bazaraki')
+             ORDER BY p.ID ASC LIMIT 501",
+            (int) $profile['author_id'], absint($input['cursor'] ?? 0)
+        ));
+        if ($wpdb->last_error) {
+            return new WP_Error('bazaraki_sync_inventory', 'Could not read inventory.', array('status' => 500));
+        }
+        $more = count($ids) > 500;
+        $ids = array_slice($ids, 0, 500);
+        update_meta_cache('post', $ids);
+        $listings = array();
+        foreach ($ids as $post_id) {
+            $source_id = (string) get_post_meta((int) $post_id, '_autoagora_import_source_id', true);
+            if ($source_id !== '') {
+                $price = get_post_meta((int) $post_id, 'price', true);
+                $listings[] = array('source_id' => $source_id, 'price' => is_numeric($price) ? (float) $price : null);
+            }
+        }
+        return rest_ensure_response(array('schema_version' => 2, 'listings' => $listings,
+            'next_cursor' => $more ? (int) end($ids) : null, 'dry_run' => !empty($profile['dry_run'])));
+    }
+
     /** @return string|WP_Error */
     private static function storePackage(string $profile_id, string $run_id, string $body)
     {
@@ -224,7 +269,7 @@ final class AutoAgora_Bazaraki_Sync_REST_Controller
         $present = array_values(array_unique(array_filter(array_map(static function ($value): string {
             return preg_replace('/[^A-Za-z0-9._-]/', '', (string) $value);
         }, (array) ($changes['present_source_ids'] ?? array())))));
-        if (empty($present) || count($present) > AutoAgora_Car_Json_Import_Validator::MAX_LISTINGS) {
+        if (empty($present) || count($present) > 10000) {
             return new WP_Error('bazaraki_sync_presence', __('The complete source listing set is missing or unsafe.', 'bricks-child'), array('status' => 400));
         }
 
@@ -233,11 +278,16 @@ final class AutoAgora_Bazaraki_Sync_REST_Controller
             return $validation;
         }
         $rows = array();
+        $invalid = array();
         foreach ($validation['rows'] as $row) {
             $source_id = (string) ($row['listing']['source_id'] ?? '');
             if ($source_id === '' || empty($row['valid'])) {
                 $message = implode(' ', (array) ($row['errors'] ?? array()));
-                return new WP_Error('bazaraki_sync_listing_invalid', $message ?: __('A changed listing failed validation.', 'bricks-child'), array('status' => 400));
+                if (empty($changes['efficient']) || $source_id === '') {
+                    return new WP_Error('bazaraki_sync_listing_invalid', $message ?: __('A changed listing failed validation.', 'bricks-child'), array('status' => 400));
+                }
+                $invalid[$source_id] = $message ?: 'Listing validation failed.';
+                continue;
             }
             $rows[$source_id] = $row;
         }
@@ -252,6 +302,11 @@ final class AutoAgora_Bazaraki_Sync_REST_Controller
                     continue;
                 }
                 $source_id = preg_replace('/[^A-Za-z0-9._-]/', '', (string) ($change['source_id'] ?? ''));
+                if (isset($invalid[$source_id])) {
+                    $jobs[] = array('source_id' => $source_id, 'action' => 'reject', 'payload' => array('error' => $invalid[$source_id]));
+                    $changed_ids[$source_id] = true;
+                    continue;
+                }
                 if ($source_id === '' || !isset($rows[$source_id]) || !in_array($source_id, $present, true)) {
                     return new WP_Error('bazaraki_sync_change_invalid', __('A changed listing is absent from the validated package.', 'bricks-child'), array('status' => 400));
                 }
@@ -269,11 +324,23 @@ final class AutoAgora_Bazaraki_Sync_REST_Controller
                     'row' => $rows[$source_id],
                     'changed_fields' => array_values((array) ($change['changed_fields'] ?? array())),
                     'baseline' => ($changes['mode'] ?? '') === 'baseline',
+                    'new_only' => !empty($changes['efficient']),
                     'image_hashes' => $image_hashes,
                     'source_image_urls' => array_values((array) ($listing['source_image_urls'] ?? array())),
                 ));
                 $changed_ids[$source_id] = true;
             }
+        }
+        foreach ((array) ($changes['price_updates'] ?? array()) as $change) {
+            $source_id = (string) ($change['source_id'] ?? '');
+            $price = $change['price'] ?? null;
+            if (!in_array($source_id, $present, true) || isset($changed_ids[$source_id])) {
+                return new WP_Error('bazaraki_sync_price', 'Invalid price update identity.', array('status' => 400));
+            }
+            $valid_price = is_numeric($price) && is_finite((float) $price) && (float) $price > 0 && (float) $price <= 100000000;
+            $jobs[] = array('source_id' => $source_id, 'action' => $valid_price ? 'price' : 'reject',
+                'payload' => $valid_price ? array('price' => (float) $price) : array('error' => 'Invalid card price.'));
+            $changed_ids[$source_id] = true;
         }
         if ($final_chunk) {
             foreach ($present as $source_id) {
@@ -287,7 +354,12 @@ final class AutoAgora_Bazaraki_Sync_REST_Controller
                 'no_found_rows' => true, 'suppress_filters' => true,
                 'meta_key' => '_autoagora_sync_profile_id', 'meta_value' => $profile_id,
             ));
-            foreach ($profile_posts as $post_id) {
+            $missing = array_filter($profile_posts, static function ($post_id) use ($present): bool {
+                return !in_array((string) get_post_meta((int) $post_id, '_autoagora_import_source_id', true), $present, true);
+            });
+            $allow_missing = empty($changes['efficient']) || (!empty($changes['allow_missing']) &&
+                count($missing) / max(1, count($profile_posts)) <= (float) ($profile['max_missing_ratio'] ?? 0.35));
+            foreach ($allow_missing ? $missing : array() as $post_id) {
                 $source_id = (string) get_post_meta((int) $post_id, '_autoagora_import_source_id', true);
                 if ($source_id !== '' && !in_array($source_id, $present, true)) {
                     $jobs[] = array('source_id' => $source_id, 'action' => 'missing', 'payload' => array());

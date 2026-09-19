@@ -3,6 +3,29 @@
 AutoAgora receives signed ZIP change packages from the separate Node worker. It
 does not scrape Bazaraki during a page request or through WordPress cron.
 
+## Efficient ID and price sync
+
+The worker now calls the signed, paginated `POST /autoagora/v1/bazaraki-sync/inventory`
+endpoint before visiting Bazaraki. It returns only the selected dealer owner's
+imported source IDs and prices, including pending/manual imports. Deploy these
+server changes before using the updated local worker.
+
+The same `node sync.cjs --all` command skips detail/image downloads for existing
+IDs and sends `price_updates` from unambiguous dealer-card prices. The `price`
+queue action changes only price plus sync bookkeeping and invokes the normal
+derived-data hooks. Existing galleries/descriptions are untouched; no periodic
+detail/image audits are performed in connected mode.
+
+Efficient packages turn invalid new-car rows into individual failed `reject`
+jobs while continuing valid rows. Processor responses include source IDs and
+error messages for failed jobs. The local worker saves text/JSON reports and
+continues other cars and profiles. New cars remain pending, and the existing
+per-job admin email suppression remains in place.
+
+Only a final, fresh, complete inventory is eligible for missing reconciliation;
+flagged rows and large drops suppress removals. Missing confirmations increment
+at most once per UTC day. Partial/cached uploads cannot expire cars.
+
 ## Production setup
 
 1. Deploy the exporter outside the public WordPress/theme directory on the same
@@ -50,7 +73,7 @@ field enums and make/model taxonomy are authoritative. New cars are pending.
 Existing cars are matched by `_autoagora_import_source` and
 `_autoagora_import_source_id` and are adopted without duplication.
 
-Image bytes are included only for created or updated cars. The worker compares
+In the legacy full-content package format, image bytes are included only for created or updated cars. The worker compares
 ordered source URLs and SHA-256 content hashes; HTTP validators are used when
 the image host supplies them. AutoAgora replaces a gallery only after every new
 image has imported successfully, then removes old attachments owned by that

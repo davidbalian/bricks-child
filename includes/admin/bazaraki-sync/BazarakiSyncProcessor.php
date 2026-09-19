@@ -39,7 +39,12 @@ final class AutoAgora_Bazaraki_Sync_Processor
             self::sendSummaryOnce($run_id);
             self::cleanupPackageIfSafe($run_id);
         }
-        return array('run_id' => $run_id, 'processed' => $processed, 'complete' => $complete, 'jobs' => $counts);
+        global $wpdb;
+        $failures = $complete ? $wpdb->get_results($wpdb->prepare(
+            'SELECT source_id,action,last_error FROM ' . AutoAgora_Bazaraki_Sync_Schema::jobsTable() . " WHERE run_id=%s AND status='failed' ORDER BY id LIMIT 500",
+            $run_id
+        ), ARRAY_A) : array();
+        return array('run_id' => $run_id, 'processed' => $processed, 'complete' => $complete, 'jobs' => $counts, 'failures' => $failures);
     }
 
     private static function sendSummaryOnce(string $run_id): void

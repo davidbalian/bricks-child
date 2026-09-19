@@ -18,12 +18,25 @@ final class AutoAgora_Bazaraki_Sync_Applier
     {
         $payload = is_array($job['payload'] ?? null) ? $job['payload'] : array();
         $action = (string) ($job['action'] ?? '');
+        if ($action === 'reject') {
+            throw new RuntimeException((string) ($payload['error'] ?? 'Listing validation failed.'));
+        }
         if (!empty($profile['dry_run'])) {
             return $action === 'missing' ? 'review' : 'complete';
         }
 
         AutoAgora_Car_Json_Import_Runner::beginAdminNotificationSuppression();
         try {
+            if ($action === 'price') {
+                $post_id = self::find((string) $job['source_id']);
+                if (!$post_id || (int) get_post_field('post_author', $post_id) !== (int) $profile['author_id']) {
+                    throw new RuntimeException('Price update target is missing or belongs to another dealer.');
+                }
+                AutoAgora_Car_Json_Import_Runner::updateField('price', (float) $payload['price'], $post_id);
+                update_post_meta($post_id, '_autoagora_synced_at', current_time('mysql', true));
+                do_action('acf/save_post', $post_id);
+                return self::markSeen((string) $job['source_id'], (string) $job['profile_id']);
+            }
             if ($action === 'seen') {
                 return self::markSeen((string) $job['source_id'], (string) $job['profile_id']);
             }
@@ -50,6 +63,10 @@ final class AutoAgora_Bazaraki_Sync_Applier
         if ($post_id <= 0) {
             return 'review';
         }
+        $profile = AutoAgora_Bazaraki_Sync_Profiles::get($profile_id);
+        if (!$profile || (int) get_post_field('post_author', $post_id) !== (int) $profile['author_id']) {
+            throw new RuntimeException('Listing belongs to another dealer.');
+        }
         update_post_meta($post_id, self::PROFILE_META, $profile_id);
         delete_post_meta($post_id, self::MISSING_META);
         if ((int) get_post_meta($post_id, self::EXPIRED_META, true) === 1) {
@@ -69,6 +86,11 @@ final class AutoAgora_Bazaraki_Sync_Applier
         if ($post_id <= 0) {
             return 'complete';
         }
+        $day = gmdate('Y-m-d');
+        if ((string) get_post_meta($post_id, '_autoagora_sync_missing_day', true) === $day) {
+            return 'review';
+        }
+        update_post_meta($post_id, '_autoagora_sync_missing_day', $day);
         $count = max(0, (int) get_post_meta($post_id, self::MISSING_META, true)) + 1;
         update_post_meta($post_id, self::MISSING_META, $count);
         $required = max(2, (int) ($profile['missing_confirmations'] ?? 3));
@@ -97,6 +119,12 @@ final class AutoAgora_Bazaraki_Sync_Applier
         }
         $listing = $row['listing'];
         $post_id = self::find((string) $listing['source_id']);
+        if ($post_id > 0 && (int) get_post_field('post_author', $post_id) !== (int) $profile['author_id']) {
+            throw new RuntimeException('Listing belongs to another dealer.');
+        }
+        if ($post_id > 0 && !empty($payload['new_only'])) {
+            return self::markSeen((string) $listing['source_id'], $profile_id);
+        }
         if ($post_id <= 0) {
             $result = AutoAgora_Car_Json_Import_Runner::importRow($row, $package_path, (int) $profile['author_id']);
             if (is_wp_error($result)) {
