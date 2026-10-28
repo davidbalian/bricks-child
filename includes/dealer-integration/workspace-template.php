@@ -24,9 +24,10 @@ foreach ($state['dealers'] as $dealer) {
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title><?php echo esc_html($pageTitle); ?> · AutoAgora</title>
 <link rel="stylesheet" href="<?php echo esc_url($assets . 'tabler/tabler-1.7.1.min.css?v=1.7.1'); ?>">
 <link rel="stylesheet" href="<?php echo esc_url($assets . 'workspace.css?v=' . filemtime(__DIR__ . '/assets/workspace.css')); ?>">
+<link rel="stylesheet" href="<?php echo esc_url($assets . 'button-kit/buttons.css?v=' . filemtime(__DIR__ . '/assets/button-kit/buttons.css')); ?>">
 <style>@font-face{font-family:Inter;font-style:normal;font-weight:100 900;font-display:swap;src:url(<?php echo esc_url(get_template_directory_uri() . '/assets/fonts/builder/Inter.woff2'); ?>) format('woff2')}</style>
 <script src="<?php echo esc_url($assets . 'workspace.js?v=' . filemtime(__DIR__ . '/assets/workspace.js')); ?>" defer></script></head>
-<body class="agw">
+<body class="agw ag-buttons">
 <a class="agw-skip" href="#workspace-main">Skip to workspace</a>
 <header class="navbar agw-header">
     <a class="agw-brand" href="<?php echo esc_url(Workspace::url()); ?>" aria-label="AutoAgora integrations"><img src="<?php echo esc_url($assets . 'autoagora-logo.png'); ?>" width="160" height="34" alt="AutoAgora"></a>

@@ -1,0 +1,30 @@
+/* AutoAgora Buttons v1.0.0 — load after Tabler 1.7.1.
+   Opt in with .ag-buttons on a wrapper; no rules apply outside that wrapper. */
+.ag-buttons .btn {
+  --tblr-btn-font-weight: var(--ag-button-weight, 600);
+  --tblr-btn-border-radius: var(--ag-button-radius, 8px);
+}
+.ag-buttons .btn:not(.btn-icon) {
+  --tblr-btn-font-size: 1rem;
+  --tblr-btn-padding-y: .75rem;
+  --tblr-btn-padding-x: 1.5rem;
+  --tblr-btn-line-height: 1.5rem;
+  --tblr-btn-border-width: 0;
+}
+.ag-buttons .btn-primary {
+  --tblr-btn-variant: var(--ag-button-color, #0d86e3);
+  --tblr-btn-variant-fg: var(--ag-button-text, #fff);
+  --tblr-btn-variant-darken: var(--ag-button-hover, #0b75c9);
+}
+.ag-buttons .btn .icon {
+  /* 400 → 1.5, 500 → 1.875, 600 → 2.25, 700 → 2.625 (24px SVG grid).
+     Use the same numeric weight variable for text and stroke; no JS required. */
+  stroke-width: calc(var(--tblr-btn-font-weight) * .00375);
+  margin-inline: 0 .35rem;
+}
+.ag-buttons .btn-icon {
+  /* Utility buttons have no visible text; keep their regular icon weight. */
+  --tblr-btn-font-weight: var(--ag-button-weight, 400);
+}
+.ag-buttons .btn-icon .icon { margin: 0; }
+.ag-buttons .btn .icon-end { margin-inline: .35rem 0; }

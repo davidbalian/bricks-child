@@ -21,17 +21,7 @@ html:has(body.agw) {
 .agw h2 { font-size: 18px; line-height: 1.4; }
 .agw h3 { font-size: 16px; }
 .agw .card-title { margin: 0; }
-.agw .btn:not(.btn-icon) {
-  --tblr-btn-font-size: 1rem;
-  --tblr-btn-font-weight: 600;
-  --tblr-btn-padding-y: .75rem;
-  --tblr-btn-padding-x: 1.5rem;
-  --tblr-btn-line-height: 1.5rem;
-  --tblr-btn-border-width: 0;
-}
 .agw-icon { width: 20px; height: 20px; flex-shrink: 0; vertical-align: middle; }
-.agw .btn .agw-icon { margin-inline: 0 .35rem; }
-.agw .btn-icon .agw-icon { margin: 0; }
 .agw-header { min-height: 76px; padding: 16px 32px; gap: 24px; justify-content: start; align-items: center; }
 .agw-brand { display: flex; align-items: center; }
 .agw-brand img { width: 155px; height: auto; }

@@ -4,7 +4,7 @@ The dealer dashboard uses [Tabler UI](https://docs.tabler.io/ui/getting-started)
 
 ## Isolation and branding
 
-Only `workspace-template.php` and `reviewer-template.php` load `assets/tabler/tabler-1.7.1.min.css`, followed by `assets/workspace.css`. These are standalone integration documents. There is no global enqueue, `wp_head` import, or change to the marketplace's `style.css`. The public marketplace does not load Tabler. The reviewer sign-in and one-time credential receipt use the same dashboard components.
+Only `workspace-template.php` and `reviewer-template.php` load `assets/tabler/tabler-1.7.1.min.css`, followed by `assets/workspace.css` and `assets/button-kit/buttons.css`. These are standalone integration documents. There is no global enqueue, `wp_head` import, or change to the marketplace's `style.css`. The public marketplace does not load Tabler. The reviewer sign-in and one-time credential receipt use the same dashboard components.
 
 Change dashboard colors, font and radii in the `html:has(body.agw)` token block at the top of `assets/workspace.css`. AutoAgora blue is `--tblr-primary: #0d86e3`. Buttons retain white text and the homepage action sizing through Tabler's button variables. Component appearance comes from Tabler; the remaining CSS handles branding, layout, responsive tables and native dialogs.
 
@@ -21,3 +21,7 @@ The npm stylesheet's optional external font import and source-map reference were
 Sync with `python3 tests/dealer-integration/sync-local.py`. Run the existing `review_checks.py` and `reviewer_checks.py` against the disposable loopback WordPress fixture only. The review suite also checks that the dashboard uses Tabler and the public homepage omits its styles. Inspect connections, stock, activity, reviewer access, dialogs and sign-in at desktop and phone widths. Never run these fixture tests on production.
 
 29 October 2026 local results: all 79 workspace checks and 70 reviewer checks passed. PHP syntax passed for the four changed PHP files. Connections, stock, activity, reviewer access, sign-in and dialogs were inspected locally; the 390px viewport stays within the page width while tables and navigation scroll in their own containers. Production tests were not run.
+
+## Reusable buttons
+
+The approved button appearance lives in `assets/button-kit/buttons.css`, shared by the dashboard and reviewer templates. The `ag-buttons` wrapper opts in. See `assets/button-kit/README.md` and `preview.html` for reuse, colors, weights, states and icon placement. The numeric `--ag-button-weight` token controls both text and SVG stroke, so changing text weight keeps them paired. Navigation icons are unaffected.

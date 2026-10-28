@@ -7,3 +7,5 @@
 /.cursor export-ignore
 /.gitattributes export-ignore
 /.gitignore export-ignore
+/includes/dealer-integration/assets/button-kit/preview.html export-ignore
+/includes/dealer-integration/assets/button-kit/README.md export-ignore
