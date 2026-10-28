@@ -21,7 +21,7 @@ foreach ($state['dealers'] as $dealer) {
 ?>
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title>Dealer integrations · AutoAgora</title>
-<link rel="stylesheet" href="<?php echo esc_url(get_stylesheet_directory_uri() . '/style.css'); ?>">
+<link rel="stylesheet" href="<?php echo esc_url(get_stylesheet_directory_uri() . '/style.css?v=' . filemtime(get_stylesheet_directory() . '/style.css')); ?>">
 <link rel="stylesheet" href="<?php echo esc_url($assets . 'workspace.css?v=' . filemtime(__DIR__ . '/assets/workspace.css')); ?>">
 <style>@font-face{font-family:Inter;font-style:normal;font-weight:100 900;font-display:swap;src:url(<?php echo esc_url(get_template_directory_uri() . '/assets/fonts/builder/Inter.woff2'); ?>) format('woff2')}</style>
 <script src="<?php echo esc_url($assets . 'workspace.js?v=' . filemtime(__DIR__ . '/assets/workspace.js')); ?>" defer></script></head>

@@ -188,12 +188,6 @@
   margin-bottom: 15px;
 }
 
-.review-form-toggle .btn {
-  border-radius: 5px;
-  font-size: 0.875rem;
-  padding: 0.625rem 1.25rem;
-}
-
 .review-notice {
   color: #666;
   font-style: italic;

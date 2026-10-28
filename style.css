@@ -67,96 +67,63 @@ body * {
   height: fit-content !important;
 }
 
-/* button system */
-.btn {
+/* Shared action buttons: the homepage Search Cars appearance is the site standard.
+   Legacy modifier classes remain valid markup and use this same presentation. */
+.btn,
+.car-filters-search-btn,
+a.btn,
+button.btn,
+input.btn {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.5rem 1.25rem;
-  font-size: 0.875rem !important;
-  font-weight: 500;
-  line-height: 1.2;
+  min-height: 3rem;
+  padding: 0.75rem 1.5rem;
+  font-family: inherit;
+  font-size: 1rem !important;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
   text-decoration: none;
   border: none;
-  border-radius: var(--border-radius-small);
+  border-radius: 0.5rem;
   cursor: pointer;
-  transition: opacity var(--transition-time);
   color: var(--white);
-  background: transparent;
+  background: var(--light-blue);
+  box-shadow: none;
+  transition: background-color var(--transition-time) ease, opacity var(--transition-time) ease;
 }
 
-.btn:hover:not(:disabled) {
-  opacity: var(--opacity);
+:is(.btn, .car-filters-search-btn):hover:not(:disabled):not(.disabled):not(.btn-disabled) {
+  background: #0b75c9;
+  color: var(--white);
+  opacity: 1;
+  text-decoration: none;
 }
 
+:is(.btn, .car-filters-search-btn):active:not(:disabled):not(.disabled):not(.btn-disabled) {
+  background: #0965b0;
+  color: var(--white);
+}
+
+:is(.btn, .car-filters-search-btn):focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(13, 134, 227, 0.3);
+}
+
+.car-filters-search-btn:disabled,
 .btn:disabled,
-.btn.disabled {
+.btn.disabled,
+.btn.btn-disabled {
   opacity: 0.6;
   cursor: not-allowed;
   pointer-events: none;
 }
 
-.btn-primary {
-  background-color: var(--light-blue);
-  color: var(--white);
-}
-
-.btn-primary:hover:not(:disabled) {
-  opacity: var(--opacity);
-}
-
-.btn-primary-gradient {
-  background: linear-gradient(to right, var(--dark-blue), var(--light-blue));
-  color: var(--white);
-}
-
-.btn-primary-gradient:hover:not(:disabled) {
-  opacity: var(--opacity);
-}
-
-.btn-secondary {
-  background-color: #666;
-  color: var(--white);
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background-color: #444;
-}
-
-.btn-success {
-  background-color: var(--success-green);
-  color: var(--white);
-}
-
-.btn-success:hover:not(:disabled) {
-  opacity: var(--opacity);
-}
-
-.btn-danger {
-  background-color: #e63e32;
-  color: var(--white);
-}
-
-.btn-danger:hover:not(:disabled) {
-  opacity: var(--opacity);
-}
-
-.btn-link {
-  background: transparent;
-  color: var(--dark-blue);
-  padding: 0;
-  text-decoration: underline;
-}
-
-.btn-link:hover:not(:disabled) {
-  color: var(--light-blue);
-  opacity: 1;
-}
-
-.btn-lg {
-  padding: 1rem 2rem;
-  font-size: 1rem !important;
+@media (prefers-reduced-motion: reduce) {
+  .btn, .car-filters-search-btn { transition: none; }
 }
 
 #block-10 p {

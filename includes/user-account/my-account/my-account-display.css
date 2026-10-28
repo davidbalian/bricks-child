@@ -62,10 +62,6 @@
   margin-top: 20px;
 }
 
-.account-section .btn {
-  font-size: 0.875rem;
-}
-
 .account-section .btn + .btn {
   margin-left: 10px;
 }

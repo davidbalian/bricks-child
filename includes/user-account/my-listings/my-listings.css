@@ -238,35 +238,9 @@
 
 .listing-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-top: auto;
-}
-
-.listing-actions .btn {
-  padding: 0.4rem 0.9rem;
-  border-radius: var(--border-radius-small);
-  text-decoration: none !important;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: opacity 0.1s ease;
-}
-
-.listing-actions .btn:hover {
-  opacity: 0.8;
-}
-
-.listing-actions .my-listing-edit-button {
-  border-color: var(--dark-blue);
-  background: var(--dark-blue);
-  color: #fff;
-  box-shadow: 0 4px 10px rgba(11, 114, 193, 0.18);
-}
-
-.listing-actions .my-listing-edit-button:hover,
-.listing-actions .my-listing-edit-button:focus-visible {
-  border-color: #095f9f;
-  background: #095f9f;
-  color: #fff;
 }
 
 .delete-button {

@@ -848,11 +848,6 @@ body.admin-bar .autoagora-single-car__gallery {
     line-height: var(--single-car-leading-ui);
 }
 
-.autoagora-single-car .autoagora-facebook-card-action .btn {
-    border-radius: var(--single-car-radius-pill);
-    font-size: var(--single-car-font-body);
-}
-
 @media (max-width: 1100px) {
     .autoagora-single-car__hero {
         grid-template-columns: minmax(0, 1.45fr) minmax(340px, 1fr);

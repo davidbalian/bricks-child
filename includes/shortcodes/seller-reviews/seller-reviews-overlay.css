@@ -257,10 +257,6 @@
   margin-top: 25px;
 }
 
-.form-actions .btn {
-  border-radius: 8px;
-}
-
 .form-messages {
   flex: 1;
 }
@@ -377,7 +373,6 @@
 
   .form-actions .btn {
     width: 100%;
-    padding: 14px 24px;
   }
 }
 

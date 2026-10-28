@@ -1,15 +1,7 @@
 # Button System Guidelines
 
-1. Always start with the shared `.btn` base class for any blue button. This provides padding, font, border radius, hover, and disabled behavior.
-2. Use color modifiers:
-   - `.btn-primary-gradient` for the dark-blue → light-blue gradient CTA.
-   - `.btn-primary` for solid light-blue buttons (`var(--light-blue)`).
-   - `.btn-secondary` for neutral gray actions.
-   - `.btn-success` for success/green actions (`var(--success-green)`).
-   - `.btn-danger` for destructive actions (`#e63e32`).
-   - `.btn-link` for text-only actions (underline + no padding).
-3. Size modifiers:
-   - Default `.btn` covers regular usage.
-   - `.btn-lg` is reserved for the primary submit buttons on the add/edit car listing flows.
-4. Width, layout, and context-specific tweaks should be applied in the local CSS (e.g., `.filter-submit-button { width: 100%; }`) without redefining padding/typography.
-5. Do not reintroduce legacy classes like `.gradient-button`, `.button-primary`, or `.submit-button`; migrate any new UI to the shared system above.
+1. All regular action buttons and button links use `.btn`. The shared appearance in `style.css` matches the homepage Search Cars button: solid blue, white 16px semibold text, 12px/24px padding, 8px corners, darker hover/active states and the pale blue focus ring.
+2. Existing modifiers (`.btn-primary`, `.btn-primary-gradient`, `.btn-secondary`, `.btn-success`, `.btn-danger`, `.btn-link`, `.btn-lg`) remain valid for markup/JS compatibility and now share the same appearance. Keep action labels and existing confirmation behaviour intact.
+3. Component CSS may set width, margins, alignment or wrapping; do not redefine button padding, typography, colour, radius, focus or disabled styling.
+4. Keep icon-only utility controls, dropdown fields and navigation links separate from action buttons.
+5. Do not introduce new legacy button classes. The homepage filter submit also uses `.btn`, with only its full width controlled locally.

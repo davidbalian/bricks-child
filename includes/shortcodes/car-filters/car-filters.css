@@ -425,30 +425,9 @@
     margin-top: 1rem;
 }
 
+/* Button appearance comes from the shared .btn system in style.css. */
 .car-filters-search-btn {
     width: 100%;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 0.5rem;
-    background-color: #0d86e3;
-    color: #ffffff;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease, opacity 0.2s ease;
-}
-
-.car-filters-search-btn:hover {
-    background-color: #0b75c9;
-}
-
-.car-filters-search-btn:active {
-    background-color: #0965b0;
-}
-
-.car-filters-search-btn:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(13, 134, 227, 0.3);
 }
 
 /* ============================================

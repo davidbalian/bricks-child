@@ -126,7 +126,7 @@ function car_filters_shortcode($atts) {
 
         <?php if ($atts['show_button'] === 'true') : ?>
             <div class="car-filters-button-wrapper">
-                <button type="button" class="car-filters-search-btn" data-group="<?php echo esc_attr($atts['group']); ?>">
+                <button type="button" class="car-filters-search-btn btn btn-primary" data-group="<?php echo esc_attr($atts['group']); ?>">
                     <?php echo esc_html($atts['button_text']); ?>
                 </button>
             </div>

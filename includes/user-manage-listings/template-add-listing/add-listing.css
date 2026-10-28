@@ -1445,14 +1445,7 @@ label svg path,
   border: 1px solid #4caf50;
 }
 
-/* Disabled Submit Button - kept for backwards compatibility but not used */
-.btn-primary-gradient.btn-disabled,
-.btn-primary-gradient:disabled {
-  background: linear-gradient(135deg, #9ca3af, #6b7280) !important;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
+/* Disabled submit appearance is defined by the shared button system. */
 /* Field Error State */
 .field-has-error .car-filter-dropdown-button,
 .field-has-error input[type="text"],
@@ -1566,22 +1559,6 @@ label svg path,
   padding: 0.5rem 1rem;
   background: var(--light-bg);
   border-radius: var(--border-radius-medium);
-}
-
-.json-import-controls .btn-link {
-  color: #dc2626;
-  text-decoration: none;
-  font-size: 0.9rem;
-  padding: 0.5rem 1rem;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.json-import-controls .btn-link:hover {
-  color: #991b1b;
-  text-decoration: underline;
 }
 
 .json-import-status {
