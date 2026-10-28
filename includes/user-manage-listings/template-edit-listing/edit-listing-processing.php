@@ -11,6 +11,7 @@ if (!defined('ABSPATH')) {
 
 // Include field validation functions
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/field-validation.php';
+require_once dirname(__DIR__) . '/car-field-writer.php';
 
 /**
  * Process edit listing form submission
@@ -54,92 +55,14 @@ function process_edit_listing_form($data, $car_id) {
         }
     }
     
-    $integer_fields = array(
-        'year',
-        'mileage',
-        'price',
-        'number_of_doors',
-        'number_of_seats',
-    );
-
-    foreach ($integer_fields as $field_key) {
-        if (isset($data[$field_key])) {
-            $value = trim((string) $data[$field_key]) === '' ? '' : intval($data[$field_key]);
-            update_field($field_key, $value, $car_id);
-        }
-    }
-
-    $text_fields = array(
-        'availability',
-        'engine_capacity',
-        'fuel_type',
-        'transmission',
-        'drive_type',
-        'body_type',
-        'exterior_color',
-        'interior_color',
-    );
-
-    foreach ($text_fields as $field_key) {
-        if (isset($data[$field_key])) {
-            update_field($field_key, sanitize_text_field($data[$field_key]), $car_id);
-        }
-    }
-
-    if (isset($data['description'])) {
-        update_field('description', wp_kses_post($data['description']), $car_id);
-    }
-    
-    // Update location-related fields
-    if (isset($data['car_city'])) {
-        update_field('car_city', sanitize_text_field($data['car_city']), $car_id);
-    }
-    if (isset($data['car_district'])) {
-        update_field('car_district', sanitize_text_field($data['car_district']), $car_id);
-    }
-    if (isset($data['car_latitude'])) {
-        update_field('car_latitude', floatval($data['car_latitude']), $car_id);
-    }
-    if (isset($data['car_longitude'])) {
-        update_field('car_longitude', floatval($data['car_longitude']), $car_id);
-    }
-    if (isset($data['car_address'])) {
-        update_field('car_address', sanitize_text_field($data['car_address']), $car_id);
-    }
-    
-    // Update optional fields
-    if (isset($data['hp'])) {
-        $hp_value = trim((string) $data['hp']) === '' ? '' : intval($data['hp']);
-        update_field('hp', $hp_value, $car_id);
-    }
-
-    // Update MOT status (optional)
-    if (isset($data['motuntil'])) {
-        $motuntil = sanitize_text_field($data['motuntil']);
-        update_field('motuntil', $motuntil, $car_id);
-    }
-    
-    // Update number of owners
-    if (isset($data['numowners'])) {
-        $numowners_value = !empty(trim($data['numowners'])) ? intval($data['numowners']) : '';
-        update_field('numowners', $numowners_value, $car_id);
-    }
-
-    $is_antique = isset($data['isantique']) ? 1 : 0;
-    update_field('isantique', $is_antique, $car_id);
-    
-    // Process vehicle history
-    $vehiclehistory = array();
-    if (isset($data['vehiclehistory']) && is_array($data['vehiclehistory'])) {
-        foreach ($data['vehiclehistory'] as $history_item) {
-            $vehiclehistory[] = sanitize_text_field($history_item);
-        }
-    }
-    update_field('vehiclehistory', $vehiclehistory, $car_id);
-    
-    // Process extras
-    $extras = isset($data['extras']) ? array_map('sanitize_text_field', $data['extras']) : array();
-    update_field('extras', $extras, $car_id);
+    // Preserve form semantics: absent checkboxes clear their existing values.
+    $save_data = $data;
+    // Make/model remain read-only in the existing website editor.
+    unset($save_data['make'], $save_data['model']);
+    $save_data['isantique'] = isset($data['isantique']) ? 1 : 0;
+    $save_data['extras'] = isset($data['extras']) ? (array) $data['extras'] : array();
+    $save_data['vehiclehistory'] = isset($data['vehiclehistory']) ? (array) $data['vehiclehistory'] : array();
+    autoagora_write_car_fields((int) $car_id, $save_data);
 
     // Keep post title aligned with add listing format when year changes
     if (!empty($data['year'])) {

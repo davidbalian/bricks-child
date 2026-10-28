@@ -15,6 +15,7 @@ if (!defined('WPINC')) {
 
 // Include field validation functions
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/field-validation.php';
+require_once __DIR__ . '/car-field-writer.php';
 
 // Include custom failure logger
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/car-submission-logger.php';
@@ -317,41 +318,13 @@ function handle_add_car_listing() {
         exit;
     }
 
-    // Add post meta for all the car details
-    update_field('make', $make, $post_id);
-    update_field('model', $model, $post_id);
-    // variant field save removed
-    update_field('year', $year, $post_id);
-    update_field('mileage', $mileage, $post_id);
-    update_field('price', $price, $post_id);
-    update_field('car_city', $city, $post_id);
-    update_field('car_district', $district, $post_id);
-    update_field('car_latitude', $latitude, $post_id);
-    update_field('car_longitude', $longitude, $post_id);
-    update_field('car_address', $address, $post_id);
-    update_field('engine_capacity', $engine_capacity, $post_id);
-    update_field('fuel_type', $fuel_type, $post_id);
-    update_field('transmission', $transmission, $post_id);
-    update_field('body_type', $body_type, $post_id);
-    update_field('drive_type', $drive_type, $post_id);
-    update_field('exterior_color', $exterior_color, $post_id);
-    update_field('interior_color', $interior_color, $post_id);
-    update_field('description', $description, $post_id);
-    update_field('number_of_doors', $number_of_doors, $post_id);
-    update_field('number_of_seats', $number_of_seats, $post_id);
-    update_field('motuntil', $motuntil, $post_id);
-    update_field('extras', $extras, $post_id);
-    update_field('availability', $availability, $post_id);
-    
-    // Update ACF fields
-    update_field('hp', $hp, $post_id);
-    update_field('numowners', $numowners, $post_id);
-    update_field('isantique', $isantique, $post_id);
-    
-    // Note: Using post_author field for ownership (original_author ACF field no longer needed)
-    
-    // Save vehicle history both as post meta and ACF field to ensure compatibility
-    update_field('vehiclehistory', $vehiclehistory, $post_id);
+    // Shared persistence also used by the dealer API; keep existing meta keys.
+    autoagora_write_car_fields((int) $post_id, array_merge($validation_data, array(
+        'make' => $make, 'model' => $model, 'description' => $description,
+        'car_city' => $city, 'car_district' => $district,
+        'car_latitude' => $latitude, 'car_longitude' => $longitude,
+        'car_address' => $address, 'motuntil' => $motuntil, 'isantique' => $isantique,
+    )));
 
     // Recalculate badges based on optional details (hp, vehicle history, extras, description, MOT, numowners)
     if (class_exists('Listing_Details_Badge_Manager')) {

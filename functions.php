@@ -68,6 +68,7 @@ require_once get_stylesheet_directory() . '/includes/user-account/my-listings/my
 require_once get_stylesheet_directory() . '/includes/core/enqueue.php';
 require_once get_stylesheet_directory() . '/includes/core/image-optimization.php';
 require_once get_stylesheet_directory() . '/includes/core/async-uploads.php';
+require_once get_stylesheet_directory() . '/includes/dealer-integration/init.php';
 require_once get_stylesheet_directory() . '/includes/auth/registration.php';
 require_once get_stylesheet_directory() . '/includes/auth/roles.php';
 require_once get_stylesheet_directory() . '/includes/auth/forgot-password-ajax.php';

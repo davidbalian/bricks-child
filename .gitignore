@@ -4,3 +4,10 @@ ignore.txt
 *Dealer Credentials*.clixml
 dealer-onboarding-auth.clixml
 dealer-onboarding.local.json
+
+# Dealer integration dependencies, isolated runtime, and secrets.
+/.staging/
+/.private/
+/tests/dealer-integration/results.local.json
+*.local.env
+/tests/**/__pycache__/

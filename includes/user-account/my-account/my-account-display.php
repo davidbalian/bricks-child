@@ -344,6 +344,9 @@ function display_my_account_main($current_user) {
         </div>
 
         <div class="account-actions">
+            <?php if (class_exists('AutoAgora\\Dealer\\Support') && \AutoAgora\Dealer\Support::ready() && \AutoAgora\Dealer\Support::eligible(get_current_user_id()) && (!\AutoAgora\Dealer\Review::privateMode() || \AutoAgora\Dealer\Review::admin())) : ?>
+                <a href="<?php echo esc_url(home_url('/?autoagora_connect=connections')); ?>" class="btn btn-secondary"><?php esc_html_e('Connected applications', 'bricks-child'); ?></a>
+            <?php endif; ?>
             <a href="<?php echo esc_url(wp_logout_url(autoagora_localized_page_url())); ?>" class="btn btn-primary"><?php esc_html_e('Logout', 'bricks-child'); ?></a>
         </div>
     </div>

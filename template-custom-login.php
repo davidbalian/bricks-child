@@ -79,7 +79,12 @@ get_header(); ?>
 								</p>
 								<p class="login-submit">
 									<input type="submit" name="wp-submit" id="wp-submit" class="btn btn-primary" value="<?php esc_attr_e( 'Log In', 'bricks-child' ); ?>" />
-									<input type="hidden" name="redirect_to" value="<?php echo esc_url( autoagora_localized_page_url() ); ?>" />
+									<?php
+                                    $integration_return = class_exists('AutoAgora\\Dealer\\OAuth')
+                                        ? \AutoAgora\Dealer\OAuth::loginReturn(isset($_GET['redirect_to']) ? wp_unslash($_GET['redirect_to']) : '')
+                                        : '';
+                                ?>
+                                <input type="hidden" name="redirect_to" value="<?php echo esc_url($integration_return !== '' ? $integration_return : autoagora_localized_page_url()); ?>" />
 									<input type="hidden" name="lang" value="<?php echo esc_attr( autoagora_current_language() ); ?>" />
 									<!-- Add custom redirect for failed login -->
 									<input type="hidden" name="login_failed_redirect" value="<?php echo esc_url( autoagora_localized_page_url( 'signin' ) ); ?>" />

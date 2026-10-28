@@ -78,7 +78,13 @@ Skip by default:
 
 ## No-Test Reality
 
-There is no local test runner, package script, PHPUnit config, or JS build system in this repository. Verification is mostly:
+Dealer integration now has an opt-in local WordPress fixture and real HTTP tests:
+`tests/dealer-integration/review_checks.py` (administrator-only default). Earlier OAuth/form contract suites are retained separately. See `docs/dealer-integration/README.md`.
+Keep all integration work/test data local until David authorizes a release.
+Never include `.private`, `.staging`, tokens, secrets or generated credentials in Git or deployment artifacts.
+The fixture uses synthetic schema/data and does not prove parity with production plugins/allowances.
+
+Outside that integration fixture there is no test runner, package script, PHPUnit config, or JS build system. Verification is mostly:
 
 - PHP syntax checks on edited PHP files if `php` is available.
 - Targeted manual reasoning through WordPress hooks/nonces/capability checks.

@@ -1,0 +1,29 @@
+{
+  "external_stock_id": "DEMO-STOCK-001",
+  "make": "BMW",
+  "model": "3 Series",
+  "year": 2020,
+  "mileage": 85000,
+  "price": 12500,
+  "availability": "In Stock",
+  "engine_capacity": "2.0",
+  "fuel_type": "Petrol",
+  "transmission": "Automatic",
+  "body_type": "Saloon",
+  "exterior_color": "Black",
+  "location": {
+    "address": "Synthetic showroom, Nicosia",
+    "city": "Nicosia",
+    "district": "Nicosia",
+    "latitude": 35.1727,
+    "longitude": 33.3639
+  },
+  "photos": [
+    {
+      "url": "https://images.example.com/fixture-one.png"
+    },
+    {
+      "url": "https://images.example.com/fixture-two.png"
+    }
+  ]
+}

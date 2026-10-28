@@ -292,6 +292,12 @@ function validate_numeric_range_field($field_name, $value) {
 function validate_car_listing_fields($data) {
     $errors = array();
     $allowed_fields = get_allowed_field_values();
+
+    foreach (array('extras', 'vehiclehistory') as $array_field) {
+        if (isset($data[$array_field]) && !is_array($data[$array_field])) {
+            $errors[] = sprintf(__('Field "%s" must be an array.', 'bricks-child'), $array_field);
+        }
+    }
     
     // Validate dropdown fields
     foreach ($allowed_fields as $field_name => $allowed_values) {

@@ -11,6 +11,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Redirect users based on their role after login.
  */
 function custom_login_redirect( $redirect_to, $request, $user ) {
+    if (class_exists('AutoAgora\\Dealer\\OAuth') && isset($user->ID)) {
+        $integration_return = \AutoAgora\Dealer\OAuth::loginReturn($request);
+        if ($integration_return !== '') { return $integration_return; }
+    }
     // Check if the user is logged in
     if ( isset( $user->roles ) && is_array( $user->roles ) ) {
         // Check if the user is an administrator
@@ -67,6 +71,10 @@ function redirect_login_page() {
                         (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], '/signin') !== false);
         
         if ($is_login_page) {
+            if (class_exists('AutoAgora\\Dealer\\OAuth')) {
+                $integration_return = \AutoAgora\Dealer\OAuth::loginReturn(isset($_GET['redirect_to']) ? wp_unslash($_GET['redirect_to']) : '');
+                if ($integration_return !== '') { wp_safe_redirect($integration_return); exit; }
+            }
             wp_redirect(autoagora_localized_page_url('my-account'));
             exit;
         }

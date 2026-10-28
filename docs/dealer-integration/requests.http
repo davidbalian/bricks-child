@@ -1,0 +1,49 @@
+# Request collection. Populate tokens only through a private REST-client environment.
+# The sample image URLs are served by the loopback fixture plugin, not a public image host.
+@base = http://127.0.0.1:8899/wp-json/autoagora-dealer/v1
+@accessToken = REPLACE_IN_PRIVATE_ENVIRONMENT
+@listingId = 123
+@version = "REPLACE_WITH_CURRENT_VERSION"
+
+### Current options and parent makes
+GET {{base}}/catalog?page=1
+Authorization: Bearer {{accessToken}}
+
+### Own stock
+GET {{base}}/listings?page=1&per_page=20
+Authorization: Bearer {{accessToken}}
+
+### Create pending stock (use a new external ID and key for a genuinely new car)
+POST {{base}}/listings
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+Idempotency-Key: sample-create-001
+
+< ./sample-vehicle.json
+
+### Read the current version before updating
+GET {{base}}/listings/{{listingId}}
+Authorization: Bearer {{accessToken}}
+
+### Update price, retaining omitted photos and optional fields
+PATCH {{base}}/listings/{{listingId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+Idempotency-Key: sample-update-001
+If-Match: {{version}}
+
+{"price":13000}
+
+### Withdraw and retain data/media
+POST {{base}}/listings/{{listingId}}/status
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+Idempotency-Key: sample-withdraw-001
+If-Match: {{version}}
+
+{"status":"withdrawn"}
+
+### Disconnect the current dealer/partner authorization
+DELETE {{base}}/connection
+Authorization: Bearer {{accessToken}}
+Idempotency-Key: sample-disconnect-001
