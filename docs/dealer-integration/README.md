@@ -62,3 +62,13 @@ The module lives in `includes/dealer-integration`. Its OAuth implementation is [
 There is no new paid license or service subscription. A hosted deployment would consume existing PHP, database and image storage resources; its capacity and any resulting cost have not been established.
 
 See [verification results](VERIFICATION.md), [API reference](API.md), [inspection and decisions](INSPECTION.md), and [deployment and rollback](DEPLOYMENT.md).
+
+## Password-only reviewers · 28 October 2026
+
+An administrator can now create an individual reviewer login from **Reviewer access** in the workspace. Username only is supported; no email is required or sent. The new account uses a dedicated WordPress role with only the integration-review capability, not an administrator or dealer role. Its password is generated from 192 bits of randomness and saved only through WordPress password hashing. The plaintext appears in the administrator's immediate, uncached response and is never put into a URL, log or persistent retrieval store.
+
+Share `/?autoagora_connect=review-login` and the password privately. Reviewer sign-in uses the normal WordPress authentication/cookie system, HTTPS outside the loopback fixture, a per-browser CSRF cookie, a host-prefixed secure cookie in HTTPS, and an account/IP limit of 5/20 attempts per 15-minute bucket. Sessions last one hour. Expiry defaults to 30 days (administrator-selectable 1–90 days). Revocation disables new access and destroys existing sessions. Reset/renew issues a new password and destroys prior sessions; no email reset link is needed.
+
+Reviewers can interact only with the tagged synthetic integration workspace and its tagged test images. They cannot reach WordPress admin, AJAX/admin-post, native WordPress REST, the dealer API, unrelated frontend submission flows, real dealer/listing records, untagged private files or reviewer management. Public queries continue excluding test data. Administrators and explicitly enabled, unexpired reviewers are the only workspace viewers. The earlier administrator-only release is now extended by this explicit reviewer exception.
+
+Run `python3 tests/dealer-integration/reviewer_checks.py` locally for the new boundaries. Never run these tests on the live site. Creating the specifically requested real reviewer login is account provisioning, not permission to populate live test stock or sign in as that reviewer for a production test.

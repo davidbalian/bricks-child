@@ -9,6 +9,7 @@ final class Review
     public const META = '_ag_dealer_sandbox';
     public const USER_META = '_ag_dealer_test_account';
     private static bool $writing = false;
+    private static bool $reading = false;
 
     public static function privateMode(): bool
     {
@@ -17,6 +18,37 @@ final class Review
     public static function admin(): bool
     {
         return current_user_can('manage_options') && in_array('administrator', (array) wp_get_current_user()->roles, true);
+    }
+    public static function canWorkspace(): bool
+    {
+        return self::admin() || Reviewer::allowed();
+    }
+    public static function read(callable $work)
+    {
+        $old = self::$reading;
+        self::$reading = self::canWorkspace();
+        try { return $work(); } finally { self::$reading = $old; }
+    }
+    private static function mediaAllowed(string $file): bool
+    {
+        if (self::admin()) { return true; }
+        if (!Reviewer::allowed()) { return false; }
+        global $wpdb;
+        $relative = substr($file, strlen(self::storage()) + 1);
+        $original = preg_replace('/-\d+x\d+(?=\.[a-z]+$)/i', '', $relative);
+        $paths = array_unique([$file, $relative, self::storage() . '/' . $original, $original]);
+        $placeholders = implode(',', array_fill(0, count($paths), '%s'));
+        $ids = $wpdb->get_col($wpdb->prepare("SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key='_wp_attached_file' AND meta_value IN ($placeholders)", array_values($paths)));
+        foreach ($ids as $id) {
+            if (!self::hidden((int) $id) || !self::testDealer((int) get_post_field('post_author', $id))) { continue; }
+            $attached = get_attached_file((int) $id);
+            if (realpath($attached) === $file) { return true; }
+            $metadata = wp_get_attachment_metadata((int) $id);
+            foreach (($metadata['sizes'] ?? []) as $size) {
+                if (!empty($size['file']) && realpath(dirname($attached) . '/' . basename($size['file'])) === $file) { return true; }
+            }
+        }
+        return false;
     }
     public static function testDealer(int $id): bool
     {
@@ -60,12 +92,12 @@ final class Review
         add_action('add_attachment', $tagAttachment, 1);
         add_action('edit_attachment', $tagAttachment, 1);
         add_filter('posts_where', static function ($where) {
-            if (self::admin()) { return $where; }
+            if (self::admin() || self::$reading) { return $where; }
             global $wpdb;
             return $where . " AND NOT EXISTS (SELECT 1 FROM {$wpdb->postmeta} ag_review_private WHERE ag_review_private.post_id = {$wpdb->posts}.ID AND ag_review_private.meta_key = '" . self::META . "' AND ag_review_private.meta_value = '1')";
         }, 99);
         add_action('pre_user_query', static function ($query) {
-            if (self::admin()) { return; }
+            if (self::admin() || self::$reading) { return; }
             global $wpdb;
             $query->query_where .= " AND NOT EXISTS (SELECT 1 FROM {$wpdb->usermeta} ag_review_user WHERE ag_review_user.user_id = {$wpdb->users}.ID AND ag_review_user.meta_key = '" . self::USER_META . "' AND ag_review_user.meta_value = '1')";
         });
@@ -89,7 +121,7 @@ final class Review
         }, PHP_INT_MAX, 3);
         add_action('template_redirect', static function () {
             $action = $_GET['autoagora_connect'] ?? '';
-            if (self::privateMode() && is_string($action) && in_array($action, ['authorize', 'connections', 'workspace'], true) && !self::admin()) {
+            if (self::privateMode() && is_string($action) && in_array($action, ['authorize', 'connections', 'workspace'], true) && !($action === 'workspace' ? self::canWorkspace() : self::admin())) {
                 self::notFound();
             }
             if (!self::admin() && is_singular() && self::hidden((int) get_queried_object_id())) { self::notFound(); }
@@ -97,11 +129,12 @@ final class Review
             $path = wp_parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
             $base = (wp_parse_url(home_url('/'), PHP_URL_PATH) ?: '/') . 'ag-review-media/';
             if (is_string($path) && str_starts_with($path, $base)) {
-                if (!self::admin() || !self::storage()) { self::notFound(); }
+                if (!self::canWorkspace() || !self::storage()) { self::notFound(); }
                 $relative = rawurldecode(substr($path, strlen($base)));
                 $root = realpath(self::storage());
                 $file = $root ? realpath($root . '/' . $relative) : false;
                 if (!$file || !str_starts_with($file, $root . '/') || !is_file($file) || !in_array(strtolower(pathinfo($file, PATHINFO_EXTENSION)), ['png', 'jpg', 'jpeg', 'webp', 'gif'], true)) { self::notFound(); }
+                if (!self::mediaAllowed($file)) { self::notFound(); }
                 nocache_headers();
                 header('X-Robots-Tag: noindex, nofollow');
                 header('X-Content-Type-Options: nosniff');

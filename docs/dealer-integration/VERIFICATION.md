@@ -60,3 +60,9 @@ Hosted plugin/schema parity, real partner callback details, hosting capacity/tim
 ## Release preparation · 28 October 2026
 
 The complete 77-check administrator review suite passed again locally after adding explicit deployment activation. Fourteen additional local installation checks passed: administrator/nonce enforcement, outside-web-root key/media setup, configuration reload, private-mode enforcement despite a public flag, an unchanged user/post/client/grant count, and administrator-only workspace rendering. Hosted listing business-rule approval remains unset. No production test is part of this release.
+
+## Password-protected reviewer access · 28 October 2026
+
+70 new local reviewer checks passed. They verify username-only account creation, hashing/entropy, administrator CSRF/role checks, masked one-time credentials, browser-bound login CSRF, generic authentication failure, rejection of administrator credentials on the reviewer endpoint, one-hour sessions, blocked backend/API/unrelated form access, real-data isolation, tagged synthetic dealer/stock actions and images, untagged image denial, native-login bypass denial, logout, immediate expiry/revocation, reset/renewal, old-password invalidation and 15-minute rate limits with hashed identifiers. The existing 77 private-review and 14 installation checks passed again. Total: 161 local checks.
+
+The login page and reviewer-management layout were also inspected in the local browser. No production login tests or sample dealer/listing creation were performed. Any production reviewer-account activation needs the administrator's deliberate provisioning action.

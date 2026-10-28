@@ -5,6 +5,8 @@ defined('ABSPATH') || exit;
 require_once __DIR__ . '/Support.php';
 require_once __DIR__ . '/Schema.php';
 require_once __DIR__ . '/Review.php';
+require_once __DIR__ . '/Reviewer.php';
+\AutoAgora\Dealer\Reviewer::bootstrap();
 require_once __DIR__ . '/Installation.php';
 \AutoAgora\Dealer\Installation::load();
 \AutoAgora\Dealer\Installation::bootstrap();

@@ -79,7 +79,7 @@ Skip by default:
 ## No-Test Reality
 
 Dealer integration now has an opt-in local WordPress fixture and real HTTP tests:
-`tests/dealer-integration/review_checks.py` (administrator-only default). Earlier OAuth/form contract suites are retained separately. See `docs/dealer-integration/README.md`.
+`tests/dealer-integration/review_checks.py` (administrator-only default). Password-only approved reviewer access is covered by `tests/dealer-integration/reviewer_checks.py`; reviewers have a separate limited role, no backend/API access, and can see only the private synthetic workspace. Earlier OAuth/form contract suites are retained separately. See `docs/dealer-integration/README.md`.
 Keep all integration work/test data local until David authorizes a release.
 Never include `.private`, `.staging`, tokens, secrets or generated credentials in Git or deployment artifacts.
 The fixture uses synthetic schema/data and does not prove parity with production plugins/allowances.

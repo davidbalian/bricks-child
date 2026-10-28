@@ -2,6 +2,8 @@
   'use strict';
   let trigger = null;
   document.addEventListener('click', (event) => {
+    const toggle = event.target.closest('[data-toggle-password]');
+    if (toggle) { const field = document.getElementById(toggle.dataset.togglePassword); if (field) { const show = field.type === 'password'; field.type = show ? 'text' : 'password'; toggle.textContent = show ? 'Hide password' : 'Show password'; } }
     const open = event.target.closest('[data-open]');
     if (open) {
       const dialog = document.getElementById(open.dataset.open);
@@ -28,6 +30,6 @@
     const form = event.target;
     if (form.dataset.confirm && !window.confirm(form.dataset.confirm)) { event.preventDefault(); return; }
     const submit = event.submitter;
-    if (submit) { submit.disabled = true; submit.textContent = 'Saving…'; }
+    if (submit) { submit.disabled = true; submit.textContent = form.hasAttribute('data-review-login') ? 'Signing in…' : 'Saving…'; }
   });
 })();

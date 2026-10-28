@@ -21,6 +21,12 @@ final class Workspace
             });
         });
     }
+    public static function tabs(): array
+    {
+        $tabs = ['connections' => ['link', 'Connections'], 'stock' => ['car-side', 'Dealer stock'], 'activity' => ['clock-rotate-left', 'Activity']];
+        if (Review::admin()) { $tabs['access'] = ['shield-check', 'Reviewer access']; }
+        return $tabs;
+    }
     public static function url(array $args = []): string
     {
         return add_query_arg(['autoagora_connect' => 'workspace'] + $args, home_url('/'));
@@ -40,7 +46,7 @@ final class Workspace
     public static function render(): void
     {
         if (($_GET['autoagora_connect'] ?? '') !== 'workspace') { return; }
-        if (!Review::admin()) { status_header(404); echo 'Not found.'; exit; }
+        if (!Review::canWorkspace()) { status_header(404); echo 'Not found.'; exit; }
         nocache_headers();
         header('X-Robots-Tag: noindex, nofollow, noarchive');
         header('Referrer-Policy: same-origin');
@@ -58,29 +64,29 @@ final class Workspace
             }
             if (is_wp_error($result)) { $notice = ['error', $result->get_error_message()]; }
             else {
-                wp_safe_redirect(self::url(['tab' => in_array($_POST['return_tab'] ?? '', ['connections', 'stock', 'activity'], true) ? $_POST['return_tab'] : 'connections', 'saved' => $result]));
+                wp_safe_redirect(self::url(['tab' => in_array($_POST['return_tab'] ?? '', array_keys(self::tabs()), true) ? $_POST['return_tab'] : 'connections', 'saved' => $result]));
                 exit;
             }
         }
-        $tab = isset($_GET['tab']) && is_string($_GET['tab']) && in_array($_GET['tab'], ['connections', 'stock', 'activity'], true) ? $_GET['tab'] : 'connections';
+        $tab = isset($_GET['tab']) && is_string($_GET['tab']) && in_array($_GET['tab'], array_keys(self::tabs()), true) ? $_GET['tab'] : 'connections';
         $search = isset($_GET['q']) && is_string($_GET['q']) ? substr(sanitize_text_field(wp_unslash($_GET['q'])), 0, 80) : '';
         $dealerFilter = isset($_GET['dealer']) && is_scalar($_GET['dealer']) ? absint($_GET['dealer']) : 0;
         try {
             if (!Support::ready()) { throw new \RuntimeException('Not configured'); }
-            $state = self::data($tab, $search, $dealerFilter);
+            $state = Review::read(static fn () => self::data($tab, $search, $dealerFilter));
         } catch (\Throwable $error) {
             $notice = ['error', 'The integration is not configured for changes. No public content has been affected.'];
             $state = ['clients' => [], 'dealers' => [], 'dealerIds' => [], 'connections' => [], 'stock' => (object) ['posts' => [], 'found_posts' => 0, 'max_num_pages' => 0], 'total' => 0, 'counts' => [], 'events' => []];
         }
         $saved = isset($_GET['saved']) && is_string($_GET['saved']) ? $_GET['saved'] : '';
-        $messages = ['dealer_created' => 'Test dealer created. Its profile is private.', 'connected' => 'Test connection authorized.', 'disconnected' => 'Application access disconnected.', 'stock_created' => 'Sample stock added for private review.', 'stock_updated' => 'Stock changes saved for review.', 'sold' => 'Stock marked sold.', 'withdrawn' => 'Stock withdrawn. Its details and photos are retained.'];
+        $messages = ['dealer_created' => 'Test dealer created. Its profile is private.', 'connected' => 'Test connection authorized.', 'disconnected' => 'Application access disconnected.', 'reviewer_revoked' => 'Reviewer access revoked. Existing sessions have been signed out.', 'stock_created' => 'Sample stock added for private review.', 'stock_updated' => 'Stock changes saved for review.', 'sold' => 'Stock marked sold.', 'withdrawn' => 'Stock withdrawn. Its details and photos are retained.'];
         if (!$notice && isset($messages[$saved])) { $notice = ['success', $messages[$saved]]; }
         require __DIR__ . '/workspace-template.php';
         exit;
     }
     private static function perform(array $input)
     {
-        if (!Review::admin() || !Review::privateMode() || !Support::ready()) { return Support::error('review_unavailable', 'This private workspace is not ready for changes.', 503); }
+        if (!Review::canWorkspace() || !Review::privateMode() || !Support::ready()) { return Support::error('review_unavailable', 'This private workspace is not ready for changes.', 503); }
         $action = $input['workspace_action'] ?? '';
         if (!is_string($action)) { return Support::error('invalid_action', 'Choose an available action.'); }
         return Review::sandbox(static function () use ($input, $action) {
@@ -174,6 +180,7 @@ final class Workspace
         $counts = $wpdb->get_results($wpdb->prepare("SELECT p.post_author, COUNT(DISTINCT p.ID) AS count FROM {$wpdb->posts} p JOIN {$wpdb->postmeta} m ON m.post_id=p.ID WHERE p.post_type='car' AND p.post_status NOT IN ('trash','auto-draft') AND m.meta_key=%s AND m.meta_value='1' GROUP BY p.post_author", Review::META), OBJECT_K);
         $events = $wpdb->get_results('SELECT event,client_id,dealer_id,listing_id,created_at FROM ' . Support::table('audit') . ' ORDER BY id DESC LIMIT 50', ARRAY_A);
         $events = array_values(array_filter($events, static fn ($e) => in_array((int) $e['dealer_id'], $dealerIds, true)));
-        return compact('clients', 'dealers', 'dealerIds', 'connections', 'stock', 'total', 'counts', 'events');
+        $reviewers = Review::admin() && $tab === 'access' ? get_users(['role' => Reviewer::ROLE, 'number' => 100, 'orderby' => 'ID', 'order' => 'DESC']) : [];
+        return compact('clients', 'dealers', 'dealerIds', 'connections', 'stock', 'total', 'counts', 'events', 'reviewers');
     }
 }
