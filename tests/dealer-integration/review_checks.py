@@ -37,7 +37,10 @@ def main():
     status, headers, _, raw = page(admin)
     check('administrator workspace renders', status, 200)
     check('workspace is uncached and noindexed', 'no-store' in headers.get('Cache-Control','') and 'noindex' in headers.get('X-Robots-Tag',''))
-    check('workspace uses existing shared style and brand', '/style.css' in raw and 'autoagora-logo.png' in raw and 'btn btn-primary' in raw)
+    check('workspace uses bundled Tabler components and brand', '/tabler/tabler-1.7.1.min.css' in raw and 'autoagora-logo.png' in raw and 'card-header' in raw and 'form-control' in raw and 'icon-tabler' in raw)
+    check('dashboard does not import marketplace styles', '/style.css' not in raw)
+    public_home = h.request(h.BASE + '/')[3]
+    check('Tabler and workspace CSS stay off the public site', '/assets/tabler/' not in public_home and '/assets/workspace.css' not in public_home)
     check('workspace contains no client secrets or passwords', all(item not in raw for item in [h.CLIENT['client_secret'], h.ACCOUNTS['admin']['password']]))
     check('missing form nonce is rejected', action(admin, {'workspace_action':'add_dealer','dealer_name':'CSRF blocked'}, '')[0], 403)
     name = 'Review Motors ' + secrets.token_hex(3)

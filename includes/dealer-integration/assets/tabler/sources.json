@@ -1,0 +1,14 @@
+[
+  {
+    "package": "@tabler/core",
+    "version": "1.7.1",
+    "source": "https://registry.npmjs.org/@tabler/core/-/core-1.7.1.tgz",
+    "integrity": "sha512-sC42sr/uslr7kIZwyBPESWJKRm1E4hYAMMZyLDoyG0ZlEOlglRW0L5c1gf8x6i+QApT+AtHm10fDP1j2WgQJpg=="
+  },
+  {
+    "package": "@tabler/icons",
+    "version": "3.50.0",
+    "source": "https://registry.npmjs.org/@tabler/icons/-/icons-3.50.0.tgz",
+    "integrity": "sha512-HflLxyrH1cqC7s7jzQGSjpsTAVIoaf7+/yHjbdM59rJQBMjliibp+LYhDPFxOMcwa1M8DNpOk6ENzQiWn9a1Dg=="
+  }
+]

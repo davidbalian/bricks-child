@@ -33,9 +33,14 @@ final class Workspace
     }
     public static function icon(string $name): string
     {
-        $allowed = ['link', 'car-side', 'building', 'shield-check', 'arrow-right', 'plus', 'gear', 'list-check', 'arrow-up', 'arrow-down', 'xmark', 'circle-check', 'circle-info', 'clock-rotate-left'];
-        if (!in_array($name, $allowed, true) || !is_file(get_stylesheet_directory() . '/assets/svg/regular/' . $name . '.svg')) { return ''; }
-        return '<img class="agw-icon" src="' . esc_url(get_stylesheet_directory_uri() . '/assets/svg/regular/' . $name . '.svg') . '" width="18" height="18" alt="" aria-hidden="true">';
+        $icons = ['link' => 'link', 'car-side' => 'car', 'building' => 'building-store', 'shield-check' => 'shield-check', 'arrow-right' => 'arrow-right', 'plus' => 'plus', 'gear' => 'settings', 'list-check' => 'list-check', 'arrow-up' => 'arrow-up', 'arrow-down' => 'arrow-down', 'xmark' => 'x', 'circle-check' => 'circle-check', 'circle-info' => 'info-circle', 'clock-rotate-left' => 'history'];
+        if (!isset($icons[$name])) { return ''; }
+        $file = __DIR__ . '/assets/tabler/icons/' . $icons[$name] . '.svg';
+        if (!is_readable($file)) { return ''; }
+        // Only bundled, allowlisted SVGs are inlined; currentColor follows the component.
+        $svg = file_get_contents($file);
+        $svg = str_replace('<svg ', '<svg aria-hidden="true" focusable="false" ', $svg);
+        return preg_replace('/class="([^"]*)"/', 'class="agw-icon $1"', $svg, 1);
     }
     public static function nonce(): void { wp_nonce_field('ag-workspace', 'workspace_nonce'); }
     public static function clientName(string $id, array $clients): string
