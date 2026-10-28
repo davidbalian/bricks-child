@@ -7,6 +7,7 @@ use AutoAgora\Dealer\Listings;
 use AutoAgora\Dealer\Reviewer;
 $assets = get_stylesheet_directory_uri() . '/includes/dealer-integration/assets/';
 $user = wp_get_current_user();
+$pageTitle = ['connections' => 'Dealer connections', 'stock' => 'Dealer stock', 'activity' => 'Integration activity', 'access' => 'Reviewer access'][$tab];
 $dealerNames = [];
 foreach ($state['dealers'] as $dealer) { $dealerNames[(int) $dealer->ID] = $dealer->display_name; }
 $connectionRows = [];
@@ -20,7 +21,7 @@ foreach ($state['dealers'] as $dealer) {
 }
 ?>
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title>Dealer integrations · AutoAgora</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title><?php echo esc_html($pageTitle); ?> · AutoAgora</title>
 <link rel="stylesheet" href="<?php echo esc_url($assets . 'tabler/tabler-1.7.1.min.css?v=1.7.1'); ?>">
 <link rel="stylesheet" href="<?php echo esc_url($assets . 'workspace.css?v=' . filemtime(__DIR__ . '/assets/workspace.css')); ?>">
 <style>@font-face{font-family:Inter;font-style:normal;font-weight:100 900;font-display:swap;src:url(<?php echo esc_url(get_template_directory_uri() . '/assets/fonts/builder/Inter.woff2'); ?>) format('woff2')}</style>
@@ -29,7 +30,7 @@ foreach ($state['dealers'] as $dealer) {
 <a class="agw-skip" href="#workspace-main">Skip to workspace</a>
 <header class="navbar agw-header">
     <a class="agw-brand" href="<?php echo esc_url(Workspace::url()); ?>" aria-label="AutoAgora integrations"><img src="<?php echo esc_url($assets . 'autoagora-logo.png'); ?>" width="160" height="34" alt="AutoAgora"></a>
-    <span class="agw-header-label">Dealer integrations</span>
+    <span class="agw-header-label"><?php echo esc_html($pageTitle); ?></span>
     <div class="agw-header-end"><span class="agw-environment"><span></span><?php echo wp_get_environment_type() === 'local' ? 'Local environment' : 'Private review'; ?></span><?php if (Review::admin()) : ?><a class="agw-admin-link" href="<?php echo esc_url(admin_url()); ?>">WordPress admin <?php echo Workspace::icon('arrow-right'); ?></a><?php else : ?><form method="post" action="<?php echo esc_url(Reviewer::url('review-logout')); ?>"><?php wp_nonce_field('ag-review-logout', 'review_nonce'); ?><button class="btn btn-primary">Sign out</button></form><?php endif; ?><span class="avatar avatar-rounded agw-avatar" title="<?php echo Review::admin() ? 'Administrator' : 'Reviewer'; ?>"><?php echo esc_html(strtoupper(substr($user->display_name, 0, 1))); ?></span></div>
 </header>
 <div class="agw-shell">
@@ -39,7 +40,7 @@ foreach ($state['dealers'] as $dealer) {
         <?php endforeach; ?>
     </nav><?php if (Review::admin()) : ?><a class="agw-tools-link" href="<?php echo esc_url(admin_url('tools.php')); ?>">Back to tools <?php echo Workspace::icon('arrow-right'); ?></a><?php endif; ?></aside>
     <main id="workspace-main" class="agw-main">
-        <div class="agw-title-row"><div><h1><?php echo esc_html(['connections' => 'Dealer connections', 'stock' => 'Dealer stock', 'activity' => 'Integration activity', 'access' => 'Reviewer access'][$tab]); ?></h1></div><?php if ($tab === 'connections') : ?><button class="btn btn-primary" type="button" data-open="add-dealer"><?php echo Workspace::icon('plus'); ?>Add test dealer</button><?php endif; ?></div>
+        <div class="agw-title-row"><div><h1><?php echo esc_html($pageTitle); ?></h1></div><?php if ($tab === 'connections') : ?><button class="btn btn-primary" type="button" data-open="add-dealer"><?php echo Workspace::icon('plus'); ?>Add test dealer</button><?php endif; ?></div>
         <div class="alert alert-info agw-privacy"><?php echo Workspace::icon('shield-check'); ?><p><strong>Private workspace.</strong> Test data is hidden from the public site.</p></div>
         <?php if ($notice) : ?><div class="alert <?php echo $notice[0] === 'error' ? 'alert-danger' : 'alert-success'; ?> agw-notice" role="status"><?php echo Workspace::icon('circle-info'); ?><?php echo esc_html($notice[1]); ?></div><?php endif; ?>
         <section class="agw-metrics" aria-label="Workspace summary">

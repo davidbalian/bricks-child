@@ -32,10 +32,10 @@ html:has(body.agw) {
 .agw-icon { width: 20px; height: 20px; flex-shrink: 0; vertical-align: middle; }
 .agw .btn .agw-icon { margin-inline: 0 .35rem; }
 .agw .btn-icon .agw-icon { margin: 0; }
-.agw-header { min-height: 76px; padding: 16px 32px; gap: 24px; justify-content: start; }
+.agw-header { min-height: 76px; padding: 16px 32px; gap: 24px; justify-content: start; align-items: center; }
 .agw-brand { display: flex; align-items: center; }
 .agw-brand img { width: 155px; height: auto; }
-.agw-header-label { padding-left: 24px; border-left: 1px solid var(--tblr-border-color); color: var(--tblr-secondary); }
+.agw-header-label { display: flex; align-items: center; min-height: 34px; padding-left: 24px; border-left: 1px solid var(--tblr-border-color); color: var(--tblr-secondary); }
 .agw-header-end { margin-left: auto; display: flex; align-items: center; gap: 24px; }
 .agw-header-end form { margin: 0; }
 .agw-environment { display: flex; align-items: center; gap: 8px; color: var(--tblr-secondary); font-size: 12px; }
