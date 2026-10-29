@@ -25,3 +25,5 @@ Sync with `python3 tests/dealer-integration/sync-local.py`. Run the existing `re
 ## Reusable buttons
 
 The approved button appearance lives in `assets/button-kit/buttons.css`, shared by the dashboard and reviewer templates. The `ag-buttons` wrapper opts in. See `assets/button-kit/README.md` and `preview.html` for reuse, colors, weights, states and icon placement. The numeric `--ag-button-weight` token controls both text and SVG stroke, so changing text weight keeps them paired. Navigation icons are unaffected.
+
+Button kit v1.1 uses shared control tokens: single-line inputs, selects and labeled buttons default to 48px high with 16px text and a 24px line height. Textareas retain their row-based height. Filter bars, dialogs, reviewer management, sign-in and credential receipts use the same sizing rules.

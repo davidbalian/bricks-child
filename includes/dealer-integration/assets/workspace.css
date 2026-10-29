@@ -56,7 +56,6 @@ html:has(body.agw) {
 .agw-search { flex: 1 1 200px; min-width: 100px; }
 .agw-filters>label:not(.agw-search) { flex: 0 1 210px; min-width: 160px; }
 .agw-filters label { margin: 0; }
-.agw-filters .form-control, .agw-filters .form-select { min-height: 48px; }
 .agw-table-wrap { overscroll-behavior-x: contain; }
 .agw-table { margin: 0; }
 .agw-table th, .agw-table td { padding: 18px 20px; }
@@ -107,7 +106,6 @@ dialog.agw-dialog:not([open]) { display: none; }
 .agw-review-access>p { color: var(--tblr-secondary); margin-top: 8px; }
 .agw-access-form { display: grid; grid-template-columns: 1fr 160px auto; gap: 16px; align-items: end; margin: 24px 0; }
 .agw-access-form .agw-field { margin: 0; }
-.agw-access-form .form-control, .agw-access-form .form-select { min-height: 48px; }
 .agw-reviewer-list { margin-top: 24px; }
 .agw-row-actions form+form { margin-top: 8px; }
 .agw-login-shell { width: min(460px, calc(100% - 32px)); margin: 64px auto 32px; }
