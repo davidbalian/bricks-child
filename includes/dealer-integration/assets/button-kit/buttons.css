@@ -1,4 +1,4 @@
-/* AutoAgora Buttons v1.1.0 — load after Tabler 1.7.1.
+/* AutoAgora Buttons v1.2.0 — load after Tabler 1.7.1.
    Opt in with .ag-buttons on a wrapper; no rules apply outside that wrapper. */
 .ag-buttons .btn {
   --tblr-btn-font-weight: var(--ag-button-weight, 600);
@@ -36,6 +36,8 @@
   margin-inline: 0 .35rem;
 }
 .ag-buttons .btn-icon {
+  min-width: 44px;
+  min-height: 44px;
   /* Utility buttons have no visible text; keep their regular icon weight. */
   --tblr-btn-font-weight: var(--ag-button-weight, 400);
 }

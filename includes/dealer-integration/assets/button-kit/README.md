@@ -1,4 +1,4 @@
-# AutoAgora Buttons · v1.1
+# AutoAgora Buttons · v1.2
 
 The approved AutoAgora dashboard button styling, built on Tabler 1.7.1. Includes blue/white colors, subtle Tabler gradient and shadow, 8px corners, 16px text, 12px/24px padding, hover/focus/disabled states, and SVG strokes paired with text weight. Text inputs and selects share the buttons’ 48px height and 16px text. Textareas keep their row-based height and use the same text size.
 
@@ -43,7 +43,7 @@ Set tokens on the wrapper or an individual button:
 
 Use numeric weights `400` (regular), `500` (medium), `600` (semibold, default) or `700` (bold). Text and SVG stroke derive from the same token. Change `--ag-button-weight`, rather than overriding `font-weight` independently. The icon must be an inline stroke SVG with `.icon`; an `<img>` cannot inherit its stroke. Keep `aria-hidden="true"` on decorative icons and a text label; icon-only controls need an `aria-label`.
 
-For an icon at the end, add `.icon-end` (Tabler handles its spacing); for an icon-only utility use `.btn-icon`. Add `disabled` to a disabled button. Existing form, link and permission behavior stays with the application.
+For an icon at the end, add `.icon-end` (Tabler handles its spacing); for an icon-only utility use `.btn-icon` (44px minimum touch target). Add `disabled` to a disabled button. Existing form, link and permission behavior stays with the application.
 
 Use Tabler’s `.form-control` on text, search, number, password and readonly inputs; use `.form-select` on selects and `.form-control` on textareas. The wrapper applies the shared control sizing everywhere, including dialogs and sign-in forms. Checkbox/radio controls and icon-only utility buttons retain their appropriate sizes.
 
