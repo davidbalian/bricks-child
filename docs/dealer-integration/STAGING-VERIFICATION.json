@@ -1,0 +1,296 @@
+{
+  "environment": "https://staging7.autoagora.cy",
+  "production_requests": 0,
+  "checks": [
+    {
+      "check": "staging is authenticated, noindex and explicitly isolated",
+      "passed": true
+    },
+    {
+      "check": "anonymous integration API denied",
+      "passed": true
+    },
+    {
+      "check": "native user REST blocked",
+      "passed": true
+    },
+    {
+      "check": "private configuration cannot be downloaded",
+      "passed": true
+    },
+    {
+      "check": "qa_one username/password login without admin privileges",
+      "passed": true
+    },
+    {
+      "check": "real consent form renders",
+      "passed": true
+    },
+    {
+      "check": "callback returns session state",
+      "passed": true
+    },
+    {
+      "check": "code + S256 PKCE issues access and refresh tokens",
+      "passed": true
+    },
+    {
+      "check": "authorization code is single use",
+      "passed": true
+    },
+    {
+      "check": "qa_one username/password login without admin privileges",
+      "passed": true
+    },
+    {
+      "check": "plain PKCE rejected",
+      "passed": true
+    },
+    {
+      "check": "qa_one username/password login without admin privileges",
+      "passed": true
+    },
+    {
+      "check": "real consent form renders",
+      "passed": true
+    },
+    {
+      "check": "dealer can cancel authorization",
+      "passed": true
+    },
+    {
+      "check": "qa_two username/password login without admin privileges",
+      "passed": true
+    },
+    {
+      "check": "real consent form renders",
+      "passed": true
+    },
+    {
+      "check": "callback returns session state",
+      "passed": true
+    },
+    {
+      "check": "code + S256 PKCE issues access and refresh tokens",
+      "passed": true
+    },
+    {
+      "check": "qa_two username/password login without admin privileges",
+      "passed": true
+    },
+    {
+      "check": "real consent form renders",
+      "passed": true
+    },
+    {
+      "check": "callback returns session state",
+      "passed": true
+    },
+    {
+      "check": "code + S256 PKCE issues access and refresh tokens",
+      "passed": true
+    },
+    {
+      "check": "read-only grant cannot post cars",
+      "passed": true
+    },
+    {
+      "check": "test dealer cannot enter WordPress backend",
+      "passed": true
+    },
+    {
+      "check": "native AJAX mutation blocked",
+      "passed": true
+    },
+    {
+      "check": "catalog uses actual hosted taxonomy",
+      "passed": true
+    },
+    {
+      "check": "dealer showroom can be saved",
+      "passed": true
+    },
+    {
+      "check": "showroom persists through API",
+      "passed": true
+    },
+    {
+      "check": "invalid catalog model rejected",
+      "passed": true
+    },
+    {
+      "check": "minimum two photos enforced",
+      "passed": true
+    },
+    {
+      "check": "real HTTPS image import creates a published staging car",
+      "passed": true
+    },
+    {
+      "check": "idempotent replay returns same car",
+      "passed": true
+    },
+    {
+      "check": "duplicate external stock ID rejected",
+      "passed": true
+    },
+    {
+      "check": "another dealer list cannot reveal this car",
+      "passed": true
+    },
+    {
+      "check": "another dealer cannot read this car",
+      "passed": true
+    },
+    {
+      "check": "another dealer cannot change this car",
+      "passed": true
+    },
+    {
+      "check": "real optimized gallery is saved",
+      "passed": true
+    },
+    {
+      "check": "normal single-car page renders imported car and price",
+      "passed": true
+    },
+    {
+      "check": "normal marketplace displays imported car",
+      "passed": true
+    },
+    {
+      "check": "anonymous visitors cannot see staged cars",
+      "passed": true
+    },
+    {
+      "check": "missing update version rejected",
+      "passed": true
+    },
+    {
+      "check": "price and photo order update succeeds",
+      "passed": true
+    },
+    {
+      "check": "updated price, publication and photo order persist",
+      "passed": true
+    },
+    {
+      "check": "stale update cannot overwrite newer data",
+      "passed": true
+    },
+    {
+      "check": "private photo destination rejected",
+      "passed": true
+    },
+    {
+      "check": "failed photo import preserves price and gallery",
+      "passed": true
+    },
+    {
+      "check": "sold status persists",
+      "passed": true
+    },
+    {
+      "check": "sold single follows existing marketplace redirect",
+      "passed": true
+    },
+    {
+      "check": "withdrawal retains draft rather than deleting",
+      "passed": true
+    },
+    {
+      "check": "withdrawn car keeps both photos",
+      "passed": true
+    },
+    {
+      "check": "withdrawn single is hidden",
+      "passed": true
+    },
+    {
+      "check": "unverified view counts are unavailable",
+      "passed": true
+    },
+    {
+      "check": "refresh rotates credentials",
+      "passed": true
+    },
+    {
+      "check": "old refresh cannot be reused",
+      "passed": true
+    },
+    {
+      "check": "renewed access works",
+      "passed": true
+    },
+    {
+      "check": "disconnect revokes grant",
+      "passed": true
+    },
+    {
+      "check": "revoked access immediately fails",
+      "passed": true
+    },
+    {
+      "check": "revoked refresh cannot issue new access",
+      "passed": true
+    },
+    {
+      "check": "unrelated dealer grant remains valid",
+      "passed": true
+    }
+  ],
+  "listing_id": 52848,
+  "listing_url": "https://staging7.autoagora.cy/car/2020-bmw-3-series-52848/",
+  "checked_at": "2026-10-29T18:01:14Z",
+  "local_regressions": {
+    "workspace": 79,
+    "reviewer": 70,
+    "status": "passed"
+  },
+  "publication_guard": {
+    "checks": 8,
+    "status": "passed"
+  },
+  "runtime_audit": {
+    "staging_environment": true,
+    "correct_home": true,
+    "public_mode_staging_only": true,
+    "schema_and_keys_ready": true,
+    "fresh_stage_keys": true,
+    "cron_disabled": true,
+    "cache_disabled": true,
+    "noindex": true,
+    "wp_mail_intercepted": true,
+    "app_mail_intercepted": true,
+    "external_http_blocked": true,
+    "payment_disabled": true,
+    "twilio_removed": true,
+    "resend_removed": true,
+    "password_only": true,
+    "no_admin": true,
+    "no_other_post_editing": true,
+    "qa_tokens_disabled": true,
+    "sample_published": true,
+    "sample_gallery": true
+  },
+  "source_scope": {
+    "staging_source_matches_local": true,
+    "production_related_theme_files_match_63d0f96": true,
+    "separate_database": true,
+    "server_rules_have_no_production_paths": true
+  },
+  "browser_checks": {
+    "real_consent_and_create": true,
+    "normal_car_page": true,
+    "mobile_price_edit_withdraw_resubmit": true,
+    "mobile_width": 390,
+    "mobile_page_scroll_width": 390
+  },
+  "temporary_ssh_key_removed": true,
+  "limitations": [
+    "Uses a demonstration partner; third-party application/callback not supplied",
+    "No production functional tests",
+    "No guarantee about unrelated native marketplace features or third-party service delivery",
+    "View reporting unavailable"
+  ]
+}

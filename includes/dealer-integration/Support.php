@@ -27,6 +27,14 @@ final class Support
         return $wpdb->prefix . 'ag_dealer_' . $suffix;
     }
 
+    public static function submissionStatus(int $dealer, int $listing): string
+    {
+        // A staging sandbox may show complete imports immediately. Production and
+        // local/private review always retain moderation, regardless of filters.
+        if (wp_get_environment_type() !== 'staging' || Review::privateMode()) { return 'pending'; }
+        return apply_filters('autoagora_dealer_api_submission_status', 'pending', $dealer, $listing) === 'publish' ? 'publish' : 'pending';
+    }
+
     public static function error(string $code, string $message, int $status = 422, array $details = []): \WP_Error
     {
         return new \WP_Error($code, $message, ['status' => $status] + $details);

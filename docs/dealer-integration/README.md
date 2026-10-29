@@ -1,5 +1,7 @@
 # AutoAgora dealer integration
 
+**Current hosted status, 29 October 2026:** the private dashboard has been deployed, and a separate authenticated staging sandbox now exercises real OAuth/API imports on normal staging car pages. See [hosted staging and partner handoff](STAGING.md). The local implementation/review sections below describe the original fixture and its boundaries.
+
 This is a local implementation candidate in the existing WordPress theme. It adds separate dealer consent for a registered stock-management partner. It does not replace AutoAgora, publish listings automatically, or enable production access by default.
 
 Source: `davidbalian/bricks-child`, based on `main` commit `be0cd509d8cb97a7a2faaab29246005a97c32309` dated 19 September 2026. Inspection and local work: 27 October 2026, Asia/Nicosia.

@@ -1,6 +1,6 @@
 # AutoAgora dealer API v1
 
-This reference describes the eventual partner contract. It is not available on AutoAgora production. Public partner onboarding is currently disabled: private review mode returns 404 for non-administrators, including bearer-only callers. The administrator workspace exercises listing and grant services locally. A later explicitly configured public release is required for the OAuth flow below. Tagged review data remains private in either mode.
+This reference describes the partner contract for explicitly configured environments. Production public partner onboarding remains disabled: private review mode returns 404 for non-administrators, including bearer-only callers. The separate authenticated [staging sandbox](STAGING.md) now exercises the OAuth flow below with synthetic dealers and real staging marketplace posts. The earlier private review workspace exercises listing/grant services directly. Tagged private review data remains private in either mode.
 
 Local base: `http://127.0.0.1:8899/wp-json/autoagora-dealer/v1`. Hosted deployments require HTTPS. Requests and responses use JSON except OAuth token/revocation requests, which use form encoding. Responses are private and not cacheable.
 

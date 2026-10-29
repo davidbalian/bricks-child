@@ -154,13 +154,14 @@ final class Listings
                 }
                 delete_post_meta($id, '_ag_dealer_withdrawn');
                 if (class_exists('Listing_Details_Badge_Manager')) { \Listing_Details_Badge_Manager::update_badges_for_listing($id); }
+                $submissionStatus = Support::submissionStatus($context['dealer'], $id);
                 $saved = wp_update_post(['ID' => $id, 'post_title' => $data['year'] . ' ' . $data['make'] . ' ' . $data['model'],
                     'post_name' => $originalId ? get_post_field('post_name', $id) : sanitize_title($data['year'] . ' ' . $data['make'] . ' ' . $data['model'] . '-' . $id),
-                    'post_status' => 'pending'], true);
+                    'post_status' => $submissionStatus], true);
                 if (is_wp_error($saved) || $wpdb->last_error) { throw new \RuntimeException('Could not save listing.'); }
                 // Confirm persisted state before declaring a successful submission.
                 clean_post_cache($id);
-                if (get_post_status($id) !== 'pending' || array_map('intval', (array) get_post_meta($id, 'car_images', true)) !== $stage['ordered']) {
+                if (get_post_status($id) !== $submissionStatus || array_map('intval', (array) get_post_meta($id, 'car_images', true)) !== $stage['ordered']) {
                     throw new \RuntimeException('Listing did not reach the expected state.');
                 }
                 $wpdb->query('COMMIT');
