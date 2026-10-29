@@ -28,10 +28,10 @@ add_filter('pre_http_request', static function ($pre, $args, $url) use ($agStage
 }, PHP_INT_MAX, 3);
 add_filter('pre_option_blog_public', '__return_zero');
 // Use the username/password form without granting backend access.
-add_filter('login_url', static fn ($url, $redirect) => add_query_arg(['admin_access' => 'true', 'redirect_to' => $redirect ?: home_url('/?autoagora_stage_client=app')], site_url('/wp-login.php')), PHP_INT_MAX, 2);
+add_filter('login_url', static fn ($url, $redirect) => add_query_arg(['admin_access' => 'true', 'redirect_to' => $redirect ?: home_url('/?autoagora_connect=workspace')], site_url('/wp-login.php')), PHP_INT_MAX, 2);
 add_filter('login_redirect', static function ($url, $requested, $user) use ($agStageDealers) {
  if ($user instanceof WP_User && in_array((int) $user->ID, $agStageDealers, true)) {
-  return class_exists('AutoAgora\\Dealer\\OAuth') && \AutoAgora\Dealer\OAuth::loginReturn($requested) ? $requested : home_url('/?autoagora_stage_client=app');
+  return class_exists('AutoAgora\\Dealer\\OAuth') && \AutoAgora\Dealer\OAuth::loginReturn($requested) ? $requested : home_url('/?autoagora_connect=workspace');
  }
  return $url;
 }, PHP_INT_MAX, 3);
@@ -78,7 +78,7 @@ add_action('init', static function () use ($agStageDealers) {
  $path = (string) wp_parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
  if (str_starts_with($path, '/wp-admin')) { wp_die('Backend access is disabled for staging test accounts.', '', ['response' => 403]); }
  if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') { return; }
- if ($path === '/wp-login.php' || str_starts_with($path, '/wp-json/autoagora-dealer/v1/') || isset($_GET['autoagora_stage_client']) || in_array($_GET['autoagora_connect'] ?? '', ['authorize', 'connections'], true)) { return; }
+ if ($path === '/wp-login.php' || str_starts_with($path, '/wp-json/autoagora-dealer/v1/') || isset($_GET['autoagora_stage_client']) || in_array($_GET['autoagora_connect'] ?? '', ['authorize', 'connections', 'workspace'], true)) { return; }
  wp_die('Use the staging connection tester to change test stock.', '', ['response' => 403]);
 }, 1);
 add_filter('rest_pre_dispatch', static function ($result, $server, $request) {
@@ -87,7 +87,9 @@ add_filter('rest_pre_dispatch', static function ($result, $server, $request) {
 }, PHP_INT_MAX, 3);
 // Remind operators that this isolated database must never be deployed to production.
 add_action('wp_head', static function () { echo '<style>@font-face{font-family:Inter;font-style:normal;font-weight:100 900;font-display:swap;src:url(/wp-content/themes/bricks/assets/fonts/builder/Inter.woff2) format("woff2")}@font-face{font-family:Outfit;font-style:normal;font-weight:100 900;font-display:swap;src:url(/staging-test-assets/Outfit-latin.woff2) format("woff2")}</style>'; });
-add_action('wp_body_open', static function () { echo '<div role="status" style="background:#fff3cd;color:#664d03;padding:10px 16px;text-align:center;font:600 14px/1.5 system-ui">STAGING TEST SITE — synthetic stock only. Nothing here is published to autoagora.cy.</div>'; });
+add_action('wp_body_open', static function () { echo '<div role="status" style="background:#fff3cd;color:#664d03;padding:10px 16px;text-align:center;font:600 14px/1.5 system-ui">STAGING TEST SITE — synthetic stock only. Nothing here is published to autoagora.cy. <a href="/?autoagora_connect=workspace" style="color:inherit;text-decoration:underline">Dashboard</a></div>'; });
 add_action('after_setup_theme', static function () { remove_action('bricks_after_header', 'show_email_verification_notification'); remove_action('wp_enqueue_scripts', 'enqueue_email_notification_assets'); }, PHP_INT_MAX);
 add_action('admin_notices', static function () { echo '<div class="notice notice-warning"><p><strong>STAGING ONLY.</strong> External services and scheduled jobs are disabled. Never deploy this database or sandbox configuration to production.</p></div>'; });
 require_once __DIR__ . '/autoagora-staging-client.php';
+
+require_once __DIR__ . '/autoagora-staging-workspace.php';

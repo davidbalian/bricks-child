@@ -1,0 +1,502 @@
+{
+  "checked_at": "2026-10-29T18:55:58.967624+00:00",
+  "environment": "https://staging7.autoagora.cy",
+  "production_requests": 0,
+  "deployment": "SiteGround File Manager, exact staging7 paths; no SSH access added",
+  "hosted": {
+    "base": "https://staging7.autoagora.cy",
+    "checks": [
+      {
+        "check": "anonymous dashboard is denied or requires login",
+        "passed": true
+      },
+      {
+        "check": "existing WordPress login returns to dashboard",
+        "passed": true
+      },
+      {
+        "check": "dashboard starts real dealer OAuth consent",
+        "passed": true
+      },
+      {
+        "check": "consent is available without administrator access",
+        "passed": true
+      },
+      {
+        "check": "consent returns to registered staging callback",
+        "passed": true
+      },
+      {
+        "check": "code exchange returns to the same dashboard session",
+        "passed": true
+      },
+      {
+        "check": "connections tab renders for the dealership account",
+        "passed": true
+      },
+      {
+        "check": "connections response is private and not indexed",
+        "passed": true
+      },
+      {
+        "check": "connections hides reviewer management and dealer creation",
+        "passed": true
+      },
+      {
+        "check": "connections contains only this account identity",
+        "passed": true
+      },
+      {
+        "check": "stock tab renders for the dealership account",
+        "passed": true
+      },
+      {
+        "check": "stock response is private and not indexed",
+        "passed": true
+      },
+      {
+        "check": "stock hides reviewer management and dealer creation",
+        "passed": true
+      },
+      {
+        "check": "stock contains only this account identity",
+        "passed": true
+      },
+      {
+        "check": "activity tab renders for the dealership account",
+        "passed": true
+      },
+      {
+        "check": "activity response is private and not indexed",
+        "passed": true
+      },
+      {
+        "check": "activity hides reviewer management and dealer creation",
+        "passed": true
+      },
+      {
+        "check": "activity contains only this account identity",
+        "passed": true
+      },
+      {
+        "check": "reviewer-management URL is forbidden",
+        "passed": true
+      },
+      {
+        "check": "WordPress admin remains inaccessible",
+        "passed": true
+      },
+      {
+        "check": "native REST is not authenticated as admin",
+        "passed": true
+      },
+      {
+        "check": "forged dealer ID cannot authorize another account",
+        "passed": true
+      },
+      {
+        "check": "forged client cannot create a grant",
+        "passed": true
+      },
+      {
+        "check": "missing form nonce cannot mutate",
+        "passed": true
+      },
+      {
+        "check": "dealer cannot create another dealer",
+        "passed": true
+      },
+      {
+        "check": "dealer cannot manage reviewer access",
+        "passed": true
+      },
+      {
+        "check": "forged dealer filter cannot expose other stock",
+        "passed": true
+      },
+      {
+        "check": "dashboard posts synthetic car through real API",
+        "passed": true
+      },
+      {
+        "check": "repeated create form is safely idempotent",
+        "passed": true
+      },
+      {
+        "check": "other dealer stock is absent from stock dialogs",
+        "passed": true
+      },
+      {
+        "check": "foreign listing ID cannot be edited",
+        "passed": true
+      },
+      {
+        "check": "foreign listing ID cannot be withdrawn",
+        "passed": true
+      },
+      {
+        "check": "own price description and photo order save",
+        "passed": true
+      },
+      {
+        "check": "edit persists and preserves ownership",
+        "passed": true
+      },
+      {
+        "check": "stale version cannot overwrite a newer edit",
+        "passed": true
+      },
+      {
+        "check": "unowned gallery attachment is rejected",
+        "passed": true
+      },
+      {
+        "check": "failed gallery edit preserves gallery",
+        "passed": true
+      },
+      {
+        "check": "own withdrawal succeeds without deleting car",
+        "passed": true
+      },
+      {
+        "check": "own withdrawn listing can be resubmitted",
+        "passed": true
+      },
+      {
+        "check": "own sold transition succeeds",
+        "passed": true
+      },
+      {
+        "check": "own connection can be disconnected",
+        "passed": true
+      },
+      {
+        "check": "disconnect removes active connection controls",
+        "passed": true
+      },
+      {
+        "check": "dealer can still manage own stock after disconnect",
+        "passed": true
+      },
+      {
+        "check": "cannot post imports without authorization",
+        "passed": true
+      },
+      {
+        "check": "dashboard starts real dealer OAuth consent",
+        "passed": true
+      },
+      {
+        "check": "consent is available without administrator access",
+        "passed": true
+      },
+      {
+        "check": "consent returns to registered staging callback",
+        "passed": true
+      },
+      {
+        "check": "code exchange returns to the same dashboard session",
+        "passed": true
+      },
+      {
+        "check": "legacy tester link redirects to full dashboard",
+        "passed": true
+      },
+      {
+        "check": "dashboard signs out the WordPress session",
+        "passed": true
+      },
+      {
+        "check": "signed-out session cannot reopen dashboard",
+        "passed": true
+      },
+      {
+        "test_listing_id": 52856,
+        "retained_as": "withdrawn"
+      }
+    ]
+  },
+  "local": {
+    "base": "http://127.0.0.1:8899",
+    "checks": [
+      {
+        "check": "anonymous dashboard is denied or requires login",
+        "passed": true
+      },
+      {
+        "check": "existing WordPress login returns to dashboard",
+        "passed": true
+      },
+      {
+        "check": "existing WordPress login returns to dashboard",
+        "passed": true
+      },
+      {
+        "check": "dashboard starts real dealer OAuth consent",
+        "passed": true
+      },
+      {
+        "check": "consent is available without administrator access",
+        "passed": true
+      },
+      {
+        "check": "consent returns to registered staging callback",
+        "passed": true
+      },
+      {
+        "check": "code exchange returns to the same dashboard session",
+        "passed": true
+      },
+      {
+        "check": "dashboard posts synthetic car through real API",
+        "passed": true
+      },
+      {
+        "check": "repeated create form is safely idempotent",
+        "passed": true
+      },
+      {
+        "check": "dashboard starts real dealer OAuth consent",
+        "passed": true
+      },
+      {
+        "check": "consent is available without administrator access",
+        "passed": true
+      },
+      {
+        "check": "consent returns to registered staging callback",
+        "passed": true
+      },
+      {
+        "check": "code exchange returns to the same dashboard session",
+        "passed": true
+      },
+      {
+        "check": "connections tab renders for the dealership account",
+        "passed": true
+      },
+      {
+        "check": "connections response is private and not indexed",
+        "passed": true
+      },
+      {
+        "check": "connections hides reviewer management and dealer creation",
+        "passed": true
+      },
+      {
+        "check": "connections contains only this account identity",
+        "passed": true
+      },
+      {
+        "check": "stock tab renders for the dealership account",
+        "passed": true
+      },
+      {
+        "check": "stock response is private and not indexed",
+        "passed": true
+      },
+      {
+        "check": "stock hides reviewer management and dealer creation",
+        "passed": true
+      },
+      {
+        "check": "stock contains only this account identity",
+        "passed": true
+      },
+      {
+        "check": "activity tab renders for the dealership account",
+        "passed": true
+      },
+      {
+        "check": "activity response is private and not indexed",
+        "passed": true
+      },
+      {
+        "check": "activity hides reviewer management and dealer creation",
+        "passed": true
+      },
+      {
+        "check": "activity contains only this account identity",
+        "passed": true
+      },
+      {
+        "check": "reviewer-management URL is forbidden",
+        "passed": true
+      },
+      {
+        "check": "WordPress admin remains inaccessible",
+        "passed": true
+      },
+      {
+        "check": "native REST is not authenticated as admin",
+        "passed": true
+      },
+      {
+        "check": "forged dealer ID cannot authorize another account",
+        "passed": true
+      },
+      {
+        "check": "forged client cannot create a grant",
+        "passed": true
+      },
+      {
+        "check": "missing form nonce cannot mutate",
+        "passed": true
+      },
+      {
+        "check": "dealer cannot create another dealer",
+        "passed": true
+      },
+      {
+        "check": "dealer cannot manage reviewer access",
+        "passed": true
+      },
+      {
+        "check": "forged dealer filter cannot expose other stock",
+        "passed": true
+      },
+      {
+        "check": "dashboard posts synthetic car through real API",
+        "passed": true
+      },
+      {
+        "check": "repeated create form is safely idempotent",
+        "passed": true
+      },
+      {
+        "check": "other dealer stock is absent from stock dialogs",
+        "passed": true
+      },
+      {
+        "check": "foreign listing ID cannot be edited",
+        "passed": true
+      },
+      {
+        "check": "foreign listing ID cannot be withdrawn",
+        "passed": true
+      },
+      {
+        "check": "own price description and photo order save",
+        "passed": true
+      },
+      {
+        "check": "edit persists and preserves ownership",
+        "passed": true
+      },
+      {
+        "check": "stale version cannot overwrite a newer edit",
+        "passed": true
+      },
+      {
+        "check": "unowned gallery attachment is rejected",
+        "passed": true
+      },
+      {
+        "check": "failed gallery edit preserves gallery",
+        "passed": true
+      },
+      {
+        "check": "own withdrawal succeeds without deleting car",
+        "passed": true
+      },
+      {
+        "check": "own withdrawn listing can be resubmitted",
+        "passed": true
+      },
+      {
+        "check": "own sold transition succeeds",
+        "passed": true
+      },
+      {
+        "check": "own connection can be disconnected",
+        "passed": true
+      },
+      {
+        "check": "disconnect removes active connection controls",
+        "passed": true
+      },
+      {
+        "check": "dealer can still manage own stock after disconnect",
+        "passed": true
+      },
+      {
+        "check": "cannot post imports without authorization",
+        "passed": true
+      },
+      {
+        "check": "dashboard starts real dealer OAuth consent",
+        "passed": true
+      },
+      {
+        "check": "consent is available without administrator access",
+        "passed": true
+      },
+      {
+        "check": "consent returns to registered staging callback",
+        "passed": true
+      },
+      {
+        "check": "code exchange returns to the same dashboard session",
+        "passed": true
+      },
+      {
+        "check": "legacy tester link redirects to full dashboard",
+        "passed": true
+      },
+      {
+        "check": "dashboard signs out the WordPress session",
+        "passed": true
+      },
+      {
+        "check": "signed-out session cannot reopen dashboard",
+        "passed": true
+      },
+      {
+        "test_listing_id": 203,
+        "retained_as": "withdrawn"
+      }
+    ]
+  },
+  "regressions": {
+    "private_workspace_checks": 79,
+    "reviewer_checks": 70,
+    "publication_guard_checks": 8,
+    "passed": true
+  },
+  "runtime": {
+    "source_fingerprint_matches": true,
+    "revision": "613192edaad9ead5-e9d49c2eb62d41cb",
+    "status": 200,
+    "tabs": {
+      "connections": 200,
+      "stock": 200,
+      "activity": 200
+    },
+    "url": "https://staging7.autoagora.cy/?autoagora_connect=workspace"
+  },
+  "account_changes": {
+    "uses_existing_wp_account": true,
+    "password_changed": false,
+    "role_changed": false,
+    "admin_access_added": false,
+    "expiry_changed": false
+  },
+  "browser": {
+    "non_admin_login": true,
+    "stock_edit_dialog": true,
+    "mobile_viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "visual_mobile_review": true,
+    "posted_car_same_session": true,
+    "dashboard_back_link": true
+  },
+  "scope": "Connections, stock, events and mutations restricted to the signed-in staging dealer. Reviewer management denied.",
+  "dependency_recovery": {
+    "normal_dashboard": true,
+    "missing_dependencies_dashboard_503": true,
+    "missing_dependencies_legacy_tester_503": true,
+    "restored_dependencies_dashboard_200": true
+  }
+}
