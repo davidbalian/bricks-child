@@ -1,20 +1,14 @@
-/* Connection-only additions. Shared Tabler, type/control tokens and button kit remain canonical. */
+/* Connection-only layout. Shared Tabler, typography/control tokens and button kit stay canonical. */
 .ag-connect .agw-login-shell{width:min(100% - 32px,540px);max-width:540px;margin:48px auto;padding:0}
 .ag-connect .agw-login-panel{padding:32px;overflow-wrap:anywhere}
 .ag-connect .ag-connect-environment{align-self:flex-start;margin-bottom:16px}
 .ag-connect .agw-field{margin-top:20px}
 .ag-connect .btn{gap:8px}
-.ag-connect .ag-connect-help{margin-top:16px}
+.ag-connect .ag-connect-help{margin-top:16px;font-size:14px;line-height:1.6}
 .ag-connect .ag-connect-secondary{margin-top:16px;text-align:center}
 .ag-connect .ag-connect-secondary .btn-link{white-space:normal;min-height:44px;line-height:1.5}
-.ag-connect .ag-connect-matches{display:grid;gap:12px;margin-top:24px}
-.ag-connect .ag-connect-match{display:flex;align-items:center;gap:16px;padding:16px;border:1px solid var(--tblr-border-color);border-radius:var(--tblr-border-radius)}
-.ag-connect .ag-connect-match-label{display:grid;gap:4px;min-width:0;flex:1}
-.ag-connect .ag-connect-match-label strong{font-weight:600}
-.ag-connect .ag-connect-match-label .text-secondary,.ag-connect .ag-connect-help{font-size:14px;line-height:1.6}
-.ag-connect .ag-connect-selected{display:flex;align-items:center;gap:12px;margin:16px 0 0}
-.ag-connect .ag-connect-success{color:var(--tblr-success);margin:12px 0}
-.ag-connect .ag-connect-success svg{width:32px;height:32px}
+.ag-connect .ag-connect-name-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ag-connect .ag-connect-name-grid .agw-field{min-width:0}
 .ag-connect .agw-login-footer{display:flex;justify-content:center;align-items:center;gap:8px}
 .ag-connect .agw-login-footer svg{width:16px;height:16px}
-@media(max-width:575px){.ag-connect .agw-login-shell{margin:24px auto}.ag-connect .agw-login-panel{padding:24px}.ag-connect .ag-connect-match{align-items:stretch;flex-direction:column;gap:12px}.ag-connect .ag-connect-match .btn{width:100%}}
+@media(max-width:575px){.ag-connect .agw-login-shell{margin:24px auto}.ag-connect .agw-login-panel{padding:24px}.ag-connect .ag-connect-name-grid{grid-template-columns:1fr;gap:0}}

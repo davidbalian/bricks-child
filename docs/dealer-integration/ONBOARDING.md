@@ -1,55 +1,48 @@
-# Seller connection and onboarding
+# Seller connection and signup
 
-This feature is scoped to partner seller integrations. It does not replace the marketplace login or grant WordPress administrator access. Deployment is staging-only; production onboarding remains disabled.
+The Postaki contract is login or verified signup on AutoAgora, consent, then code/token exchange. All release work is restricted to staging7; production onboarding stays disabled. Existing clients, secrets, exact callbacks, scopes, listing routes and moderation/ownership rules are unchanged.
 
-## Dealer flow
+## User flow
 
-1. Click **Connect to AutoAgora** in Postaki. The existing authorization URL and OAuth parameters do not change.
-2. The AutoAgora connection screen validates the application, callback, scopes and S256 challenge before showing the dealership finder. The dealer enters their business name and optionally a city. Existing login holders can skip matching and sign in directly.
-3. Possible matches show only business names and cities. Choosing one requires the existing account's phone/username and password. Signing into a different account does not claim the selected dealership.
-4. Successful sign-in resumes the exact original OAuth request. The dealer reviews and approves Postaki's permissions; code exchange, tokens and account ownership remain the existing OAuth/API implementation.
-5. If the dealer cannot find or access their account, **Request access** records a private review request. It does not create a dealership, claim a profile, reset a password, issue a token or connect Postaki. AutoAgora arranges access after verification, then the dealer starts a fresh connection from Postaki.
+1. Postaki opens the existing authorize URL with state, S256 challenge and optional `account_type=dealer` or `account_type=private`.
+2. The branded AutoAgora sign-in form opens directly. Existing users enter their phone/username and password. The actual account type wins; the hint neither converts nor rejects an otherwise eligible account.
+3. A new user chooses **Create an AutoAgora account**, confirms the account type and phone, verifies the six-digit code, then supplies their name (plus dealership name when applicable) and a password. The only assignable roles are `client` and `dealership`. Administrators/subscribers are not connection accounts.
+4. The exact original OAuth request resumes. Consent identifies the signed-in account and offers **Use a different account** without losing state/PKCE. Cancel returns `access_denied` and the original state to the validated callback.
+5. Both code exchange and every refresh return `account: {id, name}` alongside standard token fields. Postaki uses it for “Connected as”. It never sends an account ID to select listing ownership.
 
-The separate branded `/?autoagora_connect=dealer-login` screen can sign a staging dealer into an existing dashboard or car-page session. It only accepts same-origin frontend returns, rejects backend/external returns and does not expose the catalogue without a valid partner authorization request. Explicit administrator sign-in continues to use the normal administrator route.
+There is no public directory, fuzzy claim, account-claim approval or partner type-change endpoint. Invalid OAuth requests never enter signup. A valid request by an already signed-in ineligible account returns `access_denied` to the exact registered callback. Main-site registration/login and styling remain unchanged.
 
-## Private sellers
+## Signup controls
 
-Postaki sends `account_type=dealer` or `account_type=private` in the **authorization URL**, alongside the existing OAuth parameters. Omission defaults to `dealer` for existing integrations. Invalid or nonscalar types are rejected. Do not send this field in listing JSON. Existing client IDs, secrets, callbacks, scopes and API routes are unchanged.
+- `AUTOAGORA_CONNECT_SIGNUP_ENABLED=true` is separate from the existing onboarding, API approval and private-seller gates.
+- Browser/session CSRF is tied to the exact OAuth URL. Signup proof is bound to the browser and flow; phone/type are stored server-side. Altering submitted phone, role or account type at the final step cannot change them.
+- OTP requests require Cyprus phone normalization. Production requires server-validated Turnstile success, hostname and `connect_signup` action before contacting Twilio Verify. Verification uses the SID of the sent challenge. Staging/local never contact those services.
+- Production provider failures fail closed with generic messages. IP/phone send limits and five attempts per challenge constrain abuse. OTP and verified proof expire after ten minutes. Passwords/codes are never stored in the flow session or audit log.
+- Final signup requires a 12–128 character matching password. Name fields are bounded; phone uniqueness is checked after verification, under a shared phone lock, including legacy formatting. An existing phone always requires existing-password login; it is never claimed, reset or converted by signup.
+- Flow and phone locks prevent concurrent duplicate creation and proof reuse. No application grant is created until explicit OAuth consent.
+- New account names and token metadata are escaped/serialized; only the authorized account ID/name are returned. Account identity is resolved from the issued token ledger, not from WordPress browser cookies or request IDs.
 
-`private` skips dealership matching and opens the branded sign-in screen for an existing normal AutoAgora account (WordPress `client` role). Its fallback records a private account-access request without searching or exposing personal profiles. Requests are labelled by account type for operator review. A private seller can manage their own connections, defaults and listings through the existing API and dashboard; the stock tab becomes **Your listings**. Moderation and listing allowances remain unchanged.
+## Staging signup
 
-The URL selects the requested flow; it never changes a role or turns an account into a dealership. Consent and API access require the actual supported account type, existing edit/upload capabilities and eligibility rules. A dealer cannot consent as a private seller or vice versa. Private-seller support additionally requires `AUTOAGORA_DEALER_PRIVATE_SELLERS_ENABLED=true`. Only the exact staging guard enables it; the staging user allowlist still applies. Administrator and arbitrary subscriber accounts are not eligible.
+Staging reads only hashed codes and an expiry from private `signup-tests.json` outside the webroot. `AUTOAGORA_CONNECT_TEST_PHONES` and `AUTOAGORA_CONNECT_TEST_EXPIRES` must be configured explicitly. The UI states that no SMS is sent. Only approved synthetic numbers can sign up, and they cannot claim an existing cloned customer account. Plaintext test codes remain in ignored local handoff files and are never committed or included in source deployment ZIPs.
 
-## Operator workflow
+Accounts created by this verified staging-only flow are marked `_ag_connect_staging_user=1` and allowed into the sandbox until its configured expiry. They have no administrator/backend/native REST access; API stock and dashboard actions stay owner-scoped. The staging browse pages include only designated test accounts and these new synthetic signup accounts. External services/cron remain disabled. Never deploy the staging database, test configuration or MU guard to production.
 
-Open **Tools → Seller onboarding** as an administrator. Search the supplied business name and optional city to find existing dealership accounts before creating another one. Pending requests include the requester's contact, application, reference and current possible account matches.
+The staging MU guard also blocks anonymous native form/AJAX mutations and XML-RPC before WordPress handlers run. Administrators retain maintenance access. The isolated signup/OAuth routes and scoped API remain available with their own verification and ownership controls.
 
-Verify ownership using an independently known dealership contact before arranging their existing login. A submitted name, phone or email is a claim, not verification. Use the existing account-management process; this page deliberately cannot assign another user's identity or issue a partner grant. **Mark reviewed** closes the request without granting access.
+## Operator tools
 
-Public `dealer_profile` posts are separate entities from dealership user accounts. The matcher searches actual `dealership` accounts, not unclaimed public directory profiles. It checks dealership-name metadata, first/last name and display name. It handles punctuation, common company suffixes, token order, typos and Greek accents/transliteration. Similarity is a ranking aid, never a claim of verified ownership. A city match breaks ties without hiding plausible names in a different city.
+**Tools → Seller onboarding** retains internal dealership search and the historical request queue for administrators only. Those records do not assign identities or grant partner access. Normal partner connection no longer requires account matching or that queue. Account-type changes stay in AutoAgora's existing operator/account-management process.
 
-The directory is read in 200-account pages and ranked across the entire resulting catalogue. A five-minute cache is invalidated on relevant account-name, role and location edits. Public results are limited to five eligible accounts and exclude private review users and administrative accounts. Administrator searches can find otherwise API-ineligible accounts to avoid duplicates. On staging, the existing synthetic-dealer eligibility allowlist prevents cloned real accounts appearing in anonymous lookup results. No login, email, phone, internal account ID or similarity score appears in dealer-facing match results.
-
-## Controls and enablement
-
-- Explicit opt-in: `AUTOAGORA_DEALER_ONBOARDING_ENABLED=true`, alongside a configured, enabled public dealer integration. Private review mode and the production API approval gate remain in force. The flag is added only to the exact-host/root/environment staging MU guard.
-- No replacement production login hooks or global CSS. New screens load the existing scoped Tabler/button kit plus connection-only layout styles, including mobile layouts.
-- Password verification uses WordPress authentication and its existing filters. Eligible account ownership and requested account type are checked before setting a session. It does not grant capabilities or administrator access.
-- Anonymous forms use an HttpOnly SameSite cookie plus a CSRF value bound to both browser and exact return/OAuth request. Candidate handles are opaque, random, short-lived and tied to that browser/flow. Account eligibility is checked again when selected and when signing in.
-- Requests and login attempts are rate limited using hashed subjects. No secrets or submitted contact details are written to the API audit log.
-- Review records use a nonpublic, non-queryable post type with no REST exposure/export. Administrative access requires both the administrator role and `manage_options`, with nonces on changes. Submissions deduplicate under a database lock; concurrent requests return the same reference.
-- Responses are private/no-store, noindex, deny framing and use a same-origin asset policy. The consent page permits only the already-validated partner callback origin for form redirects.
-- The matched account still owns its own listings. No changes were made to API listing ownership, existing clients, credentials, grants or moderation rules.
-
-## Local verification
-
-The disposable loopback fixture uses synthetic, noncontactable accounts. It includes more than 200 catalogue rows to prove matching does not stop at the first page. Never deploy its generated MU file, accounts or credential files.
+## Verification
 
 ```sh
 python3 tests/dealer-integration/connect_fixture.py
-PHP_CLI_SERVER_WORKERS=4 php -d display_errors=0 -S 127.0.0.1:8899 -t .staging/wp tests/dealer-integration/router.php
 python3 -u tests/dealer-integration/connect_checks.py
+php tests/dealer-integration/signup_provider_checks.php
 python3 tests/dealer-integration/connect_fixture.py restore
 ```
 
-The 68-check HTTP suite exercises the branded finder, fuzzy/ambiguous results, ownership denial, valid login, real OAuth consent/code/PKCE exchange, stock read, request privacy, deduplication/concurrency, admin review, cache invalidation and rate limits, legacy ACF city shapes without warnings, plus private login, consent, real code/PKCE exchange, own listing create/update/withdraw, cross-account denial, role preservation and feature-disable denial. The original private workspace/reviewer regression suites run after restoring the normal private fixture. Screenshots and credentials remain in ignored private artifacts; sanitized verification is recorded separately.
+The loopback HTTP suite covers both existing roles with matching/different/missing hints, real consent/code/PKCE, initial and refreshed identity, name changes, no identity leakage on errors, verified signup for both types, failed/expired/replayed codes, tampered fields, duplicate/concurrent signup, safe returns, rate limits, actual car create/update/withdraw and cross-owner denial. Offline provider checks stub external transport and verify production bot/verification boundaries; they do not prove SMS delivery. Run the existing workspace/reviewer regression suites after restoring the normal private fixture. Hosted checks use only staging7, existing test clients and explicitly approved synthetic phones.
+
+The opt-in `tests/dealer-integration/hosted/signup_checks.py` suite reads the ignored `.private/postaki-setup/signup-qa.json` test accounts and existing QA/client credentials. It creates staging cars, verifies their real pages/photos and owner-only dashboard access, and disconnects only its QA grants. It retains the dealer demo car and withdraws the private demo car. Never substitute real customer accounts or the partner's fresh handoff numbers. Hosted XML-RPC requests may be terminated by the hosting rule before WordPress; the early PHP exit is exercised in the local dashboard adapter instead.

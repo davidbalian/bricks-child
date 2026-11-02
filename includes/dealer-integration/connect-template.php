@@ -1,9 +1,13 @@
 <?php
-/** Branded, server-rendered connection steps; deliberately no account IDs/contact details in matches. */
+/** Connection-only login and verified signup. No public account directory. */
 defined('ABSPATH') || exit;
 use AutoAgora\Dealer\Workspace;
+use AutoAgora\Dealer\Signup;
 $assets = get_stylesheet_directory_uri() . '/includes/dealer-integration/assets/';
-$titles = ['find'=>'Find your dealership','matches'=>'Choose your dealership','signin'=>'Sign in to AutoAgora','request'=>'Request access','requested'=>'Request received'];
+$titles = ['signin'=>'Sign in to AutoAgora','signup_phone'=>'Create your account','signup_verify'=>'Verify your phone','signup_details'=>'Complete your account'];
+$signup = $session['signup'] ?? [];
+$value = static fn ($key) => isset($_POST[$key]) && is_string($_POST[$key]) ? mb_substr(sanitize_text_field(wp_unslash($_POST[$key])),0,120) : '';
+$signupType = $value('signup_type') ?: ($signup['type'] ?? $accountType);
 $form = static function (string $operation) use ($csrf): void {
     echo '<input type="hidden" name="connect_csrf" value="' . esc_attr($csrf) . '"><input type="hidden" name="connect_action" value="' . esc_attr($operation) . '">';
 };
@@ -14,46 +18,39 @@ $form = static function (string $operation) use ($csrf): void {
 <link rel="stylesheet" href="<?php echo esc_url($assets . 'button-kit/buttons.css?v=' . filemtime(__DIR__ . '/assets/button-kit/buttons.css')); ?>">
 <link rel="stylesheet" href="<?php echo esc_url($assets . 'connect.css?v=' . filemtime(__DIR__ . '/assets/connect.css')); ?>">
 <style>@font-face{font-family:Inter;font-style:normal;font-weight:100 900;font-display:swap;src:url(<?php echo esc_url(get_template_directory_uri() . '/assets/fonts/builder/Inter.woff2'); ?>) format('woff2')}</style>
+<?php if (Signup::ready() && !Signup::testing() && $stage === 'signup_phone') : ?><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script><?php endif; ?>
 </head><body class="agw agw-signin ag-buttons ag-connect"><main class="agw-login-shell">
 <img class="agw-login-logo" src="<?php echo esc_url($assets . 'autoagora-logo.png'); ?>" width="160" height="34" alt="AutoAgora">
 <section class="card card-body agw-login-panel">
 <?php if (wp_get_environment_type() !== 'production') : ?><span class="badge bg-azure-lt ag-connect-environment"><?php echo wp_get_environment_type() === 'local' ? 'Local test' : 'Staging test'; ?></span><?php endif; ?>
 <h1><?php echo esc_html($titles[$stage]); ?></h1>
-<?php if ($clientName && $stage !== 'requested') : ?><p class="text-secondary">Connect with <?php echo esc_html($clientName); ?>.</p><?php endif; ?>
-<?php if ($accountType === 'private' && $stage !== 'requested') : ?><p class="text-secondary">Private seller account</p><?php endif; ?>
+<?php if ($clientName) : ?><p class="text-secondary">Connect with <?php echo esc_html($clientName); ?>.</p><?php endif; ?>
 <?php if ($error) : ?><div class="alert alert-danger" role="alert"><?php echo esc_html($error); ?></div><?php endif; ?>
-<?php if ($stage === 'find') : ?>
-<form method="post"><?php $form('find'); ?>
-<label class="form-label agw-field">Dealership name<input class="form-control" name="dealership_name" type="text" minlength="3" maxlength="120" required autocomplete="organization" value="<?php echo esc_attr($name); ?>" placeholder="e.g. Demo Motors"></label>
-<label class="form-label agw-field">City <span class="text-secondary">(optional)</span><input class="form-control" name="dealership_city" type="text" maxlength="80" autocomplete="address-level2" value="<?php echo esc_attr($city); ?>"></label>
-<button class="btn btn-primary agw-login-submit"><?php echo Workspace::icon('building'); ?>Find dealership</button></form>
-<form method="post" class="ag-connect-secondary"><?php $form('direct'); ?><button class="btn btn-link">Already have login details? Sign in</button></form>
-<?php elseif ($stage === 'matches') : ?>
-<p class="text-secondary">Choose a possible match, then sign in to confirm ownership.</p>
-<div class="ag-connect-matches">
-<?php foreach ($matches as $token => $match) : ?>
-<form method="post" class="ag-connect-match"><?php $form('choose'); ?><input type="hidden" name="candidate" value="<?php echo esc_attr($token); ?>">
-<span class="ag-connect-match-label"><strong><?php echo esc_html($match['name']); ?></strong><?php if ($match['city']) : ?><span class="text-secondary"><?php echo esc_html($match['city']); ?></span><?php endif; ?></span>
-<button class="btn btn-primary">Continue <?php echo Workspace::icon('arrow-right'); ?></button></form>
-<?php endforeach; ?></div>
-<form method="post" class="ag-connect-secondary"><?php $form('request-form'); ?><input type="hidden" name="dealership_name" value="<?php echo esc_attr($name); ?>"><button class="btn btn-link">My dealership isn’t listed</button></form>
-<?php elseif ($stage === 'signin') : ?>
-<?php if ($selected) : ?><div class="alert alert-secondary ag-connect-selected"><?php echo Workspace::icon('building'); ?><span><?php echo esc_html($selected['name']); ?></span></div><?php endif; ?>
+<?php if ($stage === 'signin') : ?>
 <form method="post"><?php $form('signin'); ?>
-<label class="form-label agw-field">Phone or username<input class="form-control" name="dealer_login" type="text" required maxlength="191" autocomplete="username" autocapitalize="none" spellcheck="false"></label>
-<label class="form-label agw-field">Password<input class="form-control" name="dealer_password" type="password" required maxlength="4096" autocomplete="current-password"></label>
-<button class="btn btn-primary agw-login-submit"><?php echo Workspace::icon('shield-check'); ?>Sign in and continue</button></form>
-<?php if ($authorization) : ?><form method="post" class="ag-connect-secondary"><?php $form('request-form'); ?><button class="btn btn-link"><?php echo $accountType === 'private' ? 'I need access to my account' : 'I need access to this dealership'; ?></button></form><?php else : ?><p class="ag-connect-help">Need login details? Contact AutoAgora or start again from Postaki to request access.</p><?php endif; ?>
-<?php elseif ($stage === 'request') : ?>
-<p class="text-secondary">We’ll check the existing account before arranging access.</p>
-<form method="post"><?php $form('request'); ?>
-<label class="form-label agw-field"><?php echo $accountType === 'private' ? 'Your full name' : 'Dealership name'; ?><input class="form-control" name="dealership_name" type="text" required minlength="3" maxlength="120" autocomplete="<?php echo $accountType === 'private' ? 'name' : 'organization'; ?>" value="<?php echo esc_attr($name); ?>"></label>
-<label class="form-label agw-field">City <span class="text-secondary">(optional)</span><input class="form-control" name="dealership_city" type="text" maxlength="80" autocomplete="address-level2" value="<?php echo esc_attr($city); ?>"></label>
-<?php if ($accountType !== 'private') : ?><label class="form-label agw-field">Your name<input class="form-control" name="contact_name" type="text" required maxlength="120" autocomplete="name" value="<?php echo esc_attr(isset($_POST['contact_name']) && is_string($_POST['contact_name']) ? sanitize_text_field(wp_unslash($_POST['contact_name'])) : ''); ?>"></label><?php endif; ?>
-<label class="form-label agw-field">Contact email or phone<input class="form-control" name="contact" type="text" required maxlength="191" autocomplete="off"></label>
-<button class="btn btn-primary agw-login-submit">Request access <?php echo Workspace::icon('arrow-right'); ?></button></form>
-<?php elseif ($stage === 'requested') : ?>
-<div class="ag-connect-success"><?php echo Workspace::icon('circle-check'); ?></div><p>AutoAgora will review your request and contact you with the next step.</p>
-<p class="text-secondary">Reference: <strong><?php echo esc_html($reference); ?></strong></p><p class="ag-connect-help">After access is arranged, click “Connect to AutoAgora” in <?php echo esc_html($clientName); ?> again.</p>
+<label class="form-label agw-field">Phone or username<input class="form-control" name="dealer_login" type="text" maxlength="191" required autocomplete="username" value="<?php echo esc_attr($value('dealer_login')); ?>"></label>
+<label class="form-label agw-field">Password<input class="form-control" name="dealer_password" type="password" maxlength="4096" required autocomplete="current-password"></label>
+<button class="btn btn-primary agw-login-submit"><?php echo Workspace::icon('arrow-right'); ?>Sign in</button></form>
+<?php if ($authorization && Signup::ready()) : ?><form method="post" class="ag-connect-secondary"><?php $form('signup'); ?><button class="btn btn-link">Create an AutoAgora account</button></form><?php endif; ?>
+<?php elseif ($stage === 'signup_phone') : ?>
+<form method="post"><?php $form('send-code'); ?>
+<label class="form-label agw-field">Account type<select class="form-select" name="signup_type" required><option value="">Choose account type</option><option value="dealer" <?php selected($signupType,'dealer'); ?>>Dealership</option><?php if (\AutoAgora\Dealer\Support::privateSellersEnabled()) : ?><option value="private" <?php selected($signupType,'private'); ?>>Private seller</option><?php endif; ?></select></label>
+<label class="form-label agw-field">Phone number<input class="form-control" name="signup_phone" type="tel" maxlength="30" required autocomplete="tel" placeholder="+357" value="<?php echo esc_attr($value('signup_phone')); ?>"></label>
+<?php if (Signup::testing()) : ?><p class="text-secondary ag-connect-help">Use an approved test number and code from AutoAgora. No SMS is sent.</p><?php else : ?><div class="cf-turnstile ag-connect-help" data-sitekey="<?php echo esc_attr(TURNSTILE_SITE_KEY); ?>" data-action="connect_signup"></div><?php endif; ?>
+<button class="btn btn-primary agw-login-submit"><?php echo Workspace::icon('arrow-right'); ?>Send code</button></form>
+<?php elseif ($stage === 'signup_verify') : ?>
+<p class="text-secondary">Enter the code for <?php echo esc_html($signup['phone'] ?? 'your phone'); ?>.</p>
+<form method="post"><?php $form('verify-code'); ?><label class="form-label agw-field">Verification code<input class="form-control" name="signup_code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" minlength="6" maxlength="6" required></label><button class="btn btn-primary agw-login-submit"><?php echo Workspace::icon('shield-check'); ?>Verify phone</button></form>
+<form method="post" class="ag-connect-secondary"><?php $form('signup'); ?><button class="btn btn-link">Change number or request a new code</button></form>
+<?php elseif ($stage === 'signup_details') : ?>
+<p class="text-secondary"><?php echo esc_html(($signup['type'] ?? '') === 'dealer' ? 'Dealership account' : 'Private seller account'); ?> · <?php echo esc_html($signup['phone'] ?? ''); ?></p>
+<form method="post"><?php $form('create-account'); ?>
+<?php if (($signup['type'] ?? '') === 'dealer') : ?><label class="form-label agw-field">Dealership name<input class="form-control" name="company_name" type="text" minlength="2" maxlength="120" required autocomplete="organization" value="<?php echo esc_attr($value('company_name')); ?>"></label><?php endif; ?>
+<div class="ag-connect-name-grid"><label class="form-label agw-field">First name<input class="form-control" name="first_name" type="text" maxlength="80" required autocomplete="given-name" value="<?php echo esc_attr($value('first_name')); ?>"></label><label class="form-label agw-field">Last name<input class="form-control" name="last_name" type="text" maxlength="80" required autocomplete="family-name" value="<?php echo esc_attr($value('last_name')); ?>"></label></div>
+<label class="form-label agw-field">Password<input class="form-control" name="signup_password" type="password" minlength="12" maxlength="128" required autocomplete="new-password"></label>
+<label class="form-label agw-field">Confirm password<input class="form-control" name="signup_confirm" type="password" minlength="12" maxlength="128" required autocomplete="new-password"></label>
+<button class="btn btn-primary agw-login-submit"><?php echo Workspace::icon('arrow-right'); ?>Create account</button></form>
 <?php endif; ?>
-</section><p class="agw-login-footer"><?php echo Workspace::icon('shield-check'); ?>Your password stays with AutoAgora.</p></main></body></html>
+<?php if ($stage !== 'signin') : ?><form method="post" class="ag-connect-secondary"><?php $form('signin-form'); ?><button class="btn btn-link">Already have an account? Sign in</button></form><?php endif; ?>
+</section><p class="text-secondary agw-login-footer"><?php echo Workspace::icon('shield-check'); ?>Your password stays with AutoAgora.</p>
+</main></body></html>

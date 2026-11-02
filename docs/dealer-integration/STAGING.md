@@ -1,5 +1,11 @@
 # Hosted staging sandbox — 29 October 2026
 
+## Seller onboarding update — 2 November 2026
+
+The WhatsApp agreement is deployed on staging7: branded existing-account login, phone-verified signup for dealer/private accounts, signup-only `account_type` hints, no public account matching/claiming, and current `account: {id, name}` on code exchange and every refresh. Existing accounts keep their actual type. Ownership comes from the token; account-type changes stay with AutoAgora. See [onboarding](ONBOARDING.md) and [API contract](API.md).
+
+[Current verification](STAGING-ONBOARDING-VERIFICATION.json): 370 local checks and 65 hosted signup/OAuth/car/dashboard checks passed. Both new roles posted cars with photos to real staging car pages. Private demo stock was withdrawn; dealer demo stock remains available. Staging signup uses approved synthetic phone numbers and temporary test codes, with no SMS. The 14 installed source hashes were verified, rollback backups retained privately, and the temporary installer moved outside the webroot. No live deployment, production requests or production functional tests were performed.
+
 The current theme/dashboard is installed at **https://staging7.autoagora.cy/**, SiteGround copy `dealer-integration`. This is an authenticated copy with a separate database, fresh cookie salts, independent OAuth signing/encryption keys and new staging-only application credentials. No production deployment or production functional tests were performed for this release.
 
 ## What works
@@ -24,7 +30,7 @@ Sample retained for review: https://staging7.autoagora.cy/car/2020-bmw-3-series-
 
 ## Connecting his own software
 
-The staged branded dealer connection and account-matching flow is documented in [dealer onboarding](ONBOARDING.md). It preserves Postaki's OAuth URLs and callback contract. Its explicit enablement flag belongs only in the isolated staging guard; it must not be copied to production.
+The staged branded seller login and verified-signup flow is documented in [dealer onboarding](ONBOARDING.md). It preserves Postaki's OAuth URLs and callback contract. Its explicit enablement flag belongs only in the isolated staging guard; it must not be copied to production.
 
 Give the developer the [API contract](API.md), with this staging base:
 
@@ -36,11 +42,11 @@ The developer generates state/verifier, redirects the dealer to the authorizatio
 
 ## Isolation and operating notes
 
-- Only the designated staging dealer and existing administrators can sign in. Disposable QA accounts and grants were disabled after testing. Native REST and backend access are blocked for the test dealer; native submission/AJAX mutation flows are also blocked.
+- Only designated staging accounts, verified synthetic signup accounts and existing administrators can sign in. Disposable QA accounts and grants were disabled after testing. Native REST and backend access are blocked for the test dealer; native submission/AJAX mutation flows are also blocked.
 - Marketplace car queries are restricted to designated synthetic accounts. Existing tagged private review data stays private. Cross-dealer API filtering is retained when applying the staging query restriction.
 - WordPress/app mail, SMS credentials, payment credentials, browser tracking, external WordPress HTTP and scheduled jobs are disabled. Photo ingestion still uses the real bounded public HTTPS downloader. Site fonts are served locally on staging.
 - Dynamic pages require authentication and emit noindex/no-store headers; robots disallows crawling. No cache drop-ins or copied production WAF/cache paths are used.
-- Only explicit allowlisted staging accounts can auto-publish API imports. `Support::submissionStatus()` retains `pending` in production, development, local and private review, even if a filter asks to publish.
+- Only designated staging accounts and verified synthetic signup accounts can auto-publish API imports. `Support::submissionStatus()` retains `pending` in production, development, local and private review, even if a filter asks to publish.
 - Staging-specific MU source is saved under `tests/dealer-integration/hosted/`; install `staging-guard.php` as `000-autoagora-staging-isolation.php`, `staging-client.php` as `autoagora-staging-client.php` and `staging-workspace.php` as `autoagora-staging-workspace.php`. The staging modules are pinned to the staging7 environment, host and filesystem root. They are not loaded by the production theme.
 - Keys, passwords, tokens and runtime configuration remain outside the web root or in ignored `.private` files. Never commit or deploy those files. Never restore copied production credentials into staging.
 - **Never use SiteGround Full Deploy or deploy this staging database/configuration to production.** A future production release needs a separate review and credential/onboarding setup. Recreating or removing staging does not require changing the live site.

@@ -50,8 +50,9 @@ final class OAuth
     }
     public static function requestedAccountType(): string
     {
-        $type = $_GET['account_type'] ?? 'dealer';
-        if (!is_string($type) || !in_array($type, ['dealer','private'], true) || ($type === 'private' && !Support::privateSellersEnabled())) {
+        $type = $_GET['account_type'] ?? '';
+        if ($type === '') { return ''; }
+        if (!is_string($type) || !in_array($type, ['dealer','private'], true)) {
             throw OAuthServerException::invalidRequest('account_type', 'Use dealer or private.');
         }
         return $type;
@@ -85,6 +86,17 @@ final class OAuth
             return Support::error('invalid_token', 'Access token is missing, expired, or revoked.', 401);
         }
     }
+    private static function accountIdentity(int $id): ?array
+    {
+        if (!Support::eligible($id)) { return null; }
+        $user = get_userdata($id); $name = trim((string) $user->display_name);
+        if ($name === '' || preg_match('/^[+\d\s()-]+$/D', $name)) {
+            $first = get_user_meta($id, 'first_name', true); $last = get_user_meta($id, 'last_name', true);
+            $name = trim((is_string($first) ? $first : '') . ' ' . (is_string($last) ? $last : '')) ?: 'AutoAgora account';
+        }
+        return ['id'=>$id,'name'=>$name];
+    }
+
     public static function token(\WP_REST_Request $request)
     {
         if (!Support::ready()) { return Support::error('integration_unavailable', 'Dealer integration is not configured.', 503); }
@@ -108,8 +120,13 @@ final class OAuth
                         throw new \RuntimeException('Could not store token reference.');
                     }
                 }
+                $issued = AccessTokens::$issued ? Ledger::row(AccessTokens::$issued, 'access') : null;
+                $account = $issued ? self::accountIdentity((int) $issued['dealer_id']) : null;
+                if (!$account) { throw new \RuntimeException('Issued account identity is unavailable.'); }
+                $body['account'] = $account;
+                $result = self::restResponse($response); $result->set_data($body);
                 $wpdb->query('COMMIT');
-                return self::restResponse($response);
+                return $result;
             } catch (OAuthServerException $error) {
                 $wpdb->query('ROLLBACK');
                 return self::restResponse($error->generateHttpResponse(new \Nyholm\Psr7\Response()));
@@ -167,16 +184,14 @@ final class OAuth
         }
         $dealer = get_current_user_id();
         if ($action === 'connections') { self::connections($dealer); exit; }
-        if (!Support::eligible($dealer)) { wp_die('An eligible AutoAgora dealership account is required.', 'Connect AutoAgora', ['response' => 403]); }
+
         $auth = null;
         try {
             $query = self::request()->getQueryParams();
             $server = self::server();
             $auth = self::authorizationRequest();
-            if (self::requestedAccountType() !== Support::accountType($dealer)) {
-                self::head('Use your seller account');
-                echo '<h1>Use your ' . (self::requestedAccountType() === 'private' ? 'private seller' : 'dealership') . ' account</h1><p>You are signed into a different account type. Sign out and start the connection again from your stock software.</p><a class="btn btn-primary" href="' . esc_url(wp_logout_url(home_url('/'))) . '">Sign out</a>';
-                self::foot(); exit;
+            if (!Support::eligible($dealer)) {
+                wp_redirect(add_query_arg(['error'=>'access_denied','state'=>$auth->getState()], $auth->getRedirectUri()),302,'AutoAgora OAuth'); exit;
             }
             // Browsers can apply form-action to redirects after POST consent too.
             // Permit only the origin of the exact callback already validated by the library.
@@ -189,6 +204,9 @@ final class OAuth
             if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                 if (!isset($_POST['_wpnonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), $nonceAction)) {
                     wp_die('The authorization form expired. Please reconnect.', 'Connect AutoAgora', ['response' => 403]);
+                }
+                if (($_POST['decision'] ?? '') === 'switch-account') {
+                    wp_logout(); wp_safe_redirect(home_url('/?' . ($_SERVER['QUERY_STRING'] ?? ''))); exit;
                 }
                 $approved = ($_POST['decision'] ?? '') === 'approve';
                 $response = Support::lock('oauth:' . $client, static function () use ($approved, $client, $dealer, $scopes, $auth, $server) {
@@ -203,11 +221,11 @@ final class OAuth
                 exit;
             }
             self::head('Connect AutoAgora');
-            echo '<h1>Connect ' . esc_html($auth->getClient()->getName()) . '</h1><p>Signed in as ' . esc_html(wp_get_current_user()->display_name) . '. This application will be able to:</p><ul>';
+            echo '<h1>Connect ' . esc_html($auth->getClient()->getName()) . '</h1><p>Signed in as ' . esc_html(self::accountIdentity($dealer)['name']) . '. This application will be able to:</p><ul>';
             foreach ($scopes as $scope) { echo '<li>' . esc_html(Support::SCOPES[$scope]) . '</li>'; }
             echo '</ul><p>Your password stays with AutoAgora. You can disconnect this application at any time.</p><form method="post">';
             wp_nonce_field($nonceAction);
-            echo '<button class="btn btn-primary" name="decision" value="approve">Authorize connection</button> <button class="btn btn-secondary" name="decision" value="deny">Cancel</button></form>';
+            echo '<button class="btn btn-primary" name="decision" value="approve">Authorize connection</button> <button class="btn btn-secondary" name="decision" value="deny">Cancel</button> <button class="btn btn-link" name="decision" value="switch-account">Use a different account</button></form>';
             self::foot();
             exit;
         } catch (OAuthServerException $error) {

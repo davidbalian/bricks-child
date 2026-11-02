@@ -1,0 +1,299 @@
+{
+  "environment": "https://staging7.autoagora.cy",
+  "production_requests": 0,
+  "checks": [
+    {
+      "check": "Anonymous native mutation denied: /wp-admin/admin-ajax.php",
+      "passed": true
+    },
+    {
+      "check": "Anonymous native mutation denied: /wp-admin/admin-post.php",
+      "passed": true
+    },
+    {
+      "check": "Anonymous native mutation denied: /?autoagora_connect=dealer-login",
+      "passed": true
+    },
+    {
+      "check": "Postaki exact localhost callback opens revised login",
+      "passed": true
+    },
+    {
+      "check": "private connection opens branded login without directory",
+      "passed": true
+    },
+    {
+      "check": "private signup is configured",
+      "passed": true
+    },
+    {
+      "check": "Browser returns to the same OAuth request",
+      "passed": true
+    },
+    {
+      "check": "private signup confirms phone and selected type",
+      "passed": true
+    },
+    {
+      "check": "Browser returns to the same OAuth request",
+      "passed": true
+    },
+    {
+      "check": "private approved test phone reaches verification",
+      "passed": true
+    },
+    {
+      "check": "Browser returns to the same OAuth request",
+      "passed": true
+    },
+    {
+      "check": "private OTP proof unlocks account details",
+      "passed": true
+    },
+    {
+      "check": "private signup creates a non-admin session and resumes OAuth",
+      "passed": true
+    },
+    {
+      "check": "private signed-in account sees consent",
+      "passed": true
+    },
+    {
+      "check": "private callback carries code and original state",
+      "passed": true
+    },
+    {
+      "check": "private real token exchange returns account identity",
+      "passed": true
+    },
+    {
+      "check": "private identity belongs to the new account",
+      "passed": true
+    },
+    {
+      "check": "private refresh includes the same account identity",
+      "passed": true
+    },
+    {
+      "check": "private refresh still rotates credentials",
+      "passed": true
+    },
+    {
+      "check": "private car import publishes only on staging",
+      "passed": true
+    },
+    {
+      "check": "private API reads its own new car",
+      "passed": true
+    },
+    {
+      "check": "private new car renders on normal staging site",
+      "passed": true
+    },
+    {
+      "check": "private imported photos are real staging files",
+      "passed": true
+    },
+    {
+      "check": "private can update only its own car",
+      "passed": true
+    },
+    {
+      "check": "Private seller withdrawal retains its staging car",
+      "passed": true
+    },
+    {
+      "check": "private own connections dashboard renders",
+      "passed": true
+    },
+    {
+      "check": "private own stock dashboard renders",
+      "passed": true
+    },
+    {
+      "check": "Private dashboard uses private-seller labels",
+      "passed": true
+    },
+    {
+      "check": "private dashboard includes only its own imported record",
+      "passed": true
+    },
+    {
+      "check": "private own activity dashboard renders",
+      "passed": true
+    },
+    {
+      "check": "private WordPress backend stays denied",
+      "passed": true
+    },
+    {
+      "check": "private native REST stays denied",
+      "passed": true
+    },
+    {
+      "check": "private later login accepts a different signup hint",
+      "passed": true
+    },
+    {
+      "check": "private QA grant disconnects",
+      "passed": true
+    },
+    {
+      "check": "private revoked QA token stops working",
+      "passed": true
+    },
+    {
+      "check": "dealer connection opens branded login without directory",
+      "passed": true
+    },
+    {
+      "check": "dealer signup is configured",
+      "passed": true
+    },
+    {
+      "check": "Browser returns to the same OAuth request",
+      "passed": true
+    },
+    {
+      "check": "dealer signup confirms phone and selected type",
+      "passed": true
+    },
+    {
+      "check": "Browser returns to the same OAuth request",
+      "passed": true
+    },
+    {
+      "check": "dealer approved test phone reaches verification",
+      "passed": true
+    },
+    {
+      "check": "Browser returns to the same OAuth request",
+      "passed": true
+    },
+    {
+      "check": "dealer OTP proof unlocks account details",
+      "passed": true
+    },
+    {
+      "check": "dealer signup creates a non-admin session and resumes OAuth",
+      "passed": true
+    },
+    {
+      "check": "dealer signed-in account sees consent",
+      "passed": true
+    },
+    {
+      "check": "dealer callback carries code and original state",
+      "passed": true
+    },
+    {
+      "check": "dealer real token exchange returns account identity",
+      "passed": true
+    },
+    {
+      "check": "dealer identity belongs to the new account",
+      "passed": true
+    },
+    {
+      "check": "dealer refresh includes the same account identity",
+      "passed": true
+    },
+    {
+      "check": "dealer refresh still rotates credentials",
+      "passed": true
+    },
+    {
+      "check": "dealer car import publishes only on staging",
+      "passed": true
+    },
+    {
+      "check": "dealer API reads its own new car",
+      "passed": true
+    },
+    {
+      "check": "dealer new car renders on normal staging site",
+      "passed": true
+    },
+    {
+      "check": "dealer imported photos are real staging files",
+      "passed": true
+    },
+    {
+      "check": "One new seller cannot read another seller\u2019s API record",
+      "passed": true
+    },
+    {
+      "check": "dealer can update only its own car",
+      "passed": true
+    },
+    {
+      "check": "dealer own connections dashboard renders",
+      "passed": true
+    },
+    {
+      "check": "dealer own stock dashboard renders",
+      "passed": true
+    },
+    {
+      "check": "dealer dashboard includes only its own imported record",
+      "passed": true
+    },
+    {
+      "check": "dealer own activity dashboard renders",
+      "passed": true
+    },
+    {
+      "check": "dealer WordPress backend stays denied",
+      "passed": true
+    },
+    {
+      "check": "dealer native REST stays denied",
+      "passed": true
+    },
+    {
+      "check": "dealer later login accepts a different signup hint",
+      "passed": true
+    },
+    {
+      "check": "dealer QA grant disconnects",
+      "passed": true
+    },
+    {
+      "check": "dealer revoked QA token stops working",
+      "passed": true
+    }
+  ],
+  "accounts": {
+    "private": {
+      "id": 460,
+      "listing_id": 52870,
+      "listing_url": "https://staging7.autoagora.cy/car/2020-bmw-3-series-52870/"
+    },
+    "dealer": {
+      "id": 461,
+      "listing_id": 52874,
+      "listing_url": "https://staging7.autoagora.cy/car/2020-bmw-3-series-52874/"
+    }
+  },
+  "checked_at": "2026-11-02T12:47:04Z",
+  "local_checks": {
+    "connect_contract": 141,
+    "provider_boundaries_offline": 18,
+    "private_workspace": 79,
+    "reviewer": 70,
+    "dashboard_adapter": 62,
+    "total": 370
+  },
+  "deployment": {
+    "host": "staging7.autoagora.cy",
+    "source_files_verified": 14,
+    "temporary_installer_retired": true,
+    "production_changed": false
+  },
+  "limits": [
+    "Uses explicitly approved synthetic staging phone numbers and test codes; no SMS delivery test.",
+    "AutoAgora API/hosted flow tested with the existing QA client; Postaki must retest its own software.",
+    "XML-RPC hosting rule closed the request before an application response; early WordPress exit verified in the local adapter.",
+    "Main-site UI and production were not modified or functionally tested."
+  ]
+}

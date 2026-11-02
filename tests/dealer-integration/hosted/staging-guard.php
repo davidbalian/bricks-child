@@ -10,11 +10,22 @@ $agStageConfig = is_readable($agStageConfigFile) ? json_decode(file_get_contents
 $agStageConfig = is_array($agStageConfig) ? $agStageConfig : [];
 $agStageDealers = array_map('intval', $agStageConfig['dealer_ids'] ?? []);
 $agStageExpires = (int) ($agStageConfig['expires_at'] ?? 0);
+// Only explicitly configured synthetic numbers can register in this isolated sandbox.
+$agSignupFile = $agStagePrivate . '/signup-tests.json';
+$agSignup = is_readable($agSignupFile) ? json_decode(file_get_contents($agSignupFile), true) : [];
+$agSignup = is_array($agSignup) ? $agSignup : [];
+$agSignupPhones = array_filter(is_array($agSignup['phones'] ?? null) ? $agSignup['phones'] : [], static fn ($hash,$phone) => is_string($hash) && preg_match('/^[a-f0-9]{64}$/D',$hash) && preg_match('/^\+357[0-9]{8}$/D',(string)$phone), ARRAY_FILTER_USE_BOTH);
+$agStageDealers = array_values(array_unique(array_merge($agStageDealers,array_map('intval',get_users(['meta_key'=>'_ag_connect_staging_user','meta_value'=>'1','fields'=>'ids'])))));
+$agStageAllowed = static fn ($id) => time() < $agStageExpires && (in_array((int)$id,$agStageDealers,true) || get_user_meta((int)$id,'_ag_connect_staging_user',true)==='1');
+
 $agStageValues = [
  'AUTOAGORA_DEALER_API_ENABLED' => true, 'AUTOAGORA_DEALER_API_PRODUCTION_APPROVED' => false,
  'AUTOAGORA_DEALER_PUBLIC_ENABLED' => true, 'AUTOAGORA_DEALER_RULES_VERIFIED' => true,
  'AUTOAGORA_DEALER_ONBOARDING_ENABLED' => true,
  'AUTOAGORA_DEALER_PRIVATE_SELLERS_ENABLED' => true,
+ 'AUTOAGORA_CONNECT_SIGNUP_ENABLED' => true,
+ 'AUTOAGORA_CONNECT_TEST_PHONES' => $agSignupPhones,
+ 'AUTOAGORA_CONNECT_TEST_EXPIRES' => min($agStageExpires,(int)($agSignup['expires_at']??0)),
  'AUTOAGORA_DEALER_PRIVATE_KEY' => $agStagePrivate . '/private.pem',
  'AUTOAGORA_DEALER_PUBLIC_KEY' => $agStagePrivate . '/public.pem',
  'AUTOAGORA_DEALER_ENCRYPTION_KEY' => $agStageConfig['encryption'] ?? '',
@@ -44,20 +55,20 @@ add_filter('login_redirect', static function ($url, $requested, $user) use ($agS
  return $url;
 }, PHP_INT_MAX, 3);
 add_filter('wp_robots', static fn ($robots) => ['noindex' => true, 'nofollow' => true, 'noarchive' => true]);
-add_filter('autoagora_dealer_api_eligible', static fn ($ok, $id) => $ok && time() < $agStageExpires && in_array((int) $id, $agStageDealers, true), PHP_INT_MAX, 2);
-add_filter('autoagora_dealer_api_can_save', static fn ($ok, $id) => time() < $agStageExpires && in_array((int) $id, $agStageDealers, true) ? $ok : new WP_Error('staging_account_required', 'Use the designated staging test account.', ['status' => 403]), PHP_INT_MAX, 2);
-add_filter('autoagora_dealer_api_submission_status', static fn ($status, $id) => time() < $agStageExpires && in_array((int) $id, $agStageDealers, true) ? 'publish' : 'pending', PHP_INT_MAX, 2);
-add_filter('authenticate', static function ($user, $username) use ($agStageDealers, $agStageExpires) {
+add_filter('autoagora_dealer_api_eligible', static fn ($ok, $id) => $ok && $agStageAllowed($id), PHP_INT_MAX, 2);
+add_filter('autoagora_dealer_api_can_save', static fn ($ok, $id) => $agStageAllowed($id) ? $ok : new WP_Error('staging_account_required', 'Use the designated staging test account.', ['status' => 403]), PHP_INT_MAX, 2);
+add_filter('autoagora_dealer_api_submission_status', static fn ($status, $id) => $agStageAllowed($id) ? 'publish' : 'pending', PHP_INT_MAX, 2);
+add_filter('authenticate', static function ($user, $username) use ($agStageAllowed) {
  $accountBucket = 'agstage_login_' . hash('sha256', strtolower((string) $username));
  $ipBucket = 'agstage_login_' . hash('sha256', 'ip:' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
  if ((int) get_transient($accountBucket) >= 5 || (int) get_transient($ipBucket) >= 20) { return new WP_Error('staging_login_limited', 'Too many attempts. Try again in 15 minutes.'); }
- if ($user instanceof WP_User && !user_can($user, 'manage_options') && (!in_array((int) $user->ID, $agStageDealers, true) || time() >= $agStageExpires)) { return new WP_Error('staging_access_denied', 'Use your staging test account.'); }
+ if ($user instanceof WP_User && !user_can($user, 'manage_options') && !$agStageAllowed($user->ID)) { return new WP_Error('staging_access_denied', 'Use your staging test account.'); }
  return $user;
 }, PHP_INT_MAX, 2);
 add_action('wp_login_failed', static function ($username) {
  foreach ([strtolower((string) $username), 'ip:' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown')] as $subject) { $bucket = 'agstage_login_' . hash('sha256', $subject); set_transient($bucket, (int) get_transient($bucket) + 1, 900); }
 });
-add_filter('auth_cookie_expiration', static fn ($seconds, $user) => in_array((int) $user, $agStageDealers, true) ? HOUR_IN_SECONDS : $seconds, PHP_INT_MAX, 2);
+add_filter('auth_cookie_expiration', static fn ($seconds, $user) => $agStageAllowed($user) ? HOUR_IN_SECONDS : $seconds, PHP_INT_MAX, 2);
 if (defined('DOING_CRON') && DOING_CRON) { exit; }
 add_action('send_headers', static function () {
  header('X-Robots-Tag: noindex, nofollow, noarchive');
@@ -81,11 +92,14 @@ add_action('template_redirect', static function () use ($agStageDealers) {
  if (is_singular('car') && !in_array((int) get_post_field('post_author', get_queried_object_id()), $agStageDealers, true)) { wp_die('Not part of the staging sandbox.', '', ['response' => 404]); }
 }, -90);
 // Test users must use the scoped API. Never let native forms mutate cloned records.
-add_action('init', static function () use ($agStageDealers) {
- if (!in_array(get_current_user_id(), $agStageDealers, true)) { return; }
+add_action('init', static function () {
+ if (defined('XMLRPC_REQUEST') && XMLRPC_REQUEST) { wp_die('XML-RPC is disabled in the staging sandbox.', '', ['response' => 403]); }
+ if (current_user_can('manage_options')) { return; }
  $path = (string) wp_parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
  if (str_starts_with($path, '/wp-admin')) { wp_die('Backend access is disabled for staging test accounts.', '', ['response' => 403]); }
  if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') { return; }
+ // Legacy AJAX/forms may send SMS directly through an SDK, outside the HTTP filter.
+ if (isset($_POST['action'])) { wp_die('Native form actions are disabled in the staging sandbox.', '', ['response' => 403]); }
  if ($path === '/wp-login.php' || str_starts_with($path, '/wp-json/autoagora-dealer/v1/') || isset($_GET['autoagora_stage_client']) || in_array($_GET['autoagora_connect'] ?? '', ['authorize', 'connections', 'workspace', 'dealer-login'], true)) { return; }
  wp_die('Use the staging connection tester to change test stock.', '', ['response' => 403]);
 }, 1);

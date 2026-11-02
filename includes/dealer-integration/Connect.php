@@ -3,6 +3,7 @@
 namespace AutoAgora\Dealer;
 
 defined('ABSPATH') || exit;
+require_once __DIR__ . '/Signup.php';
 
 final class Connect
 {
@@ -79,108 +80,101 @@ final class Connect
         $action = $_GET['autoagora_connect'] ?? '';
         if (!is_string($action) || !in_array($action, ['authorize','dealer-login'], true) || !self::enabled()) { return; }
         $local = wp_get_environment_type() === 'local' && in_array(wp_parse_url(home_url('/'), PHP_URL_HOST), ['127.0.0.1','localhost'], true);
-        if ((!is_ssl() && !$local) || !Support::ready()) { wp_die('Dealer sign-in is temporarily unavailable.', '', ['response' => 503]); }
+        if ((!is_ssl() && !$local) || !Support::ready()) { wp_die('Seller sign-in is temporarily unavailable.', '', ['response'=>503]); }
         if ($action === 'authorize' && is_user_logged_in()) { return; }
         $authorization = null;
         if ($action === 'authorize') {
-            // Validate the application, exact callback, scopes, state and PKCE before showing names or accepting credentials.
             try { $authorization = OAuth::authorizationRequest(); }
-            catch (\Throwable $error) { wp_die('This connection request is invalid or expired. Start again from your stock software.', '', ['response' => 400]); }
+            catch (\Throwable $error) { wp_die('This connection request is invalid or expired. Start again from your stock software.', '', ['response'=>400]); }
         }
-        $return = $action === 'authorize' ? home_url('/?' . ($_SERVER['QUERY_STRING'] ?? ''))
+        $return = $authorization ? home_url('/?' . ($_SERVER['QUERY_STRING'] ?? ''))
             : self::safeReturn(isset($_GET['return_to']) && is_string($_GET['return_to']) ? wp_unslash($_GET['return_to']) : '');
         if (is_user_logged_in()) { wp_safe_redirect($return); exit; }
-        nocache_headers();
-        header('X-Robots-Tag: noindex, nofollow, noarchive'); header('Referrer-Policy: no-referrer'); header('X-Frame-Options: DENY');
-        header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'none'; img-src 'self' data:; font-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
+        nocache_headers(); header('X-Robots-Tag: noindex, nofollow, noarchive'); header('Referrer-Policy: no-referrer'); header('X-Frame-Options: DENY');
+        $botAssets = Signup::ready() && !Signup::testing() ? ' https://challenges.cloudflare.com' : '';
+        header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'$botAssets; frame-src 'self'$botAssets; connect-src 'self'$botAssets; img-src 'self' data:; font-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
         $cookie = is_ssl() ? '__Host-ag_connect' : 'ag_connect';
         $browser = isset($_COOKIE[$cookie]) && is_string($_COOKIE[$cookie]) && preg_match('/^[a-f0-9]{64}$/D', $_COOKIE[$cookie]) ? $_COOKIE[$cookie] : '';
         $flow = hash('sha256', $return);
         $sessionKey = 'ag_connect_' . hash_hmac('sha256', $browser . ':' . $flow, wp_salt('nonce'));
-        $session = $browser ? get_transient($sessionKey) : false;
-        $session = is_array($session) ? $session : [];
+        $saved = $browser ? get_transient($sessionKey) : false; $session = is_array($saved) ? $saved : [];
         $accountType = $authorization ? OAuth::requestedAccountType() : '';
-        $stage = $action === 'authorize' && $accountType === 'dealer' ? 'find' : 'signin'; $error = ''; $reference = '';
-        $clientName = $authorization ? $authorization->getClient()->getName() : '';
-        $name = ''; $city = ''; $matches = []; $selected = null;
+        $stage = in_array($session['view'] ?? '', ['signup_phone','signup_verify','signup_details'], true) && $authorization && Signup::ready() ? $session['view'] : 'signin';
+        $error = ''; $clientName = $authorization ? $authorization->getClient()->getName() : '';
         if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
-            $posted = self::field('connect_csrf', 64);
             $expected = $browser ? hash_hmac('sha256', $browser . ':' . $flow, wp_salt('nonce')) : '';
-            if (!$expected || !hash_equals($expected, $posted)) { wp_die('This form expired. Reload and try again.', '', ['response' => 403]); }
-            $operation = self::field('connect_action', 30);
-            $name = self::field('dealership_name'); $city = self::field('dealership_city', 80);
-            $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+            if (!$expected || !hash_equals($expected, self::field('connect_csrf', 64))) { wp_die('This form expired. Reload and try again.', '', ['response'=>403]); }
+            $operation = self::field('connect_action', 30); $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown');
             if (!self::rate('forms:' . $ip, 45)) { status_header(429); header('Retry-After: 900'); $error = 'Too many attempts. Try again in 15 minutes.'; }
-            elseif ($operation === 'find' && $authorization && $accountType === 'dealer') {
-                if (mb_strlen(DealerDirectory::normalize($name)) < 3) { status_header(422); $error = 'Enter at least three letters of your dealership name.'; }
-                else {
-                    $session = ['name' => $name, 'city' => $city, 'candidates' => []];
-                    foreach (DealerDirectory::search($name, $city) as $match) { $session['candidates'][bin2hex(random_bytes(16))] = $match; }
-                    if (!self::saveSession($sessionKey, $session)) { wp_die('Matching is temporarily unavailable.', '', ['response' => 503]); }
-                    $matches = $session['candidates']; $stage = $matches ? 'matches' : 'request';
-                }
-            } elseif ($operation === 'choose' && $authorization && $accountType === 'dealer') {
-                $token = self::field('candidate', 32);
-                $selected = $session['candidates'][$token] ?? null;
-                if (!$selected || !Support::eligible((int) $selected['id']) || Support::accountType((int) $selected['id']) !== 'dealer') { wp_die('Choose your dealership again.', '', ['response' => 403]); }
-                $session['selected'] = $selected;
-                if (!self::saveSession($sessionKey, $session)) { wp_die('Sign-in is temporarily unavailable.', '', ['response' => 503]); }
-                $stage = 'signin';
-            } elseif ($operation === 'direct') {
-                unset($session['selected']); set_transient($sessionKey, $session, 20 * MINUTE_IN_SECONDS); $stage = 'signin';
+            elseif (in_array($operation, ['direct','signin-form'], true)) {
+                delete_transient($sessionKey); wp_safe_redirect($return); exit;
             } elseif ($operation === 'signin') {
-                $stage = 'signin'; $selected = $session['selected'] ?? null;
-                $login = self::field('dealer_login', 191);
-                if (preg_match('/^[+\d\s()-]+$/D', $login) && function_exists('autoagora_normalize_dealership_phone')) {
-                    $phone = autoagora_normalize_dealership_phone($login); if (!is_wp_error($phone)) { $login = $phone; }
-                }
-                $account = $selected ? (string) $selected['id'] : mb_strtolower($login);
-                $ipAllowed = self::rate('login-ip:' . $ip, 20); $accountAllowed = self::rate('login-account:' . $account, 5);
+                $stage = 'signin'; $login = self::field('dealer_login', 191);
+                if (preg_match('/^[+\d\s().-]+$/D', $login)) { $phone = Signup::phone($login); if (!is_wp_error($phone)) { $login = $phone; } }
+                $ipAllowed = self::rate('login-ip:' . $ip, 20); $accountAllowed = self::rate('login-account:' . mb_strtolower($login), 5);
                 if (!$ipAllowed || !$accountAllowed) { status_header(429); header('Retry-After: 900'); $error = 'Too many attempts. Try again in 15 minutes.'; }
                 else {
                     $password = isset($_POST['dealer_password']) && is_string($_POST['dealer_password']) ? wp_unslash($_POST['dealer_password']) : '';
                     self::$authenticating = true;
                     try { $user = wp_authenticate($login, strlen($password) <= 4096 ? $password : ''); }
                     finally { self::$authenticating = false; unset($password); }
-                    if (!is_wp_error($user) && !user_can($user, 'manage_options') && Support::eligible((int) $user->ID)
-                        && (!$authorization || Support::accountType((int) $user->ID) === $accountType)
-                        && (!$selected || (int) $selected['id'] === (int) $user->ID)) {
-                        wp_set_current_user($user->ID); wp_set_auth_cookie($user->ID, false, is_ssl());
-                        do_action('wp_login', $user->user_login, $user);
-                        delete_transient($sessionKey);
-                        // Keep the signed-in dealer on the original OAuth request, with its state/verifier challenge unchanged.
-                        wp_safe_redirect($return); exit;
+                    // The URL is a signup hint only. Existing accounts retain their actual type.
+                    if (!is_wp_error($user) && !user_can($user, 'manage_options') && Support::eligible((int) $user->ID)) {
+                        wp_set_current_user($user->ID); wp_set_auth_cookie($user->ID, false, is_ssl()); do_action('wp_login', $user->user_login, $user);
+                        delete_transient($sessionKey); wp_safe_redirect($return); exit;
                     }
-                    status_header(401); $error = 'Sign-in failed. Check your details or request access below.';
+                    status_header(401); $error = 'Sign-in failed. Check your details and try again.';
                 }
-            } elseif ($operation === 'request-form' && $authorization) { $stage = 'request'; }
-            elseif ($operation === 'request' && $authorization) {
-                $stage = 'request'; $name = $name ?: ($session['name'] ?? ''); $city = $city ?: ($session['city'] ?? '');
-                $contactName = $accountType === 'private' ? $name : self::field('contact_name'); $contact = self::field('contact', 191);
-                $validContact = is_email($contact) || preg_match('/^\+?[\d\s()-]{8,25}$/D', $contact) && strlen(preg_replace('/\D/', '', $contact)) >= 8;
-                if (mb_strlen($name) < 3 || $contactName === '' || !$validContact) { status_header(422); $error = $accountType === 'private' ? 'Add your full name and a valid email or phone number.' : 'Add your dealership name, your name, and a valid email or phone number.'; }
-                elseif (!self::rate('request:' . $ip, 5)) { status_header(429); header('Retry-After: 900'); $error = 'Too many requests. Try again in 15 minutes.'; }
-                else {
-                    $key = hash_hmac('sha256', $authorization->getClient()->getIdentifier() . ':' . $accountType . ':' . DealerDirectory::normalize($name) . ':' . mb_strtolower($contact), wp_salt('auth'));
-                    $saved = Support::lock('onboard:' . $key, static function () use ($key, $name, $city, $contactName, $contact, $authorization, $accountType) {
-                        $existing = get_posts(['post_type'=>'ag_dealer_onboard','post_status'=>'pending','numberposts'=>1,'fields'=>'ids','meta_key'=>'_ag_onboard_key','meta_value'=>$key]);
-                        if ($existing) { return (string) get_post_meta($existing[0], '_ag_onboard_reference', true); }
-                        $reference = strtoupper(bin2hex(random_bytes(6)));
-                        $id = wp_insert_post(['post_type'=>'ag_dealer_onboard','post_status'=>'pending','post_title'=>$name,'post_author'=>0,
-                            'meta_input'=>['_ag_onboard_key'=>$key,'_ag_onboard_reference'=>$reference,'_ag_onboard_contact_name'=>$contactName,
-                                '_ag_onboard_contact'=>$contact,'_ag_onboard_city'=>$city,'_ag_onboard_client'=>$authorization->getClient()->getIdentifier(), '_ag_onboard_account_type'=>$accountType]], true);
-                        return is_wp_error($id) || !$id ? Support::error('request_failed','Your request could not be saved.',503) : $reference;
-                    });
-                    if (is_wp_error($saved)) { wp_die('Your request could not be saved. Please try again.', '', ['response'=>503]); }
-                    $reference = $saved;
-                    $stage = 'requested';
+            } elseif (in_array($operation, ['signup','send-code','verify-code','create-account'], true) && $authorization && Signup::ready()) {
+                $result = Support::lock('connect-session:' . $sessionKey, static function () use ($operation,$sessionKey,$accountType) {
+                    $fresh = get_transient($sessionKey); $state = is_array($fresh) ? $fresh : [];
+                    if ($operation === 'signup') { $state = ['view'=>'signup_phone']; }
+                    elseif ($operation === 'send-code') {
+                        $phone = Signup::phone(self::field('signup_phone', 30)); $type = self::field('signup_type', 20);
+                        if (is_wp_error($phone)) { return $phone; }
+                        if (!in_array($type, ['dealer','private'], true) || ($type === 'private' && !Support::privateSellersEnabled())) { return Support::error('invalid_type', 'Choose an available account type.'); }
+                        $state = ['view'=>'signup_phone']; if (!self::saveSession($sessionKey, $state)) { return Support::error('signup_session', 'Signup is temporarily unavailable.', 503); }
+                        $challenge = Signup::send($phone, self::field('cf-turnstile-response', 2048));
+                        if (is_wp_error($challenge)) { return $challenge; }
+                        $state = ['view'=>'signup_verify','signup'=>['phone'=>$phone,'type'=>$type,'challenge'=>$challenge,'sent_at'=>time(),'attempts'=>0]];
+                    } else {
+                        $proof = $state['signup'] ?? [];
+                        if (!$proof || ($operation === 'verify-code' && (int) ($proof['sent_at'] ?? 0) + 600 < time())) { return Support::error('verification_expired', 'Your verification expired. Request a new code.', 403); }
+                        if ($operation === 'verify-code') {
+                            if (!empty($proof['verified_until']) || (int) ($proof['attempts'] ?? 0) >= 5) { return Support::error('verification_attempts', 'Request a new code before trying again.', 429); }
+                            $proof['attempts'] = (int) ($proof['attempts'] ?? 0) + 1; $state['signup'] = $proof;
+                            if (!self::saveSession($sessionKey, $state)) { return Support::error('verification_failed', 'Verification is temporarily unavailable.', 503); }
+                            if (!Signup::verify($proof['phone'], $proof['challenge'], self::field('signup_code', 20))) { return Support::error('invalid_code', 'The verification code is incorrect or expired.'); }
+                            $state['signup']['verified_until'] = time()+600; $state['view'] = 'signup_details';
+                        } else {
+                            $password = isset($_POST['signup_password']) && is_string($_POST['signup_password']) ? wp_unslash($_POST['signup_password']) : '';
+                            $confirm = isset($_POST['signup_confirm']) && is_string($_POST['signup_confirm']) ? wp_unslash($_POST['signup_confirm']) : '';
+                            $id = Signup::create($proof,self::field('first_name',80),self::field('last_name',80),self::field('company_name'),$password,$confirm);
+                            unset($password,$confirm);
+                            if (is_wp_error($id)) { return $id; }
+                            delete_transient($sessionKey); return $id;
+                        }
+                    }
+                    return self::saveSession($sessionKey, $state) ? true : Support::error('signup_session', 'Signup is temporarily unavailable.', 503);
+                });
+                if (is_wp_error($result)) {
+                    $data = $result->get_error_data(); $status = is_array($data) ? (int) ($data['status'] ?? 422) : 422;
+                    status_header($status); if ($status === 429) { header('Retry-After: 600'); }
+                    $error = $result->get_error_message();
+                    $stage = ['signup'=>'signup_phone','send-code'=>'signup_phone','verify-code'=>'signup_verify','create-account'=>'signup_details'][$operation];
+                    $fresh = get_transient($sessionKey); $session = is_array($fresh) ? $fresh : [];
+                } else {
+                    if (is_int($result)) {
+                        if (!Support::eligible($result) || user_can($result, 'manage_options')) { wp_die('Your account was created but cannot connect yet. Contact AutoAgora.', '', ['response'=>403]); }
+                        wp_set_current_user($result); wp_set_auth_cookie($result,false,is_ssl()); $user = get_userdata($result); do_action('wp_login',$user->user_login,$user);
+                    }
+                    wp_safe_redirect($return); exit;
                 }
             } else { wp_die('Unsupported form action.', '', ['response'=>400]); }
         }
         if (!$browser) { $browser = bin2hex(random_bytes(32)); }
-        setcookie($cookie, $browser, ['expires'=>time()+1200,'path'=>'/','secure'=>is_ssl(),'httponly'=>true,'samesite'=>'Lax']);
-        $csrf = hash_hmac('sha256', $browser . ':' . $flow, wp_salt('nonce'));
-        $name = $name ?: ($session['name'] ?? ''); $city = $city ?: ($session['city'] ?? '');
+        setcookie($cookie,$browser,['expires'=>time()+1200,'path'=>'/','secure'=>is_ssl(),'httponly'=>true,'samesite'=>'Lax']);
+        $csrf = hash_hmac('sha256',$browser.':'.$flow,wp_salt('nonce'));
         require __DIR__ . '/connect-template.php'; exit;
     }
 

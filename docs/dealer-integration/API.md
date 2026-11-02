@@ -23,7 +23,9 @@ code_challenge_method=S256
 account_type=dealer
 ```
 
-`account_type` is `dealer` or `private` in the connect URL. It defaults to `dealer` when omitted. In explicitly enabled environments, `private` uses the existing normal seller account (`client` role) and skips dealership lookup. The actual signed-in account must match; this parameter does not create accounts or change roles. Private sellers use the same OAuth client, API routes and scopes for their own listings. Do not include `account_type` in listing JSON. See [seller onboarding](ONBOARDING.md) for the branded login and access-request fallback.
+`account_type` is an optional **signup hint** (`dealer` or `private`) in the connect URL. Existing users always sign in to their actual AutoAgora account: a different hint never rejects their login or changes their role. New users can complete phone-verified signup and confirm the preselected account type; without a hint they choose it on AutoAgora. Invalid/nonscalar hints are rejected. Private support and connection signup each require explicit enablement. There is no public account matching/claiming and no partner account-type-change endpoint. Account-type changes stay under AutoAgora management. See [seller onboarding](ONBOARDING.md).
+
+Do not send `account_type`, `autoagora_id` or author IDs in listing JSON. Ownership comes only from the bearer token. The returned account ID is a display/storage reference, never a selector for writes.
 
 3. The dealer signs into AutoAgora and approves or cancels. The callback receives `code` and the original `state`, or an OAuth error. Reject a state mismatch. Do not log the callback query or display/store authorization codes in analytics.
 4. Exchange the code server-to-server:
@@ -35,7 +37,13 @@ Content-Type: application/x-www-form-urlencoded
 grant_type=authorization_code&client_id=CLIENT_ID&client_secret=CLIENT_SECRET&redirect_uri=EXACT_CALLBACK&code=CODE&code_verifier=ORIGINAL_VERIFIER
 ```
 
-Successful exchange returns `token_type: Bearer`, `expires_in: 3600`, `access_token`, `refresh_token`, and `scope`. Codes expire after five minutes and may be used once. S256 is required, including confidential partner clients. Password, implicit and client-credentials grants are not enabled.
+Successful exchange returns `token_type: Bearer`, `expires_in: 3600`, `access_token`, `refresh_token`, `scope`, and `account`:
+
+```json
+{"account":{"id":1234,"name":"Invite Motors"}}
+```
+
+Every successful refresh includes the same object with the **current account name**. Its identity comes from the newly issued token's server-side grant, including when the request carries an unrelated browser session. Client-supplied IDs cannot change it. Only `id` and `name` are included; no contact data or account directory is returned. Failed token requests contain no account metadata. Postaki can display “Συνδεδεμένο ως: Invite Motors.” Codes expire after five minutes and may be used once. S256 is required, including confidential partner clients. Password, implicit and client-credentials grants are not enabled.
 
 Refresh with a form POST to the same endpoint using `grant_type=refresh_token`, the current `refresh_token`, `client_id` and `client_secret`. The refresh token has a 30-day rolling expiry and is rotated on success; atomically replace the old one. Refresh requests can narrow the original scopes. An old/expired/revoked token returns an OAuth error; reconnect when necessary.
 

@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Opt-in loopback-only onboarding fixture. Never deploy the generated MU file."""
 from pathlib import Path
-import json, subprocess, sys
+import json, subprocess, sys, secrets, time
 ROOT=Path(__file__).resolve().parents[2];WP=ROOT/'.staging/wp';P=ROOT/'.private/connect-fixture'
 P.mkdir(mode=0o700,exist_ok=True)
 MU=WP/'wp-content/mu-plugins/ag-connect-fixture.php'
+TESTPHONES=P/'signup-phones.json'
+if not TESTPHONES.exists():
+ TESTPHONES.write_text(json.dumps({'codes':{'+3579000'+f'{i:04}':''.join(str(secrets.randbelow(10)) for _ in range(6)) for i in range(1,51)},'expires_at':int(time.time())+86400*14}));TESTPHONES.chmod(0o600)
 if sys.argv[1:]==['restore']:
  MU.unlink(missing_ok=True)
  subprocess.run(['python3',str(ROOT/'tests/dealer-integration/sync-local.py')],check=True)
@@ -14,15 +17,19 @@ defined('ABSPATH')||exit;
 if(wp_get_environment_type()!=='local'||wp_parse_url(home_url(),PHP_URL_HOST)!=='127.0.0.1'){wp_die('Loopback fixture only');}
 define('AUTOAGORA_DEALER_PUBLIC_ENABLED',true);
 define('AUTOAGORA_DEALER_ONBOARDING_ENABLED',true);
+define('AUTOAGORA_CONNECT_SIGNUP_ENABLED',(bool)get_option('_ag_connect_fixture_signup_enabled',true));
+$signup=json_decode(file_get_contents(SIGNUPFILE),true);
+define('AUTOAGORA_CONNECT_TEST_PHONES',array_map(static fn($code)=>hash('sha256',$code),$signup['codes']));
+define('AUTOAGORA_CONNECT_TEST_EXPIRES',(int)$signup['expires_at']);
 define('AUTOAGORA_DEALER_PRIVATE_SELLERS_ENABLED',(bool)get_option('_ag_connect_fixture_private_enabled',true));
 add_filter('pre_option_autoagora_dealer_admin_release',static fn()=>0);
 add_filter('autoagora_dealer_api_eligible',static function($ok,$id){return $ok&&!get_user_meta($id,'_ag_connect_fixture_excluded',true);},99,2);
-""")
+""".replace('SIGNUPFILE',json.dumps(str(TESTPHONES))))
 subprocess.run(['python3',str(ROOT/'tests/dealer-integration/sync-local.py')],check=True)
 code="""<?php
 if(wp_get_environment_type()!=='local'||wp_parse_url(home_url(),PHP_URL_HOST)!=='127.0.0.1'){WP_CLI::error('Local only');}
 global $wpdb;
-update_option('_ag_connect_fixture_private_enabled',true,false);
+update_option('_ag_connect_fixture_private_enabled',true,false);update_option('_ag_connect_fixture_signup_enabled',true,false);
 $path=ACCOUNTFILE;
 if(!is_file($path)){
  $accounts=[];

@@ -73,6 +73,13 @@ def create(s):
  check('repeated create form is safely idempotent',r2[0]==302 and 'saved=stock_created'in r2[1].get('Location',''))
  f=form(s,'edit_stock');return int(f['listing_id'])
 def main():
+ for path in ['/wp-admin/admin-ajax.php','/wp-admin/admin-post.php','/?autoagora_connect=dealer-login']:
+  check('anonymous native mutation denied: '+path,request(BASE+path,'POST',{'action':'ag_register_user'})[0]==403)
+ # Hosted XML-RPC is also blocked by server rules; exercise the PHP gate locally.
+ if LOCAL:
+  xml=request(BASE+'/xmlrpc.php','POST',{'probe':'blocked'})
+  # WordPress's XML-RPC wp_die handler exits without a body before its server exists.
+  check('staging XML-RPC exits before server initialization',xml[0]==200 and not xml[2].strip())
  global FOREIGN_ID
  check('anonymous dashboard is denied or requires login',request(URL)[0] in (302,403,404))
  s=login(ACCOUNT)
