@@ -20,7 +20,10 @@ scope=stock:read stock:write stock:status catalog:read showroom:write
 state=RANDOM_SESSION_BOUND_STATE
 code_challenge=S256_CHALLENGE
 code_challenge_method=S256
+account_type=dealer
 ```
+
+`account_type` is `dealer` or `private` in the connect URL. It defaults to `dealer` when omitted. In explicitly enabled environments, `private` uses the existing normal seller account (`client` role) and skips dealership lookup. The actual signed-in account must match; this parameter does not create accounts or change roles. Private sellers use the same OAuth client, API routes and scopes for their own listings. Do not include `account_type` in listing JSON. See [seller onboarding](ONBOARDING.md) for the branded login and access-request fallback.
 
 3. The dealer signs into AutoAgora and approves or cancels. The callback receives `code` and the original `state`, or an OAuth error. Reject a state mismatch. Do not log the callback query or display/store authorization codes in analytics.
 4. Exchange the code server-to-server:

@@ -24,6 +24,8 @@ Sample retained for review: https://staging7.autoagora.cy/car/2020-bmw-3-series-
 
 ## Connecting his own software
 
+The staged branded dealer connection and account-matching flow is documented in [dealer onboarding](ONBOARDING.md). It preserves Postaki's OAuth URLs and callback contract. Its explicit enablement flag belongs only in the isolated staging guard; it must not be copied to production.
+
 Give the developer the [API contract](API.md), with this staging base:
 
 `https://staging7.autoagora.cy/wp-json/autoagora-dealer/v1`

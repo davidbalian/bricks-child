@@ -43,11 +43,22 @@ final class Support
     public static function eligible(int $user): bool
     {
         $account = get_userdata($user);
-        // The existing verification badge is based on this role, not public dealer-profile claims.
-        return $account && in_array('dealership', $account->roles, true)
+        // Seller type comes from the account, never a partner-supplied URL or listing field.
+        return $account && self::accountType($user) !== '' && !user_can($user, 'manage_options')
             && user_can($user, 'upload_files') && user_can($user, 'edit_posts')
             && !get_user_meta($user, '_autoagora_dealer_api_blocked', true)
             && (bool) apply_filters('autoagora_dealer_api_eligible', true, $user);
+    }
+    public static function privateSellersEnabled(): bool
+    {
+        return defined('AUTOAGORA_DEALER_PRIVATE_SELLERS_ENABLED') && AUTOAGORA_DEALER_PRIVATE_SELLERS_ENABLED;
+    }
+    public static function accountType(int $user): string
+    {
+        $account = get_userdata($user);
+        if (!$account) { return ''; }
+        if (in_array('dealership', $account->roles, true)) { return 'dealer'; }
+        return self::privateSellersEnabled() && in_array('client', $account->roles, true) ? 'private' : '';
     }
 
     public static function lock(string $key, callable $work)

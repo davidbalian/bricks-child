@@ -30,6 +30,32 @@ final class OAuth
         $factory = new Psr17Factory();
         return (new ServerRequestCreator($factory, $factory, $factory, $factory))->fromGlobals();
     }
+    public static function authorizationRequest(): \League\OAuth2\Server\RequestTypes\AuthorizationRequest
+    {
+        $psr = self::request(); $query = $psr->getQueryParams();
+        foreach (['state', 'scope', 'redirect_uri', 'code_challenge'] as $required) {
+            if (!isset($query[$required]) || !is_string($query[$required]) || $query[$required] === '' || strlen($query[$required]) > 2048) {
+                throw OAuthServerException::invalidRequest($required);
+            }
+        }
+        if (($query['code_challenge_method'] ?? '') !== 'S256' || strlen($query['code_challenge']) !== 43) {
+            throw OAuthServerException::invalidRequest('code_challenge_method', 'S256 PKCE is required.');
+        }
+        self::requestedAccountType();
+        $auth = self::server()->validateAuthorizationRequest($psr);
+        $scopes = array_map(static fn ($s) => $s->getIdentifier(), $auth->getScopes());
+        $allowed = json_decode(Clients::row($auth->getClient()->getIdentifier())['scopes'], true);
+        if (!$scopes || array_diff($scopes, $allowed)) { throw OAuthServerException::invalidScope(''); }
+        return $auth;
+    }
+    public static function requestedAccountType(): string
+    {
+        $type = $_GET['account_type'] ?? 'dealer';
+        if (!is_string($type) || !in_array($type, ['dealer','private'], true) || ($type === 'private' && !Support::privateSellersEnabled())) {
+            throw OAuthServerException::invalidRequest('account_type', 'Use dealer or private.');
+        }
+        return $type;
+    }
     public static function server(): AuthorizationServer
     {
         $server = new AuthorizationServer(new Clients(), new AccessTokens(), new Scopes(),
@@ -130,7 +156,10 @@ final class OAuth
         header('Referrer-Policy: no-referrer');
         header('X-Robots-Tag: noindex, nofollow, noarchive');
         header('X-Frame-Options: DENY');
-        header("Content-Security-Policy: default-src 'self'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'");
+        $brandingPolicy = class_exists(Connect::class) && Connect::enabled()
+            ? "style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; script-src 'none'; base-uri 'none';"
+            : "style-src 'unsafe-inline';";
+        header("Content-Security-Policy: default-src 'self'; $brandingPolicy form-action 'self'; frame-ancestors 'none'");
         if (!Support::ready()) { wp_die('Dealer integration is not configured.', 'Connect AutoAgora', ['response' => 503]); }
         if (!is_user_logged_in()) {
             wp_safe_redirect(wp_login_url(home_url('/?' . ($_SERVER['QUERY_STRING'] ?? ''))));
@@ -141,27 +170,21 @@ final class OAuth
         if (!Support::eligible($dealer)) { wp_die('An eligible AutoAgora dealership account is required.', 'Connect AutoAgora', ['response' => 403]); }
         $auth = null;
         try {
-            $psr = self::request();
-            $query = $psr->getQueryParams();
-            foreach (['state', 'scope', 'redirect_uri', 'code_challenge'] as $required) {
-                if (!isset($query[$required]) || !is_string($query[$required]) || $query[$required] === '' || strlen($query[$required]) > 2048) {
-                    throw OAuthServerException::invalidRequest($required);
-                }
-            }
-            if (($query['code_challenge_method'] ?? '') !== 'S256' || strlen($query['code_challenge']) !== 43) {
-                throw OAuthServerException::invalidRequest('code_challenge_method', 'S256 PKCE is required.');
-            }
+            $query = self::request()->getQueryParams();
             $server = self::server();
-            $auth = $server->validateAuthorizationRequest($psr);
+            $auth = self::authorizationRequest();
+            if (self::requestedAccountType() !== Support::accountType($dealer)) {
+                self::head('Use your seller account');
+                echo '<h1>Use your ' . (self::requestedAccountType() === 'private' ? 'private seller' : 'dealership') . ' account</h1><p>You are signed into a different account type. Sign out and start the connection again from your stock software.</p><a class="btn btn-primary" href="' . esc_url(wp_logout_url(home_url('/'))) . '">Sign out</a>';
+                self::foot(); exit;
+            }
             // Browsers can apply form-action to redirects after POST consent too.
             // Permit only the origin of the exact callback already validated by the library.
             $callback = wp_parse_url($query['redirect_uri']);
             $callbackOrigin = $callback['scheme'] . '://' . $callback['host'] . (isset($callback['port']) ? ':' . $callback['port'] : '');
-            header("Content-Security-Policy: default-src 'self'; style-src 'unsafe-inline'; form-action 'self' " . $callbackOrigin . "; frame-ancestors 'none'");
+            header("Content-Security-Policy: default-src 'self'; $brandingPolicy form-action 'self' " . $callbackOrigin . "; frame-ancestors 'none'");
             $client = $auth->getClient()->getIdentifier();
             $scopes = array_map(static fn ($s) => $s->getIdentifier(), $auth->getScopes());
-            $allowed = json_decode(Clients::row($client)['scopes'], true);
-            if (!$scopes || array_diff($scopes, $allowed)) { throw OAuthServerException::invalidScope(''); }
             $nonceAction = 'ag-consent:' . hash('sha256', wp_json_encode($query));
             if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                 if (!isset($_POST['_wpnonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['_wpnonce'])), $nonceAction)) {
@@ -184,7 +207,8 @@ final class OAuth
             foreach ($scopes as $scope) { echo '<li>' . esc_html(Support::SCOPES[$scope]) . '</li>'; }
             echo '</ul><p>Your password stays with AutoAgora. You can disconnect this application at any time.</p><form method="post">';
             wp_nonce_field($nonceAction);
-            echo '<button class="btn btn-primary" name="decision" value="approve">Authorize connection</button> <button class="btn btn-secondary" name="decision" value="deny">Cancel</button></form></main></body></html>';
+            echo '<button class="btn btn-primary" name="decision" value="approve">Authorize connection</button> <button class="btn btn-secondary" name="decision" value="deny">Cancel</button></form>';
+            self::foot();
             exit;
         } catch (OAuthServerException $error) {
             if ($auth !== null && ($_POST['decision'] ?? '') === 'deny') {
@@ -218,11 +242,25 @@ final class OAuth
             echo '</ul><form method="post">'; wp_nonce_field('ag-connections');
             echo '<input type="hidden" name="client_id" value="' . esc_attr($row->client_id) . '"><button class="btn btn-danger">Disconnect</button></form></section>';
         }
-        echo '</main></body></html>';
+        self::foot();
     }
     private static function head(string $title): void
     {
         header('Content-Type: text/html; charset=utf-8');
+        if (class_exists(Connect::class) && Connect::enabled()) {
+            $assets = get_stylesheet_directory_uri() . '/includes/dealer-integration/assets/';
+            echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . esc_html($title) . ' · AutoAgora</title>';
+            foreach (['tabler/tabler-1.7.1.min.css','workspace.css','button-kit/buttons.css','connect.css'] as $file) {
+                echo '<link rel="stylesheet" href="' . esc_url($assets . $file . '?v=' . filemtime(__DIR__ . '/assets/' . $file)) . '">';
+            }
+            echo '<style>@font-face{font-family:Inter;font-weight:100 900;font-display:swap;src:url(' . esc_url(get_template_directory_uri() . '/assets/fonts/builder/Inter.woff2') . ') format("woff2")}</style></head><body class="agw agw-signin ag-buttons ag-connect"><main class="agw-login-shell"><img class="agw-login-logo" src="' . esc_url($assets . 'autoagora-logo.png') . '" width="160" height="34" alt="AutoAgora"><div class="card card-body agw-login-panel">';
+            return;
+        }
         echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>' . esc_html($title) . '</title><style>body{font:17px/1.6 system-ui;background:#f6f7f9;color:#192335;margin:0}main{max-width:640px;margin:6vh auto;background:white;padding:32px;border-radius:16px}.btn{font:inherit;padding:10px 18px;border:1px solid #ccd2dc;border-radius:8px;cursor:pointer}.btn-primary{background:#3154e8;color:white}section{border-top:1px solid #ddd;margin-top:24px}</style></head><body><main>';
+    }
+    private static function foot(): void
+    {
+        if (class_exists(Connect::class) && Connect::enabled()) { echo '</div>'; }
+        echo '</main></body></html>';
     }
 }

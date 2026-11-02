@@ -8,7 +8,9 @@ use AutoAgora\Dealer\Reviewer;
 $assets = get_stylesheet_directory_uri() . '/includes/dealer-integration/assets/';
 $user = wp_get_current_user();
 $stageWorkspace = wp_get_environment_type() === 'staging' && !empty($state['staging_workspace']) && class_exists('AutoAgoraStagingWorkspace') && AutoAgoraStagingWorkspace::allowed();
+$privateSeller = $stageWorkspace && \AutoAgora\Dealer\Support::accountType(get_current_user_id()) === 'private';
 $pageTitle = ['connections' => 'Dealer connections', 'stock' => 'Dealer stock', 'activity' => 'Integration activity', 'access' => 'Reviewer access'][$tab];
+if ($privateSeller && in_array($tab, ['connections','stock'], true)) { $pageTitle = $tab === 'connections' ? 'Seller connections' : 'Your listings'; }
 $dealerNames = [];
 foreach ($state['dealers'] as $dealer) { $dealerNames[(int) $dealer->ID] = $dealer->display_name; }
 $connectionRows = [];
@@ -46,7 +48,7 @@ foreach ($state['dealers'] as $dealer) {
         <div class="alert alert-info agw-privacy"><?php echo Workspace::icon('shield-check'); ?><p><?php if ($stageWorkspace) : ?><strong>Staging workspace.</strong> Your test cars appear on staging7.autoagora.cy only.<?php else : ?><strong>Private workspace.</strong> Test data is hidden from the public site.<?php endif; ?></p></div>
         <?php if ($notice) : ?><div class="alert <?php echo $notice[0] === 'error' ? 'alert-danger' : 'alert-success'; ?> agw-notice" role="status"><?php echo Workspace::icon('circle-info'); ?><?php echo esc_html($notice[1]); ?></div><?php endif; ?>
         <section class="agw-metrics" aria-label="Workspace summary">
-            <?php foreach ([['link', 'Connections', count($state['connections'])], ['building', $stageWorkspace ? 'Your dealership' : 'Test dealers', count($state['dealers'])], ['car-side', 'Test listings', (int) $state['total']]] as [$metricIcon, $metricLabel, $metricValue]) : ?>
+            <?php foreach ([['link', 'Connections', count($state['connections'])], ['building', $stageWorkspace ? ($privateSeller ? 'Your account' : 'Your dealership') : 'Test dealers', count($state['dealers'])], ['car-side', 'Test listings', (int) $state['total']]] as [$metricIcon, $metricLabel, $metricValue]) : ?>
                 <div class="card"><div class="card-body"><div class="agw-metric-label"><span><?php echo esc_html($metricLabel); ?></span><span class="avatar bg-primary-lt"><?php echo Workspace::icon($metricIcon); ?></span></div><strong class="h1 mb-0"><?php echo $metricValue; ?></strong></div></div>
             <?php endforeach; ?>
         </section>

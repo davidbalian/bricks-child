@@ -156,6 +156,7 @@ add_filter( 'authenticate', 'allow_phone_number_login', 30, 3 );
  */
 function custom_login_failed( $username ) {
     if (class_exists('AutoAgora\\Dealer\\Reviewer') && \AutoAgora\Dealer\Reviewer::loginAttempt()) { return; }
+    if (class_exists('AutoAgora\\Dealer\\Connect') && \AutoAgora\Dealer\Connect::loginAttempt()) { return; }
     $posted_redirect = isset( $_POST['login_failed_redirect'] )
         ? wp_validate_redirect( wp_unslash( $_POST['login_failed_redirect'] ), '' )
         : '';

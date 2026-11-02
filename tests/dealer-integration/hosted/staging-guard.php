@@ -13,6 +13,8 @@ $agStageExpires = (int) ($agStageConfig['expires_at'] ?? 0);
 $agStageValues = [
  'AUTOAGORA_DEALER_API_ENABLED' => true, 'AUTOAGORA_DEALER_API_PRODUCTION_APPROVED' => false,
  'AUTOAGORA_DEALER_PUBLIC_ENABLED' => true, 'AUTOAGORA_DEALER_RULES_VERIFIED' => true,
+ 'AUTOAGORA_DEALER_ONBOARDING_ENABLED' => true,
+ 'AUTOAGORA_DEALER_PRIVATE_SELLERS_ENABLED' => true,
  'AUTOAGORA_DEALER_PRIVATE_KEY' => $agStagePrivate . '/private.pem',
  'AUTOAGORA_DEALER_PUBLIC_KEY' => $agStagePrivate . '/public.pem',
  'AUTOAGORA_DEALER_ENCRYPTION_KEY' => $agStageConfig['encryption'] ?? '',
@@ -28,7 +30,13 @@ add_filter('pre_http_request', static function ($pre, $args, $url) use ($agStage
 }, PHP_INT_MAX, 3);
 add_filter('pre_option_blog_public', '__return_zero');
 // Use the username/password form without granting backend access.
-add_filter('login_url', static fn ($url, $redirect) => add_query_arg(['admin_access' => 'true', 'redirect_to' => $redirect ?: home_url('/?autoagora_connect=workspace')], site_url('/wp-login.php')), PHP_INT_MAX, 2);
+add_filter('login_url', static function ($url, $redirect) {
+ if (class_exists('AutoAgora\\Dealer\\Connect') && \AutoAgora\Dealer\Connect::enabled()
+     && !str_contains((string) wp_parse_url($redirect, PHP_URL_PATH), '/wp-admin')) {
+  return \AutoAgora\Dealer\Connect::loginUrl($redirect ?: home_url('/?autoagora_connect=workspace'));
+ }
+ return add_query_arg(['admin_access' => 'true', 'redirect_to' => $redirect ?: home_url('/?autoagora_connect=workspace')], site_url('/wp-login.php'));
+}, PHP_INT_MAX, 2);
 add_filter('login_redirect', static function ($url, $requested, $user) use ($agStageDealers) {
  if ($user instanceof WP_User && in_array((int) $user->ID, $agStageDealers, true)) {
   return class_exists('AutoAgora\\Dealer\\OAuth') && \AutoAgora\Dealer\OAuth::loginReturn($requested) ? $requested : home_url('/?autoagora_connect=workspace');
@@ -78,7 +86,7 @@ add_action('init', static function () use ($agStageDealers) {
  $path = (string) wp_parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
  if (str_starts_with($path, '/wp-admin')) { wp_die('Backend access is disabled for staging test accounts.', '', ['response' => 403]); }
  if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') { return; }
- if ($path === '/wp-login.php' || str_starts_with($path, '/wp-json/autoagora-dealer/v1/') || isset($_GET['autoagora_stage_client']) || in_array($_GET['autoagora_connect'] ?? '', ['authorize', 'connections', 'workspace'], true)) { return; }
+ if ($path === '/wp-login.php' || str_starts_with($path, '/wp-json/autoagora-dealer/v1/') || isset($_GET['autoagora_stage_client']) || in_array($_GET['autoagora_connect'] ?? '', ['authorize', 'connections', 'workspace', 'dealer-login'], true)) { return; }
  wp_die('Use the staging connection tester to change test stock.', '', ['response' => 403]);
 }, 1);
 add_filter('rest_pre_dispatch', static function ($result, $server, $request) {

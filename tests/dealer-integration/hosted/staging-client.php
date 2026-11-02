@@ -77,7 +77,7 @@ final class AutoAgoraStagingClient
         $state = bin2hex(random_bytes(24));
         set_transient('ag_stage_oauth_' . get_current_user_id(), compact('state', 'verifier'), 300);
         $client = self::credentials();
-        wp_safe_redirect(add_query_arg(['autoagora_connect' => 'authorize', 'response_type' => 'code', 'client_id' => $client['client_id'], 'redirect_uri' => $client['redirect_uri'], 'scope' => implode(' ', array_keys(\AutoAgora\Dealer\Support::SCOPES)), 'state' => $state, 'code_challenge' => rtrim(strtr(base64_encode(hash('sha256', $verifier, true)), '+/', '-_'), '='), 'code_challenge_method' => 'S256'], home_url('/')));
+        wp_safe_redirect(add_query_arg(['autoagora_connect' => 'authorize', 'response_type' => 'code', 'client_id' => $client['client_id'], 'redirect_uri' => $client['redirect_uri'], 'scope' => implode(' ', array_keys(\AutoAgora\Dealer\Support::SCOPES)), 'state' => $state, 'code_challenge' => rtrim(strtr(base64_encode(hash('sha256', $verifier, true)), '+/', '-_'), '='), 'code_challenge_method' => 'S256', 'account_type' => \AutoAgora\Dealer\Support::accountType(get_current_user_id())], home_url('/')));
         exit;
     }
     private static function form(string $action, string $label, array $hidden = []): void
@@ -112,7 +112,7 @@ final class AutoAgoraStagingClient
                     $state = bin2hex(random_bytes(24));
                     set_transient('ag_stage_oauth_' . get_current_user_id(), compact('state', 'verifier'), 300);
                     $client = self::credentials();
-                    wp_safe_redirect(add_query_arg(['autoagora_connect' => 'authorize', 'response_type' => 'code', 'client_id' => $client['client_id'], 'redirect_uri' => $client['redirect_uri'], 'scope' => implode(' ', array_keys(\AutoAgora\Dealer\Support::SCOPES)), 'state' => $state, 'code_challenge' => rtrim(strtr(base64_encode(hash('sha256', $verifier, true)), '+/', '-_'), '='), 'code_challenge_method' => 'S256'], home_url('/'))); exit;
+                    wp_safe_redirect(add_query_arg(['autoagora_connect' => 'authorize', 'response_type' => 'code', 'client_id' => $client['client_id'], 'redirect_uri' => $client['redirect_uri'], 'scope' => implode(' ', array_keys(\AutoAgora\Dealer\Support::SCOPES)), 'state' => $state, 'code_challenge' => rtrim(strtr(base64_encode(hash('sha256', $verifier, true)), '+/', '-_'), '='), 'code_challenge_method' => 'S256', 'account_type' => \AutoAgora\Dealer\Support::accountType(get_current_user_id())], home_url('/'))); exit;
                 }
                 $key = isset($_POST['request_key']) && is_string($_POST['request_key']) ? sanitize_text_field(wp_unslash($_POST['request_key'])) : '';
                 if (!preg_match('/^[a-zA-Z0-9-]{20,64}$/D', $key)) { throw new RuntimeException('Reload this form and try again.'); }

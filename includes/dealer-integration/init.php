@@ -23,10 +23,11 @@ if (PHP_VERSION_ID < 80200 || !extension_loaded('openssl') || !extension_loaded(
     return;
 }
 require_once __DIR__ . '/vendor/autoload.php';
-foreach (['Entities', 'Repositories', 'OAuth', 'Validation', 'Media', 'Listings', 'Rest', 'Cli', 'Workspace'] as $module) {
+foreach (['Entities', 'Repositories', 'OAuth', 'Validation', 'Media', 'Listings', 'Rest', 'Cli', 'Workspace', 'DealerDirectory', 'Connect'] as $module) {
     require_once __DIR__ . '/' . $module . '.php';
 }
 \AutoAgora\Dealer\Workspace::bootstrap();
+\AutoAgora\Dealer\Connect::bootstrap();
 require_once dirname(__DIR__) . '/user-manage-listings/field-validation.php';
 require_once dirname(__DIR__) . '/user-manage-listings/car-field-writer.php';
 

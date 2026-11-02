@@ -24,6 +24,7 @@ final class Workspace
     public static function tabs(): array
     {
         $tabs = ['connections' => ['link', 'Connections'], 'stock' => ['car-side', 'Dealer stock'], 'activity' => ['clock-rotate-left', 'Activity']];
+        if (Support::accountType(get_current_user_id()) === 'private') { $tabs['stock'][1] = 'Your listings'; }
         if (Review::admin()) { $tabs['access'] = ['shield-check', 'Reviewer access']; }
         return $tabs;
     }
