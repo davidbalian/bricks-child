@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
 
 final class DealerDirectory
 {
-    private const CACHE = 'ag_dealer_directory_v1';
+    private const CACHE = 'ag_dealer_directory_v2';
 
     public static function normalize(string $value): string
     {
@@ -48,6 +48,22 @@ final class DealerDirectory
         }
     }
 
+    private static function text($value): string
+    {
+        return is_string($value) || is_numeric($value) ? trim((string) $value) : '';
+    }
+
+    private static function city($value): string
+    {
+        if (!is_array($value)) { return self::text($value); }
+        // ACF may return a label/value choice or a list rather than a scalar.
+        foreach (['label', 'city', 'value'] as $key) {
+            $text = self::text($value[$key] ?? null);
+            if ($text !== '') { return $text; }
+        }
+        return array_is_list($value) ? implode(', ', array_filter(array_map([self::class, 'text'], array_slice($value, 0, 5)))) : '';
+    }
+
     private static function entries(): array
     {
         $cached = get_transient(self::CACHE);
@@ -61,13 +77,13 @@ final class DealerDirectory
             foreach ($users as $user) {
                 if (user_can($user, 'manage_options') || get_user_meta($user->ID, Review::USER_META, true)) { continue; }
                 $names = array_values(array_unique(array_filter(array_map('trim', [
-                    (string) get_user_meta($user->ID, 'dealership_name', true),
-                    trim($user->first_name . ' ' . $user->last_name), (string) $user->display_name,
+                    self::text(get_user_meta($user->ID, 'dealership_name', true)),
+                    trim(self::text($user->first_name) . ' ' . self::text($user->last_name)), self::text($user->display_name),
                 ]), static fn ($n) => $n !== '' && !preg_match('/^[+\d\s-]+$/D', $n))));
                 if (!$names) { continue; }
                 $showroom = get_user_meta($user->ID, '_ag_dealer_showroom', true);
-                $city = is_array($showroom) ? (string) ($showroom['city'] ?? '') : '';
-                if ($city === '') { $city = (string) (get_user_meta($user->ID, 'car_city', true) ?: get_user_meta($user->ID, 'city', true)); }
+                $city = is_array($showroom) ? self::city($showroom['city'] ?? '') : '';
+                if ($city === '') { $city = self::city(get_user_meta($user->ID, 'car_city', true)) ?: self::city(get_user_meta($user->ID, 'city', true)); }
                 $entries[] = ['id' => (int) $user->ID, 'name' => $names[0], 'names' => $names, 'city' => $city];
             }
             if (count($users) < 200) { break; }

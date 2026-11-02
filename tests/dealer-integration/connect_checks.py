@@ -29,7 +29,12 @@ def choose(u,s,raw):return post(u,s,'choose',raw,candidate=token(raw))
 def signin(u,s,raw,key='owner',password=None):
  return post(u,s,'signin',raw,dealer_login=A[key]['username'],dealer_password=password or A[key]['password'])
 def main():
- limits();u,v,state=url();s=h.opener();r=page(u,s)
+ limits()
+ for label,meta in [('ACF label/value city',{'label':'Nicosia','value':'nicosia'}),('Legacy list city',['Nicosia']),('Malformed city',{'unexpected':['nested']})]:
+  raw=json.dumps(meta,separators=(',',':'))
+  result=wp("(static function(){$id="+str(A['legacy']['id'])+";update_user_meta($id,'car_city',json_decode("+json.dumps(raw)+",true));delete_transient('ag_dealer_directory_v2');set_error_handler(static function($n,$m,$file){if(str_contains($file,'DealerDirectory.php')){throw new \\RuntimeException($m);}});$result=\\AutoAgora\\Dealer\\DealerDirectory::search('Cyprus Motors');restore_error_handler();return count($result)>0?'safe':'failed';})()")
+  check(label+' cannot emit directory or header warnings',result=='safe')
+ u,v,state=url();s=h.opener();r=page(u,s)
  check('First connection renders branded dealership form directly',r[0]==200 and 'Find your dealership' in r[3] and 'autoagora-logo.png' in r[3] and 'wp-login.php' not in r[3] and 'Powered by WordPress' not in r[3])
  check('Page is private/noindex and loads only scoped shared UI', 'no-store' in r[1].get('Cache-Control','') and 'noindex' in r[1].get('X-Robots-Tag','') and 'button-kit/buttons.css' in r[3] and '/style.css' not in r[3])
  cookie=next(c for handler in s.handlers if hasattr(handler,'cookiejar') for c in handler.cookiejar if c.name=='ag_connect')
@@ -142,12 +147,15 @@ def private_checks():
  auth['Idempotency-Key']=secrets.token_hex(16);auth['If-Match']=r[2]['version']
  r=h.request(h.API+'/listings/'+str(listing)+'/status','POST',{'status':'withdrawn'},headers=auth)
  check('Private seller can withdraw while retaining car data',r[0]==200 and r[2]['status']=='withdrawn' and wp('get_post('+str(listing)+')!==null'))
- fixture=h.ROOT/'.staging/wp/wp-content/mu-plugins/ag-connect-fixture.php';original=fixture.read_text()
+ # Keep the generated PHP unchanged; exercise each request's feature constant through a local-only DB fixture switch.
  try:
-  fixture.write_text(original.replace("define('AUTOAGORA_DEALER_PRIVATE_SELLERS_ENABLED',true)","define('AUTOAGORA_DEALER_PRIVATE_SELLERS_ENABLED',false)"))
-  check('Private API token is denied when private-seller feature is disabled',h.request(h.API+'/listings',headers=auth)[0] in [401,403])
+  wp("update_option('_ag_connect_fixture_private_enabled',false,false)")
+  check('Private feature is disabled in the local runtime',wp('\\AutoAgora\\Dealer\\Support::privateSellersEnabled()') is False)
+  disabled=h.request(h.API+'/listings',headers=auth)
+  if disabled[0] not in [401,403]: (P/'disabled-feature-response.json').write_text(json.dumps({'status':disabled[0],'body':disabled[2]},indent=2))
+  check('Private API token is denied when private-seller feature is disabled',disabled[0] in [401,403])
   check('Private authorize link is denied when feature is disabled',page(url(account_type='private')[0],h.opener())[0]==400)
- finally:fixture.write_text(original)
+ finally:wp("update_option('_ag_connect_fixture_private_enabled',true,false)")
  h.request(h.API+'/oauth/revoke','POST',{'client_id':C['client_id'],'client_secret':C['client_secret'],'token':tokens['refresh_token']},form=True)
  check('Private grant can be revoked normally',h.request(h.API+'/listings',headers=auth)[0]==401)
  check('Unsupported account_type is rejected',page(url(account_type='admin')[0],h.opener())[0]==400)
