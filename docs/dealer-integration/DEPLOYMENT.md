@@ -1,6 +1,6 @@
 # AutoAgora integration deployment and rollback
 
-The UI was implemented and tested locally; no production release or further live checks were performed. This runbook prepares a later reviewed release. Keep all current test data restricted to administrators and preserve David’s instruction against live-site testing.
+**3 November 2026:** the approved Postaki production integration has been released. See [the production record](PRODUCTION.md) for registration, verified deployment evidence and rollback. No production functional tests or test-data imports were performed. The historical preparation and administrator-review runbook below describes the earlier release boundaries.
 
 ## Local installation
 
