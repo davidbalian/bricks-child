@@ -12,7 +12,7 @@ final class Installation
     }
     public static function load(): void
     {
-        if (!get_option('autoagora_dealer_admin_release')) { return; }
+        if (!get_option('autoagora_dealer_admin_release') && !get_option('autoagora_dealer_public_release')) { return; }
         $path = self::directory() . '/runtime.json';
         if (!is_readable($path)) { return; }
         $config = json_decode(file_get_contents($path), true);
@@ -25,6 +25,17 @@ final class Installation
             'AUTOAGORA_DEALER_ENCRYPTION_KEY' => $config['encryption'],
             'AUTOAGORA_DEALER_REVIEW_STORAGE' => self::directory() . '/media',
         ];
+        // Public activation is explicit and environment-local. Review installations
+        // cannot gain public access from the runtime JSON alone.
+        if (get_option('autoagora_dealer_public_release') && ($config['public_enabled'] ?? false) === true) {
+            $values += [
+                'AUTOAGORA_DEALER_PUBLIC_ENABLED' => true,
+                'AUTOAGORA_DEALER_ONBOARDING_ENABLED' => true,
+                'AUTOAGORA_DEALER_PRIVATE_SELLERS_ENABLED' => true,
+                'AUTOAGORA_CONNECT_SIGNUP_ENABLED' => true,
+                'AUTOAGORA_DEALER_RULES_VERIFIED' => ($config['rules_verified'] ?? false) === true,
+            ];
+        }
         foreach ($values as $key => $value) { if (!defined($key)) { define($key, $value); } }
         // Hosted listing business rules have not been reconciled; no public write gate is enabled here.
     }
