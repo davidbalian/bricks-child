@@ -16,6 +16,7 @@ if (!defined('WPINC')) {
 // Include field validation functions
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/field-validation.php';
 require_once __DIR__ . '/car-field-writer.php';
+require_once __DIR__ . '/listing-submission-analytics.php';
 
 // Include custom failure logger
 require_once get_stylesheet_directory() . '/includes/user-manage-listings/car-submission-logger.php';
@@ -24,6 +25,9 @@ require_once get_stylesheet_directory() . '/includes/user-manage-listings/car-su
  * Process form submission for adding a new car listing
  */
 function handle_add_car_listing() {
+    if (!is_user_logged_in() || ($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+        wp_die('An authenticated POST request is required.', '', array('response' => 403));
+    }
     // Log all submitted form data for debugging
     car_submission_log('=== FORM SUBMISSION STARTED ===');
     car_submission_log('POST data received', 'info', array(
@@ -293,7 +297,7 @@ function handle_add_car_listing() {
     );
     
     // Insert the post
-    $post_id = wp_insert_post($post_data);
+    $post_id = wp_insert_post($post_data, true);
     
     // Check if post creation was successful
     if (is_wp_error($post_id)) {
@@ -481,6 +485,8 @@ function handle_add_car_listing() {
     }
     
     car_submission_log('Car listing created successfully. Post ID: ' . $post_id . ' with ' . count($image_ids) . ' images');
+
+    autoagora_queue_listing_submission_analytics($post_id);
     
     // Redirect to success page
     wp_safe_redirect(add_query_arg(
